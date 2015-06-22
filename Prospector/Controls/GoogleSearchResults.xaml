@@ -1,0 +1,74 @@
+﻿<UserControl x:Class="Prospector.Controls.GoogleSearchResults"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             Name="uc">
+    <Grid>
+        <ListView IsSynchronizedWithCurrentItem="True" 
+                  ItemsSource="{Binding ListResults}"
+                  Background="White"
+                  ScrollViewer.VerticalScrollBarVisibility="Auto"
+                  ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                  SelectedIndex="{Binding SIListResults, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Results" Width="{Binding Path=ActualWidth,ElementName=uc}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Background="#FFFDFDFD"  Orientation="Horizontal">
+                                    <StackPanel Margin="9">
+                                        <TextBlock Text="{Binding Title, Mode=OneWay}"
+                                                   Margin="3"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="Blue" />
+
+                                        <TextBlock Text="{Binding Link, Mode=OneWay}"
+                                                   Margin="3"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="Green" />
+
+                                        <TextBlock Text="{Binding Description, Mode=OneWay}"
+                                                   Margin="3"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="Black" />
+                                        <!--<TextBox Background="Transparent"
+                                                 BorderThickness="0"
+                                                 Text="{Binding Title, Mode=OneWay}"
+                                                 IsReadOnly="True"
+                                                 TextWrapping="Wrap"
+                                                 Foreground="Blue" />
+                                        
+                                        <TextBox Background="Transparent"
+                                                 BorderThickness="0"
+                                                 Text="{Binding Link, Mode=OneWay}"
+                                                 IsReadOnly="True"
+                                                 TextWrapping="Wrap"
+                                                 Foreground="Green" />
+                                        
+                                        <TextBox Background="Transparent"
+                                                 BorderThickness="0"
+                                                 Text="{Binding Description, Mode=OneWay}"
+                                                 IsReadOnly="True"
+                                                 TextWrapping="Wrap"
+                                                 Foreground="Gray" />-->
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Send To Browser">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListView>
+    </Grid>
+</UserControl>

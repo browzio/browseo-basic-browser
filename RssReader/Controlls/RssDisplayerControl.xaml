@@ -1,0 +1,244 @@
+﻿<UserControl x:Class="RssReader.Controlls.RssDisplayerControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:theme="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:conrols="clr-namespace:RssReader.Controlls"
+             xmlns:helpers="clr-namespace:RssReader.Helpers"
+             mc:Ignorable="d"
+             d:DesignHeight="500" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/RssReader;component/Styles/ScrollBarStyle.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+            <helpers:booleanToVisible x:Key="boolToVis" />
+
+            <DataTemplate x:Key="MetroListBoxItemTemplate">
+                <StackPanel Background="#FFFDFDFD"  Orientation="Horizontal" Grid.Column="1" Margin="0,0,0,1">
+                    <StackPanel Margin="-2,9,9,9">
+                        <TextBlock Text="{Binding Title, Mode=OneWay}"
+                                                   Margin="3"
+                                                   Width="545"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="Blue" />
+
+                        <TextBlock Text="{Binding Link, Mode=OneWay}"
+                                                   Margin="3"
+                                                   TextWrapping="Wrap"
+                                                   Width="545"
+                                                   Foreground="Green" />
+
+                        <TextBlock Text="{Binding Date, Mode=OneWay}"
+                                                   Margin="3"
+                                                   Width="545"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="Gray" />
+
+                        <TextBlock Text="{Binding Description, Mode=OneWay}"
+                                                   Margin="3"
+                                                   Width="545"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="Black" />
+
+                        <Button HorizontalAlignment="Right"
+                                Margin="0,0,8,6"
+                                                Click="Button_Click"
+                                                ContextMenuService.IsEnabled="False"
+                                                Width="40">
+                            <Button.Content>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="pack://application:,,,/Organiser.Common;component/Image/share.png" Width="18" Height="18" Margin="3,0,0,1" VerticalAlignment="Bottom">
+                                    </Image>
+
+                                    <Path x:Name="BtnArrow" Margin="3" VerticalAlignment="Center" Width="6" Fill="#FF527DB5" 
+                                                      Stretch="Uniform" HorizontalAlignment="Right" Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z "/>
+                                </StackPanel>
+                            </Button.Content>
+                            <Button.ContextMenu>
+                                <ContextMenu Width="260">
+                                    <StackPanel Orientation="Horizontal" Margin="-27,0,0,0" Background="WhiteSmoke">
+                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="facebook"
+                                                                Click="Button_Click_1">
+                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png" 
+                                                                   ToolTip="facebook"
+                                                                   Width="18" Height="18" />
+                                        </Button>
+
+                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="google"
+                                                                Click="Button_Click_1">
+                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/googleplus-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="google+" />
+                                        </Button>
+
+                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="digg"
+                                                                Click="Button_Click_1">
+                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/digg-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="digg" />
+                                        </Button>
+
+                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="pintrest"
+                                                                Click="Button_Click_1">
+                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/Pinterest-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="pintrest" />
+                                        </Button>
+
+                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="reddit"
+                                                                Click="Button_Click_1">
+                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/reddit-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="reddit" />
+                                        </Button>
+
+                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="stumbleupon"
+                                                                Click="Button_Click_1">
+                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="stumbleupon" />
+                                        </Button>
+
+                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="tumblr"
+                                                                Click="Button_Click_1">
+                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/tumblr-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="tumblr" />
+                                        </Button>
+
+                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="twitter"
+                                                                Click="Button_Click_1">
+                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/twitter-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="twitter" />
+                                        </Button>
+
+                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="wordpress"
+                                                                Click="Button_Click_1">
+                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/wordpress-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="wordpress" />
+                                        </Button>
+                                    </StackPanel>
+                                </ContextMenu>
+                            </Button.ContextMenu>
+                        </Button>
+
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+            <Style x:Key="MetroListBoxItemStyle" TargetType="{x:Type ListBoxItem}">
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="Padding" Value="4,1"/>
+                <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ItemsControl}}}"/>
+                <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ItemsControl}}}"/>
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="BorderBrush" Value="Transparent"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="FocusVisualStyle">
+                    <Setter.Value>
+                        <Style>
+                            <Setter Property="Control.Template">
+                                <Setter.Value>
+                                    <ControlTemplate>
+                                        <Rectangle Margin="2" 
+                                                   SnapsToDevicePixels="True" 
+                                                   Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
+                                                   StrokeThickness="1" 
+                                                   StrokeDashArray="1 2"/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                            <Border x:Name="Bd" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    Background="{TemplateBinding Background}" 
+                                    Padding="{TemplateBinding Padding}" 
+                                    SnapsToDevicePixels="True">
+                                <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" 
+                                                  Content="{TemplateBinding Content}" 
+                                                  ContentStringFormat="{TemplateBinding ContentStringFormat}" 
+                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsMouseOver" Value="True"/>
+                                        <Condition Property="IsSelected" Value="False"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" TargetName="Bd" Value="#FFE6E7E8" />
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{x:Null}" />
+                                    <Setter Property="Foreground" Value="Black" />
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsMouseOver" Value="False"/>
+                                        <Condition Property="IsSelected" Value="False"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" TargetName="Bd" Value="{x:Null}"/>
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{x:Null}"/>
+                                    <Setter Property="Foreground" Value="Black" />
+                                </MultiTrigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsSelected" Value="True"/>
+                                    </MultiTrigger.Conditions>
+                                    <Setter Property="Background" TargetName="Bd" Value="#FFE6E7E8"/>
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{x:Null}"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </MultiTrigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid>
+        <StackPanel Visibility="{Binding PBarVis, Converter={StaticResource boolToVis}}">
+            <TextBlock Text="{Binding RssLink}" />
+            <conrols:CirclePBarControl />
+        </StackPanel>
+
+        <StackPanel Margin="15" Visibility="{Binding ListResultVis, Converter={StaticResource boolToVis}}" Background="#FFE6E7E8">
+            <TextBlock Text="{Binding RssLink}" Width="600" />
+            <ListView IsSynchronizedWithCurrentItem="True"
+                      Name="lv"
+                      Height="600"
+                      ItemsSource="{Binding ListResults}"
+                      BorderBrush="Transparent"
+                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                      ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
+                      MouseEnter="ListView_MouseEnter"
+                      MouseLeave="ListView_MouseLeave"
+                      ItemTemplate="{DynamicResource MetroListBoxItemTemplate}" 
+                      ItemContainerStyle="{DynamicResource MetroListBoxItemStyle}"
+                      SelectedIndex="{Binding SIListResults, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Send To Browser">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListView>
+        </StackPanel>
+    </Grid>
+</UserControl>

@@ -1,0 +1,44 @@
+﻿<Window x:Class="NichResearch.Windows.CopyPasteWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Topmost="True"
+        xmlns:controls="clr-namespace:NichResearch.Controls"
+        Title="Click To Copy" Height="600" Width="300">
+    <Grid>
+        <!--<TabControl>
+            <TabItem Header="Youtube">
+                <controls:YoutubeListControl />
+            </TabItem>
+            <TabItem Header="Social Mention">
+                <controls:SocialMentionControl />
+            </TabItem>
+        </TabControl>-->
+        <DataGrid ItemsSource="{Binding CopyPasteItemList}"
+                  Background="White"
+                  AutoGenerateColumns="false"
+                  SelectedIndex="{Binding SICopyPasteItemList}"
+                  SelectionMode="Single"
+                  MouseDoubleClick="DataGrid_MouseDoubleClick"
+                  MouseUp="DataGrid_MouseDoubleClick">
+            <DataGrid.Columns>
+                
+                <DataGridTemplateColumn Header="Title">
+                <DataGridTemplateColumn.CellTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Title}" MaxWidth="130" />
+                    </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+            </DataGridTemplateColumn>
+
+                <DataGridTemplateColumn Header="Web Url">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Link}" MaxWidth="130" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

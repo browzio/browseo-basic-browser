@@ -1,0 +1,13 @@
+﻿<Window x:Class="DragDropListview.Window1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dd="clr-namespace:GongSolutions.Wpf.DragDrop;assembly=GongSolutions.Wpf.DragDrop"
+    xmlns:local="clr-namespace:DragDropListview"
+         xmlns:controls="clr-namespace:DragDropListview.Controls"
+    xmlns:converter="clr-namespace:DragDropListview.Converters" 
+    Title="Gong Solutions Drag'n'Drop: Schools Example"
+        SizeToContent="WidthAndHeight">
+    <Grid>
+        <controls:DraggableListBox />
+    </Grid>
+</Window>

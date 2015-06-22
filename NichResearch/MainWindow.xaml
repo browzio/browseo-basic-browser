@@ -1,0 +1,15 @@
+﻿<Controls:MetroWindow x:Class="NichResearch.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns:cntrol="clr-namespace:NichResearch"
+                      BorderBrush="{DynamicResource AccentColorBrush}"
+                      BorderThickness="1"
+                      EnableDWMDropShadow="True"
+                      ResizeMode="CanResizeWithGrip"
+                      WindowStartupLocation="CenterScreen"
+        Title="MainWindow" Height="500" Width="798.78">
+    <Grid>
+        <cntrol:NichResearchControl />
+    </Grid>
+</Controls:MetroWindow>

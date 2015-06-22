@@ -1,0 +1,92 @@
+﻿using RssReader.Helpers;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Input;
+
+namespace RssReader.Models
+{
+    public class RssResult : INotifyPropertyChanged
+    {
+        public event Action<string, string> OnClickedSendSocialLink = delegate { }; //socialType , link
+
+        public ICommand SendToBrowserSocial { get; set; }
+
+        public RssResult()
+        {
+            SendToBrowserSocial = new RelayCommand(SendToBrowserSocialClick);
+        }
+
+        private void SendToBrowserSocialClick(object param)
+        {
+            OnClickedSendSocialLink((string)param, link);
+        }
+
+        private string title;
+        public string Title
+        {
+            get { return title; }
+            set
+            {
+                title = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Title"));
+            }
+        }
+
+        private string link;
+        public string Link
+        {
+            get { return link; }
+            set
+            {
+                link = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Link"));
+            }
+        }
+
+        private string description;
+        public string Description
+        {
+            get { return description; }
+            set
+            {
+                description = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Description"));
+            }
+        }
+
+        //private string image;
+        //public string ImageLink
+        //{
+        //    get { return image; }
+        //    set
+        //    {
+        //        image = value;
+        //        if (PropertyChanged != null)
+        //            PropertyChanged(this, new PropertyChangedEventArgs("ImageLink"));
+        //    }
+        //}
+
+        private string date;
+        public string Date
+        {
+            get { return "published: " + date; }
+            set
+            {
+                date = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Date"));
+            }
+        }
+
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+    }
+}

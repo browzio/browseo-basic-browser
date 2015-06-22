@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="WpfDragDropTreeView.Controls.DraggableTreeview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <TreeView Name="trvBookmarks" AllowDrop="True" Foreground="DarkBlue" FontSize="15" MouseDoubleClick="trvBookmarks_MouseDoubleClick">
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <!-- We have to select the item which is right-clicked on -->
+                    <!--<EventSetter Event="TreeViewItem.PreviewMouseRightButtonDown" Handler="TreeViewItem_PreviewMouseRightButtonDown"/>-->
+                    <EventSetter Event="TreeViewItem.DragOver" Handler="treeView_DragOver"/>
+                    <EventSetter Event="TreeViewItem.Drop" Handler="treeView_Drop"/>
+                    <EventSetter Event="TreeViewItem.MouseMove" Handler="treeView_MouseMove"/>
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Name="edit" Header="Edit..." Click="edit_Click" />
+                    <MenuItem Name="addFolder" Header="Add Folder..." Click="addFolder_Click" />
+                    <MenuItem Name="addSite" Header="Add Site..." Click="addSite_Click" />
+                    <MenuItem Name="miRemove" Header="Delete" Click="miRemove_Click" />
+                </ContextMenu>
+            </TreeView.ContextMenu>
+        </TreeView>
+    </Grid>
+</UserControl>

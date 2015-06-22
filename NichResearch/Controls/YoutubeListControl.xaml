@@ -1,0 +1,184 @@
+﻿<UserControl x:Class="NichResearch.Controls.YoutubeListControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converter="clr-namespace:NichResearch.Converters" 
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <converter:MultiListConcats x:Key="MuliConverter" />
+    </UserControl.Resources>
+    <Grid>
+        <ListView IsSynchronizedWithCurrentItem="True" 
+                  ItemsSource="{Binding YoutubeResultsList}"
+                  Background="White"
+                  MaxHeight="600"
+                  MaxWidth="850"
+                  SelectedIndex="{Binding SIYoutubeResultsList, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Results">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Background="WhiteSmoke" Orientation="Horizontal">
+                                    <Image Source="{Binding ImageLink}" Width="150" Height="150" Stretch="UniformToFill" />
+                                    <StackPanel>
+                                        <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding Title, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Blue" />
+                                        <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding Link, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Green" />
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding ByName, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Gray" />
+                                            <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding ByLink, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Green" />
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding TimeAgo, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Gray" />
+                                            <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding Views, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Gray" />
+                                        </StackPanel>
+                                        <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding Description, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Black" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+            <ListBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="{Binding CommandType}">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToWindow}" CommandParameter="youtube" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                </ContextMenu>
+            </ListBox.ContextMenu>
+        </ListView>
+    </Grid>
+</UserControl>
+
+<!--<DataGrid ItemsSource="{Binding YoutubeResultsList}"
+                  Background="White"
+                  AutoGenerateColumns="False"
+                  MaxHeight="600"
+                  MaxWidth="850"
+                  SelectedIndex="{Binding SIYoutubeResultsList, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+            <DataGrid.ContextMenu>
+                <ContextMenu >
+                    <MenuItem Header="{Binding CommandType}">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToWindow}" CommandParameter="youtube" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTemplateColumn Header="results" MinWidth="500">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Background="WhiteSmoke" Orientation="Horizontal">
+                                <Image Source="{Binding ImageLink}" Width="150" Height="150" Stretch="UniformToFill" />
+                                <StackPanel>
+                                <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding Title, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Blue" />
+                                <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding Link, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Green" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding ByName, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Gray" />
+                                <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding ByLink, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Green" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding TimeAgo, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Gray" />
+                                    <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding Views, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Gray" />
+                                </StackPanel>
+                                <TextBox Background="Transparent"
+                                         BorderThickness="0"
+                                         Text="{Binding Description, Mode=OneWay}"
+                                         IsReadOnly="True"
+                                         TextWrapping="Wrap"
+                                         Foreground="Black" />                                
+                              </StackPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                
+                -->
+<!--<DataGridTextColumn Header="Results">
+                    <DataGridTextColumn.Binding>
+                        <MultiBinding Converter="{StaticResource MuliConverter}" ConverterParameter=", ">
+                            <Binding Path="Title"  />
+                            <Binding Path="ByName" />
+                            <Binding Path="TimeAgo" />
+                            <Binding Path="Views" />
+                            <Binding Path="Description" />
+                            
+                            <Binding Path="Link" />
+                            <Binding Path="ByLink" />
+                        </MultiBinding>
+                    </DataGridTextColumn.Binding>
+                </DataGridTextColumn>-->
+<!--
+            </DataGrid.Columns>
+        </DataGrid>-->

@@ -1,0 +1,9 @@
+﻿<Window x:Class="WpfTreeView.Window1"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:dragableControl="clr-namespace:WpfDragDropTreeView.Controls"    
+    Title="Drag and Drop Winodow" Height="376" Width="434">
+    <Grid>
+        <dragableControl:DraggableTreeview />
+    </Grid>
+</Window>

@@ -1,0 +1,77 @@
+﻿<UserControl x:Class="NichResearch.NichResearchControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             xmlns:converter="clr-namespace:NichResearch.Converters" 
+             xmlns:controls="clr-namespace:NichResearch.Controls"
+             xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+             Height="Auto" Width="Auto">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <converter:booleanToVisible x:Key="boolToVis" />
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml"  />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <StackPanel>
+            <Grid HorizontalAlignment="Stretch">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                    <TextBlock Text="Keywords: " 
+                               Margin="4" 
+                               VerticalAlignment="Center" />
+                    <TextBox Text="{Binding KeyWords}" 
+                             Controls:TextBoxHelper.Watermark="Coma Seperated Keywords..." 
+                             Height="30" 
+                             Width="295" 
+                             Margin="0,5,0,5" />
+                    <Button Content="Multiple" 
+                            Command="{Binding Multi}" 
+                            Height="30" 
+                            Margin="0,5,0,5" />
+                    <CheckBox Content="Youtube" 
+                              IsChecked="{Binding SearchYoutube}" 
+                              Margin="5" />
+                    <CheckBox  Content="Social Mention" 
+                               IsChecked="{Binding SearchSocialMention}" 
+                               Margin="5" />
+                    <ComboBox ItemsSource="{Binding SocialmentionTypes}" 
+                              SelectedIndex="{Binding CmbSISocialmentionTypes}" 
+                              Width="70"
+                              Height="22"
+                              Visibility="{Binding Path= CmbSocialmentionTypesVisible,Converter={StaticResource boolToVis}}"  />
+                </StackPanel>
+                    <Button Grid.Column="2" Content="Search" Command="{Binding Search}" IsEnabled="True" Margin="5" Height="30" />
+            </Grid>
+            <StackPanel Orientation="Horizontal" Margin="5" HorizontalAlignment="Stretch">
+                
+                <!--<Button Content="Save" Command="{Binding Save}" IsEnabled="True" />-->
+            </StackPanel>
+            <ProgressBar Height="15"
+                         Visibility="{Binding Path=PBarVisible,Converter={StaticResource boolToVis}}" 
+                         IsIndeterminate="true" />
+            <TabControl>
+                <TabItem Header="Youtube">
+                    <controls:YoutubeListControl />
+                </TabItem>
+                <TabItem Header="Social Mention">
+                    <controls:SocialMentionControl />
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+    </Grid>
+</UserControl>

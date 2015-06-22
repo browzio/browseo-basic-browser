@@ -1,0 +1,22 @@
+﻿<Window x:Class="NichResearch.Windows.MultiKeywordWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:Behaviours="clr-namespace:MahApps.Metro.Behaviours;assembly=MahApps.Metro"
+        Title="One Per Line" Height="300" Width="500" Topmost="True" WindowStyle="ToolWindow" WindowStartupLocation="CenterOwner">
+    <i:Interaction.Behaviors>
+        <Behaviours:BorderlessWindowBehavior />
+    </i:Interaction.Behaviors>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="30" />
+        </Grid.RowDefinitions>
+        <TextBox Grid.Row="0"  Text="{Binding InputedLinksString, UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}"
+                     VerticalScrollBarVisibility="Auto" AcceptsReturn="True" />
+        <Button Grid.Row="1" Content="Submit"  Click="Button_Click" />
+    </Grid>
+</Window>

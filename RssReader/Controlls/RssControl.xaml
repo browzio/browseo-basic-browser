@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="RssReader.RssControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:controlls="clr-namespace:RssReader.Controlls"
+             mc:Ignorable="d" 
+             Name="uc"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/RssReader;component/Styles/ScrollBarStyle.xaml"></ResourceDictionary>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+          ScrollViewer.VerticalScrollBarVisibility="Hidden"
+          Background="#FFFDFDFD">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" Name="grd"  />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Command="{Binding DockPannelButtonsClick}" CommandParameter="OpenRssLinksWindow"
+                     Width="35" Height="35">
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/rss-icon.png" 
+                                                                   ToolTip="Edit Rss Feeds"
+                                                                   Width="30" Height="30" />
+            </Button>
+            <Button Command="{Binding DockPannelButtonsClick}" CommandParameter="Refresh" 
+                    Width="35" Height="35">
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/refresh-icon.png" 
+                                                                   ToolTip="Refresh"
+                                                                   Width="30" Height="30" />
+            </Button>
+        </StackPanel>
+        
+        <controlls:RssListsControl Grid.Row="1" />
+    </Grid>
+</UserControl>
