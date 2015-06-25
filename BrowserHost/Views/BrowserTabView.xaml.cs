@@ -162,5 +162,16 @@ namespace WpfCefDynamBrowser.Views
             (sender as Button).ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
             (sender as Button).ContextMenu.IsOpen = true;
         }
+
+        private void btnImpotBookmarks_Click(object sender, RoutedEventArgs e)
+        {
+            SelectProfileWindow spw = new SelectProfileWindow();
+            spw.Title = "Select Project";
+            spw.ShowDialog();
+            if (spw.OkClicked)
+            {
+                dragnDropListview.vm.MergeBookMarksFromProjectPath(spw.SelectedProjectName);
+            }
+        }
     }
 }

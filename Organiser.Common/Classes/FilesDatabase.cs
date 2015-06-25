@@ -89,6 +89,24 @@ namespace Organiser.Common.Classes
             return projects;
         }
 
+        public static List<KeyValuePair<string, string>> GetAllProjectsAndDirs()
+        {
+            List<KeyValuePair<string, string>> projects = new List<KeyValuePair<string, string>>();
+            string path = Path.Combine(GetBaseDir(), "Projects");
+
+            if (Directory.Exists(path))
+            {
+                DirectoryInfo dirInfo = new DirectoryInfo(path);
+                foreach (DirectoryInfo dir in dirInfo.GetDirectories())
+                {
+                    projects.Add(new KeyValuePair<string, string>(dir.Name, dir.FullName));
+                }
+                return projects;
+            }
+            
+            return projects;
+        }
+
         public static void CreatProject(PersonData pdata)
         {
             try

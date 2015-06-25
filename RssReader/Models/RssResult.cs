@@ -11,7 +11,7 @@ namespace RssReader.Models
 {
     public class RssResult : INotifyPropertyChanged
     {
-        public event Action<string, string> OnClickedSendSocialLink = delegate { }; //socialType , link
+        public event Action<string, string,string> OnClickedSendSocialLink = delegate { }; //socialType , link, imgLink
 
         public ICommand SendToBrowserSocial { get; set; }
 
@@ -22,7 +22,7 @@ namespace RssReader.Models
 
         private void SendToBrowserSocialClick(object param)
         {
-            OnClickedSendSocialLink((string)param, link);
+            OnClickedSendSocialLink((string)param, link, imageLink);
         }
 
         private string title;
@@ -61,17 +61,17 @@ namespace RssReader.Models
             }
         }
 
-        //private string image;
-        //public string ImageLink
-        //{
-        //    get { return image; }
-        //    set
-        //    {
-        //        image = value;
-        //        if (PropertyChanged != null)
-        //            PropertyChanged(this, new PropertyChangedEventArgs("ImageLink"));
-        //    }
-        //}
+        private string imageLink;
+        public string ImageLink
+        {
+            get { return imageLink; }
+            set
+            {
+                imageLink = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("ImageLink"));
+            }
+        }
 
         private string date;
         public string Date

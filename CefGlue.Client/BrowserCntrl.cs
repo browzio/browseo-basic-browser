@@ -25,6 +25,7 @@ namespace Xilium.CefGlue.Client
         public event Action<string> OnBrowserMessageChanged = delegate { };
         public event Action<string,bool> OnCreateNewTab = delegate { };
         public event Action<bool> OnBrowserLoadingChanged = delegate { };
+        public event Action<string> OnPinIt = delegate { };
 
         public CefWebBrowser CBrowser { get; set; }
 
@@ -309,9 +310,10 @@ namespace Xilium.CefGlue.Client
                 return;
             }
 
+            if (huverLunk == null || huverLunk == "") return;
+
             if (contextMenueItemID == 999)
             {
-                if (huverLunk == null || huverLunk == "") return;
                 OnCreateNewTab(huverLunk,false);
             }
         }
@@ -751,7 +753,7 @@ namespace Xilium.CefGlue.Client
                      "if(attrib.value.toLowerCase().indexOf('last') > -1){" +
                          "all[i].value=" + "'" + profile.LastName + "'" + "; break;" +
                      "}" +
-                      "if(attrib.value.toLowerCase().indexOf('full') > -1){" +
+                      "if(attrib.value.toLowerCase().indexOf('full') > -1 && attrib.value.toLowerCase().indexOf('email') < -1){" +
                          "all[i].value=" + "'" +profile.FirstName +" ' + ' "+ profile.LastName + "'" + "; break;" +
                      "}" +
                      "if(attrib.value.toLowerCase().indexOf('mail') > -1 && attrib.value.toLowerCase().indexOf('name') <= 0){" +
@@ -968,6 +970,7 @@ namespace Xilium.CefGlue.Client
         }
 
         #endregion
+
 
 
         protected override void Dispose(bool disposing)

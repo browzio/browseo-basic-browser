@@ -24,6 +24,7 @@ namespace Organiser.Common
     {
         public bool OkClicked;
         public string SelectedProfileFilePath;
+        public string SelectedProjectName;
 
         private  ObservableCollection<string> profilesList;
         public  ObservableCollection<string> ProfilesList
@@ -35,6 +36,7 @@ namespace Organiser.Common
         List<KeyValuePair<string, string>> directoryValues;
 
         string projectName;
+        private bool isSelectProjWindow;
 
         public SelectProfileWindow(string projName)
         {
@@ -44,17 +46,29 @@ namespace Organiser.Common
             DataContext = this;
         }
 
+        public SelectProfileWindow()
+        {
+            InitializeComponent();
+            ProfilesList = new ObservableCollection<string>();
+            DataContext = this;
+            isSelectProjWindow = true;
+        }
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             OkClicked = true;
+
             foreach (var item in directoryValues)
             {
-                if(item.Key == cmProfiles.SelectedItem.ToString())
+                if (item.Key == cmProfiles.SelectedItem.ToString())
                 {
                     SelectedProfileFilePath = item.Value;
+                    SelectedProjectName = item.Key;
                     break;
                 }
             }
+
+
             System.Threading.Thread.Sleep(10);
             this.Close();
         }
@@ -62,7 +76,15 @@ namespace Organiser.Common
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             this.Icon = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\browseo (1).ico"));
-            directoryValues = MyFilesDatabase.GetSubProjectsFolders(projectName);
+            if (!isSelectProjWindow)
+            {
+                directoryValues = MyFilesDatabase.GetSubProjectsFolders(projectName);
+            }
+            else
+            {
+                directoryValues = MyFilesDatabase.GetAllProjectsAndDirs();
+            }
+
             foreach (var item in directoryValues)
             {
                 ProfilesList.Add(item.Key);

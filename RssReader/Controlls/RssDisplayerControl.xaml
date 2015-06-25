@@ -24,6 +24,12 @@
                                                    TextWrapping="Wrap"
                                                    Foreground="Blue" />
 
+                        <Image Source="{Binding ImageLink}"
+                               Margin="3" 
+                               MaxWidth="545"
+                               MaxHeight="100"
+                               Stretch="Uniform"/>
+
                         <TextBlock Text="{Binding Link, Mode=OneWay}"
                                                    Margin="3"
                                                    TextWrapping="Wrap"

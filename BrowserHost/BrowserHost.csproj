@@ -91,6 +91,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Controls\MyComboBox.cs" />
+    <Compile Include="Models\WebPageImg.cs" />
     <Compile Include="Models\SavedSite.cs" />
     <Compile Include="Mvvm\DelegateCommand.cs" />
     <Compile Include="Mvvm\DelegateCommandT.cs" />
@@ -102,6 +103,9 @@
     <Compile Include="ViewModels\BrowserTabViewModel.cs" />
     <Compile Include="Views\BrowserTabView.xaml.cs">
       <DependentUpon>BrowserTabView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ChoosePinterestImageWindow.xaml.cs">
+      <DependentUpon>ChoosePinterestImageWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="BrowserHostCntrl.xaml">
       <SubType>Designer</SubType>
@@ -129,6 +133,10 @@
     <Page Include="Views\BrowserTabView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\ChoosePinterestImageWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +175,10 @@
     <ProjectReference Include="..\CefGlue.Demo.WinForms\CefGlue.Demo.WinForms.csproj">
       <Project>{f9025ce1-2df4-409b-8961-a51dfaeaabdd}</Project>
       <Name>CefGlue.Demo.WinForms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
+      <Name>CefGlue.WindowsForms</Name>
     </ProjectReference>
     <ProjectReference Include="..\CefGlue.WPF\CefGlue.WPF.csproj">
       <Project>{447c6790-e36e-4a54-bfac-06c92fff4aa3}</Project>

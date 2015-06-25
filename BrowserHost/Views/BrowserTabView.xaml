@@ -256,8 +256,15 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-                            <Button Content="Export All Bookmarks" Name="btnExportAllBookmarks" Style="{DynamicResource SquareButtonStyle}" Margin="5" Click="btnExportAllBookmarks_Click" />
-                            <dragNdrop:DraggableListBox Width="300" Name="dragnDropListview" Grid.Row="1" />
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Button Content="Export All Bookmarks" Name="btnExportAllBookmarks" Grid.Column="0" 
+                                    Style="{DynamicResource SquareButtonStyle}" Margin="5" Click="btnExportAllBookmarks_Click" />
+                            <Button Content="Import Bookmarks" Name="btnImpotBookmarks" Grid.Column="1" 
+                                    Style="{DynamicResource SquareButtonStyle}" Margin="5" Click="btnImpotBookmarks_Click" />
+                            <dragNdrop:DraggableListBox Width="300" Name="dragnDropListview" Grid.Row="1" Grid.ColumnSpan="2" />
                         </Grid>
                         <!--<dragNdrop:DraggableTreeview Width="275" Name="dragnDropTreeview" />-->
                         <!--<ListBox ItemsSource="{Binding Path=SitesList}" 

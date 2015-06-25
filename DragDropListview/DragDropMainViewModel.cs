@@ -112,6 +112,9 @@ namespace DragDropListview
         }
 
         public static int LastSelectedIndex { get; set; }
+
+        Thread saveThread;
+        object mlock = new object();
         
         private ObservableCollection<FolderVM> folders;
         public ObservableCollection<FolderVM> FoldersAndSitesList
@@ -266,8 +269,8 @@ namespace DragDropListview
                 bmark.Name = name;
                 bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
                 FoldersAndSitesList[tagIndex].Sites.Add(bmark);
-                saveAll();
             }
+            saveAll();
         }
 
         void IDropTarget.DragOver(DropInfo dropInfo)
@@ -328,11 +331,19 @@ namespace DragDropListview
             catch { }
         }
 
-        public void FillList(bool setIndex0 = true)
+        public void FillList(bool setIndex0 = true, string projName = "")
         {
-            FoldersAndSitesList.Clear();
+            string fromProj = ProjectName;
+            if (projName == "")
+            {
+                FoldersAndSitesList.Clear();
+            }
+            else
+            {
+                fromProj = projName;
+            }
 
-            foreach (string folder in MyFilesDatabase.GetBookmarkedFolders(ProjectName))
+            foreach (string folder in MyFilesDatabase.GetBookmarkedFolders(fromProj))
             {
                 DirectoryInfo dirInfo = new DirectoryInfo(folder);
 
@@ -342,7 +353,7 @@ namespace DragDropListview
                 bookmarkFolder.BitmapImg = new BitmapImage
                         (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
                 bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
-                foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByPath(dirInfo.FullName, ProjectName))
+                foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByPath(dirInfo.FullName, fromProj))
                 {
                     try
                     {
@@ -361,7 +372,7 @@ namespace DragDropListview
                 FoldersAndSitesList.Add(bookmarkFolder);
             }
 
-            foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByProjName(ProjectName))
+            foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByProjName(fromProj))
             {
                 try
                 {
@@ -381,40 +392,41 @@ namespace DragDropListview
                 SIFoldersSide = 0;
         }
 
-        object mlock = new object();
         private void saveAll()
         {
-            //new Thread(() => {
-               // lock (mlock)
-               // {
-            try
-            {
-                MyFilesDatabase.DeleteBookmarks(ProjectName);
-                foreach (FolderVM folderListItem in FoldersAndSitesList)
-                {
-                    if (folderListItem.IsFolder)
-                    {
-                        if (folderListItem.Sites.Count > 0)
-                        {
-                            foreach (Bookmark bmark in folderListItem.Sites)
-                            {
-                                MyFilesDatabase.AppendBookmarkByFolderAnProjName(ProjectName, folderListItem.Name, bmark.Link, bmark.Name);
-                            }
-                        }
-                        else
-                        {
-                            MyFilesDatabase.AppendBookmarkByFolderAnProjNameNoSites(ProjectName, folderListItem.Name);
-                        }
-                    }
-                    else
-                    {
-                        MyFilesDatabase.SaveSiteBookmark(folderListItem.Link, folderListItem.Name, ProjectName);
-                    }
-                }
-            }
-            catch { }
-               // }
-            //}).Start();
+           saveThread = new Thread(() =>
+             {
+                 lock (mlock)
+                 {
+                     try
+                     {
+                         MyFilesDatabase.DeleteBookmarks(ProjectName);
+                         foreach (FolderVM folderListItem in FoldersAndSitesList)
+                         {
+                             if (folderListItem.IsFolder)
+                             {
+                                 if (folderListItem.Sites.Count > 0)
+                                 {
+                                     foreach (Bookmark bmark in folderListItem.Sites)
+                                     {
+                                         MyFilesDatabase.AppendBookmarkByFolderAnProjName(ProjectName, folderListItem.Name, bmark.Link, bmark.Name);
+                                     }
+                                 }
+                                 else
+                                 {
+                                     MyFilesDatabase.AppendBookmarkByFolderAnProjNameNoSites(ProjectName, folderListItem.Name);
+                                 }
+                             }
+                             else
+                             {
+                                 MyFilesDatabase.SaveSiteBookmark(folderListItem.Link, folderListItem.Name, ProjectName);
+                             }
+                         }
+                     }
+                     catch { }
+                 }
+             });
+            saveThread.Start();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -511,6 +523,26 @@ namespace DragDropListview
                 }).Start();
             }
             catch { }
+        }
+
+        public void MergeBookMarksFromProjectPath(string projName)
+        {
+            DragDropMainViewModel ddmvm = new DragDropMainViewModel();
+            ddmvm.FillList(true, projName);
+            ChooseFolderWindow cfw = new ChooseFolderWindow();
+            cfw.DataContext = ddmvm;
+            cfw.ShowDialog();
+            if (cfw.OkClicked)
+            {
+                foreach (FolderVM folderListItem in ddmvm.FoldersAndSitesList)
+                {
+                    if (folderListItem.IsChecked)
+                    {
+                        FoldersAndSitesList.Add(folderListItem);
+                    }
+                }
+                saveAll();
+            }
         }
     }
 }

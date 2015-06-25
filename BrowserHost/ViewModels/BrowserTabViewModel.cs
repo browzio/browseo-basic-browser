@@ -1,10 +1,12 @@
 ﻿using BrowserHost;
 using BrowserHost.Models;
+using BrowserHost.Windows;
 using Organiser.Common.Classes;
 using Organiser.Common.Windows;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Forms.Integration;
 using System.Windows.Input;
@@ -110,6 +112,21 @@ namespace WpfCefDynamBrowser.ViewModels
             set { siitelist = value; }
         }
 
+
+        private ObservableCollection<WebPageImg> webPageImages;
+        public ObservableCollection<WebPageImg> WebPageImages
+        {
+            get { return webPageImages; }
+            set { webPageImages = value; }
+        }
+        private int sLImageLink;
+        public int SLImageLink
+        {
+            get { return sLImageLink; }
+            set { sLImageLink = value; }
+        }
+
+        
         private object evaluateJavaScriptResult;
 
         public object EvaluateJavaScriptResult
@@ -139,6 +156,7 @@ namespace WpfCefDynamBrowser.ViewModels
             IsLoading = true;
 
             SitesList = new ObservableCollection<SavedSite>();
+            WebPageImages = new ObservableCollection<WebPageImg>();
 
             setBrowser(address);
 
@@ -169,39 +187,67 @@ namespace WpfCefDynamBrowser.ViewModels
         private void SendToSocialBrowserPopUp(object param)
         {
             string fullUrl = "";
-
+            bool wasPin = false;
             switch ((string)param)
             {
                 case Social.SOCIALTYPE_fb:
-                    fullUrl = Social.SHARELINK_facebook + Address;
+                    fullUrl = Social.SHARELINK_facebook + AddressEditable;
                     break;
 
                 case Social.SOCIALTYPE_gp:
-                    fullUrl = Social.SHARELINK_googleplus + Address;
+                    fullUrl = Social.SHARELINK_googleplus + AddressEditable;
                     break;
 
                 case Social.SOCIALTYPE_digg:
-                    fullUrl = Social.SHARELINK_digg + Address;
+                    fullUrl = Social.SHARELINK_digg + AddressEditable;
                     break;
 
                 case Social.SOCIALTYPE_pin:
-                    fullUrl = Social.SHARELINK_pintrest + Address;
+                    wasPin = true;
+                    var visitor = new SourceVisitor(text =>
+                    {
+                        App.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        {
+                            WebPageImages.Clear();
+                            foreach (Match m in Regex.Matches(text, "<img.+?src=[\"'](.+?)[\"'].+?>", RegexOptions.IgnoreCase | RegexOptions.Multiline))
+                            {
+                                string src = m.Groups[1].Value;
+                                WebPageImages.Add(new WebPageImg()
+                                {
+                                    ImgUrl = src,
+                                    WebUrl = AddressEditable
+                                });
+                            }
+
+                            if (WebPageImages.Count > 0)
+                            {
+                                ChoosePinterestImageWindow cpiw = new ChoosePinterestImageWindow();
+                                cpiw.DataContext = this;
+                                cpiw.ShowDialog();
+                                if (cpiw.OkClicked)
+                                {
+                                    launchSharePopUP(Social.SHARELINK_pintrest + AddressEditable + "&media=" + WebPageImages[SLImageLink].ImgUrl);
+                                }
+                            }
+                        }));
+                    });
+                    WebBrowser.CBrowser.Browser.GetMainFrame().GetSource(visitor);
                     break;
 
                 case Social.SOCIALTYPE_reddit:
-                    fullUrl = Social.SHARELINK_reddit + Address;
+                    fullUrl = Social.SHARELINK_reddit + AddressEditable;
                     break;
 
                 case Social.SOCIALTYPE_stumble:
-                    fullUrl = Social.SHARELINK_stumbleupon + Address;
+                    fullUrl = Social.SHARELINK_stumbleupon + AddressEditable;
                     break;
 
                 case Social.SOCIALTYPE_tumblr:
-                    fullUrl = Social.SHARELINK_tumblr + Address;
+                    fullUrl = Social.SHARELINK_tumblr + AddressEditable;
                     break;
 
                 case Social.SOCIALTYPE_twit:
-                    fullUrl = Social.SHARELINK_twitter + Address;
+                    fullUrl = Social.SHARELINK_twitter + AddressEditable;
                     break;
 
                 case Social.SOCIALTYPE_wp:
@@ -212,18 +258,41 @@ namespace WpfCefDynamBrowser.ViewModels
                     string wpUrl = alw.tbInputText.Text;
                     if (!wpUrl.Contains("http"))
                         wpUrl = "https://" + wpUrl;
-                    fullUrl = wpUrl + Social.SHARELINK_wordpress + Address;
+                    fullUrl = wpUrl + Social.SHARELINK_wordpress + AddressEditable;
                     break;
 
                 default:
-                    fullUrl = Address;
+                    fullUrl = AddressEditable;
                     break;
             }
 
+            if (!wasPin)
+            {
+                launchSharePopUP(fullUrl);
+            }
+        }
+
+        private void launchSharePopUP(string fullUrl)
+        {
             BrowserForSocialShare bfss = new BrowserForSocialShare();
-            bfss.Text = "Loading... " + Address;
+            bfss.Text = "Loading... " + AddressEditable;
             bfss.browserCntrl1.init(fullUrl);
             bfss.ShowDialog();
+        }
+
+        private sealed class SourceVisitor : Xilium.CefGlue.CefStringVisitor
+        {
+            private readonly Action<string> _callback;
+
+            public SourceVisitor(Action<string> callback)
+            {
+                _callback = callback;
+            }
+
+            protected override void Visit(string value)
+            {
+                _callback(value);
+            }
         }
 
         private void setBrowser(string address)
