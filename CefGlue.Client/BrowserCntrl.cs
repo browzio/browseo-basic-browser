@@ -466,6 +466,7 @@ namespace Xilium.CefGlue.Client
 
         #region injection of form data
 
+        #region unused
         [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
         public static extern void mouse_event(uint dwFlags, uint dx, uint dy, uint cButtons, uint dwExtraInfo);
 
@@ -491,6 +492,7 @@ namespace Xilium.CefGlue.Client
         bool hasToInject;
 
         PersonData pdataForImgur = null;
+        #endregion
 
         public void InjectData()
         {
@@ -750,7 +752,13 @@ namespace Xilium.CefGlue.Client
                     "if(attrib.value.toLowerCase().indexOf('first') > -1){" +
                          "all[i].value=" + "'" + profile.FirstName + "'" + "; break;" +
                      "}" +
+                     "if(attrib.value.toLowerCase().indexOf('name_f') > -1){" +
+                         "all[i].value=" + "'" + profile.FirstName + "'" + "; break;" +
+                     "}" +
                      "if(attrib.value.toLowerCase().indexOf('last') > -1){" +
+                         "all[i].value=" + "'" + profile.LastName + "'" + "; break;" +
+                     "}" +
+                     "if(attrib.value.toLowerCase().indexOf('name_l') > -1){" +
                          "all[i].value=" + "'" + profile.LastName + "'" + "; break;" +
                      "}" +
                       "if(attrib.value.toLowerCase().indexOf('full') > -1 && attrib.value.toLowerCase().indexOf('email') < -1){" +
@@ -770,6 +778,9 @@ namespace Xilium.CefGlue.Client
                      "}" +
                      "if(attrib.value.toLowerCase().indexOf('username') > -1){" +
                          "all[i].value=" + "'"+profile.Username +"'" + "; break;" +
+                     "}" +
+                     "if(attrib.value.toLowerCase().indexOf('login') > -1){" +
+                         "all[i].value=" + "'" + profile.Username + "'" + "; break;" +
                      "}" +
                      "if(attrib.value.toLowerCase().indexOf('phone') > -1 || attrib.value.toLowerCase().indexOf('mobile') > -1){" +
                         "if(attrib.value.toLowerCase().indexOf('mobileNumberAnnotation') < 0){" +
@@ -815,6 +826,15 @@ namespace Xilium.CefGlue.Client
                             "}" +
                         "}" +
                      "}"+
+
+                      "if(all[i].tagName.indexOf('BUTTON') > -1){" +
+                         "for (var j = 0; j < all[i].attributes.length; j++) {" +
+                            "var attrib = all[i].attributes[j]; " +
+                            "if(attrib.value.indexOf('disabled') > -1){" +
+                                "document.getElementsByTagName('*')[i].removeAttribute('disabled'); alert('remove'); break;"+
+                            "}" +
+                        "}" +
+                     "}" +
           "}";
             #endregion
 
