@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace DragDropListview.Windows
+namespace Organiser.Common.Windows
 {
     /// <summary>
     /// Interaction logic for ChooseFolderWindow.xaml

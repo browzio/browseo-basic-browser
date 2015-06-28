@@ -1,4 +1,5 @@
-﻿using Organiser.Common.Classes;
+﻿using Organiser.Common;
+using Organiser.Common.Classes;
 using Organiser.Common.Windows;
 using RssReader.Helpers;
 using RssReader.Models;
@@ -26,6 +27,7 @@ namespace RssReader
     {
         public event Action<string, string> OnLaunchToBrowser = delegate { };//link, rsslink
         public event Action<string> OnLaunchToTabBrowser = delegate { };//url
+        public event Action<string,List<string>> OnImportedTab = delegate { };//tab title, list of rss feeds
 
         public ICommand DockPannelButtonsClick { get; set; }
 
@@ -84,6 +86,36 @@ namespace RssReader
                 case "Refresh":
                     RefreshRssFeed();
                     break;
+
+                case "Import":
+                    SelectProfileWindow spw = new SelectProfileWindow();
+                    spw.Title = "Select Project";
+                    spw.ShowDialog();
+                    if (spw.OkClicked)
+                    {
+                        ObservableCollection<AvailableTabsAndLinks> availrsses = new ObservableCollection<AvailableTabsAndLinks>();
+                        foreach (string tabTitle in MyFilesDatabase.GetRssFeedLinksTabsTitlesByName(spw.SelectedProjectName))
+                        {
+                            availrsses.Add(new AvailableTabsAndLinks() { Name = tabTitle });
+                        }
+
+                        ChooseFolderWindow cfw = new ChooseFolderWindow();
+                        cfw.DataContext = this;
+                        cfw.lstItems.ItemsSource = availrsses;
+                        cfw.ShowDialog();
+                        if (cfw.OkClicked)
+                        {
+                            foreach (AvailableTabsAndLinks availTabs in availrsses)
+                            {
+                                if (availTabs.IsChecked)
+                                {
+                                    OnImportedTab(availTabs.Name, MyFilesDatabase.GetRssFeedLinks(spw.SelectedProjectName, availTabs.Name));
+                                }
+                            }
+                        }
+
+                    }
+            break;
 
                 default:
                     break;
@@ -280,5 +312,19 @@ namespace RssReader
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        internal void setLinks(List<string> linksList)
+        {
+            string toSave = "";
+            foreach (string link in linksList)
+            {
+                toSave += link + Environment.NewLine;
+            }
+            if (toSave != "")
+            {
+                MyFilesDatabase.SaveRssFeedsSiteLinks(toSave.Trim(), mProfile, TabTitle);
+                RefreshRssFeed();
+            }
+        }
     }
 }

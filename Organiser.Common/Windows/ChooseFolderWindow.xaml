@@ -1,6 +1,8 @@
-﻿<Window x:Class="DragDropListview.Windows.ChooseFolderWindow"
+﻿<Window x:Class="Organiser.Common.Windows.ChooseFolderWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico"
+        WindowStartupLocation="CenterScreen"
         Title="Choose Folder" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
     <Window.Resources>
         <!-- Flat Button Style -->
@@ -56,7 +58,7 @@
             <Button Content="Select None" Width="100" Margin="5" Command="{Binding SelectFolderSelect_Click}" CommandParameter="None" />
         </StackPanel>
         
-        <ListBox Grid.Row="1" ItemsSource="{Binding FoldersAndSitesList}" IsSynchronizedWithCurrentItem="True">
+        <ListBox Grid.Row="1" Name="lstItems" x:FieldModifier="public" IsSynchronizedWithCurrentItem="True">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Name}" MaxWidth="200" Margin="5" />

@@ -1,6 +1,7 @@
 ﻿<Window x:Class="BrowserHost.Windows.ChoosePinterestImageWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico"
         Title="Choose Image" Height="300" Width="300" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>

@@ -19,6 +19,8 @@ namespace WpfCefDynamBrowser.ViewModels
     public class BrowserTabViewModel : INotifyPropertyChanged
     {
         public event Action<string, bool> OnCreateNewTab = delegate { };
+        public event Action OnAddedBookmark = delegate { };
+        public event Action OnRefreshBookmarksList = delegate { };
 
         private Thickness tabMargin;
         public Thickness TabMargin
@@ -88,11 +90,13 @@ namespace WpfCefDynamBrowser.ViewModels
             set { PropertyChanged.ChangeAndNotify(ref webBrowser, value, () => WebBrowser); }
         }
 
+        private WindowsFormsHost wfh;
         public WindowsFormsHost WebBrowserHost
         {
             get
             {
-                WindowsFormsHost wfh = new WindowsFormsHost() { Child = WebBrowser };
+                if (wfh == null)
+                     wfh = new WindowsFormsHost() { Child = WebBrowser };
                 return wfh;
             }
             // set { PropertyChanged.ChangeAndNotify(ref webBrowserHost, value, () => WebBrowserHost); }
@@ -432,6 +436,16 @@ namespace WpfCefDynamBrowser.ViewModels
         {
             WebBrowser.Navigate(site);
             //WebBrowser.Navigate(SitesList[SISitesList].Site);
+        }
+
+        public void RaiseAddedBookmark()
+        {
+            OnAddedBookmark();
+        }
+
+        internal void RaiseRefreshBookmarksList()
+        {
+            OnRefreshBookmarksList();
         }
     }
 }

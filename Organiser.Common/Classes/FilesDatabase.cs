@@ -632,9 +632,14 @@ namespace Organiser.Common.Classes
 
         public static List<string> GetRssFeedLinks(PersonData profile, string tabTitle)
         {
+            return GetRssFeedLinks(profile.ProjectName, tabTitle);
+        }
+
+        public static List<string> GetRssFeedLinks(string projectname, string tabTitle)
+        {
             List<string> returnedList = new List<string>();
 
-            string directoryPath = Path.Combine(GetBaseDir(), "SavedRssLinks", profile.ProjectName, tabTitle);
+            string directoryPath = Path.Combine(GetBaseDir(), "SavedRssLinks", projectname, tabTitle);
             string filePath = Path.Combine(directoryPath, "rssLinks.txt");
 
             if (!Directory.Exists(directoryPath)) return returnedList;
@@ -651,9 +656,14 @@ namespace Organiser.Common.Classes
 
         public static List<string> GetRssFeedLinksTabsTitle(PersonData profile)
         {
+            return GetRssFeedLinksTabsTitlesByName(profile.ProjectName);
+        }
+
+        public static List<string> GetRssFeedLinksTabsTitlesByName(string projectName)
+        {
             List<string> returnedList = new List<string>();
 
-            string directoryPath = Path.Combine(GetBaseDir(), "SavedRssLinks", profile.ProjectName);
+            string directoryPath = Path.Combine(GetBaseDir(), "SavedRssLinks", projectName);
 
             if (!Directory.Exists(directoryPath)) return returnedList;
 

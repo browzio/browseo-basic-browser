@@ -81,9 +81,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Helpers\RelayCommand.cs" />
-    <Compile Include="Windows\ChooseFolderWindow.xaml.cs">
-      <DependentUpon>ChooseFolderWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Windows\EditBookmarkWindow.xaml.cs">
       <DependentUpon>EditBookmarkWindow.xaml</DependentUpon>
     </Compile>
@@ -109,10 +106,6 @@
       <DependentUpon>Window1.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Windows\ChooseFolderWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Windows\EditBookmarkWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

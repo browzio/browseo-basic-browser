@@ -58,6 +58,9 @@
     <Compile Include="Windows\AddLinkDataWindow.xaml.cs">
       <DependentUpon>AddLinkDataWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\ChooseFolderWindow.xaml.cs">
+      <DependentUpon>ChooseFolderWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="SelectProfileWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -74,6 +77,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Windows\AddLinkDataWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\ChooseFolderWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -141,7 +148,12 @@
   <ItemGroup>
     <Resource Include="Image\wordpress-icon.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Image\Import-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\browseo %281%29.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

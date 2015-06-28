@@ -81,12 +81,21 @@ namespace BrowserHost
             {
                 BrowserTabViewModel btvm = new BrowserTabViewModel(url);
                 btvm.OnCreateNewTab += btvm_OnCreateNewTab;
+                btvm.OnAddedBookmark += btvm_OnAddedBookmark;
                 if (BrowserTabs.Count > 0)
                     btvm.TabMargin = new Thickness(-20, 0, 0, 0);
                 else
                     btvm.TabMargin = new Thickness(-3, 0, 0, 0);
                 BrowserTabs.Add(btvm);
             });
+        }
+
+        void btvm_OnAddedBookmark()
+        {
+            foreach (BrowserTabViewModel btvm in BrowserTabs)
+            {
+                btvm.RaiseRefreshBookmarksList();
+            }
         }
 
         void btvm_OnCreateNewTab(string obj, bool shownewTab)

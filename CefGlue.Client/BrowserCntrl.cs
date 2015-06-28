@@ -831,7 +831,7 @@ namespace Xilium.CefGlue.Client
                          "for (var j = 0; j < all[i].attributes.length; j++) {" +
                             "var attrib = all[i].attributes[j]; " +
                             "if(attrib.value.indexOf('disabled') > -1){" +
-                                "document.getElementsByTagName('*')[i].removeAttribute('disabled'); alert('remove'); break;"+
+                                "document.getElementsByTagName('*')[i].removeAttribute('disabled'); break;"+
                             "}" +
                         "}" +
                      "}" +
@@ -943,6 +943,11 @@ namespace Xilium.CefGlue.Client
             else if (linkToExecute.ToLower().Contains("facebook.com"))
             {
                 jsForExecution = jsToExecuteFacebook;
+            }
+            else if (linkToExecute.ToLower().Contains("livejournal.com"))
+            {
+                MessageBox.Show("C/P this site is using SUPER ninja aniti cookie monster technology");
+                return;
             }
             //if (linkToExecute.ToLower().Contains("yahoo.com"))
             //{

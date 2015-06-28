@@ -31,7 +31,7 @@ namespace DragDropListview.Controls
             DataContext = vm;
         }
 
-        public void SaveSite(string site)
+        public bool SaveSite(string site)
         {
             EditBookmarkWindow ebm = new EditBookmarkWindow();
             ebm.SetValues(site, site, vm.FoldersAndSitesList, DragDropMainViewModel.LastSelectedIndex);
@@ -41,7 +41,10 @@ namespace DragDropListview.Controls
             {
                 DragDropMainViewModel.LastSelectedIndex = ebm.LastSelectedIndex;
                 vm.SaveSite(ebm.tbURL.Text, ebm.tbName.Text, (ebm.cmbFolders.SelectedItem as ComboBoxItem).Tag);
+                return true;
             }
+
+            return false;
         }
 
         private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)

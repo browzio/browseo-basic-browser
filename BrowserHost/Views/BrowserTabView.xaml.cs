@@ -48,7 +48,20 @@ namespace WpfCefDynamBrowser.Views
             dragnDropListview.vm.ProjectName = BrowserInit.pData.ProjectName;
             dragnDropListview.vm.FillList();
             dragnDropListview.vm.OnDoubleClickedSite += vm_OnDoubleClickedSite;
+            dragnDropListview.vm.OnListChanged += vm_OnListChanged;
             dragnDropListview.vm.MigrateOldSites();//TODO: takeOut
+
+            (DataContext as BrowserTabViewModel).OnRefreshBookmarksList += BrowserTabView_OnRefreshBookmarksList;
+        }
+
+        void vm_OnListChanged()
+        {
+            (DataContext as BrowserTabViewModel).RaiseAddedBookmark();
+        }
+
+        void BrowserTabView_OnRefreshBookmarksList()
+        {
+            dragnDropListview.vm.RefreshList();
         }
 
         void vm_OnDoubleClickedSite(string site)

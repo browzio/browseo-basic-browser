@@ -68,6 +68,7 @@
     </Compile>
     <Compile Include="Helpers\ArithmaticConverter.cs" />
     <Compile Include="Helpers\booleanToVisible.cs" />
+    <Compile Include="Models\AvailableTabsAndLinks.cs" />
     <Compile Include="Windows\RssFeedsLinksMultiWindow.xaml.cs">
       <DependentUpon>RssFeedsLinksMultiWindow.xaml</DependentUpon>
     </Compile>

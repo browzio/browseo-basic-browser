@@ -16,12 +16,14 @@ using System.Windows.Input;
 using DragDropListview.Helpers;
 using DragDropListview.Windows;
 using System.Threading;
+using Organiser.Common.Windows;
 
 namespace DragDropListview
 {
    public class DragDropMainViewModel : IDropTarget, INotifyPropertyChanged
     {
         public event Action<string> OnDoubleClickedSite;
+        public event Action OnListChanged = delegate { };
 
         private ICommand lVFCMenuClick;
         public ICommand LVFolderCMenuClick
@@ -113,7 +115,7 @@ namespace DragDropListview
 
         public static int LastSelectedIndex { get; set; }
 
-        Thread saveThread;
+        //Thread saveThread;
         object mlock = new object();
         
         private ObservableCollection<FolderVM> folders;
@@ -343,50 +345,7 @@ namespace DragDropListview
                 fromProj = projName;
             }
 
-            foreach (string folder in MyFilesDatabase.GetBookmarkedFolders(fromProj))
-            {
-                DirectoryInfo dirInfo = new DirectoryInfo(folder);
-
-                FolderVM bookmarkFolder = new FolderVM();
-                bookmarkFolder.Name = dirInfo.Name;
-                bookmarkFolder.IsFolder = true;
-                bookmarkFolder.BitmapImg = new BitmapImage
-                        (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
-                bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
-                foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByPath(dirInfo.FullName, fromProj))
-                {
-                    try
-                    {
-                        string[] siteNname = siteLine.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
-                        bookmarkFolder.Sites.Add(new Bookmark()
-                        {
-                            Link = siteNname[0],
-                            Name = siteNname[1],
-                            BitmapImg = new BitmapImage
-                       (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"))
-                        });
-                    }
-                    catch { }
-                }
-
-                FoldersAndSitesList.Add(bookmarkFolder);
-            }
-
-            foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByProjName(fromProj))
-            {
-                try
-                {
-                    FolderVM bookmarkFolder = new FolderVM();
-                    bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
-                    string[] siteNname = siteLine.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
-                    bookmarkFolder.Link = siteNname[0];
-                    bookmarkFolder.Name = siteNname[1];
-                    bookmarkFolder.BitmapImg = new BitmapImage
-                       (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
-                    FoldersAndSitesList.Add(bookmarkFolder);
-                }
-                catch { }
-            }
+            ReFillList(fromProj);
 
             if (setIndex0)
                 SIFoldersSide = 0;
@@ -394,10 +353,10 @@ namespace DragDropListview
 
         private void saveAll()
         {
-           saveThread = new Thread(() =>
-             {
-                 lock (mlock)
-                 {
+         //  saveThread = new Thread(() =>
+          //   {
+           //      lock (mlock)
+            //     {
                      try
                      {
                          MyFilesDatabase.DeleteBookmarks(ProjectName);
@@ -422,11 +381,13 @@ namespace DragDropListview
                                  MyFilesDatabase.SaveSiteBookmark(folderListItem.Link, folderListItem.Name, ProjectName);
                              }
                          }
+
+                         OnListChanged();
                      }
                      catch { }
-                 }
-             });
-            saveThread.Start();
+               //  }
+             //});
+           // saveThread.Start();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -483,6 +444,7 @@ namespace DragDropListview
             {
                 ChooseFolderWindow cfw = new ChooseFolderWindow();
                 cfw.DataContext = this;
+                cfw.lstItems.ItemsSource = FoldersAndSitesList;
                 cfw.ShowDialog();
                 if (!cfw.OkClicked) return;
 
@@ -531,6 +493,7 @@ namespace DragDropListview
             ddmvm.FillList(true, projName);
             ChooseFolderWindow cfw = new ChooseFolderWindow();
             cfw.DataContext = ddmvm;
+            cfw.lstItems.ItemsSource = ddmvm.FoldersAndSitesList;
             cfw.ShowDialog();
             if (cfw.OkClicked)
             {
@@ -542,6 +505,60 @@ namespace DragDropListview
                     }
                 }
                 saveAll();
+            }
+        }
+
+        public void RefreshList()
+        {
+            //if (saveThread != null && saveThread.IsAlive) saveThread.Join();
+            FoldersAndSitesList.Clear();
+            ReFillList(ProjectName);
+        }
+
+        private void ReFillList(string ProjectName)
+        {
+            foreach (string folder in MyFilesDatabase.GetBookmarkedFolders(ProjectName))
+            {
+                DirectoryInfo dirInfo = new DirectoryInfo(folder);
+
+                FolderVM bookmarkFolder = new FolderVM();
+                bookmarkFolder.Name = dirInfo.Name;
+                bookmarkFolder.IsFolder = true;
+                bookmarkFolder.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
+                bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
+                foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByPath(dirInfo.FullName, ProjectName))
+                {
+                    try
+                    {
+                        string[] siteNname = siteLine.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                        bookmarkFolder.Sites.Add(new Bookmark()
+                        {
+                            Link = siteNname[0],
+                            Name = siteNname[1],
+                            BitmapImg = new BitmapImage
+                       (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"))
+                        });
+                    }
+                    catch { }
+                }
+
+                FoldersAndSitesList.Add(bookmarkFolder);
+            }
+
+            foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByProjName(ProjectName))
+            {
+                try
+                {
+                    FolderVM bookmarkFolder = new FolderVM();
+                    bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
+                    string[] siteNname = siteLine.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                    bookmarkFolder.Link = siteNname[0];
+                    bookmarkFolder.Name = siteNname[1];
+                    bookmarkFolder.BitmapImg = new BitmapImage
+                       (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                    FoldersAndSitesList.Add(bookmarkFolder);
+                }
+                catch { }
             }
         }
     }

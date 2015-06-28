@@ -97,9 +97,21 @@ namespace RssReader.Controlls
                 MainViewModel vm = new MainViewModel() { TabTitle = stnw.tbInputText.Text };
                 vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
                 vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
+                vm.OnImportedTab += vm_OnImportedTab;
                 vm.SetProfileData(mProfile);
                 UserRssTabs.Add(vm);
             }
+        }
+
+        void vm_OnImportedTab(string tabTitle, List<string> linksList)
+        {
+            MainViewModel vm = new MainViewModel() { TabTitle = tabTitle };
+            vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
+            vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
+            vm.OnImportedTab += vm_OnImportedTab;
+            vm.SetProfileData(mProfile);
+            vm.setLinks(linksList);
+            UserRssTabs.Add(vm);
         }
 
         public void SetProfileData(PersonData profile)
@@ -113,6 +125,7 @@ namespace RssReader.Controlls
                     MainViewModel vm = new MainViewModel() { TabTitle = tabTitle };
                     vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
                     vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
+                    vm.OnImportedTab += vm_OnImportedTab;
                     vm.SetProfileData(mProfile);
                     UserRssTabs.Add(vm);
                 }
