@@ -933,6 +933,7 @@ namespace Xilium.CefGlue.Client
           "}";
             #endregion
 
+            string messageBoxMessage = "Register With This Site Using C/P";
             string jsForExecution = jsToExecute;
 
             //change js
@@ -942,11 +943,17 @@ namespace Xilium.CefGlue.Client
             }
             else if (linkToExecute.ToLower().Contains("facebook.com"))
             {
+                MessageBox.Show(messageBoxMessage);
                 jsForExecution = jsToExecuteFacebook;
             }
             else if (linkToExecute.ToLower().Contains("livejournal.com"))
             {
-                MessageBox.Show("C/P this site is using SUPER ninja aniti cookie monster technology");
+                MessageBox.Show(messageBoxMessage);
+                return;
+            }
+            else if (linkToExecute.ToLower().Contains("accounts.google.com"))
+            {
+                MessageBox.Show(messageBoxMessage);
                 return;
             }
             //if (linkToExecute.ToLower().Contains("yahoo.com"))
