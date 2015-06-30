@@ -12,7 +12,6 @@ using Organiser.Common.Classes;
 using Organiser.Common;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
-using WindowsInput;
 
 namespace Xilium.CefGlue.Client
 {

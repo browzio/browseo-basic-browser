@@ -9,7 +9,6 @@
     using System.IO;
     using System.Text;
     using System.Windows.Forms;
-    using WindowsInput;
     using Xilium.CefGlue;
 
     internal sealed class DemoApp : CefApp
@@ -107,87 +106,87 @@
             //                        "}" +
             //                      "}";
             //frame.ExecuteJavaScript(jsToExecute, frame.Url, 0);
-            if (!hasToInject) return;
-            if (node == null) return;
-            if (!node.IsFormControlElement) return;
-            try
-            {
-                foreach (var item in node.GetAttributes())
-                {
-                    string val = item.Value;
-                    if (val.Contains("first"))
-                    {
-                        Clipboard.SetText(profile.FirstName);
-                        InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-                        break;
-                    }
-                    else if (val.Contains("last"))
-                    {
-                        Clipboard.SetText(profile.LastName);
-                        InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-                        break;
-                    }
-                    else if (val.Contains("mail"))
-                    {
-                        Clipboard.SetText(profile.Email);
-                        InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-                        if (isTumblr) tumblrcounter++;
-                        break;
-                    }
-                    else if (val.Contains("user"))
-                    {
-                        Clipboard.SetText(profile.Username);
-                        InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-                        if (isTumblr) tumblrcounter++;
-                        break;
-                    }
-                    else if (val.Contains("phone"))
-                    {
-                        Clipboard.SetText(profile.PhoneNumber);
-                        InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-                        break;
-                    }
-                    else if (val.Contains("gender"))
-                    {
-                        Clipboard.SetText(profile.SexList[profile.CmbSelectedIndexSex]);
-                        InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-                        break;
-                    }
-                    else if (val.Contains("day"))
-                    {
-                        Clipboard.SetText(profile.DayList[profile.CmbSelectedIndexDay]);
-                        InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V); 
-                        break;
-                    }
-                    else if (val.Contains("month"))
-                    {
-                        Clipboard.SetText(profile.MonthList[profile.CmbSelectedIndexMonth]);
-                        InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-                        break;
-                    }
-                    else if (val.Contains("year"))
-                    {
-                        Clipboard.SetText(profile.BirthdayYear.ToString());
-                        InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-                        break;
-                    }
-                    else if (val.Contains("pass"))
-                    {
-                        Clipboard.SetText(profile.Password);
-                        InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
-                        if (isTumblr) tumblrcounter++;
-                        break;
-                    }
-                }
+            //if (!hasToInject) return;
+            //if (node == null) return;
+            //if (!node.IsFormControlElement) return;
+            //try
+            //{
+            //    foreach (var item in node.GetAttributes())
+            //    {
+            //        string val = item.Value;
+            //        if (val.Contains("first"))
+            //        {
+            //            Clipboard.SetText(profile.FirstName);
+            //            InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+            //            break;
+            //        }
+            //        else if (val.Contains("last"))
+            //        {
+            //            Clipboard.SetText(profile.LastName);
+            //            InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+            //            break;
+            //        }
+            //        else if (val.Contains("mail"))
+            //        {
+            //            Clipboard.SetText(profile.Email);
+            //            InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+            //            if (isTumblr) tumblrcounter++;
+            //            break;
+            //        }
+            //        else if (val.Contains("user"))
+            //        {
+            //            Clipboard.SetText(profile.Username);
+            //            InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+            //            if (isTumblr) tumblrcounter++;
+            //            break;
+            //        }
+            //        else if (val.Contains("phone"))
+            //        {
+            //            Clipboard.SetText(profile.PhoneNumber);
+            //            InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+            //            break;
+            //        }
+            //        else if (val.Contains("gender"))
+            //        {
+            //            Clipboard.SetText(profile.SexList[profile.CmbSelectedIndexSex]);
+            //            InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+            //            break;
+            //        }
+            //        else if (val.Contains("day"))
+            //        {
+            //            Clipboard.SetText(profile.DayList[profile.CmbSelectedIndexDay]);
+            //            InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V); 
+            //            break;
+            //        }
+            //        else if (val.Contains("month"))
+            //        {
+            //            Clipboard.SetText(profile.MonthList[profile.CmbSelectedIndexMonth]);
+            //            InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+            //            break;
+            //        }
+            //        else if (val.Contains("year"))
+            //        {
+            //            Clipboard.SetText(profile.BirthdayYear.ToString());
+            //            InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+            //            break;
+            //        }
+            //        else if (val.Contains("pass"))
+            //        {
+            //            Clipboard.SetText(profile.Password);
+            //            InputSimulator.SimulateModifiedKeyStroke(VirtualKeyCode.CONTROL, VirtualKeyCode.VK_V);
+            //            if (isTumblr) tumblrcounter++;
+            //            break;
+            //        }
+            //    }
 
-                InputSimulator.SimulateKeyPress(VirtualKeyCode.TAB);
+            //    InputSimulator.SimulateKeyPress(VirtualKeyCode.TAB);
 
-                if (!node.IsFormControlElement || tumblrcounter >= 3)
-                {
-                    hasToInject = false;
-                }
-            }
-            catch { }
+            //    if (!node.IsFormControlElement || tumblrcounter >= 3)
+            //    {
+            //        hasToInject = false;
+            //    }
+            //}
+            //catch { }
         }
     }
 }
