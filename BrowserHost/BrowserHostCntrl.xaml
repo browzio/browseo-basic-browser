@@ -100,11 +100,10 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type commonControlls:NonReloadingTabControl}">
                             <Grid ClipToBounds="True"
-                                  Background="#FFFDFDFD"
                                   KeyboardNavigation.TabNavigation="Local"
                                   SnapsToDevicePixels="True">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition x:Name="RowDefinition0" Height="50" />
+                                    <RowDefinition x:Name="RowDefinition0" Height="37" />
                                     <RowDefinition x:Name="RowDefinition1" Height="*" />
                                 </Grid.RowDefinitions>
                                 <!--<Grid.Background>
@@ -113,9 +112,8 @@
                                         <GradientStop Color="#FFCCCCCC" Offset=".9" />
                                     </LinearGradientBrush>
                                 </Grid.Background>-->
-                                    <ScrollViewer HorizontalScrollBarVisibility="Visible"
-                                                  CanContentScroll="True"
-                                                  VerticalScrollBarVisibility="Disabled">
+                                    <!--<ScrollViewer HorizontalScrollBarVisibility="Visible"
+                                                  VerticalScrollBarVisibility="Disabled">-->
                                     <Border Background="Transparent" BorderBrush="#FF999999" BorderThickness="0,0,0,1">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -132,12 +130,12 @@
                                                 <Button Style="{StaticResource addButtonStyle}" 
                                                     Grid.Column="1"
                                                     Width="25"
-                                                    Height="15"
-                                                    Margin="3, 1, 0, -5" 
+                                                    Height="20"
+                                                    Margin="10,0,0,0" 
                                                     Command="ApplicationCommands.New"  />
                                         </Grid>
                                     </Border>
-                                </ScrollViewer>
+                                <!--</ScrollViewer>-->
                                
                                 <Border x:Name="ContentPanel"
                                     Grid.Row="1"
@@ -147,7 +145,7 @@
                                     Background="White"
                                     KeyboardNavigation.TabNavigation="Local">
                                     <Grid x:Name="PART_ItemsHolder"
-                                      Margin="{TemplateBinding Padding}"
+                                      
                                       SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                 </Border>
                             </Grid>
@@ -201,10 +199,10 @@
         </ResourceDictionary>
     </UserControl.Resources>
     
-    <Grid Background="#FFFDFDFD">
+    <Grid>
         <commonControlls:NonReloadingTabControl   x:Name="TabControl"
                                            SelectionChanged="TabControl_SelectionChanged"
-                                           Margin="0,5,0,0"
+                                           Margin="0,0,0,0" 
                                            ItemsSource="{Binding BrowserTabs, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
                                            SelectedIndex="0">
             <TabControl.ContentTemplate>

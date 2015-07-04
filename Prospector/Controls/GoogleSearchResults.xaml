@@ -5,8 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              Name="uc">
-    <Grid>
-        <ListView IsSynchronizedWithCurrentItem="True" 
+   
+    <Grid Background="#f5f5f5">
+        <ListView IsSynchronizedWithCurrentItem="True" Margin="10"
                   ItemsSource="{Binding ListResults}"
                   Background="White"
                   ScrollViewer.VerticalScrollBarVisibility="Auto"

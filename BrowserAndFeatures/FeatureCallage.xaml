@@ -7,7 +7,7 @@
              xmlns:prospector="clr-namespace:Prospector.Controls;assembly=Prospector"
              xmlns:rssReaders="clr-namespace:RssReader.Controlls;assembly=RssReader"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="400">
     
     <UserControl.Resources>
         <Style TargetType="{x:Type TabItem}" x:Key="gmailTabStyle">
@@ -15,42 +15,44 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type TabItem}">
-                        <Grid>
+                        <Grid Cursor="Hand">
                             <Border Name="Border" 
-                                    Height="25"
-                                    Background="LightBlue"
-                                    BorderBrush="#FFD7D7D7" 
-                                    BorderThickness="0,1,1,0">
-                                <ContentPresenter x:Name="TitleContent" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="12,2,12,2"/>
+                                    Height="23" Width="90"
+                                    Background="#9196a1" Margin="15,0,0,5">
+                                <ContentPresenter x:Name="TitleContent" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" TextElement.Foreground="White"/>
                             </Border>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#FFFDFDFD" />
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#FF4986E7" />
-                                <Setter TargetName="Border" Property="BorderThickness" Value="0,1,0,0" />
+                                <Setter TargetName="Border" Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FF376ED4" Offset="0"/>
+                                            <GradientStop Color="#FF588DF0" Offset="0.332"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
                             </Trigger>
-               
-                            <Trigger Property="IsSelected" Value="False">
-                                <Setter TargetName="Border" Property="Background" Value="#FFF2F2F2" />
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#FFD7D7D7" />
-                                <Setter TargetName="Border" Property="BorderThickness" Value="0,1,0,0" />
-                            </Trigger>
-
-                            <Trigger Property="IsMouseOver"  Value="True">
-                                <Setter TargetName="Border" Property="BorderBrush" Value="#FF4986E7" />
-                                <Setter TargetName="Border" Property="BorderThickness" Value="0,1,0,0" />
-                            </Trigger>
+                            <!--<Trigger Property="IsMouseOver"  Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#FFc1c4cb" />
+                            </Trigger>-->
                             
                             <!--<MultiTrigger>
                                 <MultiTrigger.Conditions>
                                     <Condition Property="IsSelected" Value="True" />
-                                    <Condition Property="IsMouseOver" Value="False" />
+                                    <Condition Property="IsMouseOver" Value="True" />
                                 </MultiTrigger.Conditions>
                                 <MultiTrigger.Setters>
-                                    <Setter Property="Margin" Value="1,0,0,0" />
+                                    <Setter TargetName="Border" Property="Background">
+                                        <Setter.Value>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF376ED4" Offset="0"/>
+                                                <GradientStop Color="#FF7aa6f6" Offset="0.332"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
                                 </MultiTrigger.Setters>
-                            </MultiTrigger>-->
+                            </MultiTrigger>--> 
                         </ControlTemplate.Triggers>
                         
                     </ControlTemplate>
@@ -59,16 +61,16 @@
         </Style>
 
     </UserControl.Resources>
-    <Grid Background="#FFFDFDFD">
+    <Grid >
         <TabControl Name="tbControl" BorderThickness="0" Padding="0" SelectionChanged="tbControl_SelectionChanged">
-            <TabItem Header="Browser" Height="23" VerticalAlignment="Center" Style="{StaticResource gmailTabStyle}">
+            <TabItem Header="Browser"  Style="{StaticResource gmailTabStyle}">
                 <browser:BrowserHostCntrl Name="browser" />
             </TabItem>
-            <TabItem Header="Prospector" Height="23" VerticalAlignment="Center" BorderThickness="0" Padding="0" Style="{StaticResource gmailTabStyle}">
+            <TabItem Header="Prospector" Style="{StaticResource gmailTabStyle}">
                 <prospector:ProspectorTabs Name="prospector" />
                 <!--<nichCntrol:NichResearchControl />-->
             </TabItem>
-            <TabItem Header="RSS" Height="23" VerticalAlignment="Center" BorderThickness="0" Padding="0" Style="{StaticResource gmailTabStyle}"> 
+            <TabItem Header="RSS"  Style="{StaticResource gmailTabStyle}"> 
                 <rssReaders:RssTabbedControl Name="rssControl" />
             </TabItem>
             <!--<TabItem Name="tmContent" Header="Tasks Management" Height="23" VerticalAlignment="Center" BorderThickness="0" Padding="0">
