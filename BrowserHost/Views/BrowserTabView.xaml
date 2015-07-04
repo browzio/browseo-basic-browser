@@ -65,6 +65,36 @@
                 </Setter>
               
             </Style>
+            <Style TargetType="Button" x:Key="ButtonStyle">
+                <Setter Property="Height" Value="23" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border 
+                                Background="#a1a5ad" Cursor="Hand"
+                                Padding="{TemplateBinding Padding}" MinWidth="95"
+                                CornerRadius="0" x:Name="Border">
+                                <ContentControl Content="{TemplateBinding Content}"
+                                                HorizontalAlignment="Center" Margin="7,0"
+                                                VerticalAlignment="Center" TextElement.Foreground="White"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Border" Property="Background">
+                                        <Setter.Value>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF376ED4" Offset="0"/>
+                                                <GradientStop Color="#FF588DF0" Offset="0.332"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -108,7 +138,7 @@
                     DockPanel.Dock="Right"
                     Click="openFlyout_Click"
                     ToolTip="Open Saved Sites"
-                    Margin="0,0,10,0"
+                    Margin="5,0,10,0"
                     Command="{Binding FillListCommand}"
                     Style="{DynamicResource browser_btn}">
                         <Image 
@@ -279,25 +309,25 @@
 
                 <ContentControl Content="{Binding WebBrowserHost}" Name="host" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                 
-                <Controls:FlyoutsControl Panel.ZIndex="1"  x:Name="flyOutsControl" Background="Black" BorderBrush="Black">
+                <Controls:FlyoutsControl Panel.ZIndex="1"  x:Name="flyOutsControl">
                     <Controls:Flyout Theme="Light" x:Name="flyOut" Header="Saved Sites" Position="Right" 
                                  ClosingFinished="flyOut_ClosingFinished"
-                                 Background="#F0F0F0"
-                                 BorderBrush="Black">
+                                 Background="#f5f5f5"
+                                 BorderThickness="0">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Button Content="Export All Bookmarks" Name="btnExportAllBookmarks" Grid.Column="0" 
-                                    Style="{DynamicResource SquareButtonStyle}" Margin="5" Click="btnExportAllBookmarks_Click" />
-                            <Button Content="Import Bookmarks" Name="btnImpotBookmarks" Grid.Column="1" 
-                                    Style="{DynamicResource SquareButtonStyle}" Margin="5" Click="btnImpotBookmarks_Click" />
-                            <dragNdrop:DraggableListBox Width="300" Name="dragnDropListview" Grid.Row="1" Grid.ColumnSpan="2" />
+                                    Style="{DynamicResource ButtonStyle}" Margin="10,5,5,5" Click="btnExportAllBookmarks_Click" />
+                            <Button Content="Import Bookmarks" Name="btnImpotBookmarks" Grid.Column="1" HorizontalAlignment="Left"
+                                    Style="{DynamicResource ButtonStyle}" Margin="5" Click="btnImpotBookmarks_Click" />
+                            <dragNdrop:DraggableListBox Width="310" Name="dragnDropListview" Grid.Row="1" Grid.ColumnSpan="2" Margin="10" BorderThickness="0"/>
                         </Grid>
                         <!--<dragNdrop:DraggableTreeview Width="275" Name="dragnDropTreeview" />-->
                         <!--<ListBox ItemsSource="{Binding Path=SitesList}" 
