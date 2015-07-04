@@ -17,7 +17,7 @@
     
     <Grid ScrollViewer.HorizontalScrollBarVisibility="Hidden"
           ScrollViewer.VerticalScrollBarVisibility="Hidden"
-          Background="#FFFDFDFD">
+         >
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" Name="grd"  />

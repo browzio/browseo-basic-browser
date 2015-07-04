@@ -15,53 +15,64 @@
             </ResourceDictionary.MergedDictionaries>
             <helpers:booleanToVisible x:Key="boolToVis" />
 
+            <Style x:Name="linkStyle" TargetType="{x:Type Button}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border Height="25" Background="Transparent" x:Name="Border">
+                                <ContentPresenter Margin="10,0" VerticalAlignment="Center" TextElement.Foreground="#558aed"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Border" Property="Background" Value="#dfdfdf"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
             <DataTemplate x:Key="MetroListBoxItemTemplate">
-                <StackPanel Background="#FFFDFDFD"  Orientation="Horizontal" Grid.Column="1" Margin="0,0,0,1">
-                    <StackPanel Margin="-2,9,9,9">
+                 <StackPanel Margin="0,0,0,15">
+                    <Border Height="25" Background="#dfdfdf">
                         <TextBlock Text="{Binding Title, Mode=OneWay}"
-                                                   Margin="3"
+                                                   Margin="15,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"
                                                    Width="545"
                                                    TextWrapping="Wrap"
-                                                   Foreground="Blue" />
+                                                   Foreground="#558aed" />
 
+                    </Border>
+                       
                         <Image Source="{Binding ImageLink}"
-                               Margin="3" 
+                               Margin="15,5,0,5" 
                                MaxWidth="545"
                                MaxHeight="100"
                                Stretch="Uniform"/>
 
                         <TextBlock Text="{Binding Link, Mode=OneWay}"
-                                                   Margin="3"
+                                                   Margin="15,5,0,5" 
                                                    TextWrapping="Wrap"
                                                    Width="545"
-                                                   Foreground="Green" />
+                                                   Foreground="#099b17" />
 
                         <TextBlock Text="{Binding Date, Mode=OneWay}"
-                                                   Margin="3"
+                                                  Margin="15,5,0,5" 
                                                    Width="545"
                                                    TextWrapping="Wrap"
-                                                   Foreground="Gray" />
+                                                   Foreground="#a1a1a2" />
 
                         <TextBlock Text="{Binding Description, Mode=OneWay}"
                                                    Margin="3"
                                                    Width="545"
                                                    TextWrapping="Wrap"
-                                                   Foreground="Black" />
+                                                   Foreground="#5a5a5a" />
 
-                        <Button HorizontalAlignment="Right"
+                        <Button HorizontalAlignment="Left"
                                 Margin="0,0,8,6"
-                                                Click="Button_Click"
-                                                ContextMenuService.IsEnabled="False"
-                                                Width="40">
-                            <Button.Content>
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Source="pack://application:,,,/Organiser.Common;component/Image/share.png" Width="18" Height="18" Margin="3,0,0,1" VerticalAlignment="Bottom">
-                                    </Image>
-
-                                    <Path x:Name="BtnArrow" Margin="3" VerticalAlignment="Center" Width="6" Fill="#FF527DB5" 
-                                                      Stretch="Uniform" HorizontalAlignment="Right" Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z "/>
-                                </StackPanel>
-                            </Button.Content>
+                                Click="Button_Click"
+                                ContextMenuService.IsEnabled="False"
+                                Content="Share"
+                                Style="{StaticResource linkStyle}">
+                          
                             <Button.ContextMenu>
                                 <ContextMenu Width="260">
                                     <StackPanel Orientation="Horizontal" Margin="-27,0,0,0" Background="WhiteSmoke">
@@ -133,8 +144,7 @@
                         </Button>
 
                     </StackPanel>
-                </StackPanel>
-            </DataTemplate>
+             </DataTemplate>
             <Style x:Key="MetroListBoxItemStyle" TargetType="{x:Type ListBoxItem}">
                 <Setter Property="SnapsToDevicePixels" Value="True"/>
                 <Setter Property="Padding" Value="4,1"/>
@@ -221,13 +231,16 @@
             <conrols:CirclePBarControl />
         </StackPanel>
 
-        <StackPanel Margin="15" Visibility="{Binding ListResultVis, Converter={StaticResource boolToVis}}" Background="#FFE6E7E8">
-            <TextBlock Text="{Binding RssLink}" Width="600" />
+        <StackPanel Margin="15" Visibility="{Binding ListResultVis, Converter={StaticResource boolToVis}}" >
+            <Border Height="30" Background="#9196a1">
+                <TextBlock Text="{Binding RssLink}" Width="600" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" />
+            </Border>
+          
             <ListView IsSynchronizedWithCurrentItem="True"
                       Name="lv"
                       Height="600"
                       ItemsSource="{Binding ListResults}"
-                      BorderBrush="Transparent"
+                      BorderThickness="0"
                       ScrollViewer.VerticalScrollBarVisibility="Hidden"
                       ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
                       MouseEnter="ListView_MouseEnter"
