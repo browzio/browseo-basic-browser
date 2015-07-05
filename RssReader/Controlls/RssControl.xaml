@@ -1,5 +1,4 @@
-<<<<<<< HEAD
-﻿<UserControl x:Class="RssReader.RssControl"
+<UserControl x:Class="RssReader.RssControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -41,8 +40,8 @@
         <controlls:RssListsControl Grid.Row="1" />
     </Grid>
 </UserControl>
-=======
-﻿<UserControl x:Class="RssReader.RssControl"
+    
+<!--﻿<UserControl x:Class="RssReader.RssControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
@@ -89,5 +88,4 @@
         
         <controlls:RssListsControl Grid.Row="1" />
     </Grid>
-</UserControl>
->>>>>>> 812fda72e22fd50ede9b8224f8c24c624de62442
+</UserControl>-->
