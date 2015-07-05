@@ -35,10 +35,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MahApps.Metro">
-      <HintPath>..\..\Visual studio web downloads\WPFDynamicTab\packages\MahApps.Metro.1.0.0.0\lib\net45\MahApps.Metro.dll</HintPath>
+      <HintPath>..\BrowserHost\bin\Debug\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro.Resources">
-      <HintPath>..\..\..\..\Public\Documents\Awesomium SDK Samples\1.7.5.0\Awesomium.NET\Samples\WPF\MahApps.Metro\MahApps.Metro.Resources.dll</HintPath>
+      <HintPath>..\BrowserPlugin\bin\Debug\MahApps.Metro.Resources.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

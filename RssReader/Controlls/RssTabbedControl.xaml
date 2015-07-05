@@ -12,21 +12,115 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/RssReader;component/Styles/ScrollBarStyle.xaml"></ResourceDictionary>
             </ResourceDictionary.MergedDictionaries>
-            
-       
-       <Style TargetType="{x:Type commonControlls:NonReloadingTabControl}">
-            <Setter Property="Template">
+
+          
+            <Style x:Key="CloseButtonStyle" TargetType="{x:Type Button}" >
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Grid Width="12" Height="12">
+                                <Rectangle x:Name="rec" Fill="Transparent"/>
+                                <ContentPresenter/>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver"  Value="True">
+                                    <Setter TargetName="rec" Property="Fill" Value="#e0e0e0" />
+                                </Trigger>
+                                <Trigger Property="IsPressed"  Value="True">
+                                    <Setter TargetName="rec" Property="Fill" Value="#d5d5d5" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <!--<Style.Resources>
+                    <Style TargetType="{x:Type Path}">
+                        <Setter Property="Fill" Value="#FF969696" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                <Setter Property="Fill" Value="Black" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Style.Resources>-->
+
+            </Style>
+
+            <Style TargetType="Button" x:Key="ButtonStyle">
+                <Setter Property="Height" Value="23" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border 
+                                Background="#a1a5ad" Cursor="Hand"
+                                Padding="{TemplateBinding Padding}" MinWidth="95"
+                                CornerRadius="0" x:Name="Border">
+                                <ContentControl Content="{TemplateBinding Content}"
+                                                HorizontalAlignment="Center" Margin="7,0"
+                                                VerticalAlignment="Center" TextElement.Foreground="White"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Border" Property="Background">
+                                        <Setter.Value>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF376ED4" Offset="0"/>
+                                                <GradientStop Color="#FF588DF0" Offset="0.332"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="Button" x:Key="NarrowButtonStyle">
+                <Setter Property="Height" Value="23" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border 
+                                Background="#a1a5ad" Cursor="Hand"
+                                Padding="{TemplateBinding Padding}" MinWidth="25"
+                                CornerRadius="0" x:Name="Border">
+                                <ContentControl Content="{TemplateBinding Content}"
+                                                HorizontalAlignment="Center" Margin="7,0"
+                                                VerticalAlignment="Center" TextElement.Foreground="White"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Border" Property="Background">
+                                        <Setter.Value>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF376ED4" Offset="0"/>
+                                                <GradientStop Color="#FF588DF0" Offset="0.332"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="{x:Type commonControlls:NonReloadingTabControl}">
+              <Setter Property="Template">
                 <Setter.Value>
                         <ControlTemplate TargetType="{x:Type commonControlls:NonReloadingTabControl}">
                         <Grid ClipToBounds="True"
-                                  Background="#FFFDFDFD"
                                   KeyboardNavigation.TabNavigation="Local"
                                   SnapsToDevicePixels="True">
                             <Grid.RowDefinitions>
-                                <RowDefinition x:Name="RowDefinition0" Height="50" />
+                                <RowDefinition x:Name="RowDefinition0" Height="60" />
                                 <RowDefinition x:Name="RowDefinition1" Height="*" />
                             </Grid.RowDefinitions>
                                 <ScrollViewer HorizontalScrollBarVisibility="Visible" CanContentScroll="True" VerticalScrollBarVisibility="Disabled">
+<<<<<<< HEAD
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
@@ -34,13 +128,23 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <TabPanel x:Name="HeaderPanel"
+=======
+                                    <Border BorderThickness="0,1,0,0" BorderBrush="#d0d0d0">
+                                        <Grid Margin="1,11,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TabPanel x:Name="HeaderPanel"
+>>>>>>> 812fda72e22fd50ede9b8224f8c24c624de62442
                                                       SnapsToDevicePixels="True"
-                                                      Margin="0,0,0,-1"
-                                                      VerticalAlignment="Bottom"
+                                                      Margin="15,0,0,0"
+                                                      VerticalAlignment="Center"
                                                       Panel.ZIndex="1"
                                                       IsItemsHost="True"
                                                       KeyboardNavigation.TabIndex="1" />
 
+<<<<<<< HEAD
                                         <Button Width="20" Height="20" Name="btnAddTab" 
                                                 Command="ApplicationCommands.New"
                                                 Grid.Column="1" Margin="3" ToolTip="New Tab" >
@@ -53,6 +157,16 @@
                                                    ToolTip="Import From Other Project" />
                                         </Button>
                                     </Grid>
+=======
+                                            <Button Width="25" Name="btnAddTab" 
+                                                    Command="ApplicationCommands.New" Style="{StaticResource NarrowButtonStyle}"
+                                                    Grid.Column="1" Margin="0" VerticalAlignment="Center" >
+                                                    <TextBlock Text="+" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-3,0,0" Foreground="White" FontWeight="Bold" FontSize="16"/>
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+                                   
+>>>>>>> 812fda72e22fd50ede9b8224f8c24c624de62442
                             </ScrollViewer>
 
                             <Border x:Name="ContentPanel"
@@ -60,7 +174,6 @@
                                     Grid.Column="0"
                                     KeyboardNavigation.DirectionalNavigation="Contained"
                                     KeyboardNavigation.TabIndex="2"
-                                    Background="White"
                                     KeyboardNavigation.TabNavigation="Local">
                                 <Grid x:Name="PART_ItemsHolder"
                                       Margin="{TemplateBinding Padding}"
@@ -77,7 +190,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TabItem">
-                          <Grid Height="60" Margin="{Binding TabMargin}">
+                          <Grid Cursor="Hand">
                             <!--<Button Name="btnFirstTab"
                                     Content="{Binding TabTitle}" 
                                     VerticalAlignment="Top"
@@ -85,16 +198,15 @@
                                     Height="25" 
                                     Style="{StaticResource tabButtonStyle}" />-->
                                 <Border Name="contentRect"
-                                        BorderBrush="Black" 
-                                        BorderThickness="0.5"
-                                        Width="100" Height="25" 
-                                        Margin="5"
-                                        VerticalAlignment="Top">
+                                        Height="23" 
+                                        Margin="5,0"
+                                        Background="#ffa1a5ad"
+                                        >
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding TabTitle}" ClipToBounds="True" Width="65" VerticalAlignment="Center"  />
-                                        <Button Command="ApplicationCommands.Close" 
-                                                HorizontalAlignment="Right" Width="18" Height="18">
-                                            <TextBlock Text="x" ClipToBounds="True" HorizontalAlignment="Center" VerticalAlignment="Center"  />
+                                       <TextBlock Text="{Binding TabTitle}" ClipToBounds="True" Margin="10,0" Foreground="White" VerticalAlignment="Center"  />
+                                        <Button Command="ApplicationCommands.Close" Width="25"
+                                                Style="{StaticResource CloseButtonStyle}">
+                                            <Image Source="../Images/close.png" Stretch="None" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                                         </Button>
                                     </StackPanel>
                                     
@@ -107,16 +219,18 @@
                             </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" TargetName="contentRect" Value="#FFD7D7D7" />
-                            </Trigger>
+                                    <Setter Property="Background" TargetName="contentRect">
+                                            <Setter.Value>
+                                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                    <GradientStop Color="#FF376ED4" Offset="0"/>
+                                                    <GradientStop Color="#FF588DF0" Offset="0.332"/>
+                                                </LinearGradientBrush>
+                                            </Setter.Value>
+                                        </Setter>
+                                </Trigger>
 
-                            <Trigger Property="IsSelected" Value="False">
-                                    <Setter Property="Background" TargetName="contentRect" Value="#FFFDFDFD" />
-                            </Trigger>
-
-                            <Trigger Property="IsMouseOver"  Value="True">
-                                    <Setter TargetName="contentRect" Property="Background" Value="#FFD7D7D7" />
-                            </Trigger>
+                          
+                            
                       </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -130,9 +244,9 @@
     </UserControl.Resources>
     
     
-    <Grid Background="#FFFDFDFD">
+    <Grid >
         <commonControlls:NonReloadingTabControl x:Name="tbContrl"  
-                                                BorderThickness="0" 
+                                                BorderThickness="0"  
                                                 ItemsSource="{Binding UserRssTabs}">
             <TabControl.ContentTemplate>
                 <DataTemplate>

@@ -31,7 +31,7 @@
         <ListBox Grid.Column="0" Width="{Binding LbFoldersWidth}" ItemsSource="{Binding FoldersAndSitesList}" IsSynchronizedWithCurrentItem="True"
                  SelectedIndex="{Binding SIFoldersSide}"
                  ScrollViewer.HorizontalScrollBarVisibility="Auto" 
-                 AllowDrop="True"
+                 AllowDrop="True" BorderThickness="0"
                  MouseDoubleClick="ListBox_MouseDoubleClick"
                  dd:DragDrop.IsDropTarget="True" dd:DragDrop.IsDragSource="True" dd:DragDrop.DropHandler="{Binding}">
             <ListBox.ItemTemplate>
