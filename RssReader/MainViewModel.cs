@@ -27,7 +27,7 @@ namespace RssReader
     {
         public event Action<string, string> OnLaunchToBrowser = delegate { };//link, rsslink
         public event Action<string> OnLaunchToTabBrowser = delegate { };//url
-        public event Action<string,List<string>> OnImportedTab = delegate { };//tab title, list of rss feeds
+      //  public event Action<string,List<string>> OnImportedTab = delegate { };//tab title, list of rss feeds
 
         public ICommand DockPannelButtonsClick { get; set; }
 
@@ -52,8 +52,11 @@ namespace RssReader
         public MainViewModel()
         {
             AllRssFeedsResults = new ObservableCollection<RssList>();
+
             DockPannelButtonsClick = new RelayCommand(OnDockPannelButtonsClick);
         }
+
+
 
         public void SetProfileData(PersonData profile)
         {
@@ -87,35 +90,35 @@ namespace RssReader
                     RefreshRssFeed();
                     break;
 
-                case "Import":
-                    SelectProfileWindow spw = new SelectProfileWindow();
-                    spw.Title = "Select Project";
-                    spw.ShowDialog();
-                    if (spw.OkClicked)
-                    {
-                        ObservableCollection<AvailableTabsAndLinks> availrsses = new ObservableCollection<AvailableTabsAndLinks>();
-                        foreach (string tabTitle in MyFilesDatabase.GetRssFeedLinksTabsTitlesByName(spw.SelectedProjectName))
-                        {
-                            availrsses.Add(new AvailableTabsAndLinks() { Name = tabTitle });
-                        }
+            //    case "Import":
+            //        SelectProfileWindow spw = new SelectProfileWindow();
+            //        spw.Title = "Select Project";
+            //        spw.ShowDialog();
+            //        if (spw.OkClicked)
+            //        {
+            //            ObservableCollection<AvailableTabsAndLinks> availrsses = new ObservableCollection<AvailableTabsAndLinks>();
+            //            foreach (string tabTitle in MyFilesDatabase.GetRssFeedLinksTabsTitlesByName(spw.SelectedProjectName))
+            //            {
+            //                availrsses.Add(new AvailableTabsAndLinks() { Name = tabTitle });
+            //            }
 
-                        ChooseFolderWindow cfw = new ChooseFolderWindow();
-                        cfw.DataContext = this;
-                        cfw.lstItems.ItemsSource = availrsses;
-                        cfw.ShowDialog();
-                        if (cfw.OkClicked)
-                        {
-                            foreach (AvailableTabsAndLinks availTabs in availrsses)
-                            {
-                                if (availTabs.IsChecked)
-                                {
-                                    OnImportedTab(availTabs.Name, MyFilesDatabase.GetRssFeedLinks(spw.SelectedProjectName, availTabs.Name));
-                                }
-                            }
-                        }
+            //            ChooseFolderWindow cfw = new ChooseFolderWindow();
+            //            cfw.DataContext = this;
+            //            cfw.lstItems.ItemsSource = availrsses;
+            //            cfw.ShowDialog();
+            //            if (cfw.OkClicked)
+            //            {
+            //                foreach (AvailableTabsAndLinks availTabs in availrsses)
+            //                {
+            //                    if (availTabs.IsChecked)
+            //                    {
+            //                        OnImportedTab(availTabs.Name, MyFilesDatabase.GetRssFeedLinks(spw.SelectedProjectName, availTabs.Name));
+            //                    }
+            //                }
+            //            }
 
-                    }
-            break;
+            //        }
+            //break;
 
                 default:
                     break;
@@ -326,5 +329,7 @@ namespace RssReader
                 RefreshRssFeed();
             }
         }
+
+
     }
 }

@@ -35,12 +35,6 @@
                                                                    ToolTip="Refresh"
                                                                    Width="30" Height="30" />
             </Button>
-            <Button Command="{Binding DockPannelButtonsClick}" CommandParameter="Import" 
-                    Width="35" Height="35">
-                <Image Source="pack://application:,,,/Organiser.Common;component/Image/Import-icon.png" 
-                                                                   ToolTip="Import From Other Project"
-                                                                   Width="30" Height="30" />
-            </Button>
         </StackPanel>
         
         <controlls:RssListsControl Grid.Row="1" />

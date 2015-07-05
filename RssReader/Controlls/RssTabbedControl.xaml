@@ -31,6 +31,7 @@
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <TabPanel x:Name="HeaderPanel"
                                                       SnapsToDevicePixels="True"
@@ -42,8 +43,14 @@
 
                                         <Button Width="20" Height="20" Name="btnAddTab" 
                                                 Command="ApplicationCommands.New"
-                                                Grid.Column="1" Margin="3" >
+                                                Grid.Column="1" Margin="3" ToolTip="New Tab" >
                                             <TextBlock Text="+" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-5,0,0" />
+                                        </Button>
+
+                                        <Button Command="ApplicationCommands.Open"
+                                                Width="20" Height="20" Grid.Column="2">
+                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/Import-icon.png" 
+                                                   ToolTip="Import From Other Project" />
                                         </Button>
                                     </Grid>
                             </ScrollViewer>
