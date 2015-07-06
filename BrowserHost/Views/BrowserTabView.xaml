@@ -158,8 +158,8 @@
                         <Image 
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
-                               Stretch="None" 
-                               Source="../Images/facebook.png" />
+                               Stretch="Uniform" SnapsToDevicePixels="True"
+                               Source="../Images/user.png" Opacity="0.4" />
                     </Button>                
                 <Button Name="SaveSite" 
                    

@@ -126,7 +126,7 @@
                                             <ColumnDefinition Width="Auto" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                    <Border BorderThickness="0,1,0,0" BorderBrush="#d0d0d0">
+                                    <Border BorderThickness="0,0,0,0" BorderBrush="#d0d0d0">
                                             <Grid Margin="1,11,0,0">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="Auto" />
@@ -148,12 +148,12 @@
                                                
                                             <Button Width="25" Name="btnAddTab" 
                                                     Command="ApplicationCommands.New" Style="{StaticResource NarrowButtonStyle}"
-                                                    Grid.Column="1" Margin="0" VerticalAlignment="Center" >
+                                                    Grid.Column="1" Margin="5,0,0,0" VerticalAlignment="Center" >
                                                     <TextBlock Text="+" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-3,0,0" Foreground="White" FontWeight="Bold" FontSize="16"/>
                                             </Button>
 
                                                 <Button Command="ApplicationCommands.Open" Width="25" Grid.Column="2" Margin="10,0,0,0" Style="{StaticResource NarrowButtonStyle}">
-                                                    <Image Source="pack://application:,,,/Organiser.Common;component/Image/Import-icon.png" 
+                                                    <Image Source="pack://application:,,,/Organiser.Common;component/Image/import.png" Margin="-3"
                                                    ToolTip="Import From Other Project" />
                                                 </Button>
                                                 

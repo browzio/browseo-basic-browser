@@ -62,7 +62,7 @@
 
     </UserControl.Resources>
     <Grid >
-        <TabControl Name="tbControl" BorderThickness="0" Padding="0" SelectionChanged="tbControl_SelectionChanged">
+        <TabControl Name="tbControl" BorderThickness="0" Padding="0" SelectionChanged="tbControl_SelectionChanged" Background="Transparent">
             <TabItem Header="Browser"  Style="{StaticResource gmailTabStyle}">
                 <browser:BrowserHostCntrl Name="browser" />
             </TabItem>

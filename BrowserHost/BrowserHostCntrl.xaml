@@ -71,14 +71,10 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Path Stretch="Fill" Name="TabFill" Stroke="#FF999999" Data="M36.904667,19.333333 C42.238,19.25 36.238,0.5 34.863116,0.5 23.863116,0.5 19.613032,0.5 2.8630319,0.5 -3.2202511,0.5 4.0712139,19.416667 6.5711261,19.416667 15.593514,19.416667 28.609259,19.462949 36.904667,19.333333 z">
-                                <Path.Fill>
-                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                        <GradientStop Color="#FFEEEEEE" Offset="0"/>
-                                        <GradientStop Color="#FFDDDDDD" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Path.Fill>
-                            </Path>
+                            <Grid Height="27" VerticalAlignment="Top" Width="40">
+                                <Path  Name="TabFill" Data="M0.5,1 C0.5,0.72385763 0.72385763,0.5 1,0.5 L26,0.5 C26.276142,0.5 26.5,0.72385763 26.5,1 L38.5,15.5 C38.5,15.776142 37.996731,16 37.720588,16 L12.720588,16 C12.444446,16 12.5,15.776142 12.5,15.5 z" 
+                                       Fill="#FFFFFFFF" Height="16.5" Stretch="Fill" Stroke="#FF999999" VerticalAlignment="Top" HorizontalAlignment="Right" Width="35" Margin="0,10,0,0" />
+                            </Grid>
                             
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
@@ -122,16 +118,15 @@
                                             </Grid.ColumnDefinitions>
                                             <TabPanel x:Name="HeaderPanel"
                                                       SnapsToDevicePixels="True"
-                                                      Margin="0,0,0,-1"
+                                                      Margin="10,0,0,-1"
                                                       VerticalAlignment="Bottom"
                                                       Panel.ZIndex="1"
                                                       IsItemsHost="True"
                                                       KeyboardNavigation.TabIndex="1" />
                                                 <Button Style="{StaticResource addButtonStyle}" 
                                                     Grid.Column="1"
-                                                    Width="25"
-                                                    Height="20"
-                                                    Margin="10,0,0,0" 
+                                                    SnapsToDevicePixels="True"
+                                                    Margin="-10,3,0,0" 
                                                     Command="ApplicationCommands.New"  />
                                         </Grid>
                                     </Border>

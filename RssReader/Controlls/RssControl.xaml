@@ -17,27 +17,58 @@
     
     <Grid ScrollViewer.HorizontalScrollBarVisibility="Hidden"
           ScrollViewer.VerticalScrollBarVisibility="Hidden"
-          Background="#FFFDFDFD">
+          Background="#FFf5f5f5" Margin="10">
+        <Grid.Resources>
+            <Style TargetType="Button" >
+                <Setter Property="Height" Value="25" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border 
+                                Background="#a1a5ad" Cursor="Hand"
+                                Padding="{TemplateBinding Padding}" MinWidth="25"
+                                CornerRadius="0" x:Name="Border">
+                                <ContentControl Content="{TemplateBinding Content}"
+                                                HorizontalAlignment="Center" Margin="3"
+                                                VerticalAlignment="Center" TextElement.Foreground="White"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Border" Property="Background">
+                                        <Setter.Value>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF376ED4" Offset="0"/>
+                                                <GradientStop Color="#FF588DF0" Offset="0.332"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" Name="grd"  />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Command="{Binding DockPannelButtonsClick}" CommandParameter="OpenRssLinksWindow"
-                     Width="35" Height="35">
-                <Image Source="pack://application:,,,/Organiser.Common;component/Image/rss-icon.png" 
+                     >
+               
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/rss.png" 
                                                                    ToolTip="Edit Rss Feeds"
-                                                                   Width="30" Height="30" />
+                                                                   Stretch="Uniform" />
             </Button>
             <Button Command="{Binding DockPannelButtonsClick}" CommandParameter="Refresh" 
-                    Width="35" Height="35">
-                <Image Source="pack://application:,,,/Organiser.Common;component/Image/refresh-icon.png" 
-                                                                   ToolTip="Refresh"
-                                                                   Width="30" Height="30" />
+                   Margin="10,0,0,0">
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/refresh.png"  ToolTip="Refresh" SnapsToDevicePixels="True" Stretch="Uniform" />
             </Button>
         </StackPanel>
         
-        <controlls:RssListsControl Grid.Row="1" />
+        <controlls:RssListsControl Grid.Row="1" Margin="5,10,5,0"/>
     </Grid>
 </UserControl>
     
