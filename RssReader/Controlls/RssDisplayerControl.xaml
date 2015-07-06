@@ -15,7 +15,7 @@
             </ResourceDictionary.MergedDictionaries>
             <helpers:booleanToVisible x:Key="boolToVis" />
 
-            <Style x:Name="linkStyle" TargetType="{x:Type Button}">
+            <Style x:Name="linkStyle" TargetType="{x:Type Button}" x:Key="linkStyle">
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Button}">
