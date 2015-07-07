@@ -42,10 +42,11 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <Border Height="25" Background="#dfdfdf">
+                        <Border Height="25" Background="#dfdfdf" >
                             <TextBlock Text="{Binding Title, Mode=OneWay}"
-                                                   Margin="15,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left"
-                                                   TextWrapping="Wrap"
+                                                   Margin="15,0,0,0" VerticalAlignment="Center" 
+                                                   HorizontalAlignment="Left"
+                                                   TextTrimming="CharacterEllipsis"
                                                    Foreground="#558aed" />
 
                         </Border>
@@ -53,28 +54,28 @@
                         <Image Source="{Binding ImageLink}"
                                Margin="15,5,0,5" 
                                MaxWidth="545"
+                               HorizontalAlignment="Left"
                                MaxHeight="100" Grid.Row="1"
                                Stretch="Uniform"/>
 
                         <TextBlock Text="{Binding Link, Mode=OneWay}"
                                                    Margin="15,5,0,5" 
                                                    TextWrapping="Wrap"
-                                                   Grid.Row="2"
+                                                   Grid.Row="2" HorizontalAlignment="Left"
                                                    Foreground="#099b17" />
 
                         <TextBlock Text="{Binding Date, Mode=OneWay}"
                                                   Margin="15,5,0,5" 
-                                                   Width="545"
+                                                  HorizontalAlignment="Left"
                                                    Grid.Row="3"
                                                    TextWrapping="Wrap"
                                                    Foreground="#a1a1a2" />
-
-                        <TextBlock Text="{Binding Description, Mode=OneWay}"
-                                                   Margin="15,3"
-                                                   Width="545"
-                                                   Grid.Row="4"
+                        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto" MaxHeight="600"  Margin="15,3"  Grid.Row="4">
+                            <TextBlock Text="{Binding Description, Mode=OneWay}"
                                                    TextWrapping="Wrap"
                                                    Foreground="#5a5a5a" />
+                        </ScrollViewer>
+                       
 
                         <Button HorizontalAlignment="Left"
                                 Margin="0,0,8,0"
@@ -187,8 +188,8 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ListBoxItem}">
                             <Border x:Name="Bd" 
-                                    BorderBrush="{TemplateBinding BorderBrush}" 
-                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    BorderBrush="Transparent" 
+                                    BorderThickness="2" 
                                     Background="{TemplateBinding Background}" 
                                     Padding="{TemplateBinding Padding}" 
                                     SnapsToDevicePixels="True">
@@ -203,27 +204,19 @@
                                 <MultiTrigger>
                                     <MultiTrigger.Conditions>
                                         <Condition Property="IsMouseOver" Value="True"/>
-                                        <Condition Property="IsSelected" Value="False"/>
+                                        <Condition Property="IsSelected" Value="True"/>
                                     </MultiTrigger.Conditions>
-                                    <Setter Property="Background" TargetName="Bd" Value="#FFE6E7E8" />
-                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{x:Null}" />
+                                    <Setter Property="Background" TargetName="Bd" Value="Transparent" />
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="#FF588DF0" />
                                     <Setter Property="Foreground" Value="Black" />
                                 </MultiTrigger>
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsMouseOver" Value="False"/>
-                                        <Condition Property="IsSelected" Value="False"/>
-                                    </MultiTrigger.Conditions>
-                                    <Setter Property="Background" TargetName="Bd" Value="{x:Null}"/>
-                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{x:Null}"/>
-                                    <Setter Property="Foreground" Value="Black" />
-                                </MultiTrigger>
+                              
                                 <MultiTrigger>
                                     <MultiTrigger.Conditions>
                                         <Condition Property="IsSelected" Value="True"/>
                                     </MultiTrigger.Conditions>
-                                    <Setter Property="Background" TargetName="Bd" Value="#FFE6E7E8"/>
-                                    <Setter Property="BorderBrush" TargetName="Bd" Value="{x:Null}"/>
+                                    <Setter Property="Background" TargetName="Bd" Value="Transparent" />
+                                    <Setter Property="BorderBrush" TargetName="Bd" Value="#FF588DF0" />
                                     <Setter Property="Foreground" Value="White"/>
                                 </MultiTrigger>
                                 <Trigger Property="IsEnabled" Value="False">

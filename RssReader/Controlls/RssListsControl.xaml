@@ -17,7 +17,7 @@
             <helpers:booleanToVisible x:Key="boolToVis" />
         <helpers:ArithmaticConverter x:Key="arithConverter" />
         <DataTemplate x:Key="ItemTemplate2">
-            <controlls:RssDisplayerControl Margin="10" Width="600"/>
+            <controlls:RssDisplayerControl Margin="10" />
         </DataTemplate>
             <ItemsPanelTemplate x:Key="ItemsPanelTemplate1">
                 <StackPanel  Margin="0,0,0,0" 
@@ -30,7 +30,7 @@
     <Grid>
         <ScrollViewer x:Name="MyScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <ItemsControl ItemsSource="{Binding AllRssFeedsResults}"
-                      x:Name="list_MyControls" HorizontalAlignment="Left"
+                      x:Name="list_MyControls" 
                       Margin="0,8,0,0" VerticalAlignment="Top"
                       ItemTemplate="{StaticResource ItemTemplate2}"   
                       ItemsPanel="{StaticResource ItemsPanelTemplate1}" />
