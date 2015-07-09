@@ -86,7 +86,11 @@ namespace WpfCefDynamBrowser.ViewModels
         private BrowserCntrl webBrowser;
         public BrowserCntrl WebBrowser
         {
-            get { return webBrowser; }
+            get 
+            {
+               // webBrowser.Refresh();
+                return webBrowser;
+            }
             set { PropertyChanged.ChangeAndNotify(ref webBrowser, value, () => WebBrowser); }
         }
 

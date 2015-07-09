@@ -307,7 +307,7 @@
                     </Rectangle.Fill>
                 </Rectangle>
 
-                <ContentControl Content="{Binding WebBrowserHost}" Name="host" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                <ContentPresenter Content="{Binding WebBrowserHost}" Name="host" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
                 
                 <Controls:FlyoutsControl Panel.ZIndex="1"  x:Name="flyOutsControl">
                     <Controls:Flyout Theme="Light" x:Name="flyOut" Header="Saved Sites" Position="Right" 

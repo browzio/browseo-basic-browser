@@ -185,6 +185,10 @@ namespace RssReader
 
                                 string fixedDescription = cleanString(description);
                                 string fixedTitle = cleanString(title);
+                                if (fixedTitle.Contains("<"))
+                                {
+                                    fixedTitle = Regex.Replace(fixedTitle, "<.*?>", string.Empty);
+                                }
 
                                 App.Current.Dispatcher.Invoke((Action)delegate
                                 {
