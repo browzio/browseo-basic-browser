@@ -70,11 +70,12 @@
                                                    Grid.Row="3"
                                                    TextWrapping="Wrap"
                                                    Foreground="#a1a1a2" />
-                        <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto" MaxHeight="600"  Margin="15,3"  Grid.Row="4">
-                            <TextBlock Text="{Binding Description, Mode=OneWay}"
-                                                   TextWrapping="Wrap"
-                                                   Foreground="#5a5a5a" />
-                        </ScrollViewer>
+                        <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" MaxHeight="600"    Grid.Row="4">-->
+                        <TextBlock Text="{Binding Description, Mode=OneWay}"
+                                       TextWrapping="Wrap"
+                                       Foreground="#5a5a5a" Margin="15,3"
+                                       Grid.Row="4"/>
+                        <!--</ScrollViewer>-->
                        
 
                         <Button HorizontalAlignment="Left"
@@ -237,18 +238,23 @@
             <conrols:CirclePBarControl />
         </StackPanel>
 
-        <StackPanel Margin="15" Visibility="{Binding ListResultVis, Converter={StaticResource boolToVis}}" >
+        <Grid Margin="5,0,5,5" Visibility="{Binding ListResultVis, Converter={StaticResource boolToVis}}" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
             <Border Height="30" Background="#9196a1">
-                <TextBlock Text="{Binding RssLink}" Width="600" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" />
+                <TextBlock Text="{Binding RssLink}"  Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left"/>
             </Border>
           
             <ListView IsSynchronizedWithCurrentItem="True"
+                      Grid.Row="1"
                       Name="lv"
                       MinHeight="600"
                       ItemsSource="{Binding ListResults}"
                       BorderThickness="0"
-                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                      ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
+                      ScrollViewer.VerticalScrollBarVisibility="Visible"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
                       MouseEnter="ListView_MouseEnter"
                       MouseLeave="ListView_MouseLeave"
                       ItemTemplate="{DynamicResource MetroListBoxItemTemplate}" 
@@ -264,6 +270,6 @@
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListView>
-        </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>
