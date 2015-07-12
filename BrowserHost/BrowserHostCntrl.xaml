@@ -15,7 +15,6 @@
         <KeyBinding Key="W" Modifiers="Control" Command="Close"/>
     </UserControl.InputBindings>-->
     <UserControl.Resources>
-
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Styles/ScrollBarStyle.xaml"></ResourceDictionary>
@@ -25,7 +24,7 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
             </ResourceDictionary.MergedDictionaries>
-
+            
             <Style TargetType="{x:Type Button}" x:Key="CloseButtonStyle">
                 <Style.Resources>
                     <sys:Double x:Key="CloseButtonWidth">6.5</sys:Double>
@@ -99,7 +98,7 @@
                                   KeyboardNavigation.TabNavigation="Local"
                                   SnapsToDevicePixels="True">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition x:Name="RowDefinition0" Height="37" />
+                                    <RowDefinition x:Name="RowDefinition0" Height="40" />
                                     <RowDefinition x:Name="RowDefinition1" Height="*" />
                                 </Grid.RowDefinitions>
                                 <!--<Grid.Background>
@@ -108,14 +107,17 @@
                                         <GradientStop Color="#FFCCCCCC" Offset=".9" />
                                     </LinearGradientBrush>
                                 </Grid.Background>-->
-                                    <!--<ScrollViewer HorizontalScrollBarVisibility="Visible"
-                                                  VerticalScrollBarVisibility="Disabled">-->
                                     <Border Background="Transparent" BorderBrush="#FF999999" BorderThickness="0,0,0,1">
+                                    <ScrollViewer x:Name="Sviewer" HorizontalScrollBarVisibility="Auto"
+                                                  VerticalScrollBarVisibility="Hidden">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="39" />
+                                            </Grid.RowDefinitions>
                                             <TabPanel x:Name="HeaderPanel"
                                                       SnapsToDevicePixels="True"
                                                       Margin="10,0,0,-1"
@@ -125,12 +127,12 @@
                                                       KeyboardNavigation.TabIndex="1" />
                                                 <Button Style="{StaticResource addButtonStyle}" 
                                                     Grid.Column="1"
-                                                    SnapsToDevicePixels="True"
-                                                    Margin="-10,3,0,0" 
+                                                    Margin="-13, 6, 0, 0" 
                                                     Command="ApplicationCommands.New"  />
                                         </Grid>
+                                        
+                                    </ScrollViewer>
                                     </Border>
-                                <!--</ScrollViewer>-->
                                
                                 <Border x:Name="ContentPanel"
                                     Grid.Row="1"

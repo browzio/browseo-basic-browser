@@ -43,7 +43,7 @@
                             <ColumnDefinition Width="15" />
                         </Grid.ColumnDefinitions>
                         <Image Source="{Binding BitmapImg}"  Width="15" Height="15" />
-                        <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0,0,0" />
+                        <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0,0,0" ToolTip="{Binding DateTimeStamp}" />
                         <Path Width="5" Height="8" VerticalAlignment="Stretch"  Stretch="Fill" Stroke="Black" Fill="Black" Grid.Column="2" 
                               Visibility="{Binding Path= IsFolder,Converter={StaticResource boolToVis}}"
                               Data="F1 M 319.344,237.333L 287.328,218.849L 287.328,255.818L 319.344,237.333 Z "/>
@@ -74,7 +74,7 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Image Source="{Binding BitmapImg}"  Width="15" Height="15" />
-                        <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0,0,0" />
+                        <TextBlock Text="{Binding Name}" Grid.Column="1" Margin="5,0,0,0" ToolTip="{Binding DateTimeStamp}" />
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

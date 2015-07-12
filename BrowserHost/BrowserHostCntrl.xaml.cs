@@ -39,6 +39,7 @@ namespace BrowserHost
             CommandBindings.Add(new CommandBinding(ApplicationCommands.New, OpenNewTab));
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, CloseTab));
 
+           // (this.FindResource("Sviewer") as ScrollViewer).HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden;
         }
 
         private void CloseTab(object sender, ExecutedRoutedEventArgs e)
@@ -71,6 +72,17 @@ namespace BrowserHost
         private void OpenNewTab(object sender, ExecutedRoutedEventArgs e)
         {
             CreateNewTab();
+
+            //if (TabControl.Items.Count == 1)
+            //{
+            //    ItemContainerGenerator icg = TabControl.ItemContainerGenerator;
+            //    UIElement tabItem = icg.ContainerFromItem(TabControl.Items[0]) as UIElement;
+            //    (tabItem as TabItem).Margin = new Thickness(-12, 0, 0, 0);
+
+            //    //Type t = (FindResource("addButtonStyle") as Style).TargetType;
+            //    //(t.BaseType as Button).Margin = new Thickness(0); 
+            //   // (t as Button).Margin = new Thickness(0, 0, 0, 0);
+            //}
 
             TabControl.SelectedIndex = TabControl.Items.Count - 1;
         }

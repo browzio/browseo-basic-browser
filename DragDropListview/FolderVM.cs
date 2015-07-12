@@ -43,6 +43,20 @@ namespace DragDropListview
             }
         }
 
+        private string dateTimeStamp;
+        public string DateTimeStamp
+        {
+            get { return dateTimeStamp; }
+            set
+            {
+                dateTimeStamp = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("DateTimeStamp"));
+                }
+            }
+        }
+
         public BitmapImage BitmapImg { get; set; }
         public bool IsFolder { get; set; }
 

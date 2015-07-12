@@ -3,7 +3,65 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico"
         Title="Choose Image" Height="300" Width="300" WindowStartupLocation="CenterScreen">
-    <Grid>
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Height" Value="22" />
+            <Setter Property="MinWidth" Value="22" />
+            <Setter Property="Margin" Value="5,0,0,0" />
+            <Setter Property="ClipToBounds" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border 
+                                    Background="Transparent" x:Name="bd">
+                            <ContentControl Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" TargetName="bd" Value="#ececec" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#c7c7c7" TargetName="bd"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+        </Style>
+        
+        <Style TargetType="Button" x:Key="ButtonStyle">
+            <Setter Property="Height" Value="23" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border 
+                                Background="#a1a5ad" Cursor="Hand"
+                                Padding="{TemplateBinding Padding}" MinWidth="95"
+                                CornerRadius="0" x:Name="Border">
+                            <ContentControl Content="{TemplateBinding Content}"
+                                                HorizontalAlignment="Center" Margin="7,0"
+                                                VerticalAlignment="Center" TextElement.Foreground="White"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FF376ED4" Offset="0"/>
+                                            <GradientStop Color="#FF588DF0" Offset="0.332"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid Background="WhiteSmoke">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -14,9 +72,17 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Button Content="&lt;" Width="30" Click="btnScrollLeft_Click" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Button Content="&lt;" Width="30" Click="btnScrollLeft_Click" Height="70" />
 
-            <ListBox x:Name="list" Grid.Column="1" ScrollViewer.HorizontalScrollBarVisibility="Hidden" ItemsSource="{Binding WebPageImages}" SelectedIndex="{Binding SLImageLink}">
+            <ListBox x:Name="list" Grid.Column="1" 
+                     Width="200"
+                     Height="200"
+                     ScrollViewer.HorizontalScrollBarVisibility="Hidden" 
+                     ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                     ItemsSource="{Binding WebPageImages}" SelectedIndex="{Binding SLImageLink}">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel IsItemsHost="True" />
@@ -25,14 +91,15 @@
                 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                            <Image Source="{Binding ImgUrl}" Width="200" Height="200"/>
+                            <Image Source="{Binding ImgUrl}" Width="200" Height="200" Stretch="Fill" />
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <Button Content=">" Width="30" Click="btnScrollRight_Click" Grid.Column="2" />
+            <Button Content=">" Width="30" Click="btnScrollRight_Click" Grid.Column="2" Height="70" />
         </Grid>
-        
-        <Button Content="OK" Grid.Row="1" Click="Button_Click" />
+
+        <Button Content="Select" Grid.Row="1" Click="Button_Click" Style="{StaticResource ButtonStyle}" Margin="5">
+        </Button>
     </Grid>
 </Window>

@@ -169,6 +169,7 @@ namespace DragDropListview
                         Bookmark bmark = new Bookmark();
                         bmark.Name = ebmff.tbName.Text;
                         bmark.Link = ebmff.tbURL.Text;
+                        bmark.DateTimeStamp = DateTime.Now.ToString();
                         bmark.BitmapImg = new BitmapImage
                         (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
                         FoldersAndSitesList[SIFoldersSide].Sites.Add(bmark);
@@ -221,6 +222,7 @@ namespace DragDropListview
                         FolderVM bookmarkFolder = new FolderVM();
                         bookmarkFolder.Name = ebmf.tbName.Text;
                         bookmarkFolder.IsFolder = true;
+                        bookmarkFolder.DateTimeStamp = DateTime.Now.ToString();
                         bookmarkFolder.BitmapImg = new BitmapImage
                         (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
                         bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
@@ -238,6 +240,7 @@ namespace DragDropListview
                         FolderVM bookmarkFolder = new FolderVM();
                         bookmarkFolder.Name = ebmff.tbName.Text;
                         bookmarkFolder.Link = ebmff.tbURL.Text;
+                        bookmarkFolder.DateTimeStamp = DateTime.Now.ToString();
                         bookmarkFolder.BitmapImg = new BitmapImage
                         (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
                         FoldersAndSitesList.Add(bookmarkFolder);
@@ -256,12 +259,12 @@ namespace DragDropListview
             saveAll();
         }
 
-        internal void SaveSite(string url, string name, object indexTag)
+        internal void SaveSite(string url, string name, object indexTag, string saveTimeStamp)
         {
             int tagIndex = Convert.ToInt32(indexTag);
             if (tagIndex == -1)
             {
-                MyFilesDatabase.SaveSiteBookmark(url, name, ProjectName);
+                MyFilesDatabase.SaveSiteBookmark(url, name, ProjectName, saveTimeStamp);
                 FillList(false);
             }
             else
@@ -269,6 +272,7 @@ namespace DragDropListview
                 Bookmark bmark = new Bookmark();
                 bmark.Link = url;
                 bmark.Name = name;
+                bmark.DateTimeStamp = saveTimeStamp;
                 bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
                 FoldersAndSitesList[tagIndex].Sites.Add(bmark);
             }
@@ -297,6 +301,7 @@ namespace DragDropListview
                         {
                             Link = site.Link,
                             Name = site.Name,
+                            DateTimeStamp = site.DateTimeStamp,
                             BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png")),
                             IsFolder = false
                         });
@@ -314,6 +319,7 @@ namespace DragDropListview
                     Bookmark bmark = new Bookmark();
                     bmark.Link = site.Link;
                     bmark.Name = site.Name;
+                    bmark.DateTimeStamp = site.DateTimeStamp;
                     bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
                     bool ExistsinList = false;
                     if (folder.Sites.Count == 1)
@@ -368,7 +374,7 @@ namespace DragDropListview
                                  {
                                      foreach (Bookmark bmark in folderListItem.Sites)
                                      {
-                                         MyFilesDatabase.AppendBookmarkByFolderAnProjName(ProjectName, folderListItem.Name, bmark.Link, bmark.Name);
+                                         MyFilesDatabase.AppendBookmarkByFolderAnProjName(ProjectName, folderListItem.Name, bmark.Link, bmark.Name, bmark.DateTimeStamp);
                                      }
                                  }
                                  else
@@ -378,7 +384,7 @@ namespace DragDropListview
                              }
                              else
                              {
-                                 MyFilesDatabase.SaveSiteBookmark(folderListItem.Link, folderListItem.Name, ProjectName);
+                                 MyFilesDatabase.SaveSiteBookmark(folderListItem.Link, folderListItem.Name, ProjectName, folderListItem.DateTimeStamp);
                              }
                          }
 
@@ -517,13 +523,14 @@ namespace DragDropListview
 
         private void ReFillList(string ProjectName)
         {
-            foreach (string folder in MyFilesDatabase.GetBookmarkedFolders(ProjectName))
+            foreach (KeyValuePair<string,string> folder in MyFilesDatabase.GetBookmarkedFolders(ProjectName))
             {
-                DirectoryInfo dirInfo = new DirectoryInfo(folder);
+                DirectoryInfo dirInfo = new DirectoryInfo(folder.Key);
 
                 FolderVM bookmarkFolder = new FolderVM();
                 bookmarkFolder.Name = dirInfo.Name;
                 bookmarkFolder.IsFolder = true;
+                bookmarkFolder.DateTimeStamp = folder.Value;
                 bookmarkFolder.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
                 bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
                 foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByPath(dirInfo.FullName, ProjectName))
@@ -531,13 +538,16 @@ namespace DragDropListview
                     try
                     {
                         string[] siteNname = siteLine.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
-                        bookmarkFolder.Sites.Add(new Bookmark()
+                       Bookmark bmark = new Bookmark()
                         {
                             Link = siteNname[0],
                             Name = siteNname[1],
                             BitmapImg = new BitmapImage
                        (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"))
-                        });
+                        };
+                       if (siteNname.Length == 3)
+                           bmark.DateTimeStamp = siteNname[2];
+                       bookmarkFolder.Sites.Add(bmark);
                     }
                     catch { }
                 }
@@ -554,6 +564,8 @@ namespace DragDropListview
                     string[] siteNname = siteLine.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
                     bookmarkFolder.Link = siteNname[0];
                     bookmarkFolder.Name = siteNname[1];
+                    if (siteNname.Length == 3)
+                        bookmarkFolder.DateTimeStamp = siteNname[2];
                     bookmarkFolder.BitmapImg = new BitmapImage
                        (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
                     FoldersAndSitesList.Add(bookmarkFolder);

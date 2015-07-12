@@ -103,7 +103,6 @@ namespace Organiser.Common.Classes
             return projects;
         }
 
-
         public static void WalkDirectoryTree(System.IO.DirectoryInfo root, ref List<KeyValuePair<string, string>> projects)
         {
             System.IO.FileInfo[] files = null;
@@ -489,6 +488,7 @@ namespace Organiser.Common.Classes
             return profile;
         }
 
+        #region cookie data
         public static List<string> GetSites()
         {
             List<string> sites = new List<string>();
@@ -535,32 +535,43 @@ namespace Organiser.Common.Classes
                 catch { }
             }).Start();
         }
+        #endregion
 
-        public static void SaveSiteBookmark(string url, string name, string projName)
+        #region bookmarks
+
+        public static void SaveSiteBookmark(string url, string name, string projName, string saveTimeStamp)
         {
             string dirForBookmarks = Path.Combine(GetBaseDir(), "Bookmarks");
             if (!Directory.Exists(dirForBookmarks)) Directory.CreateDirectory(dirForBookmarks);
 
             string filePath = Path.Combine(GetBaseDir(), "Bookmarks\\" + projName + ".txt");
+
             if (File.Exists(filePath))
             {
                 foreach (string site in File.ReadAllLines(filePath))
                 {
-                    if (site == (url + SPLITTER + name))
+                    if (site.Contains(url + SPLITTER + name))
                         return;
                 }
             }
 
-            File.AppendAllText(filePath, (url + SPLITTER + name) + Environment.NewLine);
+           string lineToSave = url + SPLITTER + name + SPLITTER + saveTimeStamp;
+
+            File.AppendAllText(filePath, lineToSave + Environment.NewLine);
         }
 
-        public static IEnumerable<string> GetBookmarkedFolders(string ProjectName)
+        public static IEnumerable<KeyValuePair<string, string>> GetBookmarkedFolders(string ProjectName)
         {
             string dirForBookmarks = Path.Combine(GetBaseDir(), "Bookmarks", ProjectName);
-            string[] dirArray = new string[0];
+            List<KeyValuePair<string, string>> dirArray = new List<KeyValuePair<string, string>>();
 
             if (Directory.Exists(dirForBookmarks))
-                dirArray = Directory.GetDirectories(dirForBookmarks);
+            {
+                foreach (string dir in Directory.GetDirectories(dirForBookmarks))
+                {
+                    dirArray.Add(new KeyValuePair<string, string>(dir, Directory.GetCreationTime(dir).ToString()));
+                }
+            }
 
             return dirArray;
         }
@@ -589,7 +600,7 @@ namespace Organiser.Common.Classes
             return bookmarksLines;
         }
 
-        public static void AppendBookmarkByFolderAnProjName(string projectName, string folderName, string url, string name)
+        public static void AppendBookmarkByFolderAnProjName(string projectName, string folderName, string url, string name, string dateTimeStamp)
         {
             string dirForBookmarks = Path.Combine(GetBaseDir(), "Bookmarks", projectName, folderName);
             if (!Directory.Exists(dirForBookmarks)) Directory.CreateDirectory(dirForBookmarks);
@@ -599,12 +610,12 @@ namespace Organiser.Common.Classes
             {
                 foreach (string site in File.ReadAllLines(filePath))
                 {
-                    if (site == (url + SPLITTER + name))
+                    if (site.Contains(url + SPLITTER + name))
                         return;
                 }
             }
 
-            File.AppendAllText(filePath, (url + SPLITTER + name) + Environment.NewLine);
+            File.AppendAllText(filePath, (url + SPLITTER + name + SPLITTER + dateTimeStamp) + Environment.NewLine);
         }
 
         public static void AppendBookmarkByFolderAnProjNameNoSites(string projectName, string folderName)
@@ -642,6 +653,8 @@ namespace Organiser.Common.Classes
                 }
             }
         }
+
+        #endregion
 
         #region rss
 

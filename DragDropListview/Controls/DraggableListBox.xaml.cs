@@ -40,7 +40,7 @@ namespace DragDropListview.Controls
             if (ebm.SaveClicked)
             {
                 DragDropMainViewModel.LastSelectedIndex = ebm.LastSelectedIndex;
-                vm.SaveSite(ebm.tbURL.Text, ebm.tbName.Text, (ebm.cmbFolders.SelectedItem as ComboBoxItem).Tag);
+                vm.SaveSite(ebm.tbURL.Text, ebm.tbName.Text, (ebm.cmbFolders.SelectedItem as ComboBoxItem).Tag, DateTime.Now.ToString());
                 return true;
             }
 

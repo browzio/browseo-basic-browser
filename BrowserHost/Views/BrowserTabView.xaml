@@ -21,6 +21,8 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            
+            
 
             <Style TargetType="{x:Type ContextMenu}">
                 <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -199,7 +201,7 @@
                      Style="{DynamicResource browser_btn}">
                         <TextBlock Text="Share"  FontSize="10" Foreground="#c7c7c7" Margin="0,0,0,0"/>
                         <Button.ContextMenu>
-                            <ContextMenu Width="445" >
+                            <ContextMenu Width="450" >
                               
                                 <StackPanel Orientation="Horizontal" Margin="-27,0,0,0" HorizontalAlignment="Center">
                                     <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="facebook"
