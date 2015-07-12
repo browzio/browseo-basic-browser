@@ -96,15 +96,48 @@ namespace Organiser.Common.Classes
 
             if (Directory.Exists(path))
             {
-                DirectoryInfo dirInfo = new DirectoryInfo(path);
-                foreach (DirectoryInfo dir in dirInfo.GetDirectories())
-                {
-                    projects.Add(new KeyValuePair<string, string>(dir.Name, dir.FullName));
-                }
+                WalkDirectoryTree(new DirectoryInfo(path), ref projects);
                 return projects;
             }
             
             return projects;
+        }
+
+
+        public static void WalkDirectoryTree(System.IO.DirectoryInfo root, ref List<KeyValuePair<string, string>> projects)
+        {
+            System.IO.FileInfo[] files = null;
+            System.IO.DirectoryInfo[] subDirs = null;
+
+            try
+            {
+                files = root.GetFiles("*.*");
+            }
+            catch (UnauthorizedAccessException e)
+            {
+            }
+            catch (System.IO.DirectoryNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            // Now find all the subdirectories under this directory.
+            subDirs = root.GetDirectories();
+
+            if (subDirs != null)
+            {
+                foreach (System.IO.DirectoryInfo dirInfo in subDirs)
+                {
+                    string ProjName = dirInfo.Name;
+                    if (ProjName.Contains("_tier_"))
+                    {
+                        ProjName = ProjName.Replace("_tier_", "");
+                    }
+                    projects.Add(new KeyValuePair<string, string>(ProjName, dirInfo.FullName));
+                    // Resursive call for each subdirectory.
+                    WalkDirectoryTree(dirInfo,ref projects);
+                }
+            }
         }
 
         public static void CreatProject(PersonData pdata)
