@@ -342,13 +342,33 @@
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <Button Content="Export All Bookmarks" Name="btnExportAllBookmarks" Grid.Column="0" 
+                                    VerticalAlignment="Bottom"
                                     Style="{DynamicResource ButtonStyle}" Margin="10,5,5,5" Click="btnExportAllBookmarks_Click" />
                             <Button Content="Import Bookmarks" Name="btnImpotBookmarks" Grid.Column="1" HorizontalAlignment="Left"
+                                    VerticalAlignment="Bottom"
                                     Style="{DynamicResource ButtonStyle}" Margin="5" Click="btnImpotBookmarks_Click" />
-                            <dragNdrop:DraggableListBox Width="310" Name="dragnDropListview" Grid.Row="1" Grid.ColumnSpan="2" Margin="10" BorderThickness="0"/>
+                            <Button Name="Reminders" Grid.Column="2" Style="{DynamicResource browser_btn}" Click="Reminders_Click" 
+                                    Width="50" Height="50" HorizontalAlignment="Left" Cursor="Hand">
+                                <StackPanel>
+                                    <Border Name="borderNotification" Visibility="Collapsed" CornerRadius="999" Margin="10,0,0,-10" Width="20" Height="20" BorderThickness="0.5" BorderBrush="Black" Opacity="0.5">
+                                        <Border.Background>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FFBB0000"/>
+                                                <GradientStop Color="#FFBB0000" Offset="1"/>
+                                                <GradientStop Color="#FFFF0000" Offset="0.522"/>
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                        <TextBlock Foreground="White" FontWeight="Bold" FontSize="11" Name="tbNotificationCount" HorizontalAlignment="Center"></TextBlock>
+                                    </Border>
+                                    <Image  HorizontalAlignment="Center" Height="25" Width="25" VerticalAlignment="Center" Stretch="Uniform" SnapsToDevicePixels="True" 
+                                        Source="../Images/reminder.png" Opacity="0.4" />
+                                </StackPanel>
+                            </Button>
+                            <dragNdrop:DraggableListBox Width="310" Name="dragnDropListview" Grid.Row="1" Grid.ColumnSpan="3" Margin="10" BorderThickness="0"/>
                         </Grid>
                         <!--<dragNdrop:DraggableTreeview Width="275" Name="dragnDropTreeview" />-->
                         <!--<ListBox ItemsSource="{Binding Path=SitesList}" 

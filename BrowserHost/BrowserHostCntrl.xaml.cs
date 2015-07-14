@@ -39,7 +39,26 @@ namespace BrowserHost
             CommandBindings.Add(new CommandBinding(ApplicationCommands.New, OpenNewTab));
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, CloseTab));
 
-           // (this.FindResource("Sviewer") as ScrollViewer).HorizontalScrollBarVisibility = ScrollBarVisibility.Hidden;
+
+        }
+
+
+        private childItem FindVisualChild<childItem>(DependencyObject obj)
+    where childItem : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
+            {
+                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
+                if (child != null && child is childItem)
+                    return (childItem)child;
+                else
+                {
+                    childItem childOfChild = FindVisualChild<childItem>(child);
+                    if (childOfChild != null)
+                        return childOfChild;
+                }
+            }
+            return null;
         }
 
         private void CloseTab(object sender, ExecutedRoutedEventArgs e)
@@ -94,12 +113,25 @@ namespace BrowserHost
                 BrowserTabViewModel btvm = new BrowserTabViewModel(url);
                 btvm.OnCreateNewTab += btvm_OnCreateNewTab;
                 btvm.OnAddedBookmark += btvm_OnAddedBookmark;
+                btvm.OnRemindersChanged += btvm_OnRemindersChanged;
                 if (BrowserTabs.Count > 0)
                     btvm.TabMargin = new Thickness(-20, 0, 0, 0);
                 else
                     btvm.TabMargin = new Thickness(-3, 0, 0, 0);
                 BrowserTabs.Add(btvm);
+
+                ScrollViewer scrollview = FindVisualChild<ScrollViewer>(TabControl);
+                if (scrollview != null)
+                    scrollview.ScrollToVerticalOffset(9.5);
             });
+        }
+
+        void btvm_OnRemindersChanged()
+        {
+            foreach (BrowserTabViewModel btvm in BrowserTabs)
+            {
+                btvm.RaiseRefreshRemindersList();
+            }
         }
 
         void btvm_OnAddedBookmark()
@@ -185,6 +217,16 @@ namespace BrowserHost
             bfss.Text = "Loading... " + rssLink;
             bfss.browserCntrl1.init(link);
             bfss.ShowDialog();
+        }
+
+        private void Sviewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            ScrollViewer scrollviewer = sender as ScrollViewer;
+            if (e.Delta > 0)
+                scrollviewer.LineLeft();
+            else
+                scrollviewer.LineRight();
+            e.Handled = true;
         }
     }
 }

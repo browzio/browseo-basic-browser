@@ -62,6 +62,9 @@ namespace Xilium.CefGlue.Client
 
             CefRuntime.Initialize(mainArgs, settings, app);
 
+            Organiser.Common.Classes.UsageTracker.ProjectName = pData.ProjectName;
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Browser Started");
+
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
         }
@@ -91,26 +94,30 @@ namespace Xilium.CefGlue.Client
 
         public static void Shutdown()
         {
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Browser Closed");
+            Organiser.Common.Classes.UsageTracker.SaveAllTrackedDataList();
+
             SetErrorMode(ErrorModes.SEM_NOGPFAULTERRORBOX | ErrorModes.SEM_NOOPENFILEERRORBOX);
 
-            var threads = Process.GetCurrentProcess().Threads;
-            for (int i = 0; i < threads.Count; i++)
-            {
-                threads[i].Dispose();
-            }
+           // var threads = Process.GetCurrentProcess().Threads;
+           // for (int i = 0; i < threads.Count; i++)
+           // {
+           //     threads[i].Dispose();
+           // }
 
-            new Thread(() => {
-                ProcessModuleCollection mc = Process.GetCurrentProcess().Modules;
-                foreach (ProcessModule mod in mc)
-                {
-                    if (mod.ModuleName.ToLower() == "libcef.dll")
-                        FreeLibrary(mod.BaseAddress);
-                }
+           //// new Thread(() => {
+           //     ProcessModuleCollection mc = Process.GetCurrentProcess().Modules;
+           //     foreach (ProcessModule mod in mc)
+           //     {
+           //         if (mod.ModuleName.ToLower() == "libcef.dll")
+           //             FreeLibrary(mod.BaseAddress);
+           //     }
 
-                CefRuntime.Shutdown();
+           //     CefRuntime.Shutdown();
 
-                Process.GetCurrentProcess().Kill();
-            }).Start();
+           //     Process.GetCurrentProcess().Kill();
+
+           //// }).Start();
 
 
             //foreach (var process in Process.GetProcessesByName("BrowserAndFeatures.exe"))

@@ -56,6 +56,8 @@
                     <MenuItem Header="Add Folder..." Command="{Binding LVFolderCMenuClick}" CommandParameter="AddFolder" />
                     <MenuItem Header="Add Site..." Command="{Binding LVFolderCMenuClick}" CommandParameter="AddSite" />
                     <MenuItem Header="Delete" Command="{Binding LVFolderCMenuClick}" CommandParameter="Delete" />
+                    <Separator />
+                    <MenuItem Header="Set Reminder" Command="{Binding LVFolderCMenuClick}" CommandParameter="Reminder" />
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListBox>
@@ -83,6 +85,8 @@
                     <MenuItem Header="Edit..." Command="{Binding LVSiteCMenuClick}" CommandParameter="Edit" />
                     <MenuItem Header="Add Site..." Command="{Binding LVSiteCMenuClick}" CommandParameter="AddSite" />
                     <MenuItem Header="Delete" Command="{Binding LVSiteCMenuClick}" CommandParameter="Delete" />
+                    <Separator />
+                    <MenuItem Header="Set Reminder" Command="{Binding LVSiteCMenuClick}" CommandParameter="Reminder" />
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListBox>

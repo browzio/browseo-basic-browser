@@ -603,20 +603,25 @@ namespace Prospector.ViewModels
             Query = String.Format(@"http://google.com/search?v=1.0&q={0}", Query);
             Query = Query + TimeFrames[CmbTimeframeIndex].Query;
 
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Search " + Query);
+
             GetKeywordRankings(Query, MaxPages[CmbMaxPAgesIndex], false);
         }
 
         private void sendLinkToBrowser(object obj)
         {
+            
             try
             {
                 OnClickedSearch(ListResults[SIListResults].Link);
+                Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To browser " + ListResults[SIListResults].Link);
             }
             catch
             {
                 try
                 {
                     OnClickedSearch(ListResults[SIListResults - 1].Link);
+                    Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To browser " + ListResults[SIListResults - 1].Link);
                 }
                 catch
                 {

@@ -20,6 +20,8 @@ namespace WpfCefDynamBrowser.ViewModels
     {
         public event Action<string, bool> OnCreateNewTab = delegate { };
         public event Action OnAddedBookmark = delegate { };
+        public event Action OnRefreshReminders = delegate { };
+        public event Action OnRemindersChanged = delegate { };
         public event Action OnRefreshBookmarksList = delegate { };
 
         private Thickness tabMargin;
@@ -88,7 +90,7 @@ namespace WpfCefDynamBrowser.ViewModels
         {
             get 
             {
-               // webBrowser.Refresh();
+                //webBrowser.
                 return webBrowser;
             }
             set { PropertyChanged.ChangeAndNotify(ref webBrowser, value, () => WebBrowser); }
@@ -196,7 +198,8 @@ namespace WpfCefDynamBrowser.ViewModels
         {
             string fullUrl = "";
             bool wasPin = false;
-            switch ((string)param)
+            string shareType = (string)param;
+            switch (shareType)
             {
                 case Social.SOCIALTYPE_fb:
                     fullUrl = Social.SHARELINK_facebook + AddressEditable;
@@ -274,6 +277,8 @@ namespace WpfCefDynamBrowser.ViewModels
                     break;
             }
 
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Share From Browser " + shareType);
+
             if (!wasPin)
             {
                 launchSharePopUP(fullUrl);
@@ -330,6 +335,7 @@ namespace WpfCefDynamBrowser.ViewModels
         {
             dontGo = true;
             AddressEditable = address;
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Address Changed " + address);
         }
 
         void WebBrowser_OnBrowserTitleChanged(string ttl)
@@ -450,6 +456,16 @@ namespace WpfCefDynamBrowser.ViewModels
         internal void RaiseRefreshBookmarksList()
         {
             OnRefreshBookmarksList();
+        }
+
+        internal void RaiseRemindersChanged()
+        {
+            OnRemindersChanged();
+        }
+
+        internal void RaiseRefreshRemindersList()
+        {
+            OnRefreshReminders();
         }
     }
 }

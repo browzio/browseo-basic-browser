@@ -132,9 +132,23 @@ namespace Organiser.Common.Classes
                     {
                         ProjName = ProjName.Replace("_tier_", "");
                     }
-                    projects.Add(new KeyValuePair<string, string>(ProjName, dirInfo.FullName));
-                    // Resursive call for each subdirectory.
-                    WalkDirectoryTree(dirInfo,ref projects);
+                    //UserData
+                    //checkif is profile
+                    bool add = true;
+                    foreach (FileInfo file in dirInfo.GetFiles())
+                    {
+                        if(file.Name.Contains("UserData"))
+                        {
+                            add = false;
+                            break;
+                        }
+                    }
+                    if (add)
+                    {
+                        projects.Add(new KeyValuePair<string, string>(ProjName, dirInfo.FullName));
+                        // Resursive call for each subdirectory.
+                        WalkDirectoryTree(dirInfo, ref projects);
+                    }
                 }
             }
         }
@@ -732,5 +746,14 @@ namespace Organiser.Common.Classes
         }
 
         #endregion
+
+        public static string EncodeTo64(string toEncode)
+        {
+            byte[] toEncodeAsBytes
+                  = System.Text.ASCIIEncoding.ASCII.GetBytes(toEncode);
+            string returnValue
+                  = System.Convert.ToBase64String(toEncodeAsBytes);
+            return returnValue;
+        }
     }
 }

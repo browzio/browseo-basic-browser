@@ -46,12 +46,32 @@ namespace WpfCefDynamBrowser.Views
         void BrowserTabView_Loaded(object sender, RoutedEventArgs e)
         {
             dragnDropListview.vm.ProjectName = BrowserInit.pData.ProjectName;
+            dragnDropListview.vm.OnHasReminders += vm_OnHasReminders;
             dragnDropListview.vm.FillList();
+            dragnDropListview.vm.CheckReminders();
             dragnDropListview.vm.OnDoubleClickedSite += vm_OnDoubleClickedSite;
             dragnDropListview.vm.OnListChanged += vm_OnListChanged;
+            dragnDropListview.vm.OnRemindersChanged += vm_OnRemindersChanged;
             dragnDropListview.vm.MigrateOldSites();//TODO: takeOut
 
             (DataContext as BrowserTabViewModel).OnRefreshBookmarksList += BrowserTabView_OnRefreshBookmarksList;
+            (DataContext as BrowserTabViewModel).OnRefreshReminders += BrowserTabView_OnRefreshReminders;
+        }
+
+        void BrowserTabView_OnRefreshReminders()
+        {
+            dragnDropListview.vm.CheckReminders();
+        }
+
+        void vm_OnRemindersChanged()
+        {
+            (DataContext as BrowserTabViewModel).RaiseRemindersChanged();
+        }
+
+        void vm_OnHasReminders(int notificationCount)
+        {
+            borderNotification.Visibility = Visibility.Visible;
+            tbNotificationCount.Text = "" + notificationCount;
         }
 
         void vm_OnListChanged()
@@ -185,6 +205,11 @@ namespace WpfCefDynamBrowser.Views
             {
                 dragnDropListview.vm.MergeBookMarksFromProjectPath(spw.SelectedProjectName);
             }
+        }
+
+        private void Reminders_Click(object sender, RoutedEventArgs e)
+        {
+            dragnDropListview.vm.OpenReminders();
         }
     }
 }

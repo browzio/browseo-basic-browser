@@ -51,6 +51,8 @@ namespace RssReader
 
         public MainViewModel()
         {
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Navigated To Rss Tab");
+
             AllRssFeedsResults = new ObservableCollection<RssList>();
 
             DockPannelButtonsClick = new RelayCommand(OnDockPannelButtonsClick);
@@ -131,108 +133,122 @@ namespace RssReader
             {
                 loadingThread.Abort();
             }
-            AllRssFeedsResults.Clear();
-            List<string> rssFeeds = MyFilesDatabase.GetRssFeedLinks(mProfile, TabTitle);
-            if (rssFeeds == null) return;
-            foreach (string link in rssFeeds)
+            try
             {
-                if (string.IsNullOrEmpty(link) || string.IsNullOrWhiteSpace(link)) continue;
-                AllRssFeedsResults.Add(new RssList() { RssLink = link.Trim(), ListResults = new ObservableCollection<RssResult>() });
-            }
-            loadingThread = new Thread(() =>
-            {
-                List<string> failedLinks = new List<string>();
-
-                foreach (RssList rssLink in AllRssFeedsResults)
+                AllRssFeedsResults.Clear();
+                List<string> rssFeeds = MyFilesDatabase.GetRssFeedLinks(mProfile, TabTitle);
+                if (rssFeeds == null) return;
+                foreach (string link in rssFeeds)
+                {
+                    if (string.IsNullOrEmpty(link) || string.IsNullOrWhiteSpace(link)) continue;
+                    AllRssFeedsResults.Add(new RssList() { RssLink = link.Trim(), ListResults = new ObservableCollection<RssResult>() });
+                }
+                loadingThread = new Thread(() =>
                 {
                     try
                     {
-                        rssLink.PBarVis = true;
-                        rssLink.ListResultVis = false;
-                        string linkToFeed = rssLink.RssLink;
-                        if (linkToFeed.Contains("feed://"))
-                            linkToFeed = linkToFeed.Replace("feed://", "http://");
+                        List<string> failedLinks = new List<string>();
 
-                        var req = (HttpWebRequest)WebRequest.Create(linkToFeed);
-                        req.Method = "GET";
-                        req.UserAgent = "Fiddler";
-                        var rep = req.GetResponse();
-
-                        using (XmlReader reader = XmlReader.Create(rep.GetResponseStream(), new XmlReaderSettings() { DtdProcessing = DtdProcessing.Parse }))
+                        foreach (RssList rssLink in AllRssFeedsResults)
                         {
-                            SyndicationFeed feed = SyndicationFeed.Load(reader);
-                            foreach (SyndicationItem item in feed.Items)
+                            try
                             {
-                                string title = item.Title.Text;
-                                string link = item.Links.Count > 0 ? item.Links[item.Links.Count - 1].Uri.AbsoluteUri : "";
-                                string date = item.PublishDate == null ? "" : item.PublishDate.ToString();
-                                string description = "";
-                                string imgLink = "";
-                                try
-                                {
-                                    description = item.Summary != null ? item.Summary.Text : (item.Content as TextSyndicationContent).Text;
-                                    Match imgMatch = Regex.Match(description, "<img.+?src=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase);
-                                    if(imgMatch.Groups.Count >= 2)
-                                        imgLink = imgMatch.Groups[1].Value;
-                                    description = Regex.Replace(description, "<.*?>", string.Empty);
-                                }
-                                catch { }
+                                rssLink.PBarVis = true;
+                                rssLink.ListResultVis = false;
+                                string linkToFeed = rssLink.RssLink;
+                                if (linkToFeed.Contains("feed://"))
+                                    linkToFeed = linkToFeed.Replace("feed://", "http://");
 
-                                if (description.Length > 600)
-                                {
-                                    description = description.Substring(0, 599);
-                                }
+                                var req = (HttpWebRequest)WebRequest.Create(linkToFeed);
+                                req.Method = "GET";
+                                req.UserAgent = "Fiddler";
+                                var rep = req.GetResponse();
 
-                                string fixedDescription = cleanString(description);
-                                string fixedTitle = cleanString(title);
-                                if (fixedTitle.Contains("<"))
+                                using (XmlReader reader = XmlReader.Create(rep.GetResponseStream(), new XmlReaderSettings() { DtdProcessing = DtdProcessing.Parse }))
                                 {
-                                    fixedTitle = Regex.Replace(fixedTitle, "<.*?>", string.Empty);
-                                }
-
-                                App.Current.Dispatcher.Invoke((Action)delegate
-                                {
-                                    RssResult result = new RssResult()
+                                    SyndicationFeed feed = SyndicationFeed.Load(reader);
+                                    foreach (SyndicationItem item in feed.Items)
                                     {
-                                        Title = fixedTitle,
-                                        Link = link,
-                                        Date = date,
-                                        Description = fixedDescription,
-                                        ImageLink = imgLink
-                                    };
-                                    result.OnClickedSendSocialLink += result_OnClickedSendSocialLink;
-                                    rssLink.ListResults.Add(result);
-                                });
-                                if (rssLink.ListResults.Count > 20) break;
+                                        string title = item.Title.Text;
+                                        string link = item.Links.Count > 0 ? item.Links[item.Links.Count - 1].Uri.AbsoluteUri : "";
+                                        string date = item.PublishDate == null ? "" : item.PublishDate.ToString();
+                                        string description = "";
+                                        string imgLink = "";
+                                        try
+                                        {
+                                            description = item.Summary != null ? item.Summary.Text : (item.Content as TextSyndicationContent).Text;
+                                            Match imgMatch = Regex.Match(description, "<img.+?src=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase);
+                                            if (imgMatch.Groups.Count >= 2)
+                                                imgLink = imgMatch.Groups[1].Value;
+                                            description = Regex.Replace(description, "<.*?>", string.Empty);
+                                        }
+                                        catch { }
+
+                                        if (description.Length > 600)
+                                        {
+                                            description = description.Substring(0, 599);
+                                        }
+
+                                        string fixedDescription = cleanString(description);
+                                        string fixedTitle = cleanString(title);
+                                        if (fixedTitle.Contains("<"))
+                                        {
+                                            fixedTitle = Regex.Replace(fixedTitle, "<.*?>", string.Empty);
+                                        }
+
+                                        App.Current.Dispatcher.Invoke((Action)delegate
+                                        {
+                                            RssResult result = new RssResult()
+                                            {
+                                                Title = fixedTitle,
+                                                Link = link,
+                                                Date = date,
+                                                Description = fixedDescription,
+                                                ImageLink = imgLink
+                                            };
+                                            result.OnClickedSendSocialLink += result_OnClickedSendSocialLink;
+                                            rssLink.ListResults.Add(result);
+                                        });
+                                        if (rssLink.ListResults.Count > 20) break;
+                                    }
+                                }
+                                rssLink.PBarVis = false;
+                                rssLink.ListResultVis = true;
+                                rssLink.OnSelectedLaunchLink += rssLink_OnSelectedLaunchLink;
+                            }
+                            catch
+                            {
+                                rssLink.PBarVis = false;
+                                rssLink.ListResultVis = true;
+                                failedLinks.Add(rssLink.RssLink);
                             }
                         }
-                        rssLink.PBarVis = false;
-                        rssLink.ListResultVis = true;
-                        rssLink.OnSelectedLaunchLink += rssLink_OnSelectedLaunchLink;
-                    }
-                    catch
-                    {
-                        rssLink.PBarVis = false;
-                        rssLink.ListResultVis = true;
-                        failedLinks.Add(rssLink.RssLink);
-                    }
-                }
 
-                if (failedLinks.Count > 0)
-                {
-                    string failed = "";
-                    foreach (string failedLink in failedLinks)
-                    {
-                        failed += failedLink + " ";
-                    }
+                        if (failedLinks.Count > 0)
+                        {
+                            string failed = "";
+                            foreach (string failedLink in failedLinks)
+                            {
+                                failed += failedLink + " ";
+                            }
 
-                    if (failed.ToLower().Contains("rss20"))
-                        failed += " please change rss20 to atom10";
-                    MessageBox.Show("The Following links are incompatible " + failed,
-                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            });
-            loadingThread.Start();
+                            if (failed.ToLower().Contains("rss20"))
+                                failed += " please change rss20 to atom10";
+                            MessageBox.Show("The Following links are incompatible " + failed,
+                                "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    catch 
+                    {
+                        MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
+                    }
+                });
+                loadingThread.Start();
+            }
+            catch 
+            {
+                MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
+            }
         }
 
         private string cleanString(string stringToClean)
@@ -310,11 +326,13 @@ namespace RssReader
                     break;
             }
 
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie(type + " Social Share From RSS tab");
             OnLaunchToBrowser(fullUrl, link);
         }
 
         void rssLink_OnSelectedLaunchLink(string link)
         {
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Sent To Browser From RSS tab " + link);
             OnLaunchToTabBrowser(link);
         }
 

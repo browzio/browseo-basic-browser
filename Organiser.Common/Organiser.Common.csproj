@@ -55,6 +55,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\UsageTracker.cs" />
     <Compile Include="Windows\AddLinkDataWindow.xaml.cs">
       <DependentUpon>AddLinkDataWindow.xaml</DependentUpon>
     </Compile>

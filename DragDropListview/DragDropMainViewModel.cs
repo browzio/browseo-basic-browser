@@ -17,13 +17,24 @@ using DragDropListview.Helpers;
 using DragDropListview.Windows;
 using System.Threading;
 using Organiser.Common.Windows;
+using DragDropListview.Models;
+using System.Windows.Media;
 
 namespace DragDropListview
 {
    public class DragDropMainViewModel : IDropTarget, INotifyPropertyChanged
     {
-        public event Action<string> OnDoubleClickedSite;
+        
+        public event Action<int> OnHasReminders = delegate { };//int, amount of reminders
+        public event Action OnRemindersChanged = delegate { };
+        public event Action<string> OnDoubleClickedSite;//string, site to open
         public event Action OnListChanged = delegate { };
+
+
+        public List<Reminder> Reminders { get; set; }
+        public ObservableCollection<Reminder> RemindersByDate { get; set; }
+        public ObservableCollection<Reminder> ReminderDates { get; set; }
+
 
         private ICommand lVFCMenuClick;
         public ICommand LVFolderCMenuClick
@@ -128,13 +139,18 @@ namespace DragDropListview
         public DragDropMainViewModel()
         {
             FoldersAndSitesList = new ObservableCollection<FolderVM>();
+            Reminders = new List<Reminder>();
+            RemindersByDate = new ObservableCollection<Reminder>();
+            ReminderDates = new ObservableCollection<Reminder>();
 
             LVFolderCMenuClick = new RelayCommand(FolderMenueItemCLick);
             LVSiteCMenuClick = new RelayCommand(SiteMenueItemCLick);
             SelectFolderSelect_Click = new RelayCommand(SelectFolderSelect_BtnClick);
+            LBRemindersByDateCMClick = new RelayCommand(LBRemindersByDateCMClick_click);
 
             LbFoldersWidth = 300;
         }
+
 
         private void SiteMenueItemCLick(object param)
         {
@@ -180,6 +196,15 @@ namespace DragDropListview
                     if (MessageBox.Show("Are you sure you would like to delete " + FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Name + "?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         FoldersAndSitesList[SIFoldersSide].Sites.RemoveAt(SISitesSide);
+                    }
+                    break;
+
+                case "Reminder":
+                    SetReminderWindow srw = new SetReminderWindow();
+                    srw.ShowDialog();
+                    if (srw.OkClicked)
+                    {
+                        saveReminder(srw.tbInputedText.Text, srw.dtReminder.Text, false);
                     }
                     break;
             }
@@ -254,10 +279,20 @@ namespace DragDropListview
                         FoldersAndSitesList.RemoveAt(SIFoldersSide);
                     }
                     break;
+
+                case "Reminder":
+                    SetReminderWindow srw = new SetReminderWindow();
+                    srw.ShowDialog();
+                    if (srw.OkClicked)
+                    {
+                        saveReminder(srw.tbInputedText.Text, srw.dtReminder.Text, true);
+                    }
+                    break;
             }
 
             saveAll();
         }
+
 
         internal void SaveSite(string url, string name, object indexTag, string saveTimeStamp)
         {
@@ -573,5 +608,274 @@ namespace DragDropListview
                 catch { }
             }
         }
+
+        #region reminders
+
+        const string SPLITTER = "[|!|]";
+        const string REMINDER_SPLITTER = "{[|!|]}";
+
+        private ICommand lBRemindersByDateCMClick;
+        public ICommand LBRemindersByDateCMClick
+        {
+            get { return lBRemindersByDateCMClick; }
+            set { lBRemindersByDateCMClick = value; }
+        }
+
+        private void saveReminder(string inputedText, string dateTimeForReminder, bool fromfolder)
+        {
+            DateTime dt;
+            if (dateTimeForReminder == null || dateTimeForReminder == "" || !DateTime.TryParse(dateTimeForReminder, out dt))
+            {
+                MessageBox.Show("Date for reminder was not set.");
+                return;
+            }
+
+            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", ProjectName);
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
+
+            string nameOfItem = FoldersAndSitesList[SIFoldersSide].Name;
+            if (!fromfolder)
+                nameOfItem = FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Name;
+            nameOfItem = nameOfItem.Replace("/", "_");
+            nameOfItem = nameOfItem.Replace(":", "-");
+
+            string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", ProjectName, nameOfItem + ".txt");
+            try
+            {
+                File.AppendAllText(filePath, inputedText + SPLITTER + dateTimeForReminder + SPLITTER + "false" + REMINDER_SPLITTER);
+            }
+            catch 
+            {
+                MessageBox.Show("Error saveing reminder. Rename the bookmark and try again.");
+            }
+
+            CheckReminders();
+            OnRemindersChanged();
+        }
+
+        public void CheckReminders()
+        {
+            Reminders.Clear();
+            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", ProjectName);
+            if (Directory.Exists(dirPath))
+            {
+                foreach (string filePath in Directory.GetFiles(dirPath))
+                {
+                    FileInfo fInfo = new FileInfo(filePath);
+                    string fileText = File.ReadAllText(filePath);
+                    string[] lines = fileText.Split(new string[] { REMINDER_SPLITTER }, StringSplitOptions.None);
+
+                    foreach (FolderVM folderListItem in FoldersAndSitesList)
+                    {
+                        if (folderListItem.IsFolder)
+                        {
+                            foreach (Bookmark bmark in folderListItem.Sites)
+                            {
+                                if (fInfo.Name.Replace("_", "/").Replace("-", ":").Replace(".txt", "") == bmark.Name)
+                                {
+                                    foreach (string line in lines)
+                                    {
+                                        string[] reminderLines = line.Split(new string[]{SPLITTER}, StringSplitOptions.None);
+                                        if (reminderLines[0] == "") break;
+                                        Reminders.Add(new Reminder() 
+                                        {
+                                            ReminderText = reminderLines[0],
+                                            ReminderDate = reminderLines[1],
+                                            ResolvedText = reminderLines[2],
+                                            ForeColorComplete = reminderLines[2] == "false" ?  Brushes.Orange : Brushes.Green,
+                                            ReminderName = bmark.Name
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                        if (fInfo.Name.Replace("_", "/").Replace("-", ":").Replace(".txt", "") == folderListItem.Name)
+                        {
+                            foreach (string line in lines)
+                            {
+                                string[] reminderLines = line.Split(new string[] { SPLITTER }, StringSplitOptions.None);
+                                if (reminderLines[0] == "") break;
+                                Reminders.Add(new Reminder()
+                                {
+                                    ReminderText = reminderLines[0],
+                                    ReminderDate = reminderLines[1],
+                                    ResolvedText = reminderLines[2],
+                                    ForeColorComplete = reminderLines[2] == "false" ? Brushes.Orange : Brushes.Green,
+                                    ReminderName = folderListItem.Name
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (Reminders.Count > 0)
+            {
+                List<Reminder> orderd = Reminders.OrderBy((r2) => r2.ReminderDate).ToList();
+                Reminders.Clear();
+                foreach (Reminder rem in orderd)
+                {
+                    Reminders.Add(rem);
+                }
+                int unresolvedCount = 0;
+                foreach (Reminder rem in Reminders)
+                {
+                    if (rem.ResolvedText == "false")
+                    {
+                        unresolvedCount++;
+                        DateTime dt;
+                        DateTime.TryParse(rem.ReminderDate,out dt);
+                        if(dt < DateTime.Today)
+                        {
+                            rem.ForeColorComplete = Brushes.Red;
+                        }
+                    }
+                }
+                if (unresolvedCount > 0)
+                    OnHasReminders(unresolvedCount);
+            }
+        }
+
+        public void OpenReminders()
+        {
+            ReminderDates.Clear();
+            RemindersByDate.Clear();
+
+            foreach (Reminder reminder in Reminders)
+            {
+                bool add = true;
+                foreach (Reminder reminderDate in ReminderDates)
+                {
+                    if(reminder.ReminderDate == reminderDate.ReminderDate)
+                    {
+                        add = false;
+                        break;
+                    }
+                }
+                if(add)
+                    ReminderDates.Add(reminder);
+            }
+
+            ViewRemindersWindow vrw = new ViewRemindersWindow();
+            vrw.DataContext = this;
+
+            vrw.lbDates.SelectedIndex = 0;
+            SIReminderDate = 0;
+            SIRemindersByDate = 0;
+
+            updateRemindersByDate();
+
+            vrw.ShowDialog();
+
+        }
+
+        private void LBRemindersByDateCMClick_click(object param)
+        {
+            string clickType = param as string;
+            switch (clickType)
+            {
+                case "Resolve":
+                     Reminder remToResolve = null;
+                    foreach (Reminder remin in Reminders)
+                    {
+                        if (remin == RemindersByDate[SIRemindersByDate])
+                        {
+                            remToResolve = remin;
+                            break;
+                        }
+                    }
+                    if (remToResolve != null)
+                    {
+                        remToResolve.ResolvedText = "true";
+                        remToResolve.ForeColorComplete = Brushes.Green;
+                    }
+                    break;
+
+                case "Delete":
+                    Reminder remToRemove = null;
+                    foreach (Reminder remin in Reminders)
+                    {
+                        if (remin == RemindersByDate[SIRemindersByDate])
+                        {
+                            remToRemove = remin;
+                            break;
+                        }
+                    }
+                    if (remToRemove != null)
+                    {
+                        Reminders.Remove(remToRemove);
+                        RemindersByDate.RemoveAt(SIRemindersByDate);
+                    }
+                    break;
+            }
+
+
+            SaveAllByReminders();
+        }
+
+        private void SaveAllByReminders()
+        {
+            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", ProjectName);
+            if (Directory.Exists(dirPath))
+                Directory.Delete(dirPath, true);
+
+            Directory.CreateDirectory(dirPath);
+
+            foreach (Reminder rem in Reminders)
+            {
+                string nameOfItem = rem.ReminderName;
+                nameOfItem = nameOfItem.Replace("/", "_");
+                nameOfItem = nameOfItem.Replace(":", "-");
+
+                string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", ProjectName, nameOfItem + ".txt");
+                File.AppendAllText(filePath, rem.ReminderText + SPLITTER + rem.ReminderDate + SPLITTER + rem.ResolvedText + REMINDER_SPLITTER);
+            }
+
+            CheckReminders();
+        }
+
+        #endregion
+
+        private int sIReminderDate;
+        public int SIReminderDate
+        {
+            get { return sIReminderDate; }
+            set
+            {
+                    sIReminderDate = value;
+                    updateRemindersByDate();
+                    if (PropertyChanged != null)
+                    {
+                        PropertyChanged(this, new PropertyChangedEventArgs("SIReminderDate"));
+                    }
+            }
+        }
+
+        private void updateRemindersByDate()
+        {
+            RemindersByDate.Clear();
+            foreach (Reminder reminder in Reminders)
+            {
+                if (SIReminderDate == -1) break;
+                if (reminder.ReminderDate == ReminderDates[SIReminderDate].ReminderDate)
+                    RemindersByDate.Add(reminder);
+            }
+        }
+
+        private int sIRemindersByDate;
+        public int SIRemindersByDate
+        {
+            get { return sIRemindersByDate; }
+            set
+            {
+                sIRemindersByDate = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("SIRemindersByDate"));
+                }
+            }
+        }
+
     }
 }

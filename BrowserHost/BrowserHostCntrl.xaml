@@ -108,7 +108,7 @@
                                     </LinearGradientBrush>
                                 </Grid.Background>-->
                                     <Border Background="Transparent" BorderBrush="#FF999999" BorderThickness="0,0,0,1">
-                                    <ScrollViewer x:Name="Sviewer" HorizontalScrollBarVisibility="Auto"
+                                    <ScrollViewer x:Name="Sviewer" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="Sviewer_PreviewMouseWheel"
                                                   VerticalScrollBarVisibility="Hidden">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -116,7 +116,7 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
-                                                <RowDefinition Height="39" />
+                                                <RowDefinition Height="*" />
                                             </Grid.RowDefinitions>
                                             <TabPanel x:Name="HeaderPanel"
                                                       SnapsToDevicePixels="True"

@@ -139,21 +139,20 @@ namespace Prospector.Helpers
 
                     string title = splistResult[1].Split(new string[] { "</a>" }, StringSplitOptions.None)[0];
                     title = title.Substring(title.IndexOf('>') + 1);
-                    title = title.Replace("&nbsp;", "");
                     title = title.Replace("<br>", "");//
                     title = title.Replace("<b>", "");
                     title = title.Replace("</b>", "");
                     title = title.Replace("�", "");
-                    title = title.Replace("&#39;", "");
+                    title = cleanString(title);
+
 
                     string description = splistResult[2].Split(new string[] { @"class=""st"">" }, StringSplitOptions.None)[1];
                     description = description.Remove(description.IndexOf("</span>"));
-                    description = description.Replace("&nbsp;", "");
                     description = description.Replace("<br>", "");
                     description = description.Replace("<b>", "");
                     description = description.Replace("</b>", ""); 
                     description = description.Replace("�", "");
-                    description = description.Replace("&#39;", "");
+                    description = cleanString(description);
 
 
 
@@ -171,6 +170,27 @@ namespace Prospector.Helpers
                 }
                 catch { counts++; }
             }
+        }
+
+        private string cleanString(string stringToClean)
+        {
+            string returnstring = "";
+            if (stringToClean.Contains('&'))
+            {
+                bool noAdd = false;
+                foreach (char c in stringToClean)
+                {
+                    if (c == '&') { noAdd = true; continue; }
+                    if (noAdd) { if (c == ';') noAdd = false; continue; }
+                    returnstring += c;
+                }
+            }
+            else
+            {
+                returnstring = stringToClean;
+            }
+
+            return returnstring;
         }
     }
 }
