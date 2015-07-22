@@ -141,6 +141,7 @@ namespace WpfCefDynamBrowser.Views
         {
             if (e.Key == Key.Enter)
             {
+              //  System.Windows.Forms.SendKeys.Send("{ENTER}");
                 InputSimulator.SimulateKeyPress(VirtualKeyCode.RETURN);
             }
         }

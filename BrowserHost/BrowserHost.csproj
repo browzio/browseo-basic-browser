@@ -61,14 +61,15 @@
   <ItemGroup>
     <Reference Include="InputSimulator, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Visual studio web downloads\InputSym\InputSimulator.0.1.0.0-bin\Debug\InputSimulator.dll</HintPath>
+      <HintPath>bin\x86\Debug\InputSimulator.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro">
-      <HintPath>..\..\Visual studio web downloads\WPFDynamicTab\packages\MahApps.Metro.1.0.0.0\lib\net45\MahApps.Metro.dll</HintPath>
+      <HintPath>bin\Debug\MahApps.Metro.dll</HintPath>
     </Reference>
     <Reference Include="MahApps.Metro.Resources">
-      <HintPath>..\..\..\..\Public\Documents\Awesomium SDK Samples\1.7.5.0\Awesomium.NET\Samples\WPF\MahApps.Metro\MahApps.Metro.Resources.dll</HintPath>
+      <HintPath>bin\Debug\MahApps.Metro.Resources.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -172,17 +173,9 @@
       <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>
       <Name>CefGlue.Client</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CefGlue.Demo.WinForms\CefGlue.Demo.WinForms.csproj">
-      <Project>{f9025ce1-2df4-409b-8961-a51dfaeaabdd}</Project>
-      <Name>CefGlue.Demo.WinForms</Name>
-    </ProjectReference>
     <ProjectReference Include="..\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
       <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
       <Name>CefGlue.WindowsForms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CefGlue.WPF\CefGlue.WPF.csproj">
-      <Project>{447c6790-e36e-4a54-bfac-06c92fff4aa3}</Project>
-      <Name>CefGlue.WPF</Name>
     </ProjectReference>
     <ProjectReference Include="..\CefGlue\CefGlue.csproj">
       <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>

@@ -772,46 +772,54 @@ namespace DragDropListview
 
         private void LBRemindersByDateCMClick_click(object param)
         {
-            string clickType = param as string;
-            switch (clickType)
+            try
             {
-                case "Resolve":
-                     Reminder remToResolve = null;
-                    foreach (Reminder remin in Reminders)
-                    {
-                        if (remin == RemindersByDate[SIRemindersByDate])
+                string clickType = param as string;
+                switch (clickType)
+                {
+                    case "Resolve":
+                        Reminder remToResolve = null;
+                        foreach (Reminder remin in Reminders)
                         {
-                            remToResolve = remin;
-                            break;
+                            if (remin == RemindersByDate[SIRemindersByDate])
+                            {
+                                remToResolve = remin;
+                                break;
+                            }
                         }
-                    }
-                    if (remToResolve != null)
-                    {
-                        remToResolve.ResolvedText = "true";
-                        remToResolve.ForeColorComplete = Brushes.Green;
-                    }
-                    break;
+                        if (remToResolve != null)
+                        {
+                            remToResolve.ResolvedText = "true";
+                            remToResolve.ForeColorComplete = Brushes.Green;
+                        }
+                        break;
 
-                case "Delete":
-                    Reminder remToRemove = null;
-                    foreach (Reminder remin in Reminders)
-                    {
-                        if (remin == RemindersByDate[SIRemindersByDate])
+                    case "Delete":
+                        Reminder remToRemove = null;
+                        foreach (Reminder remin in Reminders)
                         {
-                            remToRemove = remin;
-                            break;
+                            if (remin == RemindersByDate[SIRemindersByDate])
+                            {
+                                remToRemove = remin;
+                                break;
+                            }
                         }
-                    }
-                    if (remToRemove != null)
-                    {
-                        Reminders.Remove(remToRemove);
-                        RemindersByDate.RemoveAt(SIRemindersByDate);
-                    }
-                    break;
+                        if (remToRemove != null)
+                        {
+                            Reminders.Remove(remToRemove);
+                            RemindersByDate.RemoveAt(SIRemindersByDate);
+                        }
+                        break;
+                }
+
+                SaveAllByReminders();
             }
-
-
-            SaveAllByReminders();
+            catch 
+            {
+                MessageBox.Show("Action did not complete correctly please make sure"+
+                " the reminder is selected before choosing an action on it.");
+                return;
+            }
         }
 
         private void SaveAllByReminders()

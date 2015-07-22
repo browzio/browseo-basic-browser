@@ -16,7 +16,6 @@
         {
             OnContextMenuItemClicked(menuItemID);
         }
-
         private bool _handleCreated;
 
         private CefBrowser _browser;
@@ -69,12 +68,13 @@
             }
             catch { }
 		}
+
         CefWebClient client;
-        public CefWebClient CreateWebClient(CefRequestHandler requestHandler = null, CefRenderProcessHandler RenderProcessHandler = null)
-        {
+         public CefWebClient CreateWebClient(CefRequestHandler requestHandler = null, CefRenderProcessHandler RenderProcessHandler = null)
+         {
             client = new CefWebClient(this, requestHandler, RenderProcessHandler);
             return client;
-        }
+         }
 
         protected override void OnHandleCreated(EventArgs e)
         {
@@ -92,11 +92,12 @@
                 windowInfo.SetAsChild(Handle, new CefRectangle { X = 0, Y = 0, Width = Width, Height = Height });
 
                 if (client == null)
-                 client = CreateWebClient();
+                    client = CreateWebClient();
 
                 var settings = BrowserSettings;
-                if (settings == null) settings = new CefBrowserSettings { 
-                    JavaScriptAccessClipboard = CefState.Enabled ,
+                if (settings == null) settings = new CefBrowserSettings
+                {
+                    JavaScriptAccessClipboard = CefState.Enabled,
                     JavaScriptDomPaste = CefState.Enabled
                 };
 
@@ -174,8 +175,6 @@
 
             if (_browserWindowHandle != IntPtr.Zero)
             {
-            //try
-            //{
                 // Ignore size changes when form are minimized.
                 var form = TopLevelControl as Form;
                 if (form != null && form.WindowState == FormWindowState.Minimized)
@@ -184,8 +183,6 @@
                 }
 
                 ResizeWindow(_browserWindowHandle, Width, Height);
-            //}
-            //catch { }
             }
         }
 
@@ -223,17 +220,10 @@
         {
             if (handle != IntPtr.Zero)
             {
-            //try
-            //{
-                //NativeMethods.SetWindowPos(handle, IntPtr.Zero,
-                //    0, 0,  width, height,
-                //    SetWindowPosFlags.NoMove | SetWindowPosFlags.NoZOrder
-                //    );
-                NativeMethods.SetWindowPos(handle, IntPtr.Zero, 0, 0, width, height, SetWindowPosFlags.NoZOrder );
+                NativeMethods.SetWindowPos(handle, IntPtr.Zero,
+                    0, 0, width, height, SetWindowPosFlags.NoZOrder
+                    );
             }
-            //catch { }
-           // }
-            
         }
 
         public CefBrowser Browser { get { return _browser; } }
@@ -324,6 +314,5 @@
 			if (RenderProcessTerminated != null)
 				RenderProcessTerminated(this, e);
 		}
-
     }
 }

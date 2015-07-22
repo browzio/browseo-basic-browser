@@ -34,9 +34,9 @@
 				_core.OnBeforeClose();
 		}
 
-		protected override bool OnBeforePopup(CefBrowser browser, CefFrame frame, string targetUrl, string targetFrameName, CefPopupFeatures popupFeatures, CefWindowInfo windowInfo, ref CefClient client, CefBrowserSettings settings, ref bool noJavascriptAccess)
+        protected override bool OnBeforePopup(CefBrowser browser, CefFrame frame, string targetUrl, string targetFrameName, CefWindowOpenDisposition targetDisposition, bool userGesture, CefPopupFeatures popupFeatures, CefWindowInfo windowInfo, ref CefClient client, CefBrowserSettings settings, ref bool noJavascriptAccess)
 		{
-            if (targetUrl != null)
+             if (targetUrl != null)
             {
                 string target = targetUrl.ToLower();
                 if ((target.Contains("facebook") && target.Contains("popup")) || target.Contains("login") || target.Contains("oauth") || target.Contains("signup"))
@@ -49,30 +49,12 @@
 			var e = new BeforePopupEventArgs(frame, targetUrl, targetFrameName, popupFeatures, windowInfo, client, settings,
 								 noJavascriptAccess);
 
-            client = e.Client;
-            noJavascriptAccess = e.NoJavascriptAccess;
-
-            //if (targetUrl.Contains("popup"))
-            //{
-            //    //windowInfo.Style = Xilium.CefGlue.Platform.Windows.WindowStyle.WS_BORDER |
-            //    //    Xilium.CefGlue.Platform.Windows.WindowStyle.WS_CLIPCHILDREN |
-            //    //    Xilium.CefGlue.Platform.Windows.WindowStyle.WS_CLIPSIBLINGS |
-            //    //    Xilium.CefGlue.Platform.Windows.WindowStyle.WS_DLGFRAME |
-            //    //    Xilium.CefGlue.Platform.Windows.WindowStyle.WS_GROUP |
-            //    //    Xilium.CefGlue.Platform.Windows.WindowStyle.WS_MAXIMIZEBOX | 
-            //    //    Xilium.CefGlue.Platform.Windows.WindowStyle.WS_SIZEFRAME |
-            //    //    Xilium.CefGlue.Platform.Windows.WindowStyle.WS_SYSMENU |
-            //    //    Platform.Windows.WindowStyle.WS_POPUPWINDOW | 
-            //    //    Platform.Windows.WindowStyle.WS_POPUP | 
-            //    //    Platform.Windows.WindowStyle.WS_CHILD | 
-            //    //    Xilium.CefGlue.Platform.Windows.WindowStyle.WS_VISIBLE;
-            //   // windowInfo.SetAsChild(windowInfo.Handle, new CefRectangle() { Height = 500, Width = 100, X = 10, Y = 10 });
-            //    e.Handled = false;
-            //    return false;
-            //}
 			_core.InvokeIfRequired(() => _core.OnBeforePopup(e));
 
-            return true;
+			client = e.Client;
+			noJavascriptAccess = e.NoJavascriptAccess;
+
+			return true;
 		}
 
         private sealed class DummyWebClient : CefClient { }

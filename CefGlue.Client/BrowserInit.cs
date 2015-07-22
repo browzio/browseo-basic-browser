@@ -94,10 +94,14 @@ namespace Xilium.CefGlue.Client
 
         public static void Shutdown()
         {
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Browser Closed");
-            Organiser.Common.Classes.UsageTracker.SaveAllTrackedDataList();
-
-            SetErrorMode(ErrorModes.SEM_NOGPFAULTERRORBOX | ErrorModes.SEM_NOOPENFILEERRORBOX);
+            //try
+            //{
+            //    Organiser.Common.Classes.UsageTracker.AddTraceCookie("Browser Closed");
+            //    Organiser.Common.Classes.UsageTracker.SaveAllTrackedDataList();
+            //}
+            //catch { }
+            //SetErrorMode(ErrorModes.SEM_NOGPFAULTERRORBOX | ErrorModes.SEM_NOOPENFILEERRORBOX);
+            CefRuntime.Shutdown();
 
            // var threads = Process.GetCurrentProcess().Threads;
            // for (int i = 0; i < threads.Count; i++)

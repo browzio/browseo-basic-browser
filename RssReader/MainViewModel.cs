@@ -58,8 +58,6 @@ namespace RssReader
             DockPannelButtonsClick = new RelayCommand(OnDockPannelButtonsClick);
         }
 
-
-
         public void SetProfileData(PersonData profile)
         {
             mProfile = profile;
@@ -351,7 +349,6 @@ namespace RssReader
                 RefreshRssFeed();
             }
         }
-
 
     }
 }

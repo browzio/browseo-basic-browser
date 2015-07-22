@@ -98,7 +98,7 @@
                                   KeyboardNavigation.TabNavigation="Local"
                                   SnapsToDevicePixels="True">
                                 <Grid.RowDefinitions>
-                                    <RowDefinition x:Name="RowDefinition0" Height="40" />
+                                    <RowDefinition x:Name="RowDefinition0" Height="Auto" />
                                     <RowDefinition x:Name="RowDefinition1" Height="*" />
                                 </Grid.RowDefinitions>
                                 <!--<Grid.Background>
@@ -108,7 +108,9 @@
                                     </LinearGradientBrush>
                                 </Grid.Background>-->
                                     <Border Background="Transparent" BorderBrush="#FF999999" BorderThickness="0,0,0,1">
-                                    <ScrollViewer x:Name="Sviewer" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="Sviewer_PreviewMouseWheel"
+                                    <ScrollViewer x:Name="Sviewer" 
+                                                  HorizontalScrollBarVisibility="Auto" 
+                                                  PreviewMouseWheel="Sviewer_PreviewMouseWheel"
                                                   VerticalScrollBarVisibility="Hidden">
                                         <Grid>
                                             <Grid.ColumnDefinitions>
@@ -127,7 +129,8 @@
                                                       KeyboardNavigation.TabIndex="1" />
                                                 <Button Style="{StaticResource addButtonStyle}" 
                                                     Grid.Column="1"
-                                                    Margin="-13, 6, 0, 0" 
+                                                    Margin="-13, 3, 0, 5" 
+                                                    Name="btnAddTab"
                                                     Command="ApplicationCommands.New"  />
                                         </Grid>
                                         
@@ -141,9 +144,7 @@
                                     KeyboardNavigation.TabIndex="2"
                                     Background="White"
                                     KeyboardNavigation.TabNavigation="Local">
-                                    <Grid x:Name="PART_ItemsHolder"
-                                      
-                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                    <Grid x:Name="PART_ItemsHolder" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
                                 </Border>
                             </Grid>
                         </ControlTemplate>

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Windows.Forms;
     using Xilium.CefGlue;
 
     public class CefWebClient : CefClient
@@ -12,6 +11,7 @@
         private readonly CefWebDisplayHandler _displayHandler;
         private readonly CefWebLoadHandler _loadHandler;
         private readonly CefRequestHandler _requestHandler;
+       // private readonly CefRequestHandler _requestHandler;
         private readonly CefRenderProcessHandler _RenderProcessHandler;
         private readonly ContextMenue _contextMenueHandler;
 
@@ -28,7 +28,6 @@
             else
                 _requestHandler = requestHandler;
         }
-
 
         protected CefWebBrowser Core { get { return _core; } }
 
@@ -52,7 +51,7 @@
             return _requestHandler;
         }
 
-        protected override bool OnProcessMessageReceived(CefBrowser browser, CefProcessId sourceProcess, CefProcessMessage message)
+         protected override bool OnProcessMessageReceived(CefBrowser browser, CefProcessId sourceProcess, CefProcessMessage message)
         {
             return base.OnProcessMessageReceived(browser, sourceProcess, message);
         }

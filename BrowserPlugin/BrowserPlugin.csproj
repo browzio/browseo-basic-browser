@@ -74,7 +74,7 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
     <Reference Include="WpfHost.Interfaces">
-      <HintPath>..\..\Visual studio web downloads\plugins\WpfHost\bin\Release\WpfHost.Interfaces.dll</HintPath>
+      <HintPath>.\WpfHost.Interfaces.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -114,14 +114,6 @@
     <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">
       <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>
       <Name>CefGlue.Client</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CefGlue.Demo.WinForms\CefGlue.Demo.WinForms.csproj">
-      <Project>{f9025ce1-2df4-409b-8961-a51dfaeaabdd}</Project>
-      <Name>CefGlue.Demo.WinForms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CefGlue.Demo\CefGlue.Demo.csproj">
-      <Project>{b928a030-e818-4634-9c6b-f9224e996bd6}</Project>
-      <Name>CefGlue.Demo</Name>
     </ProjectReference>
     <ProjectReference Include="..\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
       <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>

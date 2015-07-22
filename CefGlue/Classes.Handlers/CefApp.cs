@@ -54,11 +54,6 @@
         /// </summary>
         protected virtual void OnRegisterCustomSchemes(CefSchemeRegistrar registrar)
         {
-            // http, data, chrome-devtools, chrome, https.
-            //registrar.AddCustomScheme("http", true, false, false);
-            //registrar.AddCustomScheme("chrome-devtools", true, false, false);
-            //registrar.AddCustomScheme("chrome", true, false, false);
-            //registrar.AddCustomScheme("https", true, false, false);
         }
 
 

@@ -13,8 +13,6 @@ namespace Xilium.CefGlue
     /// </summary>
     public abstract unsafe partial class CefRenderProcessHandler
     {
-        public static bool NoBeforeNavigation = false;
-
         private void on_render_thread_created(cef_render_process_handler_t* self, cef_list_value_t* extra_info)
         {
             CheckSelf(self);
@@ -119,12 +117,8 @@ namespace Xilium.CefGlue
         /// false to allow the navigation to proceed. The |request| object cannot be
         /// modified in this callback.
         /// </summary>
-        public virtual bool OnBeforeNavigation(CefBrowser browser, CefFrame frame, CefRequest request, CefNavigationType navigation_type, bool isRedirect)
+        protected virtual bool OnBeforeNavigation(CefBrowser browser, CefFrame frame, CefRequest request, CefNavigationType navigation_type, bool isRedirect)
         {
-            bool returnvav = NoBeforeNavigation;
-            if (NoBeforeNavigation)
-                NoBeforeNavigation = false;
-           // System.Windows.Forms.MessageBox.Show(returnvav.ToString());
             return false;
         }
 

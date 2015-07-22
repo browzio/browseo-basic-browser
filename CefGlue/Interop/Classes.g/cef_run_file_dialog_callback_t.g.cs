@@ -13,7 +13,7 @@ namespace Xilium.CefGlue.Interop
     internal unsafe struct cef_run_file_dialog_callback_t
     {
         internal cef_base_t _base;
-        internal IntPtr _cont;
+        internal IntPtr _on_file_dialog_dismissed;
         
         [UnmanagedFunctionPointer(libcef.CEF_CALLBACK)]
         #if !DEBUG
@@ -37,7 +37,7 @@ namespace Xilium.CefGlue.Interop
         #if !DEBUG
         [SuppressUnmanagedCodeSecurity]
         #endif
-        internal delegate void cont_delegate(cef_run_file_dialog_callback_t* self, cef_browser_host_t* browser_host, cef_string_list* file_paths);
+        internal delegate void on_file_dialog_dismissed_delegate(cef_run_file_dialog_callback_t* self, int selected_accept_filter, cef_string_list* file_paths);
         
         private static int _sizeof;
         

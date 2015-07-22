@@ -28,6 +28,8 @@ namespace BrowserHost
 
         public ObservableCollection<BrowserTabViewModel> BrowserTabs { get; set; }
 
+        ulong availmem;
+
         public BrowserHostCntrl()
         {
             InitializeComponent();
@@ -39,7 +41,9 @@ namespace BrowserHost
             CommandBindings.Add(new CommandBinding(ApplicationCommands.New, OpenNewTab));
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, CloseTab));
 
-
+            Microsoft.VisualBasic.Devices.ComputerInfo ci = new Microsoft.VisualBasic.Devices.ComputerInfo();
+            availmem = ci.AvailablePhysicalMemory;
+            availmem = availmem / (1024 * 1024);
         }
 
 
@@ -90,6 +94,17 @@ namespace BrowserHost
 
         private void OpenNewTab(object sender, ExecutedRoutedEventArgs e)
         {
+            new System.Threading.Thread(() => {
+                double total = 0;
+                foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcessesByName("BrowserAndFeatures"))
+                {
+                    var counter = new System.Diagnostics.PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
+                    total += counter.RawValue / (1024 * 1024);
+                    if ((availmem - total) < 100)
+                        MessageBox.Show("to many tabs.");
+                }
+            }).Start();
+
             CreateNewTab();
 
             //if (TabControl.Items.Count == 1)
@@ -120,9 +135,25 @@ namespace BrowserHost
                     btvm.TabMargin = new Thickness(-3, 0, 0, 0);
                 BrowserTabs.Add(btvm);
 
-                ScrollViewer scrollview = FindVisualChild<ScrollViewer>(TabControl);
-                if (scrollview != null)
-                    scrollview.ScrollToVerticalOffset(9.5);
+                //ScrollViewer scrollview = FindVisualChild<ScrollViewer>(TabControl);
+                //if (scrollview != null)
+                //{
+                //    scrollview.ScrollToBottom();
+
+                //    Button openTabBtn = FindVisualChild<Button>(TabControl);
+                //    if (openTabBtn != null)
+                //    {
+                //        if (scrollview.ExtentHeight == 33)
+                //        {
+                //            openTabBtn.Margin = new Thickness(-13, 13, 0, 0);
+                //        }
+                //        if (scrollview.ContentVerticalOffset == 14)
+                //        {
+                //            openTabBtn.Margin = new Thickness(-13, -5, 0, 0);
+                //        }
+                //    }
+                //}
+                    //scrollview.ScrollToVerticalOffset(9.5);
             });
         }
 

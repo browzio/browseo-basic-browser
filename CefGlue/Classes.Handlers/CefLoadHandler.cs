@@ -77,7 +77,6 @@ namespace Xilium.CefGlue
         /// </summary>
         protected virtual void OnLoadEnd(CefBrowser browser, CefFrame frame, int httpStatusCode)
         {
-           // browser.SendProcessMessage(CefProcessId.Renderer, CefProcessMessage.Create("GetHackerNewsTitles"));
         }
 
 

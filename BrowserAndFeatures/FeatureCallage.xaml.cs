@@ -114,6 +114,7 @@ namespace BrowserAndFeatures
         {
             //if (login != null && didLogin)
             //    login.Logout();
+            close();
             BrowserInit.Shutdown();
         }
 

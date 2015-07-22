@@ -24,8 +24,12 @@ namespace Organiser.Common.Classes
             if (UsageList.Count > 10)
             {
                 new Thread(() => {
-                    SaveAllTrackedDataList();
-                    UsageList.Clear();
+                    try
+                    {
+                        SaveAllTrackedDataList();
+                        UsageList.Clear();
+                    }
+                    catch { }
                 }).Start();
             }
         }

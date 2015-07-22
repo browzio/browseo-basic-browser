@@ -50,11 +50,11 @@ namespace Xilium.CefGlue.Client
         {
         }
 
-        protected override void OnScrollOffsetChanged(CefBrowser browser)
+        protected override void OnCursorChange(CefBrowser browser, IntPtr cursorHandle, CefCursorType type, CefCursorInfo customCursorInfo)
         {
         }
 
-        protected override void OnCursorChange(CefBrowser browser, IntPtr cursorHandle, CefCursorType type, CefCursorInfo customCursorInfo)
+        protected override void OnScrollOffsetChanged(CefBrowser browser, double x, double y)
         {
         }
     }
