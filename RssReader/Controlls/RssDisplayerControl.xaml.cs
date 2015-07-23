@@ -20,6 +20,8 @@ namespace RssReader.Controlls
     /// </summary>
     public partial class RssDisplayerControl : UserControl
     {
+        public event Action<int> OnScrolled = delegate { };
+
         public RssDisplayerControl()
         {
             InitializeComponent();
@@ -69,6 +71,12 @@ namespace RssReader.Controlls
                 }
             }
             return null;
-        } 
+        }
+
+        private void lv_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            OnScrolled(e.Delta);
+        }
+
     }
 }

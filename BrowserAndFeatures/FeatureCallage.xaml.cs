@@ -93,6 +93,7 @@ namespace BrowserAndFeatures
                 profile.CmbSelectedIndexSex = Convert.ToInt32(ini.IniReadValue("Data", "Sex"));
                 profile.CmbSelectedIndexDay = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayDay"));
                 profile.CmbSelectedIndexMonth = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayMonth"));
+                profile.ProjectDIr = sitesFilePath.Replace("\\ProjectData.ini", "");
                 try
                 {
                     profile.BirthdayYear = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayYear"));
@@ -114,6 +115,7 @@ namespace BrowserAndFeatures
         {
             //if (login != null && didLogin)
             //    login.Logout();
+            RssReader.MainViewModel.isCloseing = true;
             close();
             BrowserInit.Shutdown();
         }

@@ -24,5 +24,10 @@ namespace RssReader.Controlls
         {
             InitializeComponent();
         }
+
+        private void RssDisplayerControl_OnScrolled(int delta)
+        {
+            MyScrollViewer.ScrollToVerticalOffset(MyScrollViewer.VerticalOffset - delta);
+        }
     }
 }

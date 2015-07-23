@@ -72,16 +72,17 @@ namespace Organiser.Common.Classes
             return projects;
         }
 
-        public static List<KeyValuePair<string, string>> GetSubProjectsFolders(string projectName)
+        public static List<KeyValuePair<string, string>> GetSubProjectsFolders(string path, string projname)
         {
             List<KeyValuePair<string, string>> projects = new List<KeyValuePair<string, string>>();
-            string path = Path.Combine(GetBaseDir(), "Projects\\" + projectName);
+           // string path = Path.Combine(GetBaseDir(), "Projects\\" + projectName);
             if (Directory.Exists(path))
             {
-                projects.Add(new KeyValuePair<string, string>(projectName, Path.Combine(path, "ProjectData.ini")));
+                projects.Add(new KeyValuePair<string, string>(projname, Path.Combine(path, "ProjectData.ini")));
                 DirectoryInfo dirInfo = new DirectoryInfo(path);
                 foreach (DirectoryInfo dir in dirInfo.GetDirectories())
                 {
+                    if (!dir.Name.Contains("teir"))
                     projects.Add(new KeyValuePair<string, string>(dir.Name, dir.FullName));
                 }
                 return projects;
@@ -227,9 +228,9 @@ namespace Organiser.Common.Classes
             catch { MessageBox.Show("Project not saved."); }
         }
 
-        public static bool HasMultipleProfiles(string projectName)
+        public static bool HasMultipleProfiles(string path)
         {
-            string path = Path.Combine(GetBaseDir(), "Projects\\" + projectName);
+            //string path = Path.Combine(GetBaseDir(), "Projects\\" + projectName);
             if (!Directory.Exists(path))
                 return false;
 

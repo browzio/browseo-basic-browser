@@ -205,9 +205,11 @@ namespace RssReader.Controlls
                     vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
                     vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
                    // vm.OnImportedTab += vm_OnImportedTab;
-                    vm.SetProfileData(mProfile);
+                    //vm.SetProfileData(mProfile);
                     UserRssTabs.Add(vm);
                 }
+                if(UserRssTabs.Count > 0)
+                    UserRssTabs[0].SetProfileData(mProfile);
             }
         }
 
@@ -219,6 +221,15 @@ namespace RssReader.Controlls
         void vm_OnLaunchToBrowser(string link, string rssLink)
         {
             OnLaunchToBrowser(link, rssLink);
+        }
+
+        private void tbContrl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                UserRssTabs[tbContrl.SelectedIndex].SetProfileData(mProfile);
+            }
+            catch { }
         }
     }
 }

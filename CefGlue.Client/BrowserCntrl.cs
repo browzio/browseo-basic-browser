@@ -32,6 +32,9 @@ namespace Xilium.CefGlue.Client
 
         private bool isWindowPopUp;
 
+        private static int lastProfileIndex = 0;
+
+
         private string startUrl = null, huverLunk = "";
 
         public BrowserCntrl()
@@ -352,7 +355,7 @@ namespace Xilium.CefGlue.Client
 
         PersonData pdataForImgur = null;
         #endregion
-
+        
         public void InjectData()
         {
 
@@ -364,11 +367,12 @@ namespace Xilium.CefGlue.Client
             PersonData profile = BrowserInit.pData;
             if (pdataForImgur == null)
             {
-                if (MyFilesDatabase.HasMultipleProfiles(BrowserInit.pData.ProjectName))
+                if (MyFilesDatabase.HasMultipleProfiles(BrowserInit.pData.ProjectDIr))
                 {
-                    SelectProfileWindow selectProfile = new SelectProfileWindow(BrowserInit.pData.ProjectName);
+                    SelectProfileWindow selectProfile = new SelectProfileWindow(BrowserInit.pData.ProjectName, BrowserInit.pData.ProjectDIr, lastProfileIndex);
                     selectProfile.ShowDialog();
                     if (!selectProfile.OkClicked) return;
+                    lastProfileIndex = selectProfile.cmProfiles.SelectedIndex;
                     profile = MyFilesDatabase.GetSubProjectPersonData(selectProfile.SelectedProfileFilePath);
                 }
             }

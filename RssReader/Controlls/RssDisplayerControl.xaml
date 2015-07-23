@@ -44,6 +44,7 @@
                                HorizontalAlignment="Left"
                                VerticalAlignment="Top"
                                MaxHeight="100" Grid.Row="1"
+                               Visibility="{Binding ImageLinkVisible}"
                                Stretch="Uniform"/>
                         <Grid Grid.Column="1" Margin="15,0,0,0">
                             <Grid.RowDefinitions>
@@ -260,10 +261,9 @@
                       MinHeight="400"
                       ItemsSource="{Binding ListResults}"
                       BorderThickness="0"
-                      ScrollViewer.VerticalScrollBarVisibility="Visible"
-                      ScrollViewer.HorizontalScrollBarVisibility="Disabled" 
-                      MouseEnter="ListView_MouseEnter"
-                      MouseLeave="ListView_MouseLeave"
+                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      PreviewMouseWheel="lv_PreviewMouseWheel"
                       ItemTemplate="{DynamicResource MetroListBoxItemTemplate}" 
                       ItemContainerStyle="{DynamicResource MetroListBoxItemStyle}"
                       SelectedIndex="{Binding SIListResults, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">

@@ -62,6 +62,7 @@
         <ComboBox ItemsSource="{Binding ProfilesList}" 
                       Margin="5" 
                       Name="cmProfiles"
+                        x:FieldModifier="public"
                       Style="{StaticResource FlatComboBoxStyle}" />
             <Button Margin="5" 
                     Click="Button_Click" 

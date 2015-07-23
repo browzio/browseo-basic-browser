@@ -29,6 +29,7 @@ namespace BrowserHost
         public ObservableCollection<BrowserTabViewModel> BrowserTabs { get; set; }
 
         ulong availmem;
+        int timesToCheck = 0;
 
         public BrowserHostCntrl()
         {
@@ -94,16 +95,23 @@ namespace BrowserHost
 
         private void OpenNewTab(object sender, ExecutedRoutedEventArgs e)
         {
-            new System.Threading.Thread(() => {
-                double total = 0;
-                foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcessesByName("BrowserAndFeatures"))
+            if (timesToCheck++ >= 5)
+            {
+                new System.Threading.Thread(() =>
                 {
-                    var counter = new System.Diagnostics.PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
-                    total += counter.RawValue / (1024 * 1024);
-                    if ((availmem - total) < 100)
-                        MessageBox.Show("to many tabs.");
-                }
-            }).Start();
+                    double total = 0;
+                    foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcessesByName("BrowserAndFeatures"))
+                    {
+                        var counter = new System.Diagnostics.PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
+                        total += counter.RawValue / (1024 * 1024);
+                        if ((availmem - total) < 300)
+                            MessageBox.Show(
+                                "You have only 300mb of ram space left please close down other applications"+
+                                " to free up ram before continuing. Or refrain from openning more tabs, keep in mind"+
+                                " you will risk your computer and Browseo's performance.");
+                    }
+                }).Start();
+            }
 
             CreateNewTab();
 

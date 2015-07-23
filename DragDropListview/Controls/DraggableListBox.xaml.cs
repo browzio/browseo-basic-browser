@@ -33,6 +33,7 @@ namespace DragDropListview.Controls
 
         public bool SaveSite(string site)
         {
+            if (vm == null) return false;
             EditBookmarkWindow ebm = new EditBookmarkWindow();
             ebm.SetValues(site, site, vm.FoldersAndSitesList, DragDropMainViewModel.LastSelectedIndex);
             ebm.ShowDialog();
@@ -49,16 +50,19 @@ namespace DragDropListview.Controls
 
         private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            if (vm == null) return;
             vm.DoubleClickedFolderSide();
         }
 
         private void siteSide_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            if (vm == null) return;
             vm.DoubleClickedSitesSide();
         }
 
         public void EportSitesToTxt()
         {
+            if (vm == null) return;
             vm.EportSitesToTxt();
         }
     }

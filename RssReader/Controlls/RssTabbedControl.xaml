@@ -239,7 +239,8 @@
     
     <Grid >
         <commonControlls:NonReloadingTabControl x:Name="tbContrl"  
-                                                BorderThickness="0"  
+                                                BorderThickness="0" 
+                                                SelectionChanged="tbContrl_SelectionChanged"
                                                 ItemsSource="{Binding UserRssTabs}">
             <TabControl.ContentTemplate>
                 <DataTemplate>

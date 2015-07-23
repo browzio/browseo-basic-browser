@@ -36,12 +36,16 @@ namespace Organiser.Common
         List<KeyValuePair<string, string>> directoryValues;
 
         string projectName;
+        string projectDir;
+        int lastProfileIndex;
         private bool isSelectProjWindow;
 
-        public SelectProfileWindow(string projName)
+        public SelectProfileWindow(string projName, string projDir, int lastIndex)
         {
             InitializeComponent();
             projectName = projName;
+            projectDir = projDir;
+            lastProfileIndex = lastIndex;
             ProfilesList = new ObservableCollection<string>();
             DataContext = this;
         }
@@ -78,7 +82,7 @@ namespace Organiser.Common
             this.Icon = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\browseo (1).ico"));
             if (!isSelectProjWindow)
             {
-                directoryValues = MyFilesDatabase.GetSubProjectsFolders(projectName);
+                directoryValues = MyFilesDatabase.GetSubProjectsFolders(projectDir, projectName);
             }
             else
             {
@@ -90,7 +94,10 @@ namespace Organiser.Common
                 ProfilesList.Add(item.Key);
             }
 
-            cmProfiles.SelectedIndex = 0;
+            if (lastProfileIndex > 0 && lastProfileIndex <= cmProfiles.Items.Count)
+                cmProfiles.SelectedIndex = lastProfileIndex;
+            else
+                cmProfiles.SelectedIndex = 0;
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)

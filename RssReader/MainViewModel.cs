@@ -19,12 +19,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 using System.Xml;
 
 namespace RssReader
 {
     public class MainViewModel : INotifyPropertyChanged
     {
+        public static bool isCloseing
+        {
+            get;
+            set;
+        }
         public event Action<string, string> OnLaunchToBrowser = delegate { };//link, rsslink
         public event Action<string> OnLaunchToTabBrowser = delegate { };//url
       //  public event Action<string,List<string>> OnImportedTab = delegate { };//tab title, list of rss feeds
@@ -60,8 +66,11 @@ namespace RssReader
 
         public void SetProfileData(PersonData profile)
         {
-            mProfile = profile;
-            RefreshRssFeed();
+            if (mProfile == null)
+            {
+                mProfile = profile;
+                RefreshRssFeed();
+            }
         }
 
         private void OnDockPannelButtonsClick(object param)
@@ -139,12 +148,17 @@ namespace RssReader
                 foreach (string link in rssFeeds)
                 {
                     if (string.IsNullOrEmpty(link) || string.IsNullOrWhiteSpace(link)) continue;
-                    AllRssFeedsResults.Add(new RssList() { RssLink = link.Trim(), ListResults = new ObservableCollection<RssResult>() });
+                    AllRssFeedsResults.Add(new RssList() { RssLink = link.Trim(), ListResults = new BindingList<RssResult>() { RaiseListChangedEvents = false } });
                 }
+
+                Mouse.OverrideCursor = Cursors.Wait;
+                
                 loadingThread = new Thread(() =>
                 {
                     try
                     {
+
+                        List<RssResult> tempResultsList = new List<RssResult>();
                         List<string> failedLinks = new List<string>();
 
                         foreach (RssList rssLink in AllRssFeedsResults)
@@ -194,7 +208,7 @@ namespace RssReader
                                             fixedTitle = Regex.Replace(fixedTitle, "<.*?>", string.Empty);
                                         }
 
-                                        App.Current.Dispatcher.Invoke((Action)delegate
+                                        if (tempResultsList.Count < 20)
                                         {
                                             RssResult result = new RssResult()
                                             {
@@ -204,10 +218,11 @@ namespace RssReader
                                                 Description = fixedDescription,
                                                 ImageLink = imgLink
                                             };
+                                            if (result.ImageLink == "")
+                                                result.ImageLinkVisible = Visibility.Collapsed;
                                             result.OnClickedSendSocialLink += result_OnClickedSendSocialLink;
-                                            rssLink.ListResults.Add(result);
-                                        });
-                                        if (rssLink.ListResults.Count > 20) break;
+                                            tempResultsList.Add(result);
+                                        }
                                     }
                                 }
                                 rssLink.PBarVis = false;
@@ -220,9 +235,24 @@ namespace RssReader
                                 rssLink.ListResultVis = true;
                                 failedLinks.Add(rssLink.RssLink);
                             }
+                            App.Current.Dispatcher.Invoke(DispatcherPriority.Background, (Action)delegate
+                            {
+
+                            foreach (RssResult r in tempResultsList)
+                            {
+                                rssLink.ListResults.Add(r);
+                            }
+                                //rssLink.ListResults.AddRange(tempResultsList);
+                                tempResultsList.Clear();
+                                // after all.. update the UI with following
+                               // rssLink.ListResults.RaiseListChangedEvents = true;
+                                //rssLink.ListResults.ResetBindings(); // this forces update of entire list
+                            });
+
+                               // rssLink.RaisListPropChanged();
                         }
 
-                        if (failedLinks.Count > 0)
+                        if (failedLinks.Count > 0 && !isCloseing)
                         {
                             string failed = "";
                             foreach (string failedLink in failedLinks)
@@ -238,8 +268,14 @@ namespace RssReader
                     }
                     catch 
                     {
+                        if (!isCloseing)
                         MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
                     }
+
+                    App.Current.Dispatcher.Invoke(DispatcherPriority.Background, (Action)delegate
+                    {
+                        Mouse.OverrideCursor = Cursors.Arrow;
+                    });
                 });
                 loadingThread.Start();
             }
@@ -289,6 +325,11 @@ namespace RssReader
                     break;
 
                 case Social.SOCIALTYPE_pin:
+                    if (imageLink == "")
+                    {
+                        MessageBox.Show("The feed needs to link to a image share to pinterest.");
+                        return;
+                    }
                     fullUrl = Social.SHARELINK_pintrest + link + "&media=" + imageLink;
                     break;
 

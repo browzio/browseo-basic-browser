@@ -215,5 +215,7 @@ namespace SocialOrganizer.Models
             get { return notes; }
             set { notes = value; }
         }
+
+        public string ProjectDIr { get; set; }
     }
 }

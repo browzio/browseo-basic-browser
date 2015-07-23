@@ -596,6 +596,8 @@ namespace Prospector.ViewModels
 
         private void search(object param)
         {
+            Mouse.OverrideCursor = Cursors.Wait;
+
             string Query = FootPrintString;
             Query = Query.Replace("\"", "%22");
             Query = Query.Trim();
@@ -606,6 +608,8 @@ namespace Prospector.ViewModels
             Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Search " + Query);
 
             GetKeywordRankings(Query, MaxPages[CmbMaxPAgesIndex], false);
+
+            Mouse.OverrideCursor = Cursors.Arrow;
         }
 
         private void sendLinkToBrowser(object obj)

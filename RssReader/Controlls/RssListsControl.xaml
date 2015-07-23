@@ -17,7 +17,7 @@
             <helpers:booleanToVisible x:Key="boolToVis" />
         <helpers:ArithmaticConverter x:Key="arithConverter" />
         <DataTemplate x:Key="ItemTemplate2">
-                <controlls:RssDisplayerControl Margin="10"  />
+                <controlls:RssDisplayerControl Margin="10" OnScrolled="RssDisplayerControl_OnScrolled" />
                 <!--MaxHeight="700"-->
         </DataTemplate>
             <ItemsPanelTemplate x:Key="ItemsPanelTemplate1">

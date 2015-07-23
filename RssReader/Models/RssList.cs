@@ -1,4 +1,5 @@
-﻿using RssReader.Helpers;
+﻿using Organiser.Common.Classes;
+using RssReader.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -77,7 +78,12 @@ namespace RssReader.Models
 
         //
 
-        public ObservableCollection<RssResult> ListResults { get; set; }
+        public BindingList<RssResult> ListResults { get; set; }
+
+        public void RaisListPropChanged()
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs("ListResults"));
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

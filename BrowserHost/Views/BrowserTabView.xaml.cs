@@ -173,11 +173,13 @@ namespace WpfCefDynamBrowser.Views
 
         private void SaveSite_Click(object sender, RoutedEventArgs e)
         {
+            if (dragnDropListview == null) return;
             dragnDropListview.SaveSite(cmbSites.Text);
         }
 
         private void btnExportAllBookmarks_Click(object sender, RoutedEventArgs e)
         {
+            if (dragnDropListview == null) return;
             dragnDropListview.EportSitesToTxt();
         }
 

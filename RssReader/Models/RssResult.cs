@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace RssReader.Models
@@ -70,6 +71,18 @@ namespace RssReader.Models
                 imageLink = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("ImageLink"));
+            }
+        }
+
+        private Visibility imageLinkVisible;
+        public Visibility ImageLinkVisible
+        {
+            get { return imageLinkVisible; }
+            set
+            {
+                imageLinkVisible = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("ImageLinkVisible"));
             }
         }
 

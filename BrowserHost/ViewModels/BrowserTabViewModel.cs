@@ -420,8 +420,8 @@ namespace WpfCefDynamBrowser.ViewModels
 
         private void FillList()
         {
-            SitesList.Clear();
-            SitesList = PersonDataFileReader.GetSavedSites(SitesList, BrowserInit.pData.ProjectName);
+          //  SitesList.Clear();
+           // SitesList = PersonDataFileReader.GetSavedSites(SitesList, BrowserInit.pData.ProjectName);
         }
 
         private void SaveSite()
