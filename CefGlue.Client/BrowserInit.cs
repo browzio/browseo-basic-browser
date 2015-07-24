@@ -24,6 +24,7 @@ namespace Xilium.CefGlue.Client
         {
             SitesFilePath = sitesFilePath;
             pData = data;
+
             try
             {
                 CefRuntime.Load();
@@ -59,14 +60,21 @@ namespace Xilium.CefGlue.Client
             {
                 Application.Idle += (sender, e) => { CefRuntime.DoMessageLoopWork(); };
             }
-
+            
             CefRuntime.Initialize(mainArgs, settings, app);
+
+            //CefRuntime.AddWebPluginDirectory(@"C:\Windows\system32\Macromed\Flash\");
+            //CefRuntime.RefreshWebPlugins();
 
             Organiser.Common.Classes.UsageTracker.ProjectName = pData.ProjectName;
             Organiser.Common.Classes.UsageTracker.AddTraceCookie("Browser Started");
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+
+            //CefRuntime.AddWebPluginDirectory(@"C:\Windows\system32\Macromed\Flash");
+            //CefRuntime.AddWebPluginPath(@"C:\Windows\System32\Macromed\Flash\pepflashplayer64_18_0_0_209.dll");
+            //CefRuntime.RefreshWebPlugins();
         }
 
         [DllImport("kernel32.dll", SetLastError = true)]

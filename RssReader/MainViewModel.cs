@@ -220,6 +220,12 @@ namespace RssReader
                                             };
                                             if (result.ImageLink == "")
                                                 result.ImageLinkVisible = Visibility.Collapsed;
+                                            if (!result.ImageLink.Contains("http"))
+                                            {
+                                                string tempIimgLink = result.ImageLink;
+                                                result.ImageLink = "";
+                                                result.ImageLink = "https:" + tempIimgLink; 
+                                            }
                                             result.OnClickedSendSocialLink += result_OnClickedSendSocialLink;
                                             tempResultsList.Add(result);
                                         }

@@ -26,6 +26,12 @@
 
         protected override void OnBeforeCommandLineProcessing(string processType, CefCommandLine commandLine)
         {
+
+            //commandLine.AppendArgument("--enable-npapi");
+           // CefRuntime.AddWebPluginDirectory(@"C:\Windows\System32\Macromed\Flash\");
+            //CefRuntime.AddWebPluginPath(@"C:\Windows\System32\Macromed\Flash\pepflashplayer64_18_0_0_209.dll");
+            //CefRuntime.RefreshWebPlugins();
+
             //if (!System.IO.File.Exists("C:\\file.txt"))
               //  commandLine.AppendSwitch("proxy-server", "23.94.20.30:80");
             //else
@@ -45,6 +51,19 @@
                     MessageBox.Show("failed to set proxy");
                 }
             }
+
+            //commandLine.AppendArgument("enable-system-flash");
+            
+        }
+    }
+
+    class MyPluginVisitor : CefWebPluginInfoVisitor
+    {
+
+        protected override bool Visit(CefWebPluginInfo info, int count, int total)
+        {
+            MessageBox.Show("yo");
+           return false;
         }
     }
 
