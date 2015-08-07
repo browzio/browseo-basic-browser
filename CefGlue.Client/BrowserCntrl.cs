@@ -12,6 +12,7 @@ using Organiser.Common.Classes;
 using Organiser.Common;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using DragDropListview;
 
 namespace Xilium.CefGlue.Client
 {
@@ -360,20 +361,51 @@ namespace Xilium.CefGlue.Client
         {
 
             if (CBrowser.Browser.GetMainFrame().Url == null) return;
-
+            string curUrl = CBrowser.Browser.GetMainFrame().Url;
             //bool isFromMulti = false;
             //string selectedPath = "";
             
             PersonData profile = BrowserInit.pData;
             if (pdataForImgur == null)
             {
-                if (MyFilesDatabase.HasMultipleProfiles(BrowserInit.pData.ProjectDIr))
+                bool found = false;
+                bool isImportedList = false;
+                try
                 {
-                    SelectProfileWindow selectProfile = new SelectProfileWindow(BrowserInit.pData.ProjectName, BrowserInit.pData.ProjectDIr, lastProfileIndex);
-                    selectProfile.ShowDialog();
-                    if (!selectProfile.OkClicked) return;
-                    lastProfileIndex = selectProfile.cmProfiles.SelectedIndex;
-                    profile = MyFilesDatabase.GetSubProjectPersonData(selectProfile.SelectedProfileFilePath);
+                    if (DragDropMainViewModel.Instance.FoldersAndSitesList != null && DragDropMainViewModel.Instance.FoldersAndSitesList[DragDropMainViewModel.Instance.SIFoldersSide].IsImported)
+                    {
+                        string urltoCheck = curUrl.Substring(curUrl.IndexOf('.') + 1);
+                        if (urltoCheck.Contains('.'))
+                            urltoCheck = urltoCheck.Split('.')[0];
+                        isImportedList = true;
+                        foreach (Bookmark b in DragDropMainViewModel.Instance.FoldersAndSitesList[DragDropMainViewModel.Instance.SIFoldersSide].Sites)
+                        {
+                            if (!b.IsImported) continue;
+                            string blinkToChek = b.Link.Substring(b.Link.IndexOf('.') + 1);
+                            if (blinkToChek.Contains('.'))
+                                blinkToChek = blinkToChek.Split('.')[0];
+                            if (urltoCheck.Contains(blinkToChek))
+                            {
+                                profile.Username = b.Username;
+                                profile.Email = b.Email;
+                                profile.Password = b.Password;
+                                found = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                catch {}
+                if (!found && !isImportedList)
+                {
+                    if (MyFilesDatabase.HasMultipleProfiles(BrowserInit.pData.ProjectDIr))
+                    {
+                        SelectProfileWindow selectProfile = new SelectProfileWindow(BrowserInit.pData.ProjectName, BrowserInit.pData.ProjectDIr, lastProfileIndex, CBrowser.Browser.GetMainFrame().Url.ToLower());
+                        selectProfile.ShowDialog();
+                        if (!selectProfile.OkClicked) return;
+                        lastProfileIndex = selectProfile.cmProfiles.SelectedIndex;
+                        profile = MyFilesDatabase.GetSubProjectPersonData(selectProfile.SelectedProfileFilePath);
+                    }
                 }
             }
             else

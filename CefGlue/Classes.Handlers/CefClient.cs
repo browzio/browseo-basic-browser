@@ -73,7 +73,43 @@ namespace Xilium.CefGlue
         /// </summary>
         protected virtual CefDownloadHandler GetDownloadHandler()
         {
-            return null;
+            if (downlaodHandler == null)
+                downlaodHandler = new CefWebClientDownloadHandler();
+            return downlaodHandler;
+        }
+
+        CefWebClientDownloadHandler downlaodHandler;
+        public class CefWebClientDownloadHandler : CefDownloadHandler
+        {
+            bool didnotshowcomplete;
+            protected override void OnBeforeDownload(CefBrowser browser, CefDownloadItem downloadItem, string suggestedName, CefBeforeDownloadCallback callback)
+            {
+
+                callback.Continue("", true);
+
+                //base.OnBeforeDownload(browser, downloadItem, suggestedName, callback);
+
+            }
+
+            protected override void OnDownloadUpdated(CefBrowser browser, CefDownloadItem downloadItem, CefDownloadItemCallback callback)
+            {
+
+                if (downloadItem.PercentComplete <= 0)
+                    didnotshowcomplete = false;
+
+                if (downloadItem.PercentComplete >= 100 && !didnotshowcomplete && downloadItem.FullPath != null)
+                {
+                    System.Windows.Forms.MessageBox.Show("Download complete");
+                    try
+                    {
+                        Process.Start(downloadItem.FullPath.Remove(downloadItem.FullPath.LastIndexOf("\\")));
+                    }
+                    catch { }
+                    didnotshowcomplete = true;
+                }
+
+                base.OnDownloadUpdated(browser, downloadItem, callback);
+            }
         }
 
 

@@ -99,7 +99,6 @@
                 {
                     JavaScriptAccessClipboard = CefState.Enabled,
                     JavaScriptDomPaste = CefState.Enabled
-
                 };
 
                 CefBrowserHost.CreateBrowser(windowInfo, client, settings, StartUrl);

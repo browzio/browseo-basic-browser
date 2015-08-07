@@ -71,5 +71,17 @@ namespace DragDropListview.Windows
                 cmbFolders.SelectedIndex = lastSelectedIndex;
             }
         }
+
+        public bool IsCP { get; set; }
+
+        private void Email_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (IsCP)
+            {
+                (sender as TextBox).IsReadOnly = true;
+                (sender as TextBox).SelectAll();
+                Clipboard.SetText((sender as TextBox).Text);
+            }
+        }
     }
 }

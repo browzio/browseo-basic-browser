@@ -170,8 +170,8 @@
             </Grid.RowDefinitions>
             <Grid.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                    <GradientStop Offset="0" Color="#4c4c4c"></GradientStop>
-                    <GradientStop Offset="1" Color="#434343"></GradientStop>
+                    <GradientStop Offset="0" Color="White"></GradientStop>
+                    <GradientStop Offset="1" Color="White"></GradientStop>
                 </LinearGradientBrush>
             </Grid.Background>
             <!--<RepeatButton Grid.Row="0" Height="18"

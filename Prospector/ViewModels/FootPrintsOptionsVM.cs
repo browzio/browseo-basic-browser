@@ -609,7 +609,7 @@ namespace Prospector.ViewModels
 
             GetKeywordRankings(Query, MaxPages[CmbMaxPAgesIndex], false);
 
-            Mouse.OverrideCursor = Cursors.Arrow;
+            Mouse.OverrideCursor = null;
         }
 
         private void sendLinkToBrowser(object obj)

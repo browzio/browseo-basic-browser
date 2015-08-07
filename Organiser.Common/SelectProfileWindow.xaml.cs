@@ -1,5 +1,6 @@
 ﻿using Organiser.Common.Classes;
 using ProjectsList.Models;
+using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -37,15 +38,17 @@ namespace Organiser.Common
 
         string projectName;
         string projectDir;
+        string webAddress;
         int lastProfileIndex;
         private bool isSelectProjWindow;
 
-        public SelectProfileWindow(string projName, string projDir, int lastIndex)
+        public SelectProfileWindow(string projName, string projDir, int lastIndex, string webAddress)
         {
             InitializeComponent();
             projectName = projName;
             projectDir = projDir;
             lastProfileIndex = lastIndex;
+            this.webAddress = webAddress; 
             ProfilesList = new ObservableCollection<string>();
             DataContext = this;
         }
@@ -91,7 +94,46 @@ namespace Organiser.Common
 
             foreach (var item in directoryValues)
             {
-                ProfilesList.Add(item.Key);
+                if (!isSelectProjWindow)
+                {
+                    string path = item.Value;
+                    if (!path.Contains(".ini"))
+                        path = path + "\\UserData.ini";
+                    PersonData pd = MyFilesDatabase.SetProfileFromini(path);
+                    if (webAddress.Contains(pd.WebAddress.ToLower()))
+                        ProfilesList.Add(item.Key);
+                }
+                else
+                {
+                    ProfilesList.Add(item.Key);
+                }
+            }
+
+            if (ProfilesList.Count == 0)
+            {
+                foreach (var item in directoryValues)
+                {
+                    ProfilesList.Add(item.Key);
+                }
+            }
+
+            if (ProfilesList.Count == 1)
+            {
+                OkClicked = true;
+
+                foreach (var item in directoryValues)
+                {
+                    if (item.Key == ProfilesList[0])
+                    {
+                        SelectedProfileFilePath = item.Value;
+                        SelectedProjectName = item.Key;
+                        break;
+                    }
+                }
+
+
+                System.Threading.Thread.Sleep(10);
+                this.Close();
             }
 
             if (lastProfileIndex > 0 && lastProfileIndex <= cmProfiles.Items.Count)

@@ -486,6 +486,7 @@ namespace Organiser.Common.Classes
                 profile.Street = ini.IniReadValue("Data", "Street");
                 profile.City = ini.IniReadValue("Data", "City");
                 profile.State = ini.IniReadValue("Data", "State");
+                profile.WebAddress = ini.IniReadValue("Data", "WebAddress");
                 profile.Zip = ini.IniReadValue("Data", "Zip");
                 profile.Country = ini.IniReadValue("Data", "Country");
                 profile.Notes = ini.IniReadValue("Data", "Notes");

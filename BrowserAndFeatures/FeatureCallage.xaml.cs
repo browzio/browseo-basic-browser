@@ -1,7 +1,10 @@
-﻿using Organiser.Common.Classes;
+﻿using Indexer;
+using Organiser.Common.Classes;
 using PData.FilesReader;
 using ProjectsList.Helpers;
 using Prospector.ViewModels;
+using RssReader.Mvvm;
+using RssReader.Windows;
 using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
@@ -31,8 +34,6 @@ namespace BrowserAndFeatures
     /// </summary>
     public partial class FeatureCallage : UserControl
     {
-        
-
         public FeatureCallage()
         {
             //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -120,77 +121,84 @@ namespace BrowserAndFeatures
             BrowserInit.Shutdown();
         }
 
-        //bool didLogin;
-        //ManagerControl mc;
-        //TaskList tl;
-        //Login login;
+        void FeatureCallage_OnLaunchToBrowser(string link, string rssLink)
+        {
+            browser.LaunchNewWindowToLink(link, rssLink);
+        }
+
         bool setevents = false;
+        int previndex;
+        Indexer.MainWindow imw;
+        LinksToRssWindow ltrw;
+        Youtuber.MainWindow ytmw;
         private void tbControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //if (tbControl.SelectedIndex == 2)
-            //{
-            //    if (!didLogin)
-            //    {
-            //        Eli.Taskforce.Helpers.Gloables.ProjectName = profile.ProjectName;
-            //        login = new Login();
-            //        login.OnLoginSuccess += login_OnLoginSuccess;
-            //        login.Show();
-            //    }
-            //    else
-            //    {
-            //        if (mc != null)
-            //        {
-            //            tmContent.Content = mc;
-            //        }
-            //        else
-            //        {
-            //            tmContent.Content = tl;
-            //        }
-            //    }
-            //}
             if (tbControl.SelectedIndex == 2 && !setevents)
             {
                 rssControl.SetProfileData(profile);
                 rssControl.OnLaunchToBrowser += FeatureCallage_OnLaunchToBrowser;
                 rssControl.OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;
                 setevents = true;
+            }
 
-                //if (!(rssControl.DataContext is RssReader.MainViewModel))
-                //{
-                //    rssControl.DataContext = new RssReader.MainViewModel();
-                //    (rssControl.DataContext as RssReader.MainViewModel).SetProfileData(profile);
-                //    (rssControl.DataContext as RssReader.MainViewModel).OnLaunchToBrowser += FeatureCallage_OnLaunchToBrowser;
-                //    (rssControl.DataContext as RssReader.MainViewModel).OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;
-                //}
-                //else if ((rssControl.DataContext as RssReader.MainViewModel).mProfile == null)
-                //{
-                //    (rssControl.DataContext as RssReader.MainViewModel).SetProfileData(profile);
-                //    (rssControl.DataContext as RssReader.MainViewModel).OnLaunchToBrowser += FeatureCallage_OnLaunchToBrowser;
-                //    (rssControl.DataContext as RssReader.MainViewModel).OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;
-                //}
+            if (tbControl.SelectedIndex == 3)
+            {
+                tbControl.SelectedIndex = previndex;
+            }
+            else if (tbControl.SelectedIndex == 4) 
+            {
+                tbControl.SelectedIndex = previndex;
+            }
+            else if(tbControl.SelectedIndex == 5)
+            {
+                tbControl.SelectedIndex = previndex;
+            }
+            else
+            {
+                previndex = tbControl.SelectedIndex;
             }
         }
 
-        void FeatureCallage_OnLaunchToBrowser(string link, string rssLink)
+        private void youtuber_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            browser.LaunchNewWindowToLink(link, rssLink);
+            if (ytmw == null)
+            {
+                ytmw = new Youtuber.MainWindow();
+                ytmw.Topmost = true;
+                ytmw.Closed += ltrw_Closed;
+                ytmw.Show();
+            }
         }
 
+        private void indexer_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (imw == null)
+            {
+                imw = new Indexer.MainWindow();
+                imw.Title = "Indexer - One Link On A Line keep http://";
+                imw.Topmost = true;
+                imw.Closed += ltrw_Closed;
+                imw.Show();
+            }
+        }
 
-       // void login_OnLoginSuccess(bool isManager, object control)
-        //{
-            //didLogin = true;
+        private void feed_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (ltrw == null)
+            {
+                ltrw = new LinksToRssWindow();
+                ltrw.DataContext = new LinksToRssVM();
+                ltrw.Topmost = true;
+                ltrw.Closed += ltrw_Closed;
+                ltrw.Show();
+            }
+        }
 
-            //if(isManager)
-            //{
-            //    mc = (ManagerControl)control;
-            //    tmContent.Content = mc;
-            //}
-            //else
-            //{
-            //    tl = (TaskList)control;
-            //    tmContent.Content = tl;
-            //}
-        //}
+        void ltrw_Closed(object sender, EventArgs e)
+        {
+            ytmw = null;
+            ltrw = null;
+            imw = null;
+        }
     }
 }

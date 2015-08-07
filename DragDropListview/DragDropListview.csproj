@@ -85,6 +85,9 @@
     <Compile Include="Windows\EditBookmarkWindow.xaml.cs">
       <DependentUpon>EditBookmarkWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\SelectBookmarkImportTypeWindow.xaml.cs">
+      <DependentUpon>SelectBookmarkImportTypeWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\SetReminderWindow.xaml.cs">
       <DependentUpon>SetReminderWindow.xaml</DependentUpon>
     </Compile>
@@ -116,6 +119,10 @@
     <Page Include="Windows\EditBookmarkWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SelectBookmarkImportTypeWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\SetReminderWindow.xaml">
       <SubType>Designer</SubType>

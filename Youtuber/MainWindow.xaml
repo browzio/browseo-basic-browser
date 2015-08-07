@@ -1,0 +1,9 @@
+﻿<Window x:Class="Youtuber.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:lclControl="clr-namespace:Youtuber.Controls"
+        Title="YouTube URL'r"  Height="350" Width="525" Icon="/Youtuber;component/Images/browseo (1).ico">
+    <Grid>
+        <lclControl:YputuberMainUserControl />
+    </Grid>
+</Window>

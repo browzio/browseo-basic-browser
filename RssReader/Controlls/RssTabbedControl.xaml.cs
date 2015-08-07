@@ -3,6 +3,7 @@ using Organiser.Common.Classes;
 using Organiser.Common.Windows;
 using RssReader.Helpers;
 using RssReader.Models;
+using RssReader.Mvvm;
 using RssReader.Windows;
 using SocialOrganizer.Models;
 using System;
@@ -230,6 +231,13 @@ namespace RssReader.Controlls
                 UserRssTabs[tbContrl.SelectedIndex].SetProfileData(mProfile);
             }
             catch { }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            LinksToRssWindow ltrw = new LinksToRssWindow();
+            ltrw.DataContext = new LinksToRssVM();
+            ltrw.Show();
         }
     }
 }

@@ -19,16 +19,19 @@ using System.Threading;
 using Organiser.Common.Windows;
 using DragDropListview.Models;
 using System.Windows.Media;
+using SocialOrganizer.Models;
+using BrowserHost.Views;
 
 namespace DragDropListview
 {
    public class DragDropMainViewModel : IDropTarget, INotifyPropertyChanged
     {
-        
+       public const string IMPORT_TYPE_FCS = "fcs";
+
         public event Action<int> OnHasReminders = delegate { };//int, amount of reminders
-        public event Action OnRemindersChanged = delegate { };
+        //public event Action OnRemindersChanged = delegate { };
         public event Action<string> OnDoubleClickedSite;//string, site to open
-        public event Action OnListChanged = delegate { };
+        //public event Action OnListChanged = delegate { };
 
 
         public List<Reminder> Reminders { get; set; }
@@ -110,6 +113,8 @@ namespace DragDropListview
             }
         }
 
+        public PersonData mPData { get; set; }
+
         private double lbFoldersWidth;
         public double LbFoldersWidth
         {
@@ -135,8 +140,18 @@ namespace DragDropListview
             get { return folders; }
             set { folders = value; }
         }
-        
-        public DragDropMainViewModel()
+
+        private static DragDropMainViewModel instance;
+        public static DragDropMainViewModel Instance
+        {
+            get
+            {
+                if (instance == null)
+                    instance = new DragDropMainViewModel();
+                return instance;
+            }
+        }
+        private DragDropMainViewModel()
         {
             FoldersAndSitesList = new ObservableCollection<FolderVM>();
             Reminders = new List<Reminder>();
@@ -155,6 +170,8 @@ namespace DragDropListview
         private void SiteMenueItemCLick(object param)
         {
             string clickType = param as string;
+            bool wascp = false;
+            bool wasImport = FoldersAndSitesList[SIFoldersSide].IsImported;
             switch (clickType)
             {
                 case "Edit":
@@ -162,6 +179,15 @@ namespace DragDropListview
                     ebm.SetValues(FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Name,
                         FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Link, FoldersAndSitesList,
                         LastSelectedIndex);
+                    if (FoldersAndSitesList[SIFoldersSide].IsImported)
+                    {
+                        ebm.spFolder.Visibility = Visibility.Collapsed;
+                        ebm.spImports.Visibility = Visibility.Visible;
+
+                        ebm.Email.Text = FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Email;
+                        ebm.Username.Text = FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Username;
+                        ebm.Password.Text = FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Password;
+                    }
                     ebm.ShowDialog();
                     if (ebm.SaveClicked)
                     {
@@ -169,14 +195,47 @@ namespace DragDropListview
 
                         FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Name = ebm.tbName.Text;
                         FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Link = ebm.tbURL.Text;
+                        if (FoldersAndSitesList[SIFoldersSide].IsImported)
+                        {
+                            FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Email = ebm.Email.Text;
+                            FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Username = ebm.Username.Text;
+                            FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Password = ebm.Password.Text;
+                        }
                         FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].BitmapImg = new BitmapImage
                             (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
                     }
                     break;
 
+                case "CPWindow":
+                    wascp = true;
+                    EditBookmarkWindow ebmffff = new EditBookmarkWindow();
+                    ebmffff.IsCP = true;
+                    ebmffff.SetValues(FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Name,
+                        FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Link, FoldersAndSitesList,
+                        LastSelectedIndex);
+                    ebmffff.spButtons.Visibility = Visibility.Collapsed;
+                    if (FoldersAndSitesList[SIFoldersSide].IsImported)
+                    {
+                        ebmffff.spFolder.Visibility = Visibility.Collapsed;
+                        ebmffff.spImports.Visibility = Visibility.Visible;
+
+                        ebmffff.Email.Text = FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Email;
+                        ebmffff.Username.Text = FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Username;
+                        ebmffff.Password.Text = FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Password;
+                    }
+                    ebmffff.Topmost = true;
+                    ebmffff.ResizeMode = ResizeMode.CanResize;
+                    ebmffff.Show();
+                    break;
+
                 case "AddSite":
                     EditBookmarkWindow ebmff = new EditBookmarkWindow();
                     ebmff.SetValues("", "", FoldersAndSitesList, LastSelectedIndex);
+                    if (FoldersAndSitesList[SIFoldersSide].IsImported)
+                    {
+                        ebmff.spFolder.Visibility = Visibility.Collapsed;
+                        ebmff.spImports.Visibility = Visibility.Visible;
+                    }
                     ebmff.ShowDialog();
                     if (ebmff.SaveClicked)
                     {
@@ -185,6 +244,16 @@ namespace DragDropListview
                         Bookmark bmark = new Bookmark();
                         bmark.Name = ebmff.tbName.Text;
                         bmark.Link = ebmff.tbURL.Text;
+
+                        if (FoldersAndSitesList[SIFoldersSide].IsImported)
+                        {
+                            bmark.Email = ebmff.Email.Text;
+                            bmark.Username = ebmff.Username.Text;
+                            bmark.Password = ebmff.Password.Text;
+                            bmark.ImportType = FoldersAndSitesList[SIFoldersSide].ImportType;
+                            bmark.IsImported = true;
+                        }
+
                         bmark.DateTimeStamp = DateTime.Now.ToString();
                         bmark.BitmapImg = new BitmapImage
                         (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
@@ -209,16 +278,23 @@ namespace DragDropListview
                     break;
             }
 
-            saveAll();
+            if (!wascp)
+            {
+                if (wasImport)
+                    saveAllImportedSites();
+                else
+                    saveAll();
+            }
         }
 
         private void FolderMenueItemCLick(object param)
         {
             string clickType = param as string;
+            bool wasImport = FoldersAndSitesList[SIFoldersSide].IsImported;
             switch (clickType)
             {
                 case "Edit":
-                     EditBookmarkWindow ebm = new EditBookmarkWindow();
+                    EditBookmarkWindow ebm = new EditBookmarkWindow();
                     ebm.SetValues(FoldersAndSitesList[SIFoldersSide].Name,
                         FoldersAndSitesList[SIFoldersSide].Link, FoldersAndSitesList, LastSelectedIndex);
                     ebm.ShowDialog();
@@ -228,8 +304,21 @@ namespace DragDropListview
                         FoldersAndSitesList[SIFoldersSide].Name = ebm.tbName.Text;
                         FoldersAndSitesList[SIFoldersSide].Link = ebm.tbURL.Text;
                         if (FoldersAndSitesList[SIFoldersSide].IsFolder)
-                            FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
-                            (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
+                        {
+                            if (!FoldersAndSitesList[SIFoldersSide].IsImported)
+                            {
+                                FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
+                                (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
+                            }
+                            else
+                            {
+                                if (FoldersAndSitesList[SIFoldersSide].ImportType == IMPORT_TYPE_FCS)
+                                {
+                                    FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
+                                (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png"));
+                                }
+                            }
+                        }
                         else
                             FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
                             (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
@@ -237,25 +326,41 @@ namespace DragDropListview
                     break;
 
                 case "AddFolder":
+                    SelectBookmarkImportTypeWindow bookmarkTypeWindow = new SelectBookmarkImportTypeWindow();
+                    bookmarkTypeWindow.ShowDialog();
+                    if (!bookmarkTypeWindow.OkClicked) return;
+
                     EditBookmarkWindow ebmf = new EditBookmarkWindow();
                     ebmf.spUrl.Visibility = Visibility.Collapsed;
                     ebmf.spFolder.Visibility = Visibility.Collapsed;
                     ebmf.Height = 140;
                     ebmf.ShowDialog();
-                    if (ebmf.SaveClicked)
+                    if (!ebmf.SaveClicked) return;
+
+                    FolderVM bookmarkFolder_S = new FolderVM();
+                    bookmarkFolder_S.Name = ebmf.tbName.Text;
+                    bookmarkFolder_S.IsFolder = true;
+                    bookmarkFolder_S.DateTimeStamp = DateTime.Now.ToString();
+                    bookmarkFolder_S.Sites = new ObservableCollection<Bookmark>();
+
+                    if (bookmarkTypeWindow.browseoProj.IsChecked == true)
                     {
-                        FolderVM bookmarkFolder = new FolderVM();
-                        bookmarkFolder.Name = ebmf.tbName.Text;
-                        bookmarkFolder.IsFolder = true;
-                        bookmarkFolder.DateTimeStamp = DateTime.Now.ToString();
-                        bookmarkFolder.BitmapImg = new BitmapImage
+                        bookmarkFolder_S.BitmapImg = new BitmapImage
                         (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
-                        bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
-                        FoldersAndSitesList.Add(bookmarkFolder);
                     }
+                    else if (bookmarkTypeWindow.fcs.IsChecked == true)
+                    {
+                        bookmarkFolder_S.IsImported = true;
+                        bookmarkFolder_S.ImportType = IMPORT_TYPE_FCS;
+                        bookmarkFolder_S.BitmapImg = new BitmapImage
+                            (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png"));
+                    }
+
+                    FoldersAndSitesList.Add(bookmarkFolder_S);
                     break;
 
                 case "AddSite":
+                    if (wasImport) return;
                     EditBookmarkWindow ebmff = new EditBookmarkWindow();
                     ebmff.SetValues("", "", FoldersAndSitesList, LastSelectedIndex);
                     ebmff.ShowDialog();
@@ -276,6 +381,7 @@ namespace DragDropListview
                     if (MessageBox.Show("Are you sure you would like to delete " + FoldersAndSitesList[SIFoldersSide].Name + "?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         LastSelectedIndex = 0;
+                        deleteImportedFolder();
                         FoldersAndSitesList.RemoveAt(SIFoldersSide);
                     }
                     break;
@@ -290,7 +396,10 @@ namespace DragDropListview
                     break;
             }
 
-            saveAll();
+            if (!wasImport)
+                saveAll();
+            else
+                saveAllImportedSites();
         }
 
 
@@ -328,47 +437,66 @@ namespace DragDropListview
             try
             {
                 FolderVM folder = (FolderVM)dropInfo.TargetItem;
-                if (dropInfo.Data is Bookmark)
+                if (folder.IsImported)
                 {
-                    Bookmark site = (Bookmark)dropInfo.Data;
-                    if (folder == null || !folder.IsFolder)
-                        FoldersAndSitesList.Add(new FolderVM()
+                    if (dropInfo.Data is Bookmark)
+                    {
+                        Bookmark site = (Bookmark)dropInfo.Data;
+                        if (folder != null && folder.IsFolder && folder.ImportType == site.ImportType)
                         {
-                            Link = site.Link,
-                            Name = site.Name,
-                            DateTimeStamp = site.DateTimeStamp,
-                            BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png")),
-                            IsFolder = false
-                        });
-                    else
-                        folder.Sites.Add(site);
-                    ((IList)dropInfo.DragInfo.SourceCollection).Remove(site);
-                    saveAll();
-                    return;
+                            folder.Sites.Add(site);
+                            ((IList)dropInfo.DragInfo.SourceCollection).Remove(site);
+                            saveAllImportedSites();
+                        }
+                        return;
+                    }
                 }
-                else if (dropInfo.Data is FolderVM)
+                else
                 {
-                    FolderVM site = (FolderVM)dropInfo.Data;
-                    if (site.IsFolder || folder == site || !folder.IsFolder) return;
+                    if (dropInfo.Data is Bookmark)
+                    {
+                        Bookmark site = (Bookmark)dropInfo.Data;
+                        if (site.IsImported) return;
 
-                    Bookmark bmark = new Bookmark();
-                    bmark.Link = site.Link;
-                    bmark.Name = site.Name;
-                    bmark.DateTimeStamp = site.DateTimeStamp;
-                    bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
-                    bool ExistsinList = false;
-                    if (folder.Sites.Count == 1)
-                    {
-                        if (folder.Sites[0].Link == bmark.Link && folder.Sites[0].Name == bmark.Name)
-                            ExistsinList = true;
-                    }
-                    if (!ExistsinList)
-                    {
-                        folder.Sites.Add(bmark);
+                        if (folder == null || !folder.IsFolder)
+                            FoldersAndSitesList.Add(new FolderVM()
+                            {
+                                Link = site.Link,
+                                Name = site.Name,
+                                DateTimeStamp = site.DateTimeStamp,
+                                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png")),
+                                IsFolder = false
+                            });
+                        else
+                            folder.Sites.Add(site);
                         ((IList)dropInfo.DragInfo.SourceCollection).Remove(site);
+                        saveAll();
+                        return;
                     }
-                    saveAll();
-                    return;
+                    else if (dropInfo.Data is FolderVM)
+                    {
+                        FolderVM site = (FolderVM)dropInfo.Data;
+                        if (site.IsFolder || folder == site || !folder.IsFolder || site.IsImported) return;
+
+                        Bookmark bmark = new Bookmark();
+                        bmark.Link = site.Link;
+                        bmark.Name = site.Name;
+                        bmark.DateTimeStamp = site.DateTimeStamp;
+                        bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                        bool ExistsinList = false;
+                        if (folder.Sites.Count == 1)
+                        {
+                            if (folder.Sites[0].Link == bmark.Link && folder.Sites[0].Name == bmark.Name)
+                                ExistsinList = true;
+                        }
+                        if (!ExistsinList)
+                        {
+                            folder.Sites.Add(bmark);
+                            ((IList)dropInfo.DragInfo.SourceCollection).Remove(site);
+                        }
+                        saveAll();
+                        return;
+                    }
                 }
             }
             catch { }
@@ -379,7 +507,7 @@ namespace DragDropListview
             string fromProj = ProjectName;
             if (projName == "")
             {
-                FoldersAndSitesList.Clear();
+                FoldersAndSitesList.RemoveAllThese(item => item.IsImported == false);
             }
             else
             {
@@ -390,6 +518,11 @@ namespace DragDropListview
 
             if (setIndex0)
                 SIFoldersSide = 0;
+            if (FoldersAndSitesList.Count == 1)
+            {
+                SIFoldersSide = 0;
+               // Visible_Sites = true;
+            }
         }
 
         private void saveAll()
@@ -403,6 +536,8 @@ namespace DragDropListview
                          MyFilesDatabase.DeleteBookmarks(ProjectName);
                          foreach (FolderVM folderListItem in FoldersAndSitesList)
                          {
+                             if (folderListItem.IsImported) continue;
+
                              if (folderListItem.IsFolder)
                              {
                                  if (folderListItem.Sites.Count > 0)
@@ -423,7 +558,7 @@ namespace DragDropListview
                              }
                          }
 
-                         OnListChanged();
+                        // OnListChanged();
                      }
                      catch { }
                //  }
@@ -506,7 +641,7 @@ namespace DragDropListview
                 filename = dlg.FileName;
 
                 if (filename == "") return;
-                new Thread(() => {
+               // new Thread(() => {
                     foreach (FolderVM folderListItem in FoldersAndSitesList)
                     {
                         if (folderListItem.IsFolder && folderListItem.IsChecked)
@@ -523,7 +658,7 @@ namespace DragDropListview
                     }
 
                     System.Diagnostics.Process.Start(filename);
-                }).Start();
+              //  }).Start();
             }
             catch { }
         }
@@ -547,6 +682,13 @@ namespace DragDropListview
                 }
                 saveAll();
             }
+
+            if (FoldersAndSitesList.Count > 0)
+            {
+                SIFoldersSide = 0;
+                Visible_Sites = true;
+            }
+
         }
 
         public void RefreshList()
@@ -647,11 +789,13 @@ namespace DragDropListview
             }
             catch 
             {
-                MessageBox.Show("Error saveing reminder. Rename the bookmark and try again.");
+                MessageBox.Show("Error saveing reminder."+
+                    " Rename the bookmark and try again."+
+                    @" The name must not include < > : """+@" / \ | ? *");
             }
 
             CheckReminders();
-            OnRemindersChanged();
+           // OnRemindersChanged();
         }
 
         public void CheckReminders()
@@ -798,7 +942,11 @@ namespace DragDropListview
                         Reminder remToRemove = null;
                         foreach (Reminder remin in Reminders)
                         {
-                            if (remin == RemindersByDate[SIRemindersByDate])
+                            if (remin.ForeColorComplete == RemindersByDate[SIRemindersByDate].ForeColorComplete &&
+                                remin.ReminderDate == RemindersByDate[SIRemindersByDate].ReminderDate &&
+                                remin.ReminderName == RemindersByDate[SIRemindersByDate].ReminderName &&
+                                remin.ReminderText == RemindersByDate[SIRemindersByDate].ReminderText &&
+                                remin.ResolvedText == RemindersByDate[SIRemindersByDate].ResolvedText)
                             {
                                 remToRemove = remin;
                                 break;
@@ -808,9 +956,26 @@ namespace DragDropListview
                         {
                             Reminders.Remove(remToRemove);
                             RemindersByDate.RemoveAt(SIRemindersByDate);
+                            if (RemindersByDate.Count == 0)
+                            {
+                                ReminderDates.RemoveAt(SIReminderDate);
+                            }
+                            SIRemindersByDate = 0;
                         }
+
+                       // updateRemindersByDate();
                         break;
                 }
+
+                int unresolvedCount = 0;
+                foreach (Reminder rem in Reminders)
+                {
+                    if (rem.ResolvedText == "false")
+                    {
+                        unresolvedCount++;
+                    }
+                }
+                OnHasReminders(unresolvedCount);
 
                 SaveAllByReminders();
             }
@@ -843,7 +1008,6 @@ namespace DragDropListview
             CheckReminders();
         }
 
-        #endregion
 
         private int sIReminderDate;
         public int SIReminderDate
@@ -885,5 +1049,252 @@ namespace DragDropListview
             }
         }
 
+
+        #endregion
+
+        #region imports
+
+        public void MergeFromImport(string path, string type)
+        {
+            EditBookmarkWindow ebm = new EditBookmarkWindow();
+            ebm.spUrl.Visibility = ebm.spFolder.Visibility = ebm.spName.Visibility = Visibility.Collapsed;
+            ebm.spCmbName.Visibility = Visibility.Visible;
+            string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName, type);
+            if (Directory.Exists(dirForCustomImport))
+            {
+                DirectoryInfo dInfo = new DirectoryInfo(dirForCustomImport);
+                foreach (DirectoryInfo item in dInfo.GetDirectories())
+                {
+                    ebm.cmbImportedFolders.Items.Add(item.Name);
+                }
+            }
+            ebm.cmbImportedFolders.SelectedIndex = 0;
+            ebm.ShowDialog();
+            if (!ebm.SaveClicked) return;
+            string folderName = ebm.cmbImportedFolders.Text;
+            switch (type)
+            {
+                case IMPORT_TYPE_FCS:
+                        bool createNewFvm = true;
+                        FolderVM fcsVm = null;
+                        foreach (FolderVM fvm in FoldersAndSitesList)
+                        {
+                            if (fvm.IsImported && fvm.ImportType == IMPORT_TYPE_FCS && fvm.Name == folderName)
+                            {
+                                createNewFvm = false;
+                                fcsVm = fvm;
+                                break;
+                            }
+                        }
+
+                        if (createNewFvm)
+                        {
+                            fcsVm = new FolderVM()
+                            {
+                                Name = folderName,
+                                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png")),
+                                IsFolder = true,
+                                IsImported = true,
+                                ImportType = IMPORT_TYPE_FCS
+                            };
+
+                            FoldersAndSitesList.Add(fcsVm);
+                        }
+                        if (FoldersAndSitesList.Count == 1)
+                        {
+                            SIFoldersSide = 0;
+                            Visible_Sites = true;
+                        }
+
+                        //new Thread(() =>
+                        //{
+                            try
+                            {
+                                foreach (string line in File.ReadAllLines(path))
+                                {
+                                    string[] split = line.Split(',');
+                                    string SITENAME = split[0];
+                                    string EMAIL = split[1];
+                                    string USERNAME = split[2];
+                                    string PASSWORD = split[3];
+                                    string URL = split[4];
+                                   // App.Current.Dispatcher.Invoke((Action)delegate
+                                    //{
+                                        Bookmark bmark = new Bookmark();
+                                        bmark.Link = URL;
+                                        bmark.Name = SITENAME;
+                                        bmark.Email = EMAIL;
+                                        bmark.Username = USERNAME;
+                                        bmark.Password = PASSWORD;
+                                        bmark.IsImported = true;
+                                        bmark.ImportType = type;
+                                        bmark.DateTimeStamp = DateTime.Now.ToString();
+                                        bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+
+                                        fcsVm.Sites.Add(bmark);
+                                    //});
+                                }
+
+                                saveAllImportedSites();
+                            }
+                            catch 
+                            {
+                                MessageBox.Show("Ooops something went wrong on import delete the added folder and try again");
+                            }
+                       // }).Start();
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        private void saveAllImportedSites()
+        {
+            string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName);
+            if (Directory.Exists(dirForCustomImport)) DeleteDirectory(dirForCustomImport);
+
+            foreach (FolderVM folderListItem in FoldersAndSitesList)
+            {
+                if (!folderListItem.IsImported) continue;
+                string dirpath = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName, folderListItem.ImportType, folderListItem.Name);
+                if (!Directory.Exists(dirpath)) Directory.CreateDirectory(dirpath);
+                string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName, folderListItem.ImportType, folderListItem.Name, "SavedImports.txt");
+
+                if (File.Exists(filePath)) File.Delete(filePath);
+
+                foreach (Bookmark bmark in folderListItem.Sites)
+                {
+                    File.AppendAllText(filePath,
+                        bmark.DateTimeStamp + SPLITTER +
+                        bmark.Email + SPLITTER + 
+                        bmark.Link + SPLITTER +
+                        bmark.Name + SPLITTER +
+                        bmark.Password + SPLITTER + 
+                        bmark.Username + Environment.NewLine);
+                }
+            }
+        }
+
+        public void DeleteDirectory(string target_dir)
+        {
+            string[] files = Directory.GetFiles(target_dir);
+            string[] dirs = Directory.GetDirectories(target_dir);
+
+            foreach (string file in files)
+            {
+                File.SetAttributes(file, FileAttributes.Normal);
+                File.Delete(file);
+            }
+
+            foreach (string dir in dirs)
+            {
+                DeleteDirectory(dir);
+            }
+
+            Directory.Delete(target_dir, false);
+        }
+
+        public void FillImportsList()
+        {
+            string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName);
+            if (!Directory.Exists(dirForCustomImport)) return;
+
+            DirectoryInfo dInfo = new DirectoryInfo(dirForCustomImport);
+            foreach (DirectoryInfo item in dInfo.GetDirectories())
+            {
+                foreach (DirectoryInfo dInfoWithFiles in item.GetDirectories())
+                {
+                    foreach (FileInfo file in dInfoWithFiles.GetFiles())
+                    {
+                        if (item.Name == IMPORT_TYPE_FCS)
+                        {
+                            FolderVM fcsVm = new FolderVM()
+                            {
+                                Name = dInfoWithFiles.Name,
+                                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png")),
+                                IsFolder = true,
+                                IsImported = true,
+                                ImportType = IMPORT_TYPE_FCS
+                            };
+                            foreach (string line in File.ReadAllLines(file.FullName))
+                            {
+                                string[] split = line.Split(new string[] { SPLITTER }, StringSplitOptions.None);
+                                string dt = split[0];
+                                string SITENAME = split[3];
+                                string EMAIL = split[1];
+                                string USERNAME = split[5];
+                                string PASSWORD = split[4];
+                                string URL = split[2];
+                                Bookmark bmark = new Bookmark();
+                                bmark.Link = URL;
+                                bmark.Name = SITENAME;
+                                bmark.Email = EMAIL;
+                                bmark.Username = USERNAME;
+                                bmark.Password = PASSWORD;
+                                bmark.IsImported = true;
+                                bmark.DateTimeStamp = dt;
+                                bmark.ImportType = IMPORT_TYPE_FCS;
+                                bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                                fcsVm.Sites.Add(bmark);
+                            }
+                            FoldersAndSitesList.Add(fcsVm);
+                        }
+                    }
+                }
+            }
+            //foreach (string filepath in Directory.GetFiles(dirForCustomImport))
+            //{
+            //    if (filepath.Contains(IMPORT_TYPE_FCS))
+            //    {
+            //        FolderVM fcsVm = new FolderVM()
+            //        {
+            //            Name = "FCS Network",
+            //            BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png")),
+            //            IsFolder = true,
+            //            IsImported = true,
+            //            ImportType = IMPORT_TYPE_FCS
+            //        };
+            //        foreach (string line in File.ReadAllLines(filepath))
+            //        {
+            //            string[] split = line.Split(new string[] { SPLITTER }, StringSplitOptions.None);
+            //            string dt = split[0];
+            //            string SITENAME = split[3];
+            //            string EMAIL = split[1];
+            //            string USERNAME = split[5];
+            //            string PASSWORD = split[4];
+            //            string URL = split[2];
+            //            Bookmark bmark = new Bookmark();
+            //            bmark.Link = URL;
+            //            bmark.Name = SITENAME;
+            //            bmark.Email = EMAIL;
+            //            bmark.Username = USERNAME;
+            //            bmark.Password = PASSWORD;
+            //            bmark.IsImported = true;
+            //            bmark.DateTimeStamp = dt;
+            //            bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+            //            fcsVm.Sites.Add(bmark);
+            //        }
+            //        FoldersAndSitesList.Add(fcsVm);
+            //    }
+            //}
+
+            if (FoldersAndSitesList.Count == 1)
+            {
+                SIFoldersSide = 0;
+                Visible_Sites = true;
+            }
+        }
+
+        private void deleteImportedFolder()
+        {
+            string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName);
+            if (!Directory.Exists(dirForCustomImport)) return;
+
+            string filePath = Path.Combine(dirForCustomImport, FoldersAndSitesList[SIFoldersSide].ImportType, FoldersAndSitesList[SIFoldersSide].Name);
+            if (Directory.Exists(filePath)) Directory.Delete(filePath,true);
+        }
+
+        #endregion
     }
 }

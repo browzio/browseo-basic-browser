@@ -74,6 +74,9 @@ namespace DragDropListview
             }
         }
 
+        public bool IsImported { get; set; }
+        public string ImportType { get; set; }
+
         public ObservableCollection<Bookmark> Sites { get;  set; }
 
 

@@ -131,6 +131,10 @@
       <Project>{0c6674cc-6d49-414a-9b41-d4e175028ffb}</Project>
       <Name>GongSolutions.Wpf.DragDrop</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Indexer\Indexer.csproj">
+      <Project>{0b51ac08-7106-431f-8359-0f86e9f48dca}</Project>
+      <Name>Indexer</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
       <Name>Organiser.Common</Name>
@@ -142,6 +146,10 @@
     <ProjectReference Include="..\RssReader\RssReader.csproj">
       <Project>{05ac600c-f668-4bfa-8f8a-6de63d73526f}</Project>
       <Name>RssReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Youtuber\Youtuber.csproj">
+      <Project>{9ee91744-7d3f-4f68-8b98-395759ab4eb0}</Project>
+      <Name>Youtuber</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

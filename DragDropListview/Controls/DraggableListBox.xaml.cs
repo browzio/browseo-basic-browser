@@ -27,7 +27,7 @@ namespace DragDropListview.Controls
         {
             InitializeComponent();
 
-            vm = new DragDropMainViewModel();
+            vm = DragDropMainViewModel.Instance;
             DataContext = vm;
         }
 

@@ -238,7 +238,13 @@
     
     
     <Grid >
+        <!--<Grid.RowDefinitions>
+            <RowDefinition Height="35" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>-->
+        <!--<Button Content="Create Rss Feed" Click="Button_Click" Style="{StaticResource ButtonStyle}" Margin="5" Width="150" HorizontalAlignment="Left" />-->
         <commonControlls:NonReloadingTabControl x:Name="tbContrl"  
+                                                Grid.Row="1"
                                                 BorderThickness="0" 
                                                 SelectionChanged="tbContrl_SelectionChanged"
                                                 ItemsSource="{Binding UserRssTabs}">

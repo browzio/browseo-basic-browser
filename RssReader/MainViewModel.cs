@@ -280,7 +280,7 @@ namespace RssReader
 
                     App.Current.Dispatcher.Invoke(DispatcherPriority.Background, (Action)delegate
                     {
-                        Mouse.OverrideCursor = Cursors.Arrow;
+                        Mouse.OverrideCursor = null;
                     });
                 });
                 loadingThread.Start();
@@ -396,6 +396,5 @@ namespace RssReader
                 RefreshRssFeed();
             }
         }
-
     }
 }

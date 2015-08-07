@@ -21,9 +21,10 @@ namespace Organiser.Common.Classes
                 UsageList = new List<KeyValuePair<string, string>>();
 
             UsageList.Add(new KeyValuePair<string,string>(traceType, DateTime.Now.ToString()));
-            if (UsageList.Count > 10)
+            if (UsageList.Count > 5)
             {
-                new Thread(() => {
+                new Thread(() =>
+                {
                     try
                     {
                         SaveAllTrackedDataList();
@@ -36,13 +37,17 @@ namespace Organiser.Common.Classes
 
         public static void SaveAllTrackedDataList()
         {
-            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Track", ProjectName);
+            var datetime = DateTime.Now;
+            var date = datetime.Date;
+            var dtString = date.Day + "_" + datetime.Month + "_" + datetime.Year;
+
+            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Track", ProjectName, dtString);
             if (!Directory.Exists(dirPath))
             {
                 Directory.CreateDirectory(dirPath);
             }
 
-            string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Track", ProjectName, "Usage.txt");
+            string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Track", ProjectName,dtString, "Usage.txt");
             foreach (KeyValuePair<string, string> trackCookie in UsageList)
             {
                 string line = trackCookie.Key + SPLITTER + trackCookie.Value;

@@ -49,8 +49,17 @@ namespace DragDropListview
             }
         }
 
+        public string Email { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string ImportType { get; set; }
+
+        public bool IsImported { get; set; }
+
         public BitmapImage BitmapImg { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+       
     }
 }

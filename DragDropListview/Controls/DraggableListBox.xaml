@@ -86,6 +86,8 @@
                     <MenuItem Header="Add Site..." Command="{Binding LVSiteCMenuClick}" CommandParameter="AddSite" />
                     <MenuItem Header="Delete" Command="{Binding LVSiteCMenuClick}" CommandParameter="Delete" />
                     <Separator />
+                    <MenuItem Header="C\P OnTop" Command="{Binding LVSiteCMenuClick}" CommandParameter="CPWindow" />
+                    <Separator />
                     <MenuItem Header="Set Reminder" Command="{Binding LVSiteCMenuClick}" CommandParameter="Reminder" />
                 </ContextMenu>
             </ListBox.ContextMenu>

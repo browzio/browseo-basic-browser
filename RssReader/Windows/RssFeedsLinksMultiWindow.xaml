@@ -73,7 +73,7 @@
         </Grid.RowDefinitions>
 
         <TextBox Name="tbInputedText" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" FontFamily="Verdana" FontSize="15" />
-        <Button Click="Button_Click"  Style="{StaticResource FlatButtonStyle}"  Grid.Row="1">
+        <Button Click="Button_Click"  Style="{StaticResource FlatButtonStyle}"  Grid.Row="1" Cursor="Hand">
             <TextBlock Text="OK" HorizontalAlignment="Center" />
         </Button>
     </Grid>

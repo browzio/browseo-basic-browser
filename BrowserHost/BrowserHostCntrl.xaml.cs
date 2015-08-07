@@ -1,4 +1,5 @@
-﻿using SocialOrganizer.Models;
+﻿using DragDropListview;
+using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -92,25 +93,38 @@ namespace BrowserHost
             }
             catch { }
         }
-
+        System.Threading.Thread ramCheckerThread;
         private void OpenNewTab(object sender, ExecutedRoutedEventArgs e)
         {
             if (timesToCheck++ >= 5)
             {
-                new System.Threading.Thread(() =>
+                if (ramCheckerThread == null || !ramCheckerThread.IsAlive)
                 {
-                    double total = 0;
-                    foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcessesByName("BrowserAndFeatures"))
+                    ramCheckerThread = new System.Threading.Thread(() =>
                     {
-                        var counter = new System.Diagnostics.PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
-                        total += counter.RawValue / (1024 * 1024);
-                        if ((availmem - total) < 300)
-                            MessageBox.Show(
-                                "You have only 300mb of ram space left please close down other applications"+
-                                " to free up ram before continuing. Or refrain from openning more tabs, keep in mind"+
-                                " you will risk your computer and Browseo's performance.");
-                    }
-                }).Start();
+                        double total = 0;
+                        bool showedMSgBox = false;
+                        foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcessesByName("BrowserAndFeatures"))
+                        {
+                            var counter = new System.Diagnostics.PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
+                            total += counter.RawValue / (1024 * 1024);
+                            if ((availmem - total) < 350)
+                            {
+                                if (!showedMSgBox)
+                                App.Current.Dispatcher.Invoke((Action)delegate
+                                {
+                                    MessageBox.Show(
+                                        "You have only " + (availmem - total) + "mb of ram space left please close down other applications" +
+                                        " to free up ram before continuing. Or refrain from openning more tabs, keep in mind" +
+                                        " you will risk your computer and Browseo's performance.");
+                                });
+                                showedMSgBox = true;
+                            }
+                        }
+                    });
+                    ramCheckerThread.Start();
+                }
+                timesToCheck = 0;
             }
 
             CreateNewTab();
@@ -181,11 +195,11 @@ namespace BrowserHost
             }
         }
 
-        void btvm_OnCreateNewTab(string obj, bool shownewTab)
+        void btvm_OnCreateNewTab(string webSite, bool shownewTab)
         {
-             App.Current.Dispatcher.Invoke((Action)delegate
+            App.Current.Dispatcher.Invoke((Action)delegate
             {
-              CreateNewTab(obj);
+                CreateNewTab(webSite);
 
               int oldindex = TabControl.SelectedIndex;
               TabControl.SelectedIndex = TabControl.Items.Count - 1;
@@ -266,6 +280,18 @@ namespace BrowserHost
             else
                 scrollviewer.LineRight();
             e.Handled = true;
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            DragDropMainViewModel.Instance.OnDoubleClickedSite += Instance_OnDoubleClickedSite;
+        }
+
+        void Instance_OnDoubleClickedSite(string site)
+        {
+
+            BrowserTabs[TabControl.SelectedIndex].NavigateToSelectedSite(site);
+           // btvm_OnCreateNewTab(site, true);
         }
     }
 }

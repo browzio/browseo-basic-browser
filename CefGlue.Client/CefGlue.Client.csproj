@@ -152,6 +152,14 @@
       <Project>{703FF300-34B9-48D4-A5D6-E741F48D5F95}</Project>
       <Name>CefGlue</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DragDropListview\DragDropListview.csproj">
+      <Project>{f2c9dcf4-9c94-4389-9532-e9e7d0412c01}</Project>
+      <Name>DragDropListview</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GongSolutions.Wpf.DragDrop\GongSolutions.Wpf.DragDrop.csproj">
+      <Project>{0c6674cc-6d49-414a-9b41-d4e175028ffb}</Project>
+      <Name>GongSolutions.Wpf.DragDrop</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
       <Name>Organiser.Common</Name>

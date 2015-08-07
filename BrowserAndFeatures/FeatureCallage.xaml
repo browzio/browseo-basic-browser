@@ -8,7 +8,7 @@
              xmlns:rssReaders="clr-namespace:RssReader.Controlls;assembly=RssReader"
              xmlns:commonControlls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="400">
+             d:DesignHeight="300" d:DesignWidth="600">
     
     <UserControl.Resources>
         <Style TargetType="{x:Type TabItem}" x:Key="gmailTabStyle">
@@ -73,6 +73,12 @@
             </TabItem>
             <TabItem Header="RSS"  Style="{StaticResource gmailTabStyle}"> 
                 <rssReaders:RssTabbedControl Name="rssControl" />
+            </TabItem>
+            <TabItem Header="Feed Masher" Name="feed" PreviewMouseDown="feed_PreviewMouseDown"  Style="{StaticResource gmailTabStyle}">
+            </TabItem>
+            <TabItem Header="Indexer" Name="indexer" PreviewMouseDown="indexer_PreviewMouseDown"  Style="{StaticResource gmailTabStyle}">
+            </TabItem>
+            <TabItem Header="YouTube URL'r" Name="youtuber" PreviewMouseDown="youtuber_PreviewMouseDown"  Style="{StaticResource gmailTabStyle}">
             </TabItem>
             <!--<TabItem Name="tmContent" Header="Tasks Management" Height="23" VerticalAlignment="Center" BorderThickness="0" Padding="0">
             </TabItem>-->

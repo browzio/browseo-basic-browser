@@ -1,5 +1,7 @@
 ﻿using BrowserHost;
 using BrowserHost.Models;
+using BrowserHost.Views;
+using Microsoft.Win32;
 using Organiser.Common;
 using Organiser.Common.Classes;
 using SocialOrganizer.Models;
@@ -43,16 +45,24 @@ namespace WpfCefDynamBrowser.Views
             this.Loaded += BrowserTabView_Loaded;
         }
 
+        static bool initializedddvm = false;
         void BrowserTabView_Loaded(object sender, RoutedEventArgs e)
         {
-            dragnDropListview.vm.ProjectName = BrowserInit.pData.ProjectName;
+            if (!initializedddvm)
+            {
+                dragnDropListview.vm.ProjectName = BrowserInit.pData.ProjectName;
+                dragnDropListview.vm.mPData = BrowserInit.pData;
+                dragnDropListview.vm.FillList();
+                dragnDropListview.vm.FillImportsList();
+                //dragnDropListview.vm.OnDoubleClickedSite += vm_OnDoubleClickedSite;
+                // dragnDropListview.vm.OnListChanged += vm_OnListChanged;
+                //dragnDropListview.vm.OnRemindersChanged += vm_OnRemindersChanged;
+                //dragnDropListview.vm.MigrateOldSites();//TODO: takeOut
+
+                initializedddvm = true;
+            }
             dragnDropListview.vm.OnHasReminders += vm_OnHasReminders;
-            dragnDropListview.vm.FillList();
             dragnDropListview.vm.CheckReminders();
-            dragnDropListview.vm.OnDoubleClickedSite += vm_OnDoubleClickedSite;
-            dragnDropListview.vm.OnListChanged += vm_OnListChanged;
-            dragnDropListview.vm.OnRemindersChanged += vm_OnRemindersChanged;
-            dragnDropListview.vm.MigrateOldSites();//TODO: takeOut
 
             (DataContext as BrowserTabViewModel).OnRefreshBookmarksList += BrowserTabView_OnRefreshBookmarksList;
             (DataContext as BrowserTabViewModel).OnRefreshReminders += BrowserTabView_OnRefreshReminders;
@@ -72,6 +82,8 @@ namespace WpfCefDynamBrowser.Views
         {
             borderNotification.Visibility = Visibility.Visible;
             tbNotificationCount.Text = "" + notificationCount;
+            if(notificationCount == 0)
+                borderNotification.Visibility = Visibility.Hidden;
         }
 
         void vm_OnListChanged()
@@ -201,12 +213,26 @@ namespace WpfCefDynamBrowser.Views
 
         private void btnImpotBookmarks_Click(object sender, RoutedEventArgs e)
         {
-            SelectProfileWindow spw = new SelectProfileWindow();
-            spw.Title = "Select Project";
-            spw.ShowDialog();
-            if (spw.OkClicked)
+            SelectBookmarkImportTypeWindow bookmarkTypeWindow = new SelectBookmarkImportTypeWindow();
+            bookmarkTypeWindow.ShowDialog();
+            if(!bookmarkTypeWindow.OkClicked)return;
+            if (bookmarkTypeWindow.browseoProj.IsChecked == true)
             {
-                dragnDropListview.vm.MergeBookMarksFromProjectPath(spw.SelectedProjectName);
+                SelectProfileWindow spw = new SelectProfileWindow();
+                spw.Title = "Select Project";
+                spw.ShowDialog();
+                if (spw.OkClicked)
+                {
+                    dragnDropListview.vm.MergeBookMarksFromProjectPath(spw.SelectedProjectName);
+                }
+            }
+            else if(bookmarkTypeWindow.fcs.IsChecked == true)
+            {
+                OpenFileDialog ofd = new OpenFileDialog();
+                ofd.Multiselect = false;
+                ofd.ShowDialog();
+                string path = ofd.FileName;
+                dragnDropListview.vm.MergeFromImport(path, DragDropListview.DragDropMainViewModel.IMPORT_TYPE_FCS);
             }
         }
 
