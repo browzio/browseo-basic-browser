@@ -138,6 +138,8 @@ namespace Indexer
 
         public IndexerVM()
         {
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Indexer Opened");
+
             BtnOkClicked = new RelayCommand(OnBtnOkClicked);
 
             BtnOkEnabled = true;
@@ -245,6 +247,8 @@ namespace Indexer
                         }
                     }
                     client.Dispose();
+
+                    Organiser.Common.Classes.UsageTracker.AddTraceCookie("Indexed Links " + InputedLinks + " Response: " + Response);
 
                     BtnOkEnabled = true;
                     ResponseVisible = Visibility.Visible;

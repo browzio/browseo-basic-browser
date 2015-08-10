@@ -48,6 +48,7 @@ namespace Youtuber
 
         public YoutuberVM()
         {
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Youtube Urlr Opened");
             OkClicked = new RelayCommand(OnOkClicked);
 
             mYoutubeVariationsList.Add("https://youtube.com/watch?feature=youtu.be&v=");
@@ -80,27 +81,33 @@ namespace Youtuber
         {
             if (!string.IsNullOrWhiteSpace(InputCode) && !string.IsNullOrEmpty(InputCode))
             {
-                ResultsVisible = Visibility.Collapsed;
-                OutputText = "";
-
-                string code = "";
-
-                foreach (string link in mYoutubeVariationsList)
+                try
                 {
-                    if (InputCode.Contains(link))
+                    ResultsVisible = Visibility.Collapsed;
+                    OutputText = "";
+
+                    string code = "";
+
+                    foreach (string link in mYoutubeVariationsList)
                     {
-                        code = InputCode.Replace(link, "");
+                        if (InputCode.Contains(link))
+                        {
+                            code = InputCode.Replace(link, "");
+                        }
                     }
-                }
 
-                if (code == "") return;
-                
-                foreach (string link in mYoutubeVariationsList)
-                {
-                    OutputText += link + code + Environment.NewLine;
-                }
+                    if (code == "") return;
 
-                ResultsVisible = Visibility.Visible;
+                    Organiser.Common.Classes.UsageTracker.AddTraceCookie("Created Links for video " + InputCode);
+
+                    foreach (string link in mYoutubeVariationsList)
+                    {
+                        OutputText += link + code + Environment.NewLine;
+                    }
+
+                    ResultsVisible = Visibility.Visible;
+                }
+                catch { }
             }
         }
 

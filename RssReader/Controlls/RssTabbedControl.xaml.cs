@@ -235,9 +235,9 @@ namespace RssReader.Controlls
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            LinksToRssWindow ltrw = new LinksToRssWindow();
-            ltrw.DataContext = new LinksToRssVM();
-            ltrw.Show();
+            //LinksToRssWindow ltrw = new LinksToRssWindow();
+            //ltrw.DataContext = new LinksToRssVM();
+            //ltrw.Show();
         }
     }
 }

@@ -72,6 +72,7 @@
     <Compile Include="Helpers\ArithmaticConverter.cs" />
     <Compile Include="Helpers\booleanToVisible.cs" />
     <Compile Include="Models\AvailableTabsAndLinks.cs" />
+    <Compile Include="Models\SavedPostedFeed.cs" />
     <Compile Include="Mvvm\LinksToRssVM.cs" />
     <Compile Include="Windows\LinksToRssWindow.xaml.cs">
       <DependentUpon>LinksToRssWindow.xaml</DependentUpon>
@@ -181,6 +182,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\browseo %281%29.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\v.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

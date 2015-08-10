@@ -75,7 +75,7 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <DockPanel Margin="5">
-            <TextBlock Text="Url no www keep http://:" VerticalAlignment="Center" Margin="5" />
+            <TextBlock Text="Url keep http://:" VerticalAlignment="Center" Margin="5" />
             <TextBox Text="{Binding InputCode}" FontFamily="Verdana" FontSize="15" Margin="5" />
         </DockPanel>
 

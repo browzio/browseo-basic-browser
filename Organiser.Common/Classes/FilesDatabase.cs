@@ -757,5 +757,14 @@ namespace Organiser.Common.Classes
                   = System.Convert.ToBase64String(toEncodeAsBytes);
             return returnValue;
         }
+
+        public static string DecodeFrom64(string encodedData)
+        {
+            byte[] encodedDataAsBytes
+                = System.Convert.FromBase64String(encodedData);
+            string returnValue =
+               System.Text.ASCIIEncoding.ASCII.GetString(encodedDataAsBytes);
+            return returnValue;
+        }
     }
 }

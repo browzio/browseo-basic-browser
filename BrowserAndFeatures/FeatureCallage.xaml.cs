@@ -187,7 +187,7 @@ namespace BrowserAndFeatures
             if (ltrw == null)
             {
                 ltrw = new LinksToRssWindow();
-                ltrw.DataContext = new LinksToRssVM();
+                ltrw.DataContext = new LinksToRssVM(profile, ltrw);
                 ltrw.Topmost = true;
                 ltrw.Closed += ltrw_Closed;
                 ltrw.Show();
