@@ -135,21 +135,32 @@ namespace BrowserAndFeatures
         {
             if (tbControl.SelectedIndex == 2 && !setevents)
             {
+                previndex = tbControl.SelectedIndex;
                 rssControl.SetProfileData(profile);
                 rssControl.OnLaunchToBrowser += FeatureCallage_OnLaunchToBrowser;
                 rssControl.OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;
+                rssControl.OnLaunchToMasher += rssControl_OnLaunchToMasher;
                 setevents = true;
             }
-
-            if (tbControl.SelectedIndex == 3)
+            else if (tbControl.SelectedIndex == 3)
+            {
+                previndex = tbControl.SelectedIndex;
+                if (wisi.DataContext == null)
+                {
+                    WPF_WYSIWYG_HTML_Editor.XmlRpcVM wvm = new WPF_WYSIWYG_HTML_Editor.XmlRpcVM();
+                    wvm.SetProfileDate(profile);
+                    wisi.DataContext = wvm;
+                }
+            }
+            else if (tbControl.SelectedIndex == 4)
             {
                 tbControl.SelectedIndex = previndex;
             }
-            else if (tbControl.SelectedIndex == 4) 
+            else if (tbControl.SelectedIndex == 5) 
             {
                 tbControl.SelectedIndex = previndex;
             }
-            else if(tbControl.SelectedIndex == 5)
+            else if(tbControl.SelectedIndex == 6)
             {
                 tbControl.SelectedIndex = previndex;
             }
@@ -158,6 +169,7 @@ namespace BrowserAndFeatures
                 previndex = tbControl.SelectedIndex;
             }
         }
+
 
         private void youtuber_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -191,6 +203,23 @@ namespace BrowserAndFeatures
                 ltrw.Topmost = true;
                 ltrw.Closed += ltrw_Closed;
                 ltrw.Show();
+            }
+        }
+
+        void rssControl_OnLaunchToMasher(string link)
+        {
+            if (ltrw == null)
+            {
+                ltrw = new LinksToRssWindow();
+                ltrw.DataContext = new LinksToRssVM(profile, ltrw);
+                ltrw.Topmost = true;
+                ltrw.Closed += ltrw_Closed;
+                (ltrw.DataContext as LinksToRssVM).AddMasherLink(link);
+                ltrw.Show();
+            }
+            else
+            {
+                (ltrw.DataContext as LinksToRssVM).AddMasherLink(link);
             }
         }
 

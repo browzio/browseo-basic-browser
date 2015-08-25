@@ -33,6 +33,7 @@ namespace RssReader
         }
         public event Action<string, string> OnLaunchToBrowser = delegate { };//link, rsslink
         public event Action<string> OnLaunchToTabBrowser = delegate { };//url
+        public event Action<string> OnLaunchToTabMasher = delegate { };//url
       //  public event Action<string,List<string>> OnImportedTab = delegate { };//tab title, list of rss feeds
 
         public ICommand DockPannelButtonsClick { get; set; }
@@ -54,6 +55,7 @@ namespace RssReader
         private PersonData mProfile;
 
         Thread loadingThread;
+        bool wasRefresh;
 
         public MainViewModel()
         {
@@ -96,6 +98,7 @@ namespace RssReader
                     break;
 
                 case "Refresh":
+                    wasRefresh = true;
                     RefreshRssFeed();
                     break;
 
@@ -136,9 +139,10 @@ namespace RssReader
 
         public void RefreshRssFeed()
         {
-            if (loadingThread != null && loadingThread.IsAlive)
+            if (loadingThread != null && loadingThread.IsAlive && wasRefresh)
             {
                 loadingThread.Abort();
+                wasRefresh = false;
             }
             try
             {
@@ -234,6 +238,7 @@ namespace RssReader
                                 rssLink.PBarVis = false;
                                 rssLink.ListResultVis = true;
                                 rssLink.OnSelectedLaunchLink += rssLink_OnSelectedLaunchLink;
+                                rssLink.OnSelectedLaunchLinkMasher += rssLink_OnSelectedLaunchLinkMasher;
                             }
                             catch
                             {
@@ -272,8 +277,9 @@ namespace RssReader
                                 "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
-                    catch 
+                    catch(Exception ex) 
                     {
+                        if (ex.Message != null && ex.Message.ToLower().Contains("thread was being aborted")) return;
                         if (!isCloseing)
                         MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
                     }
@@ -289,6 +295,12 @@ namespace RssReader
             {
                 MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
             }
+        }
+
+        void rssLink_OnSelectedLaunchLinkMasher(string link)
+        {
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Sent To Masher " + link);
+            OnLaunchToTabMasher(link);
         }
 
         private string cleanString(string stringToClean)

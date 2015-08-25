@@ -290,7 +290,7 @@ namespace WpfCefDynamBrowser.ViewModels
             BrowserForSocialShare bfss = new BrowserForSocialShare();
             bfss.Text = "Loading... " + AddressEditable;
             bfss.browserCntrl1.init(fullUrl);
-            bfss.ShowDialog();
+            bfss.Show();
         }
 
         private sealed class SourceVisitor : Xilium.CefGlue.CefStringVisitor

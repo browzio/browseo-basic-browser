@@ -94,47 +94,47 @@ namespace Organiser.Common
 
             foreach (var item in directoryValues)
             {
-                if (!isSelectProjWindow)
-                {
-                    string path = item.Value;
-                    if (!path.Contains(".ini"))
-                        path = path + "\\UserData.ini";
-                    PersonData pd = MyFilesDatabase.SetProfileFromini(path);
-                    if (webAddress.Contains(pd.WebAddress.ToLower()))
+                //if (!isSelectProjWindow)
+                //{
+                //    string path = item.Value;
+                //    if (!path.Contains(".ini"))
+                //        path = path + "\\UserData.ini";
+                //    PersonData pd = MyFilesDatabase.SetProfileFromini(path);
+                //    if (webAddress.Contains(pd.WebAddress.ToLower()))
                         ProfilesList.Add(item.Key);
-                }
-                else
-                {
-                    ProfilesList.Add(item.Key);
-                }
+              //  }
+               // else
+                //{
+                 //   ProfilesList.Add(item.Key);
+                //}
             }
 
-            if (ProfilesList.Count == 0)
-            {
-                foreach (var item in directoryValues)
-                {
-                    ProfilesList.Add(item.Key);
-                }
-            }
+            //if (ProfilesList.Count == 0)
+            //{
+            //    foreach (var item in directoryValues)
+            //    {
+            //        ProfilesList.Add(item.Key);
+            //    }
+            //}
 
-            if (ProfilesList.Count == 1)
-            {
-                OkClicked = true;
+            //if (ProfilesList.Count == 1)
+            //{
+            //    OkClicked = true;
 
-                foreach (var item in directoryValues)
-                {
-                    if (item.Key == ProfilesList[0])
-                    {
-                        SelectedProfileFilePath = item.Value;
-                        SelectedProjectName = item.Key;
-                        break;
-                    }
-                }
+            //    foreach (var item in directoryValues)
+            //    {
+            //        if (item.Key == ProfilesList[0])
+            //        {
+            //            SelectedProfileFilePath = item.Value;
+            //            SelectedProjectName = item.Key;
+            //            break;
+            //        }
+            //    }
 
 
-                System.Threading.Thread.Sleep(10);
-                this.Close();
-            }
+            //    System.Threading.Thread.Sleep(10);
+            //    this.Close();
+            //}
 
             if (lastProfileIndex > 0 && lastProfileIndex <= cmProfiles.Items.Count)
                 cmProfiles.SelectedIndex = lastProfileIndex;

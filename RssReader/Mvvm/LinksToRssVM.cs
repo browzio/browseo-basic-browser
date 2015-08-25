@@ -230,6 +230,12 @@ namespace RssReader.Mvvm
             }
         }
 
+
+        public void AddMasherLink(string link)
+        {
+            InputedText += link + Environment.NewLine;
+        }
+
         #region posting
 
         private void btn_OkClicked(object obj)

@@ -31,6 +31,7 @@ namespace RssReader.Controlls
     {
         public event Action<string, string> OnLaunchToBrowser = delegate { };//link, rsslink
         public event Action<string> OnLaunchToTabBrowser = delegate { };//url
+        public event Action<string> OnLaunchToMasher = delegate { };//url
 
         public ObservableCollection<MainViewModel> UserRssTabs { get; set; }
 
@@ -129,10 +130,16 @@ namespace RssReader.Controlls
             MainViewModel vm = new MainViewModel() { TabTitle = tabTitle };
             vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
             vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
+            vm.OnLaunchToTabMasher += vm_OnLaunchToTabMasher;
             // vm.OnImportedTab += vm_OnImportedTab;
             vm.SetProfileData(mProfile);
             vm.setLinks(linksList);
             UserRssTabs.Add(vm);
+        }
+
+        void vm_OnLaunchToTabMasher(string link)
+        {
+            OnLaunchToMasher(link);
         }
 
         #endregion
@@ -188,6 +195,7 @@ namespace RssReader.Controlls
                 MainViewModel vm = new MainViewModel() { TabTitle = stnw.tbInputText.Text };
                 vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
                 vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
+                vm.OnLaunchToTabMasher += vm_OnLaunchToTabMasher;
                // vm.OnImportedTab += vm_OnImportedTab;
                 vm.SetProfileData(mProfile);
                 UserRssTabs.Add(vm);
@@ -205,6 +213,7 @@ namespace RssReader.Controlls
                     MainViewModel vm = new MainViewModel() { TabTitle = tabTitle };
                     vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
                     vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
+                    vm.OnLaunchToTabMasher += vm_OnLaunchToTabMasher;
                    // vm.OnImportedTab += vm_OnImportedTab;
                     //vm.SetProfileData(mProfile);
                     UserRssTabs.Add(vm);

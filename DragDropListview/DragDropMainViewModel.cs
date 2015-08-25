@@ -171,7 +171,9 @@ namespace DragDropListview
         {
             string clickType = param as string;
             bool wascp = false;
-            bool wasImport = FoldersAndSitesList[SIFoldersSide].IsImported;
+            bool wasImport = false;
+            if (FoldersAndSitesList.Count > 0 && SIFoldersSide >= 0)
+                wasImport = FoldersAndSitesList[SIFoldersSide].IsImported;
             switch (clickType)
             {
                 case "Edit":
@@ -290,7 +292,9 @@ namespace DragDropListview
         private void FolderMenueItemCLick(object param)
         {
             string clickType = param as string;
-            bool wasImport = FoldersAndSitesList[SIFoldersSide].IsImported;
+            bool wasImport = false;
+            if (FoldersAndSitesList.Count > 0 && SIFoldersSide >=0)
+                wasImport = FoldersAndSitesList[SIFoldersSide].IsImported;
             switch (clickType)
             {
                 case "Edit":

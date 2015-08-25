@@ -62,6 +62,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CookComputing.XmlRpcV2">
+      <HintPath>..\WordPressSharp\packages\xmlrpcnet.3.0.0.266\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -139,6 +142,10 @@
       <Project>{f2c9dcf4-9c94-4389-9532-e9e7d0412c01}</Project>
       <Name>DragDropListview</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Drupal7.Services\Drupal7.Services.csproj">
+      <Project>{4f6c5819-0ee7-4c69-8012-b0afa3d901f0}</Project>
+      <Name>Drupal7.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GongSolutions.Wpf.DragDrop\GongSolutions.Wpf.DragDrop.csproj">
       <Project>{0c6674cc-6d49-414a-9b41-d4e175028ffb}</Project>
       <Name>GongSolutions.Wpf.DragDrop</Name>
@@ -170,6 +177,14 @@
     <ProjectReference Include="..\RssReader\RssReader.csproj">
       <Project>{05ac600c-f668-4bfa-8f8a-6de63d73526f}</Project>
       <Name>RssReader</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WordPressSharp\WordPressSharp.csproj">
+      <Project>{7a938355-0b6b-48b7-97fb-c0c09015307b}</Project>
+      <Name>WordPressSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WPF WYSIWYG HTML Editor\WYSIWYG.csproj">
+      <Project>{13a55ae8-28ab-4ddb-9bc3-babfd7d64fea}</Project>
+      <Name>WYSIWYG</Name>
     </ProjectReference>
     <ProjectReference Include="..\Youtuber\Youtuber.csproj">
       <Project>{9ee91744-7d3f-4f68-8b98-395759ab4eb0}</Project>

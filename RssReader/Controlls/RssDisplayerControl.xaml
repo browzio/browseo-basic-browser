@@ -271,7 +271,13 @@
                     <ContextMenu>
                         <MenuItem Header="Send To Browser">
                             <MenuItem.InputBindings>
-                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" />
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="Browser" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+
+                        <MenuItem Header="Send To Feed Masher">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="Masher" />
                             </MenuItem.InputBindings>
                         </MenuItem>
                     </ContextMenu>

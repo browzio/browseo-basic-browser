@@ -269,7 +269,7 @@ namespace BrowserHost
             BrowserForSocialShare bfss = new BrowserForSocialShare();
             bfss.Text = "Loading... " + rssLink;
             bfss.browserCntrl1.init(link);
-            bfss.ShowDialog();
+            bfss.Show();
         }
 
         private void Sviewer_PreviewMouseWheel(object sender, MouseWheelEventArgs e)

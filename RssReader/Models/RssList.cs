@@ -13,7 +13,8 @@ namespace RssReader.Models
 {
     public class RssList : INotifyPropertyChanged
     {
-        public event Action<string> OnSelectedLaunchLink = delegate { };
+        public event Action<string> OnSelectedLaunchLink = delegate { };//send to browser
+        public event Action<string> OnSelectedLaunchLinkMasher = delegate { };//send to MAsher
 
         public ICommand SendToBrowser { get; set; }
 
@@ -25,7 +26,19 @@ namespace RssReader.Models
 
         private void OnSendToBrowser(object obj)
         {
-            OnSelectedLaunchLink(ListResults[SIListResults].Link);
+            switch ((string)obj)
+            {
+                case "Browser":
+                    OnSelectedLaunchLink(ListResults[SIListResults].Link);
+                    break;
+
+                case "Masher":
+                    OnSelectedLaunchLinkMasher(ListResults[SIListResults].Link);
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private string rssLink;

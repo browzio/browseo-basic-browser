@@ -268,6 +268,7 @@ namespace Organiser.Common.Classes
                 profile.Zip = ini.IniReadValue("Data", "Zip");
                 profile.Country = ini.IniReadValue("Data", "Country");
                 profile.Notes = ini.IniReadValue("Data", "Notes");
+                profile.WebAddress = ini.IniReadValue("Data", "WebAddress");
                 profile.CmbSelectedIndexSex = Convert.ToInt32(ini.IniReadValue("Data", "Sex"));
                 profile.CmbSelectedIndexDay = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayDay"));
                 profile.CmbSelectedIndexMonth = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayMonth"));
