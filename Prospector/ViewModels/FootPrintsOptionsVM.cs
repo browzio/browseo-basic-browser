@@ -731,7 +731,7 @@ namespace Prospector.ViewModels
 
         private void Crawler_LinkWasAdded(SearchResult result, bool found)
         {
-            App.Current.Dispatcher.Invoke((Action)delegate
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 ListResults.Add(result);
                 switch (tCSelectedTabIndex)

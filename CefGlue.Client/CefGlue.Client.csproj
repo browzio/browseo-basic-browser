@@ -144,13 +144,13 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
-      <Project>{679AF14D-8FF5-4608-BFF8-EC1A7DED04A4}</Project>
-      <Name>CefGlue.WindowsForms</Name>
+    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
+      <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
+      <Name>CefGlue.WindowsForms-old</Name>
     </ProjectReference>
-    <ProjectReference Include="..\CefGlue\CefGlue.csproj">
-      <Project>{703FF300-34B9-48D4-A5D6-E741F48D5F95}</Project>
-      <Name>CefGlue</Name>
+    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj">
+      <Project>{9080d62a-6fe7-41d2-9a77-f3d7f6c33418}</Project>
+      <Name>CefGlue-old</Name>
     </ProjectReference>
     <ProjectReference Include="..\DragDropListview\DragDropListview.csproj">
       <Project>{f2c9dcf4-9c94-4389-9532-e9e7d0412c01}</Project>

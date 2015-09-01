@@ -35,6 +35,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WYSIWYG", "WPF WYSIWYG HTML
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Drupal7.Services", "Drupal7.Services\Drupal7.Services.csproj", "{4F6C5819-0EE7-4C69-8012-B0AFA3D901F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CefGlue-old", "..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj", "{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CefGlue.WindowsForms-old", "..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj", "{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -237,6 +241,30 @@ Global
 		{4F6C5819-0EE7-4C69-8012-B0AFA3D901F0}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{4F6C5819-0EE7-4C69-8012-B0AFA3D901F0}.Release|x86.ActiveCfg = Release|Any CPU
 		{4F6C5819-0EE7-4C69-8012-B0AFA3D901F0}.Release|x86.Build.0 = Release|Any CPU
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Debug|x86.ActiveCfg = Debug|x86
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Debug|x86.Build.0 = Debug|x86
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Release|Mixed Platforms.Build.0 = Release|x86
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Release|x86.ActiveCfg = Release|x86
+		{9080D62A-6FE7-41D2-9A77-F3D7F6C33418}.Release|x86.Build.0 = Release|x86
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Debug|x86.Build.0 = Debug|Any CPU
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Release|x86.ActiveCfg = Release|Any CPU
+		{706ABB6A-2A0B-4D0F-B496-3D6B67EDD6D4}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -170,7 +170,7 @@ namespace Indexer
 
                 new Thread(() =>
                 {
-                    App.Current.Dispatcher.Invoke((Action)delegate
+                    Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         Mouse.OverrideCursor = Cursors.Wait;
                     });
@@ -253,7 +253,7 @@ namespace Indexer
                     BtnOkEnabled = true;
                     ResponseVisible = Visibility.Visible;
 
-                    App.Current.Dispatcher.Invoke((Action)delegate
+                    Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         Mouse.OverrideCursor = null;
                     });

@@ -65,7 +65,7 @@ namespace RssReader.Mvvm
                 }
                 else if (value >= 0 && SavedFeeds.Count <= 0)
                 {
-                    App.Current.Dispatcher.Invoke((Action)delegate
+                    Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         MessageBox.Show(mParent, "No saved posted feeds.");
                     });
@@ -253,7 +253,7 @@ namespace RssReader.Mvvm
                 OutputedLinks = "";
                 ResultsVisible = Visibility.Collapsed;
 
-                App.Current.Dispatcher.Invoke((Action)delegate
+                Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     Mouse.OverrideCursor = Cursors.Wait;
                 });
@@ -302,7 +302,7 @@ namespace RssReader.Mvvm
                         }
                         catch
                         {
-                            App.Current.Dispatcher.Invoke((Action)delegate
+                            Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         if (!string.IsNullOrEmpty(link) && !string.IsNullOrWhiteSpace(link))
                             MessageBox.Show(mParent, "Incompatible link " + link);
@@ -358,7 +358,7 @@ namespace RssReader.Mvvm
                 catch (Exception ex)
                 {
                     failed = true;
-                    App.Current.Dispatcher.Invoke((Action)delegate
+                    Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     MessageBox.Show(mParent, "Upload Faild: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 });
@@ -385,7 +385,7 @@ namespace RssReader.Mvvm
                     }
                     if (!found)
                     {
-                        App.Current.Dispatcher.Invoke((Action)delegate
+                        Application.Current.Dispatcher.Invoke((Action)delegate
                         {
                             SavedFeeds.Add(new SavedPostedFeed()
                             {
@@ -403,7 +403,7 @@ namespace RssReader.Mvvm
 
                 Organiser.Common.Classes.UsageTracker.AddTraceCookie("Rss Masher Results: " + OutputedLinks);
 
-                App.Current.Dispatcher.Invoke((Action)delegate
+                Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     Mouse.OverrideCursor = null;
                 });
@@ -472,7 +472,7 @@ namespace RssReader.Mvvm
                 if (site == xmlsite)
                 {
                     bool okClicked = false;
-                    App.Current.Dispatcher.Invoke((Action)delegate
+                    Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         string message = "There Is already a site that you own with this title would you like to overwrite it?";
                         if (isRemove)
@@ -486,7 +486,7 @@ namespace RssReader.Mvvm
                     }
                 }
             }
-            App.Current.Dispatcher.Invoke((Action)delegate
+            Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         string message = "A site with this title already exists choose another one.";
                         if (isRemove)

@@ -246,7 +246,7 @@ namespace RssReader
                                 rssLink.ListResultVis = true;
                                 failedLinks.Add(rssLink.RssLink);
                             }
-                            App.Current.Dispatcher.Invoke(DispatcherPriority.Background, (Action)delegate
+                            Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, (Action)delegate
                             {
 
                             foreach (RssResult r in tempResultsList)
@@ -283,8 +283,8 @@ namespace RssReader
                         if (!isCloseing)
                         MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
                     }
-
-                    App.Current.Dispatcher.Invoke(DispatcherPriority.Background, (Action)delegate
+                    if (!isCloseing)
+                    Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, (Action)delegate
                     {
                         Mouse.OverrideCursor = null;
                     });

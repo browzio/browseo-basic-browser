@@ -356,6 +356,8 @@ namespace Xilium.CefGlue.Client
 
         PersonData pdataForImgur = null;
         #endregion
+
+        SelectProfileWindow selectProfile;
         
         public void InjectData()
         {
@@ -400,11 +402,24 @@ namespace Xilium.CefGlue.Client
                 {
                     if (MyFilesDatabase.HasMultipleProfiles(BrowserInit.pData.ProjectDIr))
                     {
-                        SelectProfileWindow selectProfile = new SelectProfileWindow(BrowserInit.pData.ProjectName, BrowserInit.pData.ProjectDIr, lastProfileIndex, CBrowser.Browser.GetMainFrame().Url.ToLower());
-                        selectProfile.ShowDialog();
-                        if (!selectProfile.OkClicked) return;
-                        lastProfileIndex = selectProfile.cmProfiles.SelectedIndex;
-                        profile = MyFilesDatabase.GetSubProjectPersonData(selectProfile.SelectedProfileFilePath);
+                        if (selectProfile == null)
+                        {
+                            selectProfile = new SelectProfileWindow(BrowserInit.pData.ProjectName, BrowserInit.pData.ProjectDIr, lastProfileIndex, CBrowser.Browser.GetMainFrame().Url.ToLower());
+                            //selectProfile.Closed += selectProfile_Closed;
+                            selectProfile.ShowDialog();
+                            if (!selectProfile.OkClicked)
+                            {
+                                selectProfile = null;
+                                return;
+                            }
+                            lastProfileIndex = selectProfile.cmProfiles.SelectedIndex;
+                            profile = MyFilesDatabase.GetSubProjectPersonData(selectProfile.SelectedProfileFilePath);
+                        }
+                        else
+                        {
+                            selectProfile.Focus();
+                        }
+                        selectProfile = null;
                     }
                 }
             }

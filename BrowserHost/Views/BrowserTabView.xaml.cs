@@ -226,13 +226,13 @@ namespace WpfCefDynamBrowser.Views
                     dragnDropListview.vm.MergeBookMarksFromProjectPath(spw.SelectedProjectName);
                 }
             }
-            else if(bookmarkTypeWindow.fcs.IsChecked == true)
+            else if(bookmarkTypeWindow.fcs.IsChecked == true || bookmarkTypeWindow.entBud.IsChecked == true)
             {
                 OpenFileDialog ofd = new OpenFileDialog();
                 ofd.Multiselect = false;
                 ofd.ShowDialog();
                 string path = ofd.FileName;
-                dragnDropListview.vm.MergeFromImport(path, DragDropListview.DragDropMainViewModel.IMPORT_TYPE_FCS);
+                dragnDropListview.vm.MergeFromImport(path, bookmarkTypeWindow.fcs.IsChecked == true ? DragDropListview.DragDropMainViewModel.IMPORT_TYPE_FCS : DragDropListview.DragDropMainViewModel.IMPORT_TYPE_EB);
             }
         }
 

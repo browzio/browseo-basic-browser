@@ -11,6 +11,7 @@
         [STAThread]
         private static int Main(string[] args)
         {
+            return 0;
             try
             {
                 CefRuntime.Load();

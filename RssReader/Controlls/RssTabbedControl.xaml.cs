@@ -67,31 +67,39 @@ namespace RssReader.Controlls
 
         public void ImportBookmarks()
         {
-            SelectProfileWindow spw = new SelectProfileWindow();
-            spw.Title = "Select Project";
-            spw.ShowDialog();
-            if (spw.OkClicked)
+            try
             {
-                AvailrssesForImports.Clear();
-                foreach (string tabTitle in MyFilesDatabase.GetRssFeedLinksTabsTitlesByName(spw.SelectedProjectName))
+                SelectProfileWindow spw = new SelectProfileWindow();
+                spw.Title = "Select Project";
+                spw.ShowDialog();
+                if (spw.OkClicked)
                 {
-                    AvailrssesForImports.Add(new AvailableTabsAndLinks() { Name = tabTitle });
-                }
-
-                ChooseFolderWindow cfw = new ChooseFolderWindow();
-                cfw.DataContext = this;
-                cfw.lstItems.ItemsSource = AvailrssesForImports;
-                cfw.ShowDialog();
-                if (cfw.OkClicked)
-                {
-                    foreach (AvailableTabsAndLinks availTabs in AvailrssesForImports)
+                    AvailrssesForImports.Clear();
+                    foreach (string tabTitle in MyFilesDatabase.GetRssFeedLinksTabsTitlesByName(spw.SelectedProjectName))
                     {
-                        if (availTabs.IsChecked)
+                        AvailrssesForImports.Add(new AvailableTabsAndLinks() { Name = tabTitle });
+                    }
+
+                    ChooseFolderWindow cfw = new ChooseFolderWindow();
+                    cfw.DataContext = this;
+                    cfw.lstItems.ItemsSource = AvailrssesForImports;
+                    cfw.ShowDialog();
+                    if (cfw.OkClicked)
+                    {
+                        foreach (AvailableTabsAndLinks availTabs in AvailrssesForImports)
                         {
-                            OnImportedTab(availTabs.Name, MyFilesDatabase.GetRssFeedLinks(spw.SelectedProjectName, availTabs.Name));
+                            if (availTabs.IsChecked)
+                            {
+                                OnImportedTab(availTabs.Name, MyFilesDatabase.GetRssFeedLinks(spw.SelectedProjectName, availTabs.Name));
+                            }
                         }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Wow Something went wrong here try again please. " + ex.Message);
+                return;
             }
         }
 

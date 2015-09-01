@@ -97,8 +97,10 @@
                 var settings = BrowserSettings;
                 if (settings == null) settings = new CefBrowserSettings
                 {
-                    JavaScriptAccessClipboard = CefState.Enabled,
-                    JavaScriptDomPaste = CefState.Enabled
+                    //JavaScriptAccessClipboard = CefState.Enabled,
+                    //JavaScriptDomPaste = CefState.Enabled,
+                    //JavaScript = CefState.Disabled
+                    //Java = CefState.Disabled
                 };
 
                 CefBrowserHost.CreateBrowser(windowInfo, client, settings, StartUrl);

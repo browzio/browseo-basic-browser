@@ -40,6 +40,7 @@ namespace BrowserAndFeatures
             //Dispatcher.CurrentDispatcher.UnhandledException += CurrentDispatcher_UnhandledException;
             //this.Closed += (sender, args) => { PostQuitMessage(0); };
             InitializeComponent();
+            SetPermissions();
             SetPersonData();
             (prospector.DataContext as FootPrintsOptionsVM).OnClickedSearch += FeatureCallage_OnClickedSearch;
         }
@@ -63,6 +64,108 @@ namespace BrowserAndFeatures
         //    var message = exception == null ? "null" : exception.Message;
         //    MessageBox.Show("CLR unhandled exception: " + message);
         //}
+
+
+        #region setup data
+        private void SetPermissions()
+        {
+            //MyFilesDatabase
+            string dir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Lisence");
+            if (!Directory.Exists(dir)) App.Current.Shutdown();
+            string lisenceFilePath = System.IO.Path.Combine(dir, "Lisence.browseoLisence");
+            if (!File.Exists(lisenceFilePath)) App.Current.Shutdown();
+
+            string canSeeProxys = "", canCreateLisence = "",
+        cbAllowProject = "",
+        cbAllowProspector = "",
+        cbAllowRSS = "",
+        cbAllowPBN = "",
+        cbAllowFeedMash = "",
+        cbAllowIndexer = "",
+        cbYoutube = "",
+        key = "", name = "", email = "";
+            decryptLisence(MyFilesDatabase.DecodeFrom64(File.ReadAllText(lisenceFilePath)), ref canSeeProxys, ref canCreateLisence,
+                ref cbAllowProject,
+                ref cbAllowProspector,
+                ref cbAllowRSS,
+                ref cbAllowPBN,
+                ref cbAllowFeedMash,
+                ref cbAllowIndexer,
+                ref cbYoutube,
+                ref key, ref name, ref email);
+
+
+            if (cbAllowProspector.ToLower() != "true") tabProspector.Visibility = System.Windows.Visibility.Collapsed;
+            if (cbAllowRSS.ToLower() != "true") tabrssControl.Visibility = System.Windows.Visibility.Collapsed;
+            if (cbAllowPBN.ToLower() != "true") tabrsswisi.Visibility = System.Windows.Visibility.Collapsed;
+            if (cbAllowFeedMash.ToLower() != "true") feed.Visibility = System.Windows.Visibility.Collapsed;
+            if (cbAllowIndexer.ToLower() != "true") indexer.Visibility = System.Windows.Visibility.Collapsed;
+            if (cbYoutube.ToLower() != "true") youtuber.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        public static void decryptLisence(string lisenceText, ref string canSeeProxys, ref string canCreateLisence,
+            ref string cbAllowProject,
+            ref string cbAllowProspector,
+            ref string cbAllowRSS,
+            ref string cbAllowPBN,
+            ref string cbAllowFeedMash,
+            ref string cbAllowIndexer,
+            ref string cbYoutube,
+            ref string key, ref string name, ref string email)
+        {
+            string[] lisenceLines = lisenceText.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            foreach (string line in lisenceLines)
+            {
+                string[] lineValPairs = line.Split('=');
+                switch (lineValPairs[0])
+                {
+                    case "CanSeeProxys":
+                        canSeeProxys = lineValPairs[1];
+                        break;
+
+                    case "CanCreateLisence":
+                        canCreateLisence = lineValPairs[1];
+                        break;
+
+                    case "cbAllowProject":
+                        cbAllowProject = lineValPairs[1];
+                        break;
+                    case "cbAllowProspector":
+                        cbAllowProspector = lineValPairs[1];
+                        break;
+                    case "cbAllowRSS":
+                        cbAllowRSS = lineValPairs[1];
+                        break;
+                    case "cbAllowPBN":
+                        cbAllowPBN = lineValPairs[1];
+                        break;
+                    case "cbAllowFeedMash":
+                        cbAllowFeedMash = lineValPairs[1];
+                        break;
+                    case "cbAllowIndexer":
+                        cbAllowIndexer = lineValPairs[1];
+                        break;
+                    case "cbYoutube":
+                        cbYoutube = lineValPairs[1];
+                        break;
+
+                    case "Key":
+                        key = lineValPairs[1];
+                        break;
+
+                    case "Name":
+                        name = lineValPairs[1];
+                        break;
+
+                    case "Email":
+                        email = lineValPairs[1];
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
         PersonData profile;
         public void SetPersonData(PersonData data = null)
         {
@@ -107,6 +210,8 @@ namespace BrowserAndFeatures
 
         }
 
+        #endregion
+
         internal void close()
         {
             browser.CloseAllTabs();
@@ -125,6 +230,8 @@ namespace BrowserAndFeatures
         {
             browser.LaunchNewWindowToLink(link, rssLink);
         }
+
+        #region other features tabs
 
         bool setevents = false;
         int previndex;
@@ -150,6 +257,7 @@ namespace BrowserAndFeatures
                     WPF_WYSIWYG_HTML_Editor.XmlRpcVM wvm = new WPF_WYSIWYG_HTML_Editor.XmlRpcVM();
                     wvm.SetProfileDate(profile);
                     wisi.DataContext = wvm;
+                    wisi.SetProfileData(profile);
                 }
             }
             else if (tbControl.SelectedIndex == 4)
@@ -229,5 +337,6 @@ namespace BrowserAndFeatures
             ltrw = null;
             imw = null;
         }
+        #endregion
     }
 }

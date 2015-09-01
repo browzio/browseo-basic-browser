@@ -217,7 +217,7 @@ namespace WpfCefDynamBrowser.ViewModels
                     wasPin = true;
                     var visitor = new SourceVisitor(text =>
                     {
-                        App.Current.Dispatcher.BeginInvoke(new Action(() =>
+                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                         {
                             WebPageImages.Clear();
                             foreach (Match m in Regex.Matches(text, "<img.+?src=[\"'](.+?)[\"'].+?>", RegexOptions.IgnoreCase | RegexOptions.Multiline))

@@ -144,7 +144,7 @@ namespace WPF_WYSIWYG_HTML_Editor
             new Thread(() =>
             {
                 EnableBtns = false;
-                App.Current.Dispatcher.Invoke((Action)delegate 
+                Application.Current.Dispatcher.Invoke((Action)delegate 
                 { 
                    Mouse.OverrideCursor = Cursors.Wait;
                 });
@@ -275,7 +275,7 @@ namespace WPF_WYSIWYG_HTML_Editor
                     MessageBox.Show("Whoops something went wrong: " + ex.Message);
                 }
 
-                App.Current.Dispatcher.Invoke((Action)delegate
+                Application.Current.Dispatcher.Invoke((Action)delegate
                 {
                     Mouse.OverrideCursor = null;
                 });

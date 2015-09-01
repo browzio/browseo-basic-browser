@@ -132,11 +132,11 @@
                 <TextBox Text="{Binding BacklinksindexerAPIKey}" Margin="5" />
             </DockPanel>
 
-            <CheckBox Content="Crazy Indexer" IsChecked="{Binding CrazyindexerChecked}" Margin="5,0,0,0" />
+            <!--<CheckBox Content="Crazy Indexer" IsChecked="{Binding CrazyindexerChecked}" Margin="5,0,0,0" />
             <DockPanel Visibility="{Binding CrazyindexerVisible}" Margin="5">
                 <TextBlock Text="API Key"  Margin="5" VerticalAlignment="Center" />
                 <TextBox Text="{Binding CrazyindexerAPIKey}" Margin="5" />
-            </DockPanel>
+            </DockPanel>-->
 
             <CheckBox Content="Instant Link Indexer" IsChecked="{Binding InstantlinkindexerChecked}" Margin="5,0,0,0" />
             <DockPanel Visibility="{Binding InstantlinkindexerVisible}" Margin="5">

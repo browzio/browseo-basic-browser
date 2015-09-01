@@ -27,6 +27,7 @@ namespace DragDropListview
    public class DragDropMainViewModel : IDropTarget, INotifyPropertyChanged
     {
        public const string IMPORT_TYPE_FCS = "fcs";
+       public const string IMPORT_TYPE_EB = "eb";
 
         public event Action<int> OnHasReminders = delegate { };//int, amount of reminders
         //public event Action OnRemindersChanged = delegate { };
@@ -1078,6 +1079,7 @@ namespace DragDropListview
             string folderName = ebm.cmbImportedFolders.Text;
             switch (type)
             {
+                #region fcs
                 case IMPORT_TYPE_FCS:
                         bool createNewFvm = true;
                         FolderVM fcsVm = null;
@@ -1147,7 +1149,73 @@ namespace DragDropListview
                             }
                        // }).Start();
                     break;
+                #endregion
 
+                #region eb
+                case IMPORT_TYPE_EB:
+                        bool createNeweb = true;
+                        FolderVM ebVm = null;
+                        foreach (FolderVM fvm in FoldersAndSitesList)
+                        {
+                            if (fvm.IsImported && fvm.ImportType == IMPORT_TYPE_EB && fvm.Name == folderName)
+                            {
+                                createNeweb = false;
+                                ebVm = fvm;
+                                break;
+                            }
+                        }
+
+                        if (createNeweb)
+                        {
+                            ebVm = new FolderVM()
+                            {
+                                Name = folderName,
+                                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\enterprise buddy.ico")),
+                                IsFolder = true,
+                                IsImported = true,
+                                ImportType = IMPORT_TYPE_EB
+                            };
+
+                            FoldersAndSitesList.Add(ebVm);
+                        }
+                        if (FoldersAndSitesList.Count == 1)
+                        {
+                            SIFoldersSide = 0;
+                            Visible_Sites = true;
+                        }
+                            try
+                            {
+                                foreach (string line in File.ReadAllLines(path))
+                                {
+                                    string[] split = line.Split(',');
+                                    string SITENAME = split[0];
+                                    string URL = split[1];
+                                    string EMAIL = split[2];
+                                    string PASSWORD = split[3];
+                                    string USERNAME = split[4];
+
+                                    Bookmark bmark = new Bookmark();
+                                    bmark.Link = URL;
+                                    bmark.Name = SITENAME;
+                                    bmark.Email = EMAIL;
+                                    bmark.Username = USERNAME;
+                                    bmark.Password = PASSWORD;
+                                    bmark.IsImported = true;
+                                    bmark.ImportType = type;
+                                    bmark.DateTimeStamp = DateTime.Now.ToString();
+                                    bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+
+                                    ebVm.Sites.Add(bmark);
+                                }
+
+                                saveAllImportedSites();
+                            }
+                            catch 
+                            {
+                                MessageBox.Show("Ooops something went wrong on import delete the added folder and try again");
+                            }
+                    break;
+                #endregion
                 default:
                     break;
             }
@@ -1211,9 +1279,10 @@ namespace DragDropListview
                 {
                     foreach (FileInfo file in dInfoWithFiles.GetFiles())
                     {
+                        FolderVM fcsVm = null;
                         if (item.Name == IMPORT_TYPE_FCS)
                         {
-                            FolderVM fcsVm = new FolderVM()
+                            fcsVm = new FolderVM()
                             {
                                 Name = dInfoWithFiles.Name,
                                 BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png")),
@@ -1221,6 +1290,19 @@ namespace DragDropListview
                                 IsImported = true,
                                 ImportType = IMPORT_TYPE_FCS
                             };
+                        }
+
+                        if (item.Name == IMPORT_TYPE_EB)
+                        {
+                            fcsVm = new FolderVM()
+                            {
+                                Name = dInfoWithFiles.Name,
+                                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\enterprise buddy.ico")),
+                                IsFolder = true,
+                                IsImported = true,
+                                ImportType = IMPORT_TYPE_EB
+                            };
+                        }
                             foreach (string line in File.ReadAllLines(file.FullName))
                             {
                                 string[] split = line.Split(new string[] { SPLITTER }, StringSplitOptions.None);
@@ -1243,7 +1325,7 @@ namespace DragDropListview
                                 fcsVm.Sites.Add(bmark);
                             }
                             FoldersAndSitesList.Add(fcsVm);
-                        }
+                       // }
                     }
                 }
             }
@@ -1292,11 +1374,15 @@ namespace DragDropListview
 
         private void deleteImportedFolder()
         {
-            string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName);
-            if (!Directory.Exists(dirForCustomImport)) return;
+            try
+            {
+                string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName);
+                if (!Directory.Exists(dirForCustomImport)) return;
 
-            string filePath = Path.Combine(dirForCustomImport, FoldersAndSitesList[SIFoldersSide].ImportType, FoldersAndSitesList[SIFoldersSide].Name);
-            if (Directory.Exists(filePath)) Directory.Delete(filePath,true);
+                string filePath = Path.Combine(dirForCustomImport, FoldersAndSitesList[SIFoldersSide].ImportType, FoldersAndSitesList[SIFoldersSide].Name);
+                if (Directory.Exists(filePath)) Directory.Delete(filePath, true);
+            }
+            catch { }
         }
 
         #endregion

@@ -111,7 +111,7 @@ namespace BrowserHost
                             if ((availmem - total) < 350)
                             {
                                 if (!showedMSgBox)
-                                App.Current.Dispatcher.Invoke((Action)delegate
+                               Application.Current.Dispatcher.Invoke((Action)delegate
                                 {
                                     MessageBox.Show(
                                         "You have only " + (availmem - total) + "mb of ram space left please close down other applications" +
@@ -145,7 +145,7 @@ namespace BrowserHost
 
         private void CreateNewTab(string url = DefaultUrlForAddedTabs)
         {
-            App.Current.Dispatcher.Invoke((Action)delegate
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 BrowserTabViewModel btvm = new BrowserTabViewModel(url);
                 btvm.OnCreateNewTab += btvm_OnCreateNewTab;
@@ -197,7 +197,7 @@ namespace BrowserHost
 
         void btvm_OnCreateNewTab(string webSite, bool shownewTab)
         {
-            App.Current.Dispatcher.Invoke((Action)delegate
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 CreateNewTab(webSite);
 

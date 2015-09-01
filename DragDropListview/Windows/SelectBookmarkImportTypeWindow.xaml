@@ -1,7 +1,7 @@
 ﻿<Window x:Class="BrowserHost.Views.SelectBookmarkImportTypeWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Select Type" Height="140" Width="300"
+        Title="Select Type" Height="167" Width="300"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Icon="/BrowserHost;component/Images/browseo (1).ico">
@@ -115,7 +115,15 @@
                 <TextBlock Text="  FCS Networker" />
             </StackPanel>
         </CheckBox>
-        
+
+        <CheckBox Margin="5" Name="entBud" x:FieldModifier="public">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="/BrowserHost;component/Images/enterprise buddy.ico" 
+                       Width="20" />
+                <TextBlock Text="  BE" VerticalAlignment="Center" />
+            </StackPanel>
+        </CheckBox>
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
             <Button Content="OK" Width="120" Name="btnOk" Click="btnOk_Click" Cursor="Hand" />
             <Button Content="Cancel" Width="120" Name="btnCancel" Click="btnCancel_Click" Cursor="Hand" />

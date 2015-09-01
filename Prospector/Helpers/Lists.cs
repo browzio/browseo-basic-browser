@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Prospector.Helpers
 {
@@ -46,7 +47,7 @@ namespace Prospector.Helpers
 
         public static ObservableCollection<T> Shuffle<T>(ObservableCollection<T> list)
         {
-            App.Current.Dispatcher.Invoke((Action)delegate
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 Random rng = new Random();
                 int n = list.Count;

@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WPF_WYSIWYG_HTML_Editor"
+             xmlns:localXaml="clr-namespace:WPF_WYSIWYG_HTML_Editor.XAML"
              mc:Ignorable="d" Loaded="Window_Loaded">
     <Grid>
         <Grid.RowDefinitions>
@@ -11,13 +12,13 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
-        <Grid Name="grdFtpProjects">
-            
+        <Grid Name="grdFtpProjects" Width="150" Grid.Column="1" Grid.RowSpan="2" >
+            <localXaml:FTPProjectsList x:Name="ftpProjectList" />
         </Grid>
-        <Ribbon Grid.Column="1" Foreground="#333333" Background="WhiteSmoke" Margin="0,-22,0,0">
+        <Ribbon Name="ribon" Foreground="#333333" Background="WhiteSmoke" Margin="0,-22,0,0" SelectionChanged="Ribbon_SelectionChanged">
             <Ribbon.ApplicationMenu>
                 <RibbonApplicationMenu Visibility="Collapsed" />
             </Ribbon.ApplicationMenu>
@@ -73,7 +74,7 @@
                 </RibbonGroup>
             </RibbonTab>
 
-            <RibbonTab Header="Publish">
+            <RibbonTab Header="Publish PBN">
                 <RibbonGroup Header="Title">
                     <TextBlock Text="Post Title:" Margin="3" VerticalAlignment="Center" />
                     <TextBox Text="{Binding PostTitle}" Margin="3" Width="200" />
@@ -100,7 +101,7 @@
                 </RibbonGroup>
 
                 <RibbonGroup Header="Publish">
-                    <Button ToolTip="Publish" Cursor="Hand" IsEnabled="{Binding EnableBtns}" Background="Transparent" BorderBrush="Transparent" Name="btnPublish" Click="btnPublish_Click">
+                    <Button ToolTip="Publish" Cursor="Hand" IsEnabled="{Binding EnableBtns}" Background="Transparent" BorderBrush="Transparent" Name="btnPublishFTP" Click="btnPublish_Click">
                         <Image Source="..\Images\publish.png" />
                     </Button>
                 </RibbonGroup>
@@ -110,13 +111,17 @@
                 </RibbonGroup>
             </RibbonTab>
 
+            <!--<RibbonTab Header="Publish FTP">
+
+            </RibbonTab>-->
+
         </Ribbon>
         <!--<StatusBar Grid.Row="2">
             <StatusBarItem>
                 <TextBlock x:Name="lblCursorPosition" Text="http://www.greencomponent.net"/>
             </StatusBarItem>
         </StatusBar>-->
-        <local:WPFWebBrowser Grid.Column="1" x:Name="webBrowserEditor"  Grid.Row="1" />
-        <local:HtmlEditor Grid.Column="1" x:Name="HtmlEditor1"  Grid.Row="1" Visibility="Hidden"/>
+        <local:WPFWebBrowser Grid.Column="0" x:Name="webBrowserEditor"  Grid.Row="1" VerticalAlignment="Top" />
+        <local:HtmlEditor Grid.Column="0" x:Name="HtmlEditor1"  Grid.Row="1" Visibility="Hidden" VerticalAlignment="Top"/>
     </Grid>
 </UserControl>

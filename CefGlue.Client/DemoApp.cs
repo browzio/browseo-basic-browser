@@ -39,7 +39,17 @@
 
             //System.IO.File.Create("C:\\file.txt");
 
-            //commandLine.AppendArgument("request-context-per-browser");
+            //commandLine.AppendArgument("disable-media-stream");
+            //commandLine.AppendSwitch("media.peerconnection.enabled", "false");
+            //commandLine.AppendArgument("disable-webrtc");
+            //commandLine.AppendSwitch("disable-webrtc-encryption");
+            //commandLine.AppendArgument("disable-webrtc-hw-decoding");
+            //commandLine.AppendArgument("disable-webrtc-hw-encoding");
+            //commandLine.AppendArgument("disable-webrtc-hw-encoding");
+            //commandLine.AppendSwitch("enable_webrtc", "0");
+            //commandLine.AppendSwitch("ENABLE_WEBRTC", "0");
+            //commandLine.AppendSwitch("enable-media-stream", "0");
+            //commandLine.AppendSwitch("multiple_routes_enabled", "0");
             if (BrowserInit.pData != null && !string.IsNullOrEmpty(BrowserInit.pData.ProxyIP) && !string.IsNullOrWhiteSpace(BrowserInit.pData.ProxyIP))
             {
                 try
@@ -52,7 +62,11 @@
                 }
             }
 
-            //commandLine.AppendArgument("enable-system-flash");
+            //commandLine.AppendArgument("disable-system-flash");
+            //commandLine.AppendArgument("disable-bundled-ppapi-flash");
+            //commandLine.AppendArgument("disable-flash-3d");
+            //commandLine.AppendArgument("disable-flash-stage3d");
+            //commandLine.AppendArgument("disable-flash-stage3d");
             
         }
     }

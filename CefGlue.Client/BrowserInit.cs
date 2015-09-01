@@ -108,7 +108,7 @@ namespace Xilium.CefGlue.Client
             //    Organiser.Common.Classes.UsageTracker.SaveAllTrackedDataList();
             //}
             //catch { }
-            //SetErrorMode(ErrorModes.SEM_NOGPFAULTERRORBOX | ErrorModes.SEM_NOOPENFILEERRORBOX);
+            SetErrorMode(ErrorModes.SEM_NOGPFAULTERRORBOX | ErrorModes.SEM_NOOPENFILEERRORBOX);
             CefRuntime.Shutdown();
 
            // var threads = Process.GetCurrentProcess().Threads;

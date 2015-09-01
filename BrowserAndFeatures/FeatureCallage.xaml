@@ -68,14 +68,14 @@
             <TabItem Header="Browser"  Style="{StaticResource gmailTabStyle}">
                 <browser:BrowserHostCntrl Name="browser" />
             </TabItem>
-            <TabItem Header="Prospector" Style="{StaticResource gmailTabStyle}">
+            <TabItem Header="Prospector" Style="{StaticResource gmailTabStyle}" Name="tabProspector">
                 <prospector:ProspectorTabs Name="prospector" />
                 <!--<nichCntrol:NichResearchControl />-->
             </TabItem>
-            <TabItem Header="RSS"  Style="{StaticResource gmailTabStyle}"> 
+            <TabItem Header="RSS"  Style="{StaticResource gmailTabStyle}" Name="tabrssControl"> 
                 <rssReaders:RssTabbedControl Name="rssControl" />
             </TabItem>
-            <TabItem Header="PBN Poster"  Style="{StaticResource gmailTabStyle}">
+            <TabItem Header="PBN Poster"  Style="{StaticResource gmailTabStyle}" Name="tabrsswisi">
                 <wisi:WysiwigControl Name="wisi" />
                 <!--<wisi:WysiwigControl />-->
                 <!--<wisi:WysiwigControl Name="wysiwig" />-->

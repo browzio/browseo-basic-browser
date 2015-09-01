@@ -10,27 +10,26 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace WPF_WYSIWYG_HTML_Editor.XAML
 {
     /// <summary>
-    /// Interaction logic for FTPProjectsList.xaml
+    /// Interaction logic for CreateNewFTPprojectWindow.xaml
     /// </summary>
-    public partial class FTPProjectsList : UserControl
+    public partial class CreateNewFTPprojectWindow : Window
     {
-        FTP_VM vm;
-        public FTPProjectsList()
+        public bool OkClicked { get; set; }
+
+        public CreateNewFTPprojectWindow()
         {
             InitializeComponent();
-           // vm =  new FTP_VM();
-            //DataContext = vm;
         }
 
-        internal void SetProfile(SocialOrganizer.Models.PersonData profile)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //vm.SetProfile(profile);
+            OkClicked = true;
+            this.Close();
         }
     }
 }

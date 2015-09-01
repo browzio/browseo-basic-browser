@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{13A55AE8-28AB-4DDB-9BC3-BABFD7D64FEA}</ProjectGuid>
-    <OutputType>WinExe</OutputType>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WPF_WYSIWYG_HTML_Editor</RootNamespace>
     <AssemblyName>WYSIWYG</AssemblyName>
@@ -34,6 +34,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CookComputing.XmlRpcV2, Version=3.0.0.0, Culture=neutral, PublicKeyToken=a7d6e17aa302004d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -60,10 +63,6 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
     <Compile Include="Core\DialogBox.cs" />
     <Compile Include="Core\Format.cs" />
     <Compile Include="Core\Gui.cs" />
@@ -71,7 +70,11 @@
     <Compile Include="Core\Initialisation.cs" />
     <Compile Include="FTP_VM.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
+    <Compile Include="Models\FTPprofile.cs" />
     <Compile Include="Models\SelectedProfile.cs" />
+    <Compile Include="XAML\CreateNewFTPprojectWindow.xaml.cs">
+      <DependentUpon>CreateNewFTPprojectWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XAML\FTPProjectsList.xaml.cs">
       <DependentUpon>FTPProjectsList.xaml</DependentUpon>
     </Compile>
@@ -99,6 +102,10 @@
       <DependentUpon>WysiwigControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="XmlRpcVM.cs" />
+    <Page Include="XAML\CreateNewFTPprojectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="XAML\FTPProjectsList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -123,10 +130,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Core\Items.cs" />
     <Compile Include="XAML\WebEditor.xaml.cs">
       <DependentUpon>WebEditor.xaml</DependentUpon>

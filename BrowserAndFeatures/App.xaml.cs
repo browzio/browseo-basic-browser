@@ -11,12 +11,17 @@ using System.Windows;
 namespace BrowserAndFeatures
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    /// Interaction logic for Application.xaml
     /// </summary>
     ///     // Starts the application. 
     [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            //this.Shutdown();
+            base.OnStartup(e);
+        }
         //App()
         //{
         //    InitializeComponent();
