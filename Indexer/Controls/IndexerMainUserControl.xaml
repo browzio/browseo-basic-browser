@@ -132,11 +132,29 @@
                 <TextBox Text="{Binding BacklinksindexerAPIKey}" Margin="5" />
             </DockPanel>
 
-            <!--<CheckBox Content="Crazy Indexer" IsChecked="{Binding CrazyindexerChecked}" Margin="5,0,0,0" />
+            <CheckBox Content="Link Indexer" IsChecked="{Binding LinkindexerChecked}" Margin="5,0,0,0" />
+            <StackPanel Visibility="{Binding LinkindexerVisible}" Margin="5">
+                <DockPanel>
+                    <TextBlock Text="API Key" Width="63"  Margin="5" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding LinkindexerAPIKey}" Margin="5" />
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock Text="Campaign:" Width="63"  Margin="5" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding LinkIndexerCampaign}" Margin="5" />
+                </DockPanel>
+                <DockPanel>
+                    <TextBlock Text="Drip Feed:" Width="63" Margin="5" VerticalAlignment="Center" />
+                    <ComboBox Cursor="Hand" Background="#eeeeee" 
+                          SelectedIndex="{Binding SIDripFeed}"
+                          ItemsSource="{Binding DripFeeds}" />
+                </DockPanel>
+            </StackPanel>
+
+            <CheckBox Content="Crazy Indexer" IsChecked="{Binding CrazyindexerChecked}" Margin="5,0,0,0" />
             <DockPanel Visibility="{Binding CrazyindexerVisible}" Margin="5">
                 <TextBlock Text="API Key"  Margin="5" VerticalAlignment="Center" />
                 <TextBox Text="{Binding CrazyindexerAPIKey}" Margin="5" />
-            </DockPanel>-->
+            </DockPanel>
 
             <CheckBox Content="Instant Link Indexer" IsChecked="{Binding InstantlinkindexerChecked}" Margin="5,0,0,0" />
             <DockPanel Visibility="{Binding InstantlinkindexerVisible}" Margin="5">

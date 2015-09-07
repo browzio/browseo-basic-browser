@@ -82,7 +82,7 @@ namespace Organiser.Common.Classes
                 DirectoryInfo dirInfo = new DirectoryInfo(path);
                 foreach (DirectoryInfo dir in dirInfo.GetDirectories())
                 {
-                    if (!dir.Name.Contains("teir"))
+                    if (!dir.Name.Contains("_tier_"))
                     projects.Add(new KeyValuePair<string, string>(dir.Name, dir.FullName));
                 }
                 return projects;

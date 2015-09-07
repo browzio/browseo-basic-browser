@@ -122,7 +122,7 @@ namespace WPF_WYSIWYG_HTML_Editor
         public static void EditWeb()
         {
             if (webBrowser.Visibility == Visibility.Visible) return;
-            htmlEditor.Visibility = Visibility.Hidden;
+            htmlEditor.Visibility = Visibility.Collapsed;
             webBrowser.Visibility = Visibility.Visible;
             htmlEditor.Editor.SelectAll();
 
@@ -134,7 +134,7 @@ namespace WPF_WYSIWYG_HTML_Editor
         {
             if (htmlEditor.Visibility == Visibility.Visible) return;
             htmlEditor.Visibility = Visibility.Visible;
-            webBrowser.Visibility = Visibility.Hidden;
+            webBrowser.Visibility = Visibility.Collapsed;
 
             htmlEditor.Editor.Selection.Text = webBrowser.doc.documentElement.innerHTML;
         }

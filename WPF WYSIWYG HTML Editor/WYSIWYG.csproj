@@ -70,8 +70,10 @@
     <Compile Include="Core\Initialisation.cs" />
     <Compile Include="FTP_VM.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
+    <Compile Include="Helpers\Spinner.cs" />
     <Compile Include="Models\FTPprofile.cs" />
     <Compile Include="Models\SelectedProfile.cs" />
+    <Compile Include="SpinningVM.cs" />
     <Compile Include="XAML\CreateNewFTPprojectWindow.xaml.cs">
       <DependentUpon>CreateNewFTPprojectWindow.xaml</DependentUpon>
     </Compile>
@@ -250,6 +252,8 @@
     <Content Include="bin\Debug\WPF WYSIWYG HTML Editor.vshost.exe" />
     <Content Include="bin\Debug\WPF_WYSIWYG_HTML_Editor.exe" />
     <Content Include="bin\Debug\WPF_WYSIWYG_HTML_Editor.pdb" />
+    <Resource Include="Images\clear.png" />
+    <Resource Include="Images\spin.png" />
     <Resource Include="Images\browseo %281%29.ico" />
     <Resource Include="Images\v.png" />
     <Resource Include="Images\settings-icon.png" />

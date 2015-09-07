@@ -23,6 +23,9 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
         public WysiwigControl()
         {
             InitializeComponent();
+            //lineResizer.DataContext = this;
+            //MouseY = 0;
+            //lineResizer.Visibility = System.Windows.Visibility.Hidden;
         }
         private void SettingsBold_Click(object sender, RoutedEventArgs e)
         {
@@ -164,6 +167,8 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
             grdFtpProjects.Visibility = System.Windows.Visibility.Collapsed;
         }
 
+
+
         private void btnPublish_Click(object sender, RoutedEventArgs e)
         {
             if (DataContext != null && DataContext is XmlRpcVM)
@@ -197,5 +202,87 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
                 grdFtpProjects.Visibility = System.Windows.Visibility.Collapsed;
             }
         }
+
+        private void btnSpin_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext != null && DataContext is XmlRpcVM)
+            {
+                XmlRpcVM vm = DataContext as XmlRpcVM;
+                vm.Spin(webBrowserEditor.doc.body.innerText, tbPostTitle.Text);
+            }
+        }
+
+        private void btnClearAllTabs_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext != null && DataContext is XmlRpcVM)
+            {
+                XmlRpcVM vm = DataContext as XmlRpcVM;
+                vm.ClearSpunTabs();
+            }
+        }
+
+        #region Resize
+
+
+
+        //public int MouseY
+        //{
+        //    get { return (int)GetValue(MouseYProperty); }
+        //    set { SetValue(MouseYProperty, value); }
+        //}
+
+        //// Using a DependencyProperty as the backing store for MouseX.  This enables animation, styling, binding, etc...
+        //public static readonly DependencyProperty MouseYProperty =
+        //    DependencyProperty.Register("MouseY", typeof(int), typeof(WysiwigControl), new UIPropertyMetadata(0));
+
+
+        //protected override void OnMouseMove(MouseEventArgs e)
+        //{
+        //    base.OnMouseMove(e);
+
+        //    MouseY = (int)Mouse.GetPosition(grdTasks).Y;
+        //    double y = Mouse.GetPosition(tbContrl).Y;
+        //    if (Mouse.GetPosition(tbContrl).Y < tbContrl.ActualHeight)
+        //    {
+        //        Mouse.SetCursor(Cursors.Cross);
+
+        //        if (e.LeftButton == MouseButtonState.Pressed)
+        //        {
+        //            lineResizer.Visibility = System.Windows.Visibility.Visible;
+        //            IsResizeIng = true;
+        //            Mouse.SetCursor(Cursors.Cross);
+        //        }
+        //    }
+
+        //    if (IsResizeIng && System.Windows.Forms.Cursor.Current != System.Windows.Forms.Cursors.Cross)
+        //        Mouse.SetCursor(Cursors.Cross);
+        //}
+
+        //public bool IsResizeIng { get; set; }
+
+        //protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
+        //{
+        //    base.OnMouseLeftButtonUp(e);
+
+        //    if (IsResizeIng)
+        //    {
+        //        double width = Mouse.GetPosition(tbContrl).Y;
+        //        if (width > 145)
+        //        {
+        //            tbContrl.Height = width + 5;
+        //            //cmbOrdering.Width = width + 5;
+        //        }
+        //        else // if width < 145
+        //        {
+        //            tbContrl.Height = 150;
+        //            //cmbOrdering.Width = 150;
+        //        }
+        //    }
+
+        //    IsResizeIng = false;
+        //    lineResizer.Visibility = System.Windows.Visibility.Hidden; 
+        //}
+
+        #endregion
     }
 }

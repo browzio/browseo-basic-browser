@@ -6,122 +6,222 @@
              xmlns:local="clr-namespace:WPF_WYSIWYG_HTML_Editor"
              xmlns:localXaml="clr-namespace:WPF_WYSIWYG_HTML_Editor.XAML"
              mc:Ignorable="d" Loaded="Window_Loaded">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
-        <Grid Name="grdFtpProjects" Width="150" Grid.Column="1" Grid.RowSpan="2" >
-            <localXaml:FTPProjectsList x:Name="ftpProjectList" />
-        </Grid>
-        <Ribbon Name="ribon" Foreground="#333333" Background="WhiteSmoke" Margin="0,-22,0,0" SelectionChanged="Ribbon_SelectionChanged">
-            <Ribbon.ApplicationMenu>
-                <RibbonApplicationMenu Visibility="Collapsed" />
-            </Ribbon.ApplicationMenu>
+    <UserControl.Resources>
+
+        <Style x:Key="EmptyCheckBoxFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="1" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="CheckRadioFocusVisual">
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <Rectangle Margin="14,0,0,0" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style  TargetType="{x:Type CheckBox}">
+            <Setter Property="FocusVisualStyle" Value="{StaticResource EmptyCheckBoxFocusVisual}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <Grid x:Name="grid" Height="20" Background="Transparent" Cursor="Hand">
+                            <Border Width="16" Height="16" Background="#eeeeee" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
+                            <Image x:Name="v" 
+                                       HorizontalAlignment="Left" 
+                                       VerticalAlignment="Bottom"
+                                       SnapsToDevicePixels="True" 
+                                       Visibility="Collapsed" 
+                                       Source="/Indexer;component/Images/v.png" 
+                                       Stretch="Fill" Width="12" Height="12" Margin="3,0,0,3"/>
+                            <ContentPresenter Margin="25,0,0,0" VerticalAlignment="Bottom"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked"  Value="True">
+                                <Setter Property="Visibility" TargetName="v" Value="Visible"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Opacity" TargetName="grid" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="templateForTheContent" DataType="{x:Type local:SpinningVM}">
+            <TextBox AcceptsReturn="True" VerticalScrollBarVisibility="Auto" MaxHeight="415" TextWrapping="Wrap" Text="{Binding Content}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="templateForTheHeader"  DataType="{x:Type local:SpinningVM}">
+            <StackPanel Orientation="Horizontal" Background="WhiteSmoke">
+                <TextBox Background="#eeeeee" Text="{Binding Title}" VerticalAlignment="Center" Margin="4" MaxWidth="200" />
+                <CheckBox IsChecked="{Binding IsChecked}" />
+            </StackPanel>
+        </DataTemplate>
+
+    </UserControl.Resources>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <Grid Name="grdFtpProjects" Width="150" Grid.Column="1" Grid.RowSpan="2" >
+                <localXaml:FTPProjectsList x:Name="ftpProjectList" />
+            </Grid>
+            <Ribbon Name="ribon" Foreground="#333333" Background="WhiteSmoke" Margin="0,-22,0,0" SelectionChanged="Ribbon_SelectionChanged">
+                <Ribbon.ApplicationMenu>
+                    <RibbonApplicationMenu Visibility="Collapsed" />
+                </Ribbon.ApplicationMenu>
+
+                <RibbonTab Header="Publish PBN">
+                    <RibbonGroup Header="Title">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="5">
+                                <TextBlock Text="Post Title:" Margin="3" VerticalAlignment="Center" />
+                                <TextBox Text="{Binding PostTitle}" Margin="3" Width="200" Name="tbPostTitle" />
+                            </StackPanel>
+                            <CheckBox Content="Spin Title" IsChecked="{Binding IsSpinChecked}" Margin="5" />
+                        </StackPanel>
+                    </RibbonGroup>
+
+                    <RibbonGroup Header="Settings">
+                        <Button Cursor="Hand" IsEnabled="{Binding EnableBtns}" ToolTip="Platform Settings" Background="Transparent" BorderBrush="Transparent" Command="{Binding SettingsClicked}">
+                            <Image Source="..\Images\settings-icon.png" />
+                        </Button>
+                        <!--<StackPanel>
+                            <DockPanel>
+                                <TextBlock Text="Status: " VerticalAlignment="Center" Margin="3" />
+                                <ComboBox ItemsSource="{Binding StatusTypes}" SelectedIndex="{Binding SIPostStatus,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                    Background="#eeeeee" Margin="1,0,0,0" Height="23" MinWidth="60" />
+
+                                <DatePicker Height="26" MinWidth="210" Foreground="Black" Margin="5" SelectedDate="{Binding PublishDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock Text="Profile:" Margin="3" VerticalAlignment="Center" />
+                                <ComboBox ItemsSource="{Binding Profiles}" SelectedIndex="{Binding SIProfile}" 
+                                          Margin="3" Height="23" Background="#eeeeee" MinWidth="150" />
+                            </DockPanel>
+                        </StackPanel>-->
+                    </RibbonGroup>
+
+                    <RibbonGroup Header="Publish">
+                        <Button ToolTip="Publish" Cursor="Hand" IsEnabled="{Binding EnableBtns}" Background="Transparent" BorderBrush="Transparent" Name="btnPublishFTP" Click="btnPublish_Click">
+                            <Image Source="..\Images\publish.png" />
+                        </Button>
+                    </RibbonGroup>
+
+                    <RibbonGroup Header="Spin">
+                        <StackPanel Orientation="Horizontal">
+                            <StackPanel>
+                                <RibbonButton x:Name="btnSpin" Cursor="Hand" HorizontalAlignment="Center" Height="40" LargeImageSource="..\Images\spin.png" Click="btnSpin_Click" />
+                                <CheckBox Content="Publish Spun Articles" IsChecked="{Binding UseSpunArticlesChecked}" />
+                            </StackPanel>
+                            <StackPanel Margin="3">
+                                <CheckBox Content="Auto Spin" IsChecked="{Binding AutoSpinChecked}" Margin="5,5,5,8" />
+                                <DockPanel Margin="5" Visibility="{Binding DPtimesToSPinVisible}">
+                                    <TextBlock Text="Times To Spin: " VerticalAlignment="Center" />
+                                    <TextBox Text="{Binding TimesToSpin}" Width="30"/>
+                                </DockPanel>
+                            </StackPanel>
+                            <Button Cursor="Hand" ToolTip="Clear All Spun Tabs" IsEnabled="{Binding EnableBtns}" 
+                                    Background="Transparent" BorderBrush="Transparent" Name="btnClearAllTabs" Click="btnClearAllTabs_Click">
+                                <StackPanel>
+                                <Image Source="..\Images\clear.png" Width="45" />
+                                    <TextBlock Text="Clear" HorizontalAlignment="Center" />
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
+                    </RibbonGroup>
+
+                    <RibbonGroup Header="Status">
+                        <TextBlock Text="{Binding Status}" VerticalAlignment="Center" Margin="10" Name="tbStatus" />
+                        <ProgressBar IsIndeterminate="{Binding ProgressBarStart}" Width="{Binding ElementName=tbStatus, Path=ActualWidth}" Height="18" Margin="5" HorizontalAlignment="Center" />
+                    </RibbonGroup>
+                </RibbonTab>
             
-            <RibbonTab Header="Editor">
-                <RibbonGroup Header="Clear" Width="60" >
-                    <RibbonButton x:Name="RibbonButtonNew" Label="" ToolTip="Clear"
-                                  LargeImageSource="..\Images\new.png" 
-                                  Click="RibbonButtonNew_Click"  />
-                    <!--<RibbonButton x:Name="RibbonButtonOpen" Label="" SmallImageSource="..\Images\open.png" Click="RibbonButtonOpen_Click" HorizontalAlignment="Left" Width="22"/>-->
-                    <!--<RibbonButton x:Name="RibbonButtonOpenweb" Label="" SmallImageSource="..\Images\link.png"  HorizontalAlignment="Left" Width="22" Click="RibbonButtonOpenweb_Click"/>-->
-                    <!--<RibbonButton x:Name="RibbonButtonSave" Label="" SmallImageSource="..\Images\save.png" Click="RibbonButtonSave_Click"/>-->
-                </RibbonGroup>
-                <RibbonGroup Header="Editor" Width="350">
-                    <StackPanel>
-                        <ComboBox x:Name="RibbonComboboxFormat" Background="#eeeeee" Width="160" Height="21"  Margin="0,0,0,4" HorizontalAlignment="Left" SelectionChanged="RibbonComboboxFormat_SelectionChanged" >
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Value}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <StackPanel Orientation="Horizontal">
-                            <ComboBox  x:Name="RibbonComboboxFonts" Width="160" Background="#eeeeee" Height="21" SelectionChanged="RibbonComboboxFonts_SelectionChanged"/>
-                            <ComboBox x:Name="RibbonComboboxFontHeight" Width="50" Margin="3,0,0,0" Height="21" Background="#eeeeee" SelectionChanged="RibbonComboboxFontHeight_SelectionChanged"/>
+                <RibbonTab Header="Editor">
+                    <RibbonGroup Header="Clear" Width="60" >
+                        <RibbonButton x:Name="RibbonButtonNew" Label="" ToolTip="Clear"
+                                      LargeImageSource="..\Images\new.png" 
+                                      Click="RibbonButtonNew_Click"  />
+                        <!--<RibbonButton x:Name="RibbonButtonOpen" Label="" SmallImageSource="..\Images\open.png" Click="RibbonButtonOpen_Click" HorizontalAlignment="Left" Width="22"/>-->
+                        <!--<RibbonButton x:Name="RibbonButtonOpenweb" Label="" SmallImageSource="..\Images\link.png"  HorizontalAlignment="Left" Width="22" Click="RibbonButtonOpenweb_Click"/>-->
+                        <!--<RibbonButton x:Name="RibbonButtonSave" Label="" SmallImageSource="..\Images\save.png" Click="RibbonButtonSave_Click"/>-->
+                    </RibbonGroup>
+                    <RibbonGroup Header="Editor" Width="350">
+                        <StackPanel>
+                            <ComboBox x:Name="RibbonComboboxFormat" Background="#eeeeee" Width="160" Height="21"  Margin="0,0,0,4" HorizontalAlignment="Left" SelectionChanged="RibbonComboboxFormat_SelectionChanged" >
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Value}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <StackPanel Orientation="Horizontal">
+                                <ComboBox  x:Name="RibbonComboboxFonts" Width="160" Background="#eeeeee" Height="21" SelectionChanged="RibbonComboboxFonts_SelectionChanged"/>
+                                <ComboBox x:Name="RibbonComboboxFontHeight" Width="50" Margin="3,0,0,0" Height="21" Background="#eeeeee" SelectionChanged="RibbonComboboxFontHeight_SelectionChanged"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <RibbonButton x:Name="SettingsBold" SmallImageSource="..\Images\bold.png" Click="SettingsBold_Click"/>
+                                <RibbonButton x:Name="SettingsItalic" SmallImageSource="..\Images\italic.png" Click="SettingsItalic_Click"/>
+                                <RibbonButton x:Name="SettingsUnderLine" SmallImageSource="..\Images\UnderLine.png" Click="SettingsUnderLine_Click"/>
+                                <RibbonButton x:Name="SettingsFontColor" SmallImageSource="..\Images\Color.png" Click="SettingsFontColor_Click"/>
+                                <RibbonButton x:Name="SettingsBackColor" SmallImageSource="..\Images\backcolor.png" Click="SettingsBackColor_Click"/>
+                                <RibbonButton x:Name="SettingsAddLink" SmallImageSource="..\Images\link.png" Click="SettingsAddLink_Click"/>
+                                <RibbonButton x:Name="SettingsAddImage" SmallImageSource="..\Images\image.png" Click="SettingsAddImage_Click"/>
+                                <RibbonButton x:Name="SettingsLeftAlign" SmallImageSource="..\Images\LeftAlign.png" Click="SettingsLeftAlign_Click"/>
+                                <RibbonButton x:Name="SettingsCenter2" SmallImageSource="..\Images\center2.png" Click="SettingsCenter2_Click"/>
+                                <RibbonButton x:Name="SettingsRightAlign" SmallImageSource="..\Images\RightAlign.png" Click="SettingsJustifyRight_Click"/>
+                                <RibbonButton x:Name="SettingsCenter" SmallImageSource="..\Images\center.png" Click="SettingsJustifyFull_Click"/>
+                                <RibbonButton x:Name="SettingsNumbered" SmallImageSource="..\Images\Numbered.png" Click="SettingsInsertOrderedList_Click"/>
+                                <RibbonButton x:Name="SettingsBullets" SmallImageSource="..\Images\bullets.png" Click="SettingsBullets_Click"/>
+                                <RibbonButton x:Name="SettingsOutIdent" SmallImageSource="..\Images\OutIdent.png" Click="SettingsOutIdent_Click"/>
+                                <RibbonButton x:Name="SettingsIdent" SmallImageSource="..\Images\ident.png" Click="SettingsIdent_Click"/>
+                            </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <RibbonButton x:Name="SettingsBold" SmallImageSource="..\Images\bold.png" Click="SettingsBold_Click"/>
-                            <RibbonButton x:Name="SettingsItalic" SmallImageSource="..\Images\italic.png" Click="SettingsItalic_Click"/>
-                            <RibbonButton x:Name="SettingsUnderLine" SmallImageSource="..\Images\UnderLine.png" Click="SettingsUnderLine_Click"/>
-                            <RibbonButton x:Name="SettingsFontColor" SmallImageSource="..\Images\Color.png" Click="SettingsFontColor_Click"/>
-                            <RibbonButton x:Name="SettingsBackColor" SmallImageSource="..\Images\backcolor.png" Click="SettingsBackColor_Click"/>
-                            <RibbonButton x:Name="SettingsAddLink" SmallImageSource="..\Images\link.png" Click="SettingsAddLink_Click"/>
-                            <RibbonButton x:Name="SettingsAddImage" SmallImageSource="..\Images\image.png" Click="SettingsAddImage_Click"/>
-                            <RibbonButton x:Name="SettingsLeftAlign" SmallImageSource="..\Images\LeftAlign.png" Click="SettingsLeftAlign_Click"/>
-                            <RibbonButton x:Name="SettingsCenter2" SmallImageSource="..\Images\center2.png" Click="SettingsCenter2_Click"/>
-                            <RibbonButton x:Name="SettingsRightAlign" SmallImageSource="..\Images\RightAlign.png" Click="SettingsJustifyRight_Click"/>
-                            <RibbonButton x:Name="SettingsCenter" SmallImageSource="..\Images\center.png" Click="SettingsJustifyFull_Click"/>
-                            <RibbonButton x:Name="SettingsNumbered" SmallImageSource="..\Images\Numbered.png" Click="SettingsInsertOrderedList_Click"/>
-                            <RibbonButton x:Name="SettingsBullets" SmallImageSource="..\Images\bullets.png" Click="SettingsBullets_Click"/>
-                            <RibbonButton x:Name="SettingsOutIdent" SmallImageSource="..\Images\OutIdent.png" Click="SettingsOutIdent_Click"/>
-                            <RibbonButton x:Name="SettingsIdent" SmallImageSource="..\Images\ident.png" Click="SettingsIdent_Click"/>
+                    </RibbonGroup>
+                    <RibbonGroup Header="Custom" Width="120">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <RibbonButton x:Name="EditWeb1"  LargeImageSource="..\Images\Editor.png" Height="42" HorizontalAlignment="Left" Click="EditWeb_Click"/>
+                                <RibbonButton x:Name="ViewHTML"  LargeImageSource="..\Images\html.png" Height="42" HorizontalAlignment="Left" Click="ViewHTML_Click"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </RibbonGroup>
-                <RibbonGroup Header="Custom" Width="120">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <RibbonButton x:Name="EditWeb1"  LargeImageSource="..\Images\Editor.png" Height="42" HorizontalAlignment="Left" Click="EditWeb_Click"/>
-                            <RibbonButton x:Name="ViewHTML"  LargeImageSource="..\Images\html.png" Height="42" HorizontalAlignment="Left" Click="ViewHTML_Click"/>
-                        </StackPanel>
-                    </StackPanel>
-                </RibbonGroup>
-            </RibbonTab>
+                    </RibbonGroup>
+                </RibbonTab>
 
-            <RibbonTab Header="Publish PBN">
-                <RibbonGroup Header="Title">
-                    <TextBlock Text="Post Title:" Margin="3" VerticalAlignment="Center" />
-                    <TextBox Text="{Binding PostTitle}" Margin="3" Width="200" />
-                </RibbonGroup>
 
-                <RibbonGroup Header="Settings">
-                    <Button Cursor="Hand" IsEnabled="{Binding EnableBtns}" ToolTip="Platform Settings" Background="Transparent" BorderBrush="Transparent" Command="{Binding SettingsClicked}">
-                        <Image Source="..\Images\settings-icon.png" />
-                    </Button>
-                    <!--<StackPanel>
-                        <DockPanel>
-                            <TextBlock Text="Status: " VerticalAlignment="Center" Margin="3" />
-                            <ComboBox ItemsSource="{Binding StatusTypes}" SelectedIndex="{Binding SIPostStatus,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                Background="#eeeeee" Margin="1,0,0,0" Height="23" MinWidth="60" />
+                <!--<RibbonTab Header="Publish FTP">
 
-                            <DatePicker Height="26" MinWidth="210" Foreground="Black" Margin="5" SelectedDate="{Binding PublishDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        </DockPanel>
-                        <DockPanel>
-                            <TextBlock Text="Profile:" Margin="3" VerticalAlignment="Center" />
-                            <ComboBox ItemsSource="{Binding Profiles}" SelectedIndex="{Binding SIProfile}" 
-                                      Margin="3" Height="23" Background="#eeeeee" MinWidth="150" />
-                        </DockPanel>
-                    </StackPanel>-->
-                </RibbonGroup>
+                </RibbonTab>-->
 
-                <RibbonGroup Header="Publish">
-                    <Button ToolTip="Publish" Cursor="Hand" IsEnabled="{Binding EnableBtns}" Background="Transparent" BorderBrush="Transparent" Name="btnPublishFTP" Click="btnPublish_Click">
-                        <Image Source="..\Images\publish.png" />
-                    </Button>
-                </RibbonGroup>
-
-                <RibbonGroup Header="Status">
-                    <TextBlock Text="{Binding Status}" VerticalAlignment="Center" Margin="0,26,0,0" />
-                </RibbonGroup>
-            </RibbonTab>
-
-            <!--<RibbonTab Header="Publish FTP">
-
-            </RibbonTab>-->
-
-        </Ribbon>
-        <!--<StatusBar Grid.Row="2">
-            <StatusBarItem>
-                <TextBlock x:Name="lblCursorPosition" Text="http://www.greencomponent.net"/>
-            </StatusBarItem>
-        </StatusBar>-->
-        <local:WPFWebBrowser Grid.Column="0" x:Name="webBrowserEditor"  Grid.Row="1" VerticalAlignment="Top" />
-        <local:HtmlEditor Grid.Column="0" x:Name="HtmlEditor1"  Grid.Row="1" Visibility="Hidden" VerticalAlignment="Top"/>
-    </Grid>
+            </Ribbon>
+            <!--<StatusBar Grid.Row="2">
+                <StatusBarItem>
+                    <TextBlock x:Name="lblCursorPosition" Text="http://www.greencomponent.net"/>
+                </StatusBarItem>
+            </StatusBar>-->
+            <local:WPFWebBrowser Grid.Column="0" x:Name="webBrowserEditor"  Grid.Row="1" VerticalAlignment="Top" />
+                <local:HtmlEditor Grid.Column="0" x:Name="HtmlEditor1"  Grid.Row="1" Visibility="Hidden" VerticalAlignment="Top"/>
+        
+            <!--<Line Name="lineResizer" Stroke="Black" Fill="Black"  
+                  X1="{Binding ActualHeight,ElementName=trvTasks}" X2="50"
+                  Y1="{Binding MouseY}"  Y2="{Binding MouseY}" />-->
+        <TabControl Name="tbContrl" ItemsSource="{Binding Tabs}" Visibility="{Binding TabsVisible}" Grid.Column="0" Grid.Row="2" 
+                ContentTemplate="{StaticResource templateForTheContent}"
+                ItemTemplate="{StaticResource templateForTheHeader}">
+        </TabControl>
+        </Grid>
 </UserControl>

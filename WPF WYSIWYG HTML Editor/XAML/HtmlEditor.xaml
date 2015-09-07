@@ -8,7 +8,7 @@
         <RichTextBox x:Name="Editor" VerticalScrollBarVisibility="Visible">
             <FlowDocument>
                 <Paragraph>
-                    <Run Text=""/>
+                    <Run Name="theText" Text=""/>
                 </Paragraph>
             </FlowDocument>
             <RichTextBox.Resources>

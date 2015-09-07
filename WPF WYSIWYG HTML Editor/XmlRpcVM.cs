@@ -29,6 +29,21 @@ namespace WPF_WYSIWYG_HTML_Editor
     {
         public ICommand SettingsClicked { get; set; }
 
+        //TabsVisible
+        private Visibility tabsVisible;
+        public Visibility TabsVisible
+        {
+            get { return tabsVisible; }
+            set
+            {
+                tabsVisible = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("TabsVisible"));
+                }
+            }
+        }
+
         private bool enableBtns;
         public bool EnableBtns
         {
@@ -39,6 +54,20 @@ namespace WPF_WYSIWYG_HTML_Editor
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("EnableBtns"));
+                }
+            }
+        }
+        //ProgressBarStart
+        private bool progressBarStart;
+        public bool ProgressBarStart
+        {
+            get { return progressBarStart; }
+            set
+            {
+                progressBarStart = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("ProgressBarStart"));
                 }
             }
         }
@@ -70,6 +99,7 @@ namespace WPF_WYSIWYG_HTML_Editor
                 }
             }
         }
+        public bool IsSpinChecked { get; set; }
 
         //settings window
         public bool IsWPChecked { get; set; }
@@ -89,15 +119,77 @@ namespace WPF_WYSIWYG_HTML_Editor
             set { cmbBoxDrupalList = value; }
         }
 
+        //Tabs
+        private ObservableCollection<SpinningVM> tabs;
+        public ObservableCollection<SpinningVM> Tabs
+        {
+            get { return tabs; }
+            set { tabs = value; }
+        }
+        public bool UseSpunArticlesChecked { get; set; }
+
+        private bool autoSpinChecked;
+        public bool AutoSpinChecked
+        {
+            get { return autoSpinChecked; }
+            set
+            {
+                autoSpinChecked = value;
+                if (value)
+                    DPtimesToSPinVisible = Visibility.Visible;
+                else
+                    DPtimesToSPinVisible = Visibility.Collapsed;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("AutoSpinChecked"));
+                }
+            }
+        }
+        //DPtimesToSPinVisible
+        private Visibility dPtimesToSPinVisible;
+        public Visibility DPtimesToSPinVisible
+        {
+            get { return dPtimesToSPinVisible; }
+            set
+            {
+                dPtimesToSPinVisible = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("DPtimesToSPinVisible"));
+                }
+            }
+        }
+        //TimesToSpin
+        private int timesToSpin;
+        public int TimesToSpin
+        {
+            get { return timesToSpin; }
+            set
+            {
+                timesToSpin = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("TimesToSpin"));
+                }
+            }
+        }
+
+        string errorString = "";
+        string successString = "";
+
         public XmlRpcVM()
         {
             SettingsClicked = new RelayCommand(OnSettingsClicked);
 
             CmbBoxWPList = new ObservableCollection<SelectedProfile>();
             CmbBoxDrupalList = new ObservableCollection<SelectedProfile>();
+            Tabs = new ObservableCollection<SpinningVM>();
 
             Status = "Select platforms to pulbilsh to from settings.";
             EnableBtns = true;
+            TabsVisible = Visibility.Collapsed;
+            AutoSpinChecked = false;
+            TimesToSpin = 0;
         }
 
         private void OnSettingsClicked(object param)
@@ -142,152 +234,245 @@ namespace WPF_WYSIWYG_HTML_Editor
                 return;
             }
             new Thread(() =>
+           {
+               errorString = "";
+               successString = "";
+               
+               if (UseSpunArticlesChecked)
+               {
+                   publishSpun(content,"", true);
+
+                   foreach (SpinningVM spin in Tabs)
+                   {
+                       spin.WasUsed = false;
+                   }
+
+                   if (successString != "")
+                       MessageBox.Show(successString);
+                   if (errorString != "")
+                       MessageBox.Show(errorString);
+                   return;
+               }
+               if (TimesToSpin > 0 && AutoSpinChecked)
+               {
+                   for (int i = 1; i < TimesToSpin; i++)
+                   {
+                       string ttl = Spinner.Spin(PostTitle);
+                       if(ttl == "")
+                           ttl = " ";
+                       publishSpun(Spinner.Spin(content), IsSpinChecked ? ttl : "");
+                   }
+
+                   if (successString != "")
+                       MessageBox.Show(successString);
+                   if (errorString != "")
+                       MessageBox.Show(errorString);
+
+                   return;
+               }
+               publishSpun(content);
+           }).Start();
+        }
+
+        private void publishSpun(string content, string title = "", bool fromtabs = false)
+        {
+            EnableBtns = false;
+            ProgressBarStart = true;
+            //Application.Current.Dispatcher.Invoke((Action)delegate
+            //{
+            //    Mouse.OverrideCursor = Cursors.Wait;
+            //});
+
+            try
             {
-                EnableBtns = false;
-                Application.Current.Dispatcher.Invoke((Action)delegate 
-                { 
-                   Mouse.OverrideCursor = Cursors.Wait;
-                });
-                string errorString = "";
-                string successString = "";
-                try
+                #region --wp--
+                if (IsWPChecked)
                 {
-                    #region --wp--
-                    if (IsWPChecked)
+                    Status = "Gathering wordpress profiles.";
+
+                    foreach (SelectedProfile prof in CmbBoxWPList)
                     {
-                        Status = "Gathering wordpress profiles.";
+                        if (!prof.IsSelected) continue;
 
-                        foreach (SelectedProfile prof in CmbBoxWPList)
+
+                        PersonData profile = MyFilesDatabase.GetSubProjectPersonData(prof.Path);
+
+                        if (string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress))
                         {
-                            if (!prof.IsSelected) continue;
+                            MessageBox.Show("Website in profile data cannot be empty. " + profile.ProfileName);
+                            continue;
+                        }
+                        Status = "Posting to " + profile.WebAddress + ".";
+                        DateTime publishdt = DateTime.Now;
+                        try
+                        {
+                            publishdt = GetNistTime(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword);
+                        }
+                        catch { publishdt = DateTime.Now; }
+                        if (UseSpunArticlesChecked)
+                        {
+                            title = PostTitle;
+                            getSpunContent(ref content, ref title);
+                        }
+                        var post = new Post
+                        {
+                            PostType = "post", // "post" or "page"
+                            Title = title == "" ? PostTitle : title,
+                            Content = content,
+                            PublishDateTime = publishdt,
+                            Status = "publish" // "draft" or "publish"
+                        };
 
-
-                            PersonData profile = MyFilesDatabase.GetSubProjectPersonData(prof.Path);
-
-                            if (string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress))
-                            {
-                                MessageBox.Show("Website in profile data cannot be empty. " + profile.ProfileName);
-                                continue;
-                            }
-                            Status = "Posting to " + profile.WebAddress + ".";
-                            DateTime publishdt = DateTime.Now;
+                        using (var client = new WordPressClient(new WordPressSiteConfig
+                        {
+                            BaseUrl = profile.WebAddress,
+                            BlogId = 1,
+                            Username = profile.Username,
+                            Password = profile.Password,
+                        }, profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword))
+                        {
                             try
                             {
-                                publishdt = GetNistTime(profile.ProxyIP,profile.ProxyPort,profile.ProxyUsername,profile.ProxyPassword);
+                                var id = client.NewPost(post);
                             }
-                            catch { publishdt = DateTime.Now; }
-                            var post = new Post
+                            catch
                             {
-                                PostType = "post", // "post" or "page"
-                                Title = PostTitle,
-                                Content = content,
-                                PublishDateTime = publishdt,
-                                Status = "publish" // "draft" or "publish"
-                            };
-
-                            using (var client = new WordPressClient(new WordPressSiteConfig
-                            {
-                                BaseUrl = profile.WebAddress,
-                                BlogId = 1,
-                                Username = profile.Username,
-                                Password = profile.Password,
-                            }, profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword))
-                            {
-                                try
-                                {
-                                    var id = client.NewPost(post);
-                                }
-                                catch
-                                {
-                                    errorString += "Unable to post to " + profile.WebAddress + Environment.NewLine;
-                                    continue;
-                                }
-                            }
-
-                             successString += "Post succesfull to "+profile.WebAddress + Environment.NewLine;
-                        }
-                    }
-                    #endregion
-
-                    #region --drupal--
-                    if (IsDrupalChecked)
-                    {
-                        Status = "Gathering drupal profiles.";
-                        foreach (SelectedProfile prof in CmbBoxDrupalList)
-                        {
-                            if (!prof.IsSelected) continue;
-
-                            PersonData profile = MyFilesDatabase.GetSubProjectPersonData(prof.Path);
-                            if (string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress))
-                            {
-                                MessageBox.Show("Website in profile data cannot be empty. " + profile.ProfileName);
+                                errorString += "Unable to post to " + profile.WebAddress + Environment.NewLine;
                                 continue;
                             }
-                            Status = "Posting to " + profile.WebAddress + ".";
-
-                            string url = profile.WebAddress;
-                            if (url[url.Length - 1] != '/')
-                                url += '/';
-                            url += "xmlrpc.php";
-
-                            DrupalServices d = new Drupal7.Services.DrupalServices(url, profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword);
-                            bool isin = d.Login(profile.Username, profile.Password);
-                            if(!isin)
-                            {
-                                errorString += "Was unable to authenticate " + profile.WebAddress + Environment.NewLine;
-                                continue;
-                            }
-
-                            XmlRpcStruct postStruct = new XmlRpcStruct();
-                            postStruct.Add("type", "article");
-                            postStruct.Add("title", PostTitle);
-
-                            XmlRpcStruct postBodyStructParams = new XmlRpcStruct();
-                            postBodyStructParams.Add("format", "full_html");
-                            postBodyStructParams.Add("value", content);
-
-
-                            XmlRpcStruct[] postBodyStructParamsArr = new XmlRpcStruct[1];
-                            postBodyStructParamsArr[0] = postBodyStructParams;
-
-                            XmlRpcStruct postBodyStruct = new XmlRpcStruct();
-                            postBodyStruct.Add("und", postBodyStructParamsArr);
-
-                            postStruct.Add("body", postBodyStruct);
-
-                            XmlRpcStruct s = d.NodeCreate(postStruct);
-                            if (s == null)
-                            {
-                                errorString += "Was Unable to post to " + profile.WebAddress + Environment.NewLine;
-                            }
-                            else
-                            {
-                                successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
-                            }
-
-                            d.Logout();
                         }
+
+                        successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
                     }
-                    #endregion
                 }
-                catch (Exception ex)
+                #endregion
+
+                #region --drupal--
+                if (IsDrupalChecked)
+                {
+                    Status = "Gathering drupal profiles.";
+                    foreach (SelectedProfile prof in CmbBoxDrupalList)
+                    {
+                        if (!prof.IsSelected) continue;
+
+                        PersonData profile = MyFilesDatabase.GetSubProjectPersonData(prof.Path);
+                        if (string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress))
+                        {
+                            MessageBox.Show("Website in profile data cannot be empty. " + profile.ProfileName);
+                            continue;
+                        }
+                        Status = "Posting to " + profile.WebAddress + ".";
+
+                        string url = profile.WebAddress;
+                        if (url[url.Length - 1] != '/')
+                            url += '/';
+                        url += "xmlrpc.php";
+
+                        DrupalServices d = new Drupal7.Services.DrupalServices(url, profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword);
+                        bool isin = d.Login(profile.Username, profile.Password);
+                        if (!isin)
+                        {
+                            errorString += "Was unable to authenticate " + profile.WebAddress + Environment.NewLine;
+                            continue;
+                        }
+
+                        if (UseSpunArticlesChecked)
+                        {
+                            title = PostTitle;
+                            getSpunContent(ref content, ref title);
+                        }
+
+                        XmlRpcStruct postStruct = new XmlRpcStruct();
+                        postStruct.Add("type", "article");
+                        postStruct.Add("title", title == "" ? PostTitle : title);
+
+                        XmlRpcStruct postBodyStructParams = new XmlRpcStruct();
+                        postBodyStructParams.Add("format", "full_html");
+                        postBodyStructParams.Add("value", content);
+
+
+                        XmlRpcStruct[] postBodyStructParamsArr = new XmlRpcStruct[1];
+                        postBodyStructParamsArr[0] = postBodyStructParams;
+
+                        XmlRpcStruct postBodyStruct = new XmlRpcStruct();
+                        postBodyStruct.Add("und", postBodyStructParamsArr);
+
+                        postStruct.Add("body", postBodyStruct);
+
+                        XmlRpcStruct s = d.NodeCreate(postStruct);
+                        if (s == null)
+                        {
+                            errorString += "Was Unable to post to " + profile.WebAddress + Environment.NewLine;
+                        }
+                        else
+                        {
+                            successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
+                        }
+
+                        d.Logout();
+                    }
+                }
+                #endregion
+            }
+            catch (Exception ex)
+            {
+                if (!UseSpunArticlesChecked && TimesToSpin <= 0 && !AutoSpinChecked)
                 {
                     MessageBox.Show("Whoops something went wrong: " + ex.Message);
                 }
-
-                Application.Current.Dispatcher.Invoke((Action)delegate
+                else
                 {
-                    Mouse.OverrideCursor = null;
-                });
+                    errorString += "Whoops something went wrong: " + ex.Message;
+                }
+            }
 
+            //Application.Current.Dispatcher.Invoke((Action)delegate
+            //{
+            //    Mouse.OverrideCursor = null;
+            //});
+
+            if (!UseSpunArticlesChecked && TimesToSpin <= 0 && !AutoSpinChecked)
+            {
                 if (successString != "")
                     MessageBox.Show(successString);
                 if (errorString != "")
                     MessageBox.Show(errorString);
+            }
 
-                Status = "Ready to publish.";
-                EnableBtns = true;
-            }).Start();
+            Status = "Ready to publish.";
+            EnableBtns = true;
+            ProgressBarStart = false;
+        }
+
+        public void getSpunContent(ref string content, ref string title)
+        {
+
+            bool found = false;
+            foreach (SpinningVM spin in Tabs)
+            {
+                if (!spin.WasUsed && spin.IsChecked)
+                {
+                    content = Spinner.Spin(content);
+                    if (IsSpinChecked)
+                     title = Spinner.Spin(PostTitle);
+                    spin.WasUsed = true;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)
+            {
+                foreach (SpinningVM spin in Tabs)
+                {
+                    if (!spin.WasUsed && spin.IsChecked)
+                    {
+                        spin.WasUsed = false;
+                        break;
+                    }
+                }
+
+                getSpunContent(ref content, ref  title);
+            }
         }
 
         public static DateTime GetNistTime(string ip,string port,string username,string pass)
@@ -331,7 +516,27 @@ namespace WPF_WYSIWYG_HTML_Editor
             }
         }
 
-
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public void Spin(string text, string title)
+        {
+            try
+            {   
+                if(IsSpinChecked)
+                    title = Spinner.Spin(title);
+                string content = Spinner.Spin(text);
+                Tabs.Add(new SpinningVM() { IsChecked = true, Title = title, Content = content });
+                TabsVisible = Visibility.Visible;
+            }
+            catch
+            {
+                MessageBox.Show("Error Spinning Content, Unbalanced brace.");
+            }
+        }
+
+        internal void ClearSpunTabs()
+        {
+            Tabs.Clear();
+        }
     }
 }

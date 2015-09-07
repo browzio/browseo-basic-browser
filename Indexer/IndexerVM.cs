@@ -3,6 +3,7 @@ using Organiser.Common.Classes;
 using PData.FilesReader;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
@@ -79,6 +80,43 @@ namespace Indexer
             }
         }
         public string BacklinksindexerAPIKey { get; set; }
+        //
+        private bool linkindexerChecked;
+        public bool LinkindexerChecked
+        {
+            get { return linkindexerChecked; }
+            set
+            {
+                linkindexerChecked = value;
+                if (value)
+                    LinkindexerVisible = Visibility.Visible;
+                else
+                    LinkindexerVisible = Visibility.Collapsed;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("LinkindexerChecked"));
+            }
+        }
+        private Visibility linkindexerVisible;
+        public Visibility LinkindexerVisible
+        {
+            get { return linkindexerVisible; }
+            set
+            {
+                linkindexerVisible = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("LinkindexerVisible"));
+            }
+        }
+        public string LinkindexerAPIKey { get; set; }
+        public string LinkIndexerCampaign { get; set; }
+        public int SIDripFeed { get; set; }
+        private ObservableCollection<string> dripFeeds;
+        public ObservableCollection<string> DripFeeds
+        {
+            get { return dripFeeds; }
+            set { dripFeeds = value; }
+        }
+
 
         private bool crazyindexerChecked;
         public bool CrazyindexerChecked
@@ -144,7 +182,17 @@ namespace Indexer
 
             BtnOkEnabled = true;
             ResponseVisible = Visibility.Collapsed;
-            BacklinksindexerChecked = CrazyindexerChecked = InstantlinkindexerChecked = false;
+            BacklinksindexerChecked = CrazyindexerChecked = InstantlinkindexerChecked = LinkindexerChecked = false;
+
+            DripFeeds = new ObservableCollection<string>();
+            DripFeeds.Add("INSTANT");
+            DripFeeds.Add("3 days");
+            DripFeeds.Add("5 days");
+            DripFeeds.Add("7 days");
+            DripFeeds.Add("15 days");
+            DripFeeds.Add("30 days");
+
+            SIDripFeed = 0;
 
             getApiKeys();
         }
@@ -158,7 +206,8 @@ namespace Indexer
                 Response = "";
                 string[] links = InputedLinks.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
                 string backlinksindexerurl = "http://backlinksindexer.com/api.php?key=" + BacklinksindexerAPIKey + "&urls=" + InputedLinks;
-                string crazyUrl = "http://api.crazyindexer.com/tci-api.php";
+                string crazyUrl = "http://crazyindexer.com/tci-api/tci-api.php";
+                string linkIndexerURl = "http://linkindexr.info/api.php";
                 string crazyLinks = "";
                 string instantUrl = "http://www.instantlinkindexer.com/api.php";
 
@@ -188,6 +237,43 @@ namespace Indexer
                         {
                             Response += "Backlinksindexer Response = failed"+ Environment.NewLine;
                             MessageBox.Show("Backlinksindexer Faild: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
+                    }
+                    if (LinkindexerChecked)
+                    {
+                        try
+                        {
+                            string linkLinks = "";
+                            foreach (string link in links)
+                            {
+                                linkLinks += link + "|";
+                            }
+                            linkLinks = linkLinks.Remove(linkLinks.Length - 1);
+                            var request = (HttpWebRequest)WebRequest.Create(linkIndexerURl);
+
+                            var postData = "apikey=" + WebUtility.UrlEncode(LinkindexerAPIKey);
+                            postData += "&campaign=" + WebUtility.UrlEncode(LinkIndexerCampaign);
+                            if (SIDripFeed>=1)
+                                postData += "&campaign=" + WebUtility.UrlEncode(DripFeeds[SIDripFeed].Replace(" ", "_"));
+                            postData += "&urls=" + crazyLinks;
+                            var data = Encoding.ASCII.GetBytes(postData);
+
+                            request.Method = "POST";
+                            request.ContentType = "application/x-www-form-urlencoded";
+                            request.ContentLength = data.Length;
+                            using (var stream = request.GetRequestStream())
+                            {
+                                stream.Write(data, 0, data.Length);
+                            }
+
+                            var response = (HttpWebResponse)request.GetResponse();
+
+                            Response += "Link Indexer Response = " + response.StatusCode + Environment.NewLine;
+                        }
+                        catch (Exception ex)
+                        {
+                            Response += "Link Indexer Response = failed" + Environment.NewLine;
+                            MessageBox.Show("Link Indexer Faild: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
                     if (CrazyindexerChecked)
@@ -278,6 +364,7 @@ namespace Indexer
                 fileWrighter.IniWriteValue("Data", "BacklinksindexerAPIKey", BacklinksindexerAPIKey);
                 fileWrighter.IniWriteValue("Data", "CrazyindexerAPIKey", CrazyindexerAPIKey);
                 fileWrighter.IniWriteValue("Data", "InstantlinkindexerAPIKey", InstantlinkindexerAPIKey);
+                fileWrighter.IniWriteValue("Data", "LinkindexerAPIKey", LinkindexerAPIKey);
             }
             catch { MessageBox.Show("Keys not saved."); }
         }
@@ -293,6 +380,7 @@ namespace Indexer
                         BacklinksindexerAPIKey = ini.IniReadValue("Data", "BacklinksindexerAPIKey");
                         CrazyindexerAPIKey = ini.IniReadValue("Data", "CrazyindexerAPIKey");
                         InstantlinkindexerAPIKey = ini.IniReadValue("Data", "InstantlinkindexerAPIKey");
+                        LinkindexerAPIKey = ini.IniReadValue("Data", "LinkindexerAPIKey");
                     }
                     catch { }
             }
