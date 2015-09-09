@@ -116,7 +116,7 @@
             </StackPanel>
         </CheckBox>
 
-        <CheckBox Margin="5" Name="entBud" x:FieldModifier="public">
+        <CheckBox Margin="5" Name="entBud" x:FieldModifier="public" Checked="entBud_Checked">
             <StackPanel Orientation="Horizontal">
                 <Image Source="/BrowserHost;component/Images/enterprise buddy.ico" 
                        Width="20" />

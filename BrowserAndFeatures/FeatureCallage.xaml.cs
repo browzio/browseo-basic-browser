@@ -194,9 +194,13 @@ namespace BrowserAndFeatures
                 profile.Country = ini.IniReadValue("Data", "Country");
                 profile.WebAddress = ini.IniReadValue("Data", "WebAddress");
                 profile.Notes = ini.IniReadValue("Data", "Notes");
-                profile.CmbSelectedIndexSex = Convert.ToInt32(ini.IniReadValue("Data", "Sex"));
-                profile.CmbSelectedIndexDay = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayDay"));
-                profile.CmbSelectedIndexMonth = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayMonth"));
+                try
+                {
+                    profile.CmbSelectedIndexSex = Convert.ToInt32(ini.IniReadValue("Data", "Sex"));
+                    profile.CmbSelectedIndexDay = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayDay"));
+                    profile.CmbSelectedIndexMonth = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayMonth"));
+                }
+                catch { }
                 profile.ProjectDIr = sitesFilePath.Replace("\\ProjectData.ini", "");
                 try
                 {

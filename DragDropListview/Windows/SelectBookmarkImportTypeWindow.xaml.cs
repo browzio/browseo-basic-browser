@@ -30,15 +30,21 @@ namespace BrowserHost.Views
         private void browseoProj_Checked(object sender, RoutedEventArgs e)
         {
             fcs.Checked -= fcs_Checked;
+            entBud.Checked -= entBud_Checked;
             fcs.IsChecked = false;
+            entBud.IsChecked = false;
             fcs.Checked += fcs_Checked;
+            entBud.Checked += entBud_Checked;
         }
 
         private void fcs_Checked(object sender, RoutedEventArgs e)
         {
             browseoProj.Checked -= browseoProj_Checked;
+            entBud.Checked -= entBud_Checked;
             browseoProj.IsChecked = false;
+            entBud.IsChecked = false;
             browseoProj.Checked += browseoProj_Checked;
+            entBud.Checked += entBud_Checked;
         }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)
@@ -50,6 +56,16 @@ namespace BrowserHost.Views
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        private void entBud_Checked(object sender, RoutedEventArgs e)
+        {
+            fcs.Checked -= fcs_Checked;
+            browseoProj.Checked -= entBud_Checked;
+            fcs.IsChecked = false;
+            browseoProj.IsChecked = false;
+            fcs.Checked += fcs_Checked;
+            browseoProj.Checked += entBud_Checked;
         }
     }
 }

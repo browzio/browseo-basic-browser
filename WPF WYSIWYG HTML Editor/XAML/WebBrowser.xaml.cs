@@ -29,9 +29,48 @@ namespace WPF_WYSIWYG_HTML_Editor
         public HTMLDocument doc;
         public WebBrowser webBrowser;
 
+       // private IHTMLTxtRange m_lastRange;
+       // private AxWebBrowser m_browser;
+
         public WPFWebBrowser()
         {
             InitializeComponent();
+        }
+
+        private DispHTMLBody Body
+        {
+            get
+            {
+                if ((Document != null) && (Document.body != null))
+                {
+                    return (DispHTMLBody)Document.body;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        private DispHTMLDocument Document
+        {
+            get
+            {
+                try
+                {
+                    if (webBrowser.Document != null)
+                    {
+                        return (DispHTMLDocument)webBrowser.Document;
+                    }
+                }
+                catch (InvalidCastException)
+                {
+
+                    // nothing to do
+                }
+
+                return null;
+            }
         }
 
 
@@ -94,6 +133,102 @@ namespace WPF_WYSIWYG_HTML_Editor
             Format.doc = doc;
         }
 
+        private void FindFirst(string text)
+        {
+            try
+            {
+                IHTMLDocument2 doc = (IHTMLDocument2)webBrowser.Document;
+                IHTMLSelectionObject sel = (IHTMLSelectionObject)doc.selection;
+                sel.empty(); // get an empty selection, so we start from the beginning
+                IHTMLTxtRange rng = (IHTMLTxtRange)sel.createRange();
+                if (rng.findText(text, 1000000000, 0))
+                {
+                    rng.select();
+                }
+            }
+            catch { }
+        }
+        private bool FindNext(string text)
+        {
+            try
+            {
+                IHTMLDocument2 doc = (IHTMLDocument2)webBrowser.Document;
+                IHTMLSelectionObject sel = (IHTMLSelectionObject)doc.selection;
+                IHTMLTxtRange rng = (IHTMLTxtRange)sel.createRange();
+                rng.collapse(false); // collapse the current selection so we start from the end of the previous range
+                if (rng.findText(text, 1000000000, 0))
+                {
+                    rng.select();
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {}
+            return false;
+        }
+
+
+        private bool FindNextReplace(string findText, string replaceText)
+        {
+            try
+            {
+                IHTMLDocument2 doc = (IHTMLDocument2)webBrowser.Document;
+                IHTMLSelectionObject sel = (IHTMLSelectionObject)doc.selection;
+                IHTMLTxtRange rng = (IHTMLTxtRange)sel.createRange();
+                rng.text = replaceText;
+                rng.collapse(false); // collapse the current selection so we start from the end of the previous range
+                if (rng.findText(findText, 1000000000, 0))
+                {
+                    rng.select();
+                    return true;
+                }
+                return false;
+            }
+            catch
+            { }
+            return false;
+        }
+
+        internal void ReplaceAll(string findText, string replaceText, bool clickedOnce)
+        {
+            try
+            {
+                IHTMLDocument2 doc = (IHTMLDocument2)webBrowser.Document;
+                IHTMLSelectionObject sel = (IHTMLSelectionObject)doc.selection;
+                if (!clickedOnce)
+                    sel.empty(); // get an empty selection, so we start from the beginning
+                IHTMLTxtRange rng = (IHTMLTxtRange)sel.createRange();
+                if (!clickedOnce)
+                    rng.collapse(false); // collapse the current selection so we start from the end of the previous range
+                if (rng.findText(findText, 1000000000, 0))
+                {
+                    rng.select();
+                    rng.text = replaceText;
+                    ReplaceAll(findText, replaceText, true);
+                }
+            }
+            catch
+            { }
+        }
+
+        public void Find(string findText, bool clickedOnce)
+        {
+            if (!clickedOnce)
+                FindFirst(findText);
+            else
+                if (!FindNext(findText))
+                    FindFirst(findText);
+        }
+
+        internal void FindReplace(string findText, string replaceText, bool clickedOnce)
+        {
+            if (!clickedOnce)
+                FindFirst(findText);
+            else
+                if (!FindNextReplace(findText, replaceText))
+                    FindFirst(findText);
+        }
 
 
 

@@ -20,6 +20,8 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
     /// </summary>
     public partial class WysiwigControl : UserControl
     {
+        FindReplaceWindow frw;
+
         public WysiwigControl()
         {
             InitializeComponent();
@@ -218,8 +220,57 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
             {
                 XmlRpcVM vm = DataContext as XmlRpcVM;
                 vm.ClearSpunTabs();
+                tbContrl.Visibility = System.Windows.Visibility.Collapsed;
             }
         }
+
+        #region custom windows
+        private void btnSpinWindow_Click(object sender, RoutedEventArgs e)
+        {
+            SpinWindow sw = new SpinWindow();
+            sw.OnClickedSpin += sw_OnClickedSpin;
+            sw.Show();
+        }
+
+        void sw_OnClickedSpin(string spunText)
+        {
+            webBrowserEditor.doc.body.innerText = spunText;
+        }
+
+        private void btnFindReplace_Click(object sender, RoutedEventArgs e)
+        {
+            if (frw == null)
+            {
+                frw = new FindReplaceWindow();
+                frw.OnClickedFind += frw_OnClickedFind;
+                frw.OnClickedFindReplace += frw_OnClickedFindReplace;
+                frw.OnClickedReplaceAll += frw_OnClickedReplaceAll;
+                frw.Closed += frw_Closed;
+                frw.Show();
+            }
+        }
+
+        void frw_OnClickedFind(string findText, bool clickedOnce)
+        {
+            webBrowserEditor.Find(findText, clickedOnce);
+        }
+
+        void frw_OnClickedFindReplace(string findText, string replaceText, bool clickedOnce)
+        {
+            webBrowserEditor.FindReplace(findText, replaceText, clickedOnce);
+        }
+
+        void frw_OnClickedReplaceAll(string findText, string replaceText)
+        {
+            webBrowserEditor.ReplaceAll(findText, replaceText, false);
+        }
+
+        void frw_Closed(object sender, EventArgs e)
+        {
+            frw = null;
+        }
+
+        #endregion
 
         #region Resize
 

@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WPF_WYSIWYG_HTML_Editor"
              xmlns:localXaml="clr-namespace:WPF_WYSIWYG_HTML_Editor.XAML"
+             xmlns:localHelper="clr-namespace:WPF_WYSIWYG_HTML_Editor.Helpers"
              mc:Ignorable="d" Loaded="Window_Loaded">
     <UserControl.Resources>
 
@@ -55,16 +56,67 @@
             </Setter>
         </Style>
 
-        <DataTemplate x:Key="templateForTheContent" DataType="{x:Type local:SpinningVM}">
+        <!--<DataTemplate x:Key="templateForTheContent" DataType="{x:Type local:SpinningVM}">
             <TextBox AcceptsReturn="True" VerticalScrollBarVisibility="Auto" MaxHeight="415" TextWrapping="Wrap" Text="{Binding Content}" />
+        </DataTemplate>-->
+
+        <Style x:Key="EditableTabHeaderControl" TargetType="{x:Type localHelper:EditableTabHeaderControl}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type localHelper:EditableTabHeaderControl}">
+                        <Grid Background="#eeeeee">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" MaxWidth="200" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox x:Name="PART_TabHeader"  VerticalAlignment="Center"
+                                     Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, Mode=TwoWay}" Visibility="Collapsed"/>
+                            <TextBlock x:Name="PART_TextBlock" VerticalAlignment="Center" 
+                                       Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, Mode=TwoWay}"/>
+                            <CheckBox IsChecked="{Binding IsChecked}" Grid.Column="1" Margin="5,2,3,2" VerticalAlignment="Center" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+
+                            <Trigger Property="IsInEditMode" Value="True">
+                                <Trigger.Setters>
+                                    <Setter TargetName="PART_TabHeader" Property="Visibility" Value="Visible"/>
+                                    <Setter TargetName="PART_TextBlock" Property="Visibility" Value="Collapsed"/>
+                                </Trigger.Setters>
+                            </Trigger>
+
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ItemContainerStyle" TargetType="TabItem">
+            <Setter Property="HeaderTemplate">
+                <Setter.Value>
+                    <DataTemplate DataType="{x:Type local:SpinningVM}">
+                        <localHelper:EditableTabHeaderControl Style="{StaticResource EditableTabHeaderControl}">
+                            <localHelper:EditableTabHeaderControl.Content>
+                                <!--<StackPanel>-->
+                                    <Binding Path="Title" Mode="TwoWay" />
+                                    <!--<CheckBox IsChecked="{Binding IsChecked}" />-->
+                                <!--</StackPanel>-->
+                            </localHelper:EditableTabHeaderControl.Content>
+                        </localHelper:EditableTabHeaderControl>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <DataTemplate x:Key="ContentTemplate" DataType="{x:Type local:SpinningVM}">
+            <Grid>
+                <TextBox AcceptsReturn="True" VerticalScrollBarVisibility="Auto" MaxHeight="415" TextWrapping="Wrap" Text="{Binding Content}" />
+            </Grid>
         </DataTemplate>
 
-        <DataTemplate x:Key="templateForTheHeader"  DataType="{x:Type local:SpinningVM}">
+        <!--<DataTemplate x:Key="templateForTheHeader"  DataType="{x:Type local:SpinningVM}">
             <StackPanel Orientation="Horizontal" Background="WhiteSmoke">
                 <TextBox Background="#eeeeee" Text="{Binding Title}" VerticalAlignment="Center" Margin="4" MaxWidth="200" />
                 <CheckBox IsChecked="{Binding IsChecked}" />
             </StackPanel>
-        </DataTemplate>
+        </DataTemplate>-->
 
     </UserControl.Resources>
         <Grid>
@@ -85,7 +137,68 @@
                     <RibbonApplicationMenu Visibility="Collapsed" />
                 </Ribbon.ApplicationMenu>
 
-                <RibbonTab Header="Publish PBN">
+            <RibbonTab Header="Editor">
+                <RibbonGroup Header="Clear" Width="60" >
+                    <RibbonButton x:Name="RibbonButtonNew" Label="" ToolTip="Clear"
+                                      LargeImageSource="..\Images\new.png" 
+                                      Click="RibbonButtonNew_Click"  />
+                    <!--<RibbonButton x:Name="RibbonButtonOpen" Label="" SmallImageSource="..\Images\open.png" Click="RibbonButtonOpen_Click" HorizontalAlignment="Left" Width="22"/>-->
+                    <!--<RibbonButton x:Name="RibbonButtonOpenweb" Label="" SmallImageSource="..\Images\link.png"  HorizontalAlignment="Left" Width="22" Click="RibbonButtonOpenweb_Click"/>-->
+                    <!--<RibbonButton x:Name="RibbonButtonSave" Label="" SmallImageSource="..\Images\save.png" Click="RibbonButtonSave_Click"/>-->
+                </RibbonGroup>
+                <RibbonGroup Header="Editor" Width="350">
+                    <StackPanel>
+                        <ComboBox x:Name="RibbonComboboxFormat" Background="#eeeeee" Width="160" Height="21"  Margin="0,0,0,4" HorizontalAlignment="Left" SelectionChanged="RibbonComboboxFormat_SelectionChanged" >
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Value}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <StackPanel Orientation="Horizontal">
+                            <ComboBox  x:Name="RibbonComboboxFonts" Width="160" Background="#eeeeee" Height="21" SelectionChanged="RibbonComboboxFonts_SelectionChanged"/>
+                            <ComboBox x:Name="RibbonComboboxFontHeight" Width="50" Margin="3,0,0,0" Height="21" Background="#eeeeee" SelectionChanged="RibbonComboboxFontHeight_SelectionChanged"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <RibbonButton x:Name="SettingsBold" SmallImageSource="..\Images\bold.png" Click="SettingsBold_Click"/>
+                            <RibbonButton x:Name="SettingsItalic" SmallImageSource="..\Images\italic.png" Click="SettingsItalic_Click"/>
+                            <RibbonButton x:Name="SettingsUnderLine" SmallImageSource="..\Images\UnderLine.png" Click="SettingsUnderLine_Click"/>
+                            <RibbonButton x:Name="SettingsFontColor" SmallImageSource="..\Images\Color.png" Click="SettingsFontColor_Click"/>
+                            <RibbonButton x:Name="SettingsBackColor" SmallImageSource="..\Images\backcolor.png" Click="SettingsBackColor_Click"/>
+                            <RibbonButton x:Name="SettingsAddLink" SmallImageSource="..\Images\link.png" Click="SettingsAddLink_Click"/>
+                            <RibbonButton x:Name="SettingsAddImage" SmallImageSource="..\Images\image.png" Click="SettingsAddImage_Click"/>
+                            <RibbonButton x:Name="SettingsLeftAlign" SmallImageSource="..\Images\LeftAlign.png" Click="SettingsLeftAlign_Click"/>
+                            <RibbonButton x:Name="SettingsCenter2" SmallImageSource="..\Images\center2.png" Click="SettingsCenter2_Click"/>
+                            <RibbonButton x:Name="SettingsRightAlign" SmallImageSource="..\Images\RightAlign.png" Click="SettingsJustifyRight_Click"/>
+                            <RibbonButton x:Name="SettingsCenter" SmallImageSource="..\Images\center.png" Click="SettingsJustifyFull_Click"/>
+                            <RibbonButton x:Name="SettingsNumbered" SmallImageSource="..\Images\Numbered.png" Click="SettingsInsertOrderedList_Click"/>
+                            <RibbonButton x:Name="SettingsBullets" SmallImageSource="..\Images\bullets.png" Click="SettingsBullets_Click"/>
+                            <RibbonButton x:Name="SettingsOutIdent" SmallImageSource="..\Images\OutIdent.png" Click="SettingsOutIdent_Click"/>
+                            <RibbonButton x:Name="SettingsIdent" SmallImageSource="..\Images\ident.png" Click="SettingsIdent_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </RibbonGroup>
+                <RibbonGroup Header="Custom" Width="120">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <RibbonButton x:Name="EditWeb1"  LargeImageSource="..\Images\Editor.png" Height="42" HorizontalAlignment="Left" Click="EditWeb_Click"/>
+                            <RibbonButton x:Name="ViewHTML"  LargeImageSource="..\Images\html.png" Height="42" HorizontalAlignment="Left" Click="ViewHTML_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </RibbonGroup>
+                <RibbonGroup Header="FR">
+                    <Button Cursor="Hand" ToolTip="Clear All Spun Tabs" IsEnabled="{Binding EnableBtns}" 
+                            Background="Transparent" BorderBrush="Transparent" Name="btnFindReplace" 
+                            Click="btnFindReplace_Click">
+                        <StackPanel>
+                            <Image Source="..\Images\findReplace.ico" Width="45" />
+                            <TextBlock Text="Find Replace" HorizontalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </RibbonGroup>
+            </RibbonTab>
+                
+            <RibbonTab Header="Publish PBN">
                     <RibbonGroup Header="Title">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="5">
@@ -142,7 +255,15 @@
                                     <TextBlock Text="Clear" HorizontalAlignment="Center" />
                                 </StackPanel>
                             </Button>
-                        </StackPanel>
+
+                        <Button Cursor="Hand" ToolTip="Clear All Spun Tabs" IsEnabled="{Binding EnableBtns}" 
+                                    Background="Transparent" BorderBrush="Transparent" Name="btnSpinWindow" Click="btnSpinWindow_Click">
+                            <StackPanel>
+                                <Image Source="..\Images\new_window-icon.png" Width="45" />
+                                <TextBlock Text="Spinner Window" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
                     </RibbonGroup>
 
                     <RibbonGroup Header="Status">
@@ -151,56 +272,7 @@
                     </RibbonGroup>
                 </RibbonTab>
             
-                <RibbonTab Header="Editor">
-                    <RibbonGroup Header="Clear" Width="60" >
-                        <RibbonButton x:Name="RibbonButtonNew" Label="" ToolTip="Clear"
-                                      LargeImageSource="..\Images\new.png" 
-                                      Click="RibbonButtonNew_Click"  />
-                        <!--<RibbonButton x:Name="RibbonButtonOpen" Label="" SmallImageSource="..\Images\open.png" Click="RibbonButtonOpen_Click" HorizontalAlignment="Left" Width="22"/>-->
-                        <!--<RibbonButton x:Name="RibbonButtonOpenweb" Label="" SmallImageSource="..\Images\link.png"  HorizontalAlignment="Left" Width="22" Click="RibbonButtonOpenweb_Click"/>-->
-                        <!--<RibbonButton x:Name="RibbonButtonSave" Label="" SmallImageSource="..\Images\save.png" Click="RibbonButtonSave_Click"/>-->
-                    </RibbonGroup>
-                    <RibbonGroup Header="Editor" Width="350">
-                        <StackPanel>
-                            <ComboBox x:Name="RibbonComboboxFormat" Background="#eeeeee" Width="160" Height="21"  Margin="0,0,0,4" HorizontalAlignment="Left" SelectionChanged="RibbonComboboxFormat_SelectionChanged" >
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Value}" />
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                            <StackPanel Orientation="Horizontal">
-                                <ComboBox  x:Name="RibbonComboboxFonts" Width="160" Background="#eeeeee" Height="21" SelectionChanged="RibbonComboboxFonts_SelectionChanged"/>
-                                <ComboBox x:Name="RibbonComboboxFontHeight" Width="50" Margin="3,0,0,0" Height="21" Background="#eeeeee" SelectionChanged="RibbonComboboxFontHeight_SelectionChanged"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <RibbonButton x:Name="SettingsBold" SmallImageSource="..\Images\bold.png" Click="SettingsBold_Click"/>
-                                <RibbonButton x:Name="SettingsItalic" SmallImageSource="..\Images\italic.png" Click="SettingsItalic_Click"/>
-                                <RibbonButton x:Name="SettingsUnderLine" SmallImageSource="..\Images\UnderLine.png" Click="SettingsUnderLine_Click"/>
-                                <RibbonButton x:Name="SettingsFontColor" SmallImageSource="..\Images\Color.png" Click="SettingsFontColor_Click"/>
-                                <RibbonButton x:Name="SettingsBackColor" SmallImageSource="..\Images\backcolor.png" Click="SettingsBackColor_Click"/>
-                                <RibbonButton x:Name="SettingsAddLink" SmallImageSource="..\Images\link.png" Click="SettingsAddLink_Click"/>
-                                <RibbonButton x:Name="SettingsAddImage" SmallImageSource="..\Images\image.png" Click="SettingsAddImage_Click"/>
-                                <RibbonButton x:Name="SettingsLeftAlign" SmallImageSource="..\Images\LeftAlign.png" Click="SettingsLeftAlign_Click"/>
-                                <RibbonButton x:Name="SettingsCenter2" SmallImageSource="..\Images\center2.png" Click="SettingsCenter2_Click"/>
-                                <RibbonButton x:Name="SettingsRightAlign" SmallImageSource="..\Images\RightAlign.png" Click="SettingsJustifyRight_Click"/>
-                                <RibbonButton x:Name="SettingsCenter" SmallImageSource="..\Images\center.png" Click="SettingsJustifyFull_Click"/>
-                                <RibbonButton x:Name="SettingsNumbered" SmallImageSource="..\Images\Numbered.png" Click="SettingsInsertOrderedList_Click"/>
-                                <RibbonButton x:Name="SettingsBullets" SmallImageSource="..\Images\bullets.png" Click="SettingsBullets_Click"/>
-                                <RibbonButton x:Name="SettingsOutIdent" SmallImageSource="..\Images\OutIdent.png" Click="SettingsOutIdent_Click"/>
-                                <RibbonButton x:Name="SettingsIdent" SmallImageSource="..\Images\ident.png" Click="SettingsIdent_Click"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </RibbonGroup>
-                    <RibbonGroup Header="Custom" Width="120">
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <RibbonButton x:Name="EditWeb1"  LargeImageSource="..\Images\Editor.png" Height="42" HorizontalAlignment="Left" Click="EditWeb_Click"/>
-                                <RibbonButton x:Name="ViewHTML"  LargeImageSource="..\Images\html.png" Height="42" HorizontalAlignment="Left" Click="ViewHTML_Click"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </RibbonGroup>
-                </RibbonTab>
+                
 
 
                 <!--<RibbonTab Header="Publish FTP">
@@ -214,14 +286,14 @@
                 </StatusBarItem>
             </StatusBar>-->
             <local:WPFWebBrowser Grid.Column="0" x:Name="webBrowserEditor"  Grid.Row="1" VerticalAlignment="Top" />
-                <local:HtmlEditor Grid.Column="0" x:Name="HtmlEditor1"  Grid.Row="1" Visibility="Hidden" VerticalAlignment="Top"/>
+            <local:HtmlEditor Grid.Column="0" x:Name="HtmlEditor1"  Grid.Row="1" Visibility="Hidden" VerticalAlignment="Top"/>
         
             <!--<Line Name="lineResizer" Stroke="Black" Fill="Black"  
                   X1="{Binding ActualHeight,ElementName=trvTasks}" X2="50"
                   Y1="{Binding MouseY}"  Y2="{Binding MouseY}" />-->
-        <TabControl Name="tbContrl" ItemsSource="{Binding Tabs}" Visibility="{Binding TabsVisible}" Grid.Column="0" Grid.Row="2" 
-                ContentTemplate="{StaticResource templateForTheContent}"
-                ItemTemplate="{StaticResource templateForTheHeader}">
-        </TabControl>
+        <TabControl Name="tbContrl" ItemsSource="{Binding Tabs}" Visibility="{Binding TabsVisible}"
+                    Grid.Column="0" Grid.Row="2" MinHeight="400" 
+                    ItemContainerStyle="{StaticResource ItemContainerStyle}" 
+                    ContentTemplate="{StaticResource ContentTemplate}" />
         </Grid>
 </UserControl>
