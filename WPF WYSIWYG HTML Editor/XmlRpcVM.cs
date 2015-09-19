@@ -28,6 +28,8 @@ namespace WPF_WYSIWYG_HTML_Editor
     public class XmlRpcVM : INotifyPropertyChanged
     {
         public ICommand SettingsClicked { get; set; }
+        //RefreshPBNVault
+        public ICommand RefreshPBNVault { get; set; }
 
         //TabsVisible
         private Visibility tabsVisible;
@@ -119,12 +121,21 @@ namespace WPF_WYSIWYG_HTML_Editor
             set { cmbBoxDrupalList = value; }
         }
 
+        //SavedPBNProjects
+        private ObservableCollection<PBNProject> savedPBNProjects;
+        public ObservableCollection<PBNProject> SavedPBNProjects
+        {
+            get { return savedPBNProjects; }
+            set { savedPBNProjects = value; }
+        }
+
         //Tabs
         private ObservableCollection<SpinningVM> tabs;
         public ObservableCollection<SpinningVM> Tabs
         {
             get { return tabs; }
-            set { tabs = value; }
+            set { tabs = value;
+            }
         }
         public bool UseSpunArticlesChecked { get; set; }
 
@@ -180,16 +191,41 @@ namespace WPF_WYSIWYG_HTML_Editor
         public XmlRpcVM()
         {
             SettingsClicked = new RelayCommand(OnSettingsClicked);
+            RefreshPBNVault = new RelayCommand(OnRefreshPBNVaultClick);
 
             CmbBoxWPList = new ObservableCollection<SelectedProfile>();
             CmbBoxDrupalList = new ObservableCollection<SelectedProfile>();
             Tabs = new ObservableCollection<SpinningVM>();
+            SavedPBNProjects = new ObservableCollection<PBNProject>();
 
             Status = "Select platforms to pulbilsh to from settings.";
             EnableBtns = true;
             TabsVisible = Visibility.Collapsed;
             AutoSpinChecked = false;
             TimesToSpin = 0;
+
+            OnRefreshPBNVaultClick("");
+        }
+
+        private void OnRefreshPBNVaultClick(object param)
+        {
+            try
+            {
+                SavedPBNProjects.Clear();
+                string vaultDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "PBNVault");
+                if (!Directory.Exists(vaultDir)) return;
+
+                string filePath = Path.Combine(vaultDir, "vaultConfig.txt");
+                if (!File.Exists(filePath)) return;
+
+                string[] fileLines = File.ReadAllLines(filePath);
+                foreach (string line in fileLines)
+                {
+                    string[] lineInfo = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                    SavedPBNProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = lineInfo[2] });
+                }
+            }
+            catch { }
         }
 
         private void OnSettingsClicked(object param)
@@ -272,6 +308,192 @@ namespace WPF_WYSIWYG_HTML_Editor
                }
                publishSpun(content);
            }).Start();
+        }
+
+        internal void OnPubFromVaultClick(string content)
+        {
+            new Thread(() =>
+            {
+                try
+                {
+                    ProgressBarStart = true;
+                    EnableBtns = false;
+
+                    errorString = "";
+                    successString = "";
+
+                    foreach (SpinningVM spin in Tabs)
+                    {
+                        spin.WasUsed = false;
+                    }
+
+                    foreach (PBNProject pbnProj in SavedPBNProjects)
+                    {
+                        if (!pbnProj.IsSelected) continue;
+
+                        if (UseSpunArticlesChecked)
+                        {
+                            string title = PostTitle;
+                            getSpunContent(ref content, ref title);
+
+                            switch (pbnProj.SIType)
+                            {
+                                case PBNProject.TYPE_WORDPRESS:
+                                    publishFromVaultWP(pbnProj, title, content);
+                                    break;
+                                case PBNProject.TYPE_DRUPAL:
+                                    publishFromVaultDrupal(pbnProj, title, content);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            continue;
+                        }
+                        if (TimesToSpin > 0 && AutoSpinChecked)
+                        {
+                             switch (pbnProj.SIType)
+                            {
+                                case PBNProject.TYPE_WORDPRESS:
+                                    publishFromVaultWP(pbnProj, IsSpinChecked ? Spinner.Spin(PostTitle) : PostTitle, Spinner.Spin(content));
+                                    break;
+                                case PBNProject.TYPE_DRUPAL:
+                                    publishFromVaultDrupal(pbnProj, IsSpinChecked ? Spinner.Spin(PostTitle) : PostTitle, Spinner.Spin(content));
+                                    break;
+                                default:
+                                    break;
+                            }
+                            continue;
+                        }
+                        switch (pbnProj.SIType)
+                        {
+                            case PBNProject.TYPE_WORDPRESS:
+                                publishFromVaultWP(pbnProj, PostTitle, content);
+                                break;
+                            case PBNProject.TYPE_DRUPAL:
+                                publishFromVaultDrupal(pbnProj, PostTitle, content);
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    if (successString != "")
+                        MessageBox.Show(successString);
+                    if (errorString != "")
+                        MessageBox.Show(errorString);
+
+                    Status = "Done : )   ";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: " + ex.Message);
+                    Status = "Whoops @#$%@!!   ";
+                }
+
+                ProgressBarStart = false;
+                EnableBtns = true;
+            }).Start();
+        }
+
+        private void publishFromVaultDrupal(PBNProject pbnProj, string title, string content)
+        {
+            PersonData profile = MyFilesDatabase.GetSubProjectPersonData(pbnProj.FilePath);
+            if (string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress))
+            {
+                errorString += "Website in profile data cannot be empty. " + profile.ProfileName + Environment.NewLine;
+                return;
+            }
+            Status = "Posting to " + profile.WebAddress + ".";
+
+            string url = profile.WebAddress;
+            if (url[url.Length - 1] != '/')
+                url += '/';
+            url += "xmlrpc.php";
+
+            DrupalServices d = new Drupal7.Services.DrupalServices(url, profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword);
+            bool isin = d.Login(profile.Username, profile.Password);
+            if (!isin)
+            {
+                errorString += "Was unable to authenticate " + profile.WebAddress + Environment.NewLine;
+                return;
+            }
+
+            XmlRpcStruct postStruct = new XmlRpcStruct();
+            postStruct.Add("type", "article");
+            postStruct.Add("title", title);
+
+            XmlRpcStruct postBodyStructParams = new XmlRpcStruct();
+            postBodyStructParams.Add("format", "full_html");
+            postBodyStructParams.Add("value", content);
+
+
+            XmlRpcStruct[] postBodyStructParamsArr = new XmlRpcStruct[1];
+            postBodyStructParamsArr[0] = postBodyStructParams;
+
+            XmlRpcStruct postBodyStruct = new XmlRpcStruct();
+            postBodyStruct.Add("und", postBodyStructParamsArr);
+
+            postStruct.Add("body", postBodyStruct);
+
+            XmlRpcStruct s = d.NodeCreate(postStruct);
+            if (s == null)
+            {
+                errorString += "Was Unable to post to " + profile.WebAddress + Environment.NewLine;
+            }
+            else
+            {
+                successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
+            }
+
+            d.Logout();
+        }
+
+        private void publishFromVaultWP(PBNProject pbnProj, string title, string content)
+        {
+            PersonData profile = MyFilesDatabase.GetSubProjectPersonData(pbnProj.FilePath);
+            if (string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress))
+            {
+                errorString += "Website in profile data cannot be empty. " + profile.ProfileName + Environment.NewLine;
+                return;
+            }
+            Status = "Posting to " + profile.WebAddress + ".";
+
+            DateTime publishdt = DateTime.Now;
+            try
+            {
+                publishdt = GetNistTime(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword);
+            }
+            catch { publishdt = DateTime.Now; }
+
+            var post = new Post
+            {
+                PostType = "post", // "post" or "page"
+                Title = title,
+                Content = content,
+                PublishDateTime = publishdt,
+                Status = "publish" // "draft" or "publish"
+            };
+
+            using (var client = new WordPressClient(new WordPressSiteConfig
+            {
+                BaseUrl = profile.WebAddress,
+                BlogId = 1,
+                Username = profile.Username,
+                Password = profile.Password,
+            }, profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword))
+            {
+                try
+                {
+                    var id = client.NewPost(post);
+                }
+                catch
+                {
+                    errorString += "Unable to post to " + profile.WebAddress + Environment.NewLine;
+                    return;
+                }
+            }
+
+            successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
         }
 
         private void publishSpun(string content, string title = "", bool fromtabs = false)
@@ -452,9 +674,16 @@ namespace WPF_WYSIWYG_HTML_Editor
             {
                 if (!spin.WasUsed && spin.IsChecked)
                 {
-                    content = Spinner.Spin(content);
-                    if (IsSpinChecked)
-                     title = Spinner.Spin(PostTitle);
+                    if (!UseSpunArticlesChecked)
+                        content = Spinner.Spin(content);
+                    else
+                        content = spin.Content;
+
+                    if (IsSpinChecked && !UseSpunArticlesChecked)
+                        title = Spinner.Spin(PostTitle);
+                    else
+                        title = spin.Title;
+
                     spin.WasUsed = true;
                     found = true;
                     break;
@@ -464,7 +693,7 @@ namespace WPF_WYSIWYG_HTML_Editor
             {
                 foreach (SpinningVM spin in Tabs)
                 {
-                    if (!spin.WasUsed && spin.IsChecked)
+                    if (spin.WasUsed && spin.IsChecked)
                     {
                         spin.WasUsed = false;
                         break;
@@ -526,6 +755,11 @@ namespace WPF_WYSIWYG_HTML_Editor
                     title = Spinner.Spin(title);
                 string content = Spinner.Spin(text);
                 Tabs.Add(new SpinningVM() { IsChecked = true, Title = title, Content = content });
+                if (Tabs.Count == 1)
+                {
+                    Tabs.Add(new SpinningVM() { IsChecked = true, Title = title, Content = content });
+                    Tabs.RemoveAt(Tabs.Count - 1);
+                }
                 TabsVisible = Visibility.Visible;
             }
             catch
@@ -537,6 +771,7 @@ namespace WPF_WYSIWYG_HTML_Editor
         internal void ClearSpunTabs()
         {
             Tabs.Clear();
+            TabsVisible = Visibility.Collapsed;
         }
     }
 }

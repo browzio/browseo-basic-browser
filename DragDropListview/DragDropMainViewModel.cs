@@ -322,6 +322,12 @@ namespace DragDropListview
                                     FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
                                 (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png"));
                                 }
+
+                                if (FoldersAndSitesList[SIFoldersSide].ImportType == IMPORT_TYPE_EB)
+                                {
+                                    FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
+                                (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\enterprise buddy.ico"));
+                                }
                             }
                         }
                         else
@@ -359,6 +365,13 @@ namespace DragDropListview
                         bookmarkFolder_S.ImportType = IMPORT_TYPE_FCS;
                         bookmarkFolder_S.BitmapImg = new BitmapImage
                             (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png"));
+                    }
+                    else if (bookmarkTypeWindow.entBud.IsChecked == true)
+                    {
+                        bookmarkFolder_S.IsImported = true;
+                        bookmarkFolder_S.ImportType = IMPORT_TYPE_EB;
+                        bookmarkFolder_S.BitmapImg = new BitmapImage
+                            (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\enterprise buddy.ico"));
                     }
 
                     FoldersAndSitesList.Add(bookmarkFolder_S);
@@ -1320,7 +1333,7 @@ namespace DragDropListview
                                 bmark.Password = PASSWORD;
                                 bmark.IsImported = true;
                                 bmark.DateTimeStamp = dt;
-                                bmark.ImportType = IMPORT_TYPE_FCS;
+                                bmark.ImportType = item.Name;
                                 bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
                                 fcsVm.Sites.Add(bmark);
                             }

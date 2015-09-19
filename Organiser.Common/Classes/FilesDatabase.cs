@@ -245,9 +245,15 @@ namespace Organiser.Common.Classes
             string sitesFilePath = selectedProjectPath;
             if (!selectedProjectPath.Contains(".ini"))
                 sitesFilePath = Path.Combine(selectedProjectPath, "UserData.ini");
+            if (!File.Exists(sitesFilePath))
+                sitesFilePath = sitesFilePath.Replace("UserData.ini", "ProjectData.ini");
+
+            PersonData profile = new PersonData();
+
+            if (!File.Exists(sitesFilePath))
+                return profile;
 
             IniFile ini = new IniFile(sitesFilePath);
-            PersonData profile = new PersonData();
             try
             {
                 profile.ProjectName = ini.IniReadValue("Data", "ProjectName");

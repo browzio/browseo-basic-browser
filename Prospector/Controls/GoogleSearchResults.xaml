@@ -30,6 +30,19 @@
                                                    TextWrapping="Wrap"
                                                    Foreground="Green" />
 
+                                        <StackPanel Orientation="Horizontal" Visibility="{Binding AuthorityVisible}">
+                                            <TextBlock Text="{Binding PageAuthority}"
+                                                   Margin="3"
+                                                   TextWrapping="Wrap"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="Black" />
+                                            <TextBlock Text="{Binding DomainAuthority}"
+                                                   Margin="3"
+                                                   TextWrapping="Wrap"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="Black" />
+                                        </StackPanel>
+
                                         <TextBlock Text="{Binding Description, Mode=OneWay}"
                                                    Margin="3"
                                                    TextWrapping="Wrap"
@@ -66,6 +79,12 @@
                     <MenuItem Header="Send To Browser">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    
+                    <MenuItem Header="Moz Check">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding RanckCheck}" CommandParameter="MOZ" />
                         </MenuItem.InputBindings>
                     </MenuItem>
                 </ContextMenu>

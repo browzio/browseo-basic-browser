@@ -114,5 +114,14 @@ namespace Prospector.Controls
             btnLink_Roundups.Background = (Brush)bc.ConvertFrom("#FFFDFDFD");
             btnCustom.Background = (Brush)bc.ConvertFrom("#FFFDFDFD");
         }
+
+        private void btnSaved_Click(object sender, RoutedEventArgs e)
+        {
+            tbContrl.SelectedIndex = FootPrintsOptionsVM.Saved;
+            setButtonsWhite();
+            var bc = new BrushConverter();
+            btnSaved.Background = (Brush)bc.ConvertFrom("#FFD7D7D7");
+            currentSenderContent = (sender as Button).Content.ToString();
+        }
     }
 }

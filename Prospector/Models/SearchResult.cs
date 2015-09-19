@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Prospector.Models
@@ -80,6 +81,42 @@ namespace Prospector.Models
                 description = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("Description"));
+            }
+        }
+
+        private string pageAuthority;
+        public string PageAuthority
+        {
+            get { return pageAuthority; }
+            set
+            {
+                pageAuthority = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("PageAuthority"));
+            }
+        }
+
+        private string domainAuthority;
+        public string DomainAuthority
+        {
+            get { return domainAuthority; }
+            set
+            {
+                domainAuthority = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("DomainAuthority"));
+            }
+        }
+
+        private Visibility authorityVisible;
+        public Visibility AuthorityVisible
+        {
+            get { return authorityVisible; }
+            set
+            {
+                authorityVisible = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("AuthorityVisible"));
             }
         }
 

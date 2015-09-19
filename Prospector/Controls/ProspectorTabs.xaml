@@ -151,6 +151,19 @@
                 <controls:KeywordAndOptions />
             </TabItem>
 
+            <TabItem>
+                <TabItem.Header>
+                    <Button Name="btnSaved"
+                            Click="btnSaved_Click"
+                            MouseEnter="Btn_MouseEnter"
+                            MouseLeave="Btn_MouseLeave"
+                            Content="Saved"
+                             Margin="5,0,0,0"
+                            Style="{StaticResource tabButtonStyle}">
+                    </Button>
+                </TabItem.Header>
+                <controls:KeywordAndOptions />
+            </TabItem>
             <!--<TabItem Header="Resource pages">
                 <controls:KeywordAndOptions />
             </TabItem>

@@ -72,7 +72,14 @@
     <Compile Include="Helpers\WebPageRequests.cs" />
     <Compile Include="Models\Footprint.cs" />
     <Compile Include="Models\MyKeyVal.cs" />
+    <Compile Include="Models\SavedFootprint.cs" />
     <Compile Include="Models\SearchResult.cs" />
+    <Compile Include="SaveFootprintWindow.xaml.cs">
+      <DependentUpon>SaveFootprintWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="SaveMozKeysWindow.xaml.cs">
+      <DependentUpon>SaveMozKeysWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\FootPrintsOptionsVM.cs" />
     <Page Include="Controls\GoogleSearchResults.xaml">
       <SubType>Designer</SubType>
@@ -98,6 +105,14 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="SaveFootprintWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SaveMozKeysWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -131,6 +146,9 @@
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
       <Name>Organiser.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\browseo %281%29.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

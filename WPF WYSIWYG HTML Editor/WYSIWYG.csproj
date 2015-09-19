@@ -73,6 +73,7 @@
     <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="Helpers\Spinner.cs" />
     <Compile Include="Models\FTPprofile.cs" />
+    <Compile Include="Models\PBNProject.cs" />
     <Compile Include="Models\SelectedProfile.cs" />
     <Compile Include="SpinningVM.cs" />
     <Compile Include="XAML\CreateNewFTPprojectWindow.xaml.cs">
@@ -97,6 +98,9 @@
     </Compile>
     <Compile Include="XAML\HtmlEditor.xaml.cs">
       <DependentUpon>HtmlEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\PBNVaultUserControl.xaml.cs">
+      <DependentUpon>PBNVaultUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="XAML\SelectPlatformWindow.xaml.cs">
       <DependentUpon>SelectPlatformWindow.xaml</DependentUpon>
@@ -132,6 +136,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="XAML\HtmlEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="XAML\PBNVaultUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -267,6 +275,8 @@
     <Content Include="bin\Debug\WPF WYSIWYG HTML Editor.vshost.exe" />
     <Content Include="bin\Debug\WPF_WYSIWYG_HTML_Editor.exe" />
     <Content Include="bin\Debug\WPF_WYSIWYG_HTML_Editor.pdb" />
+    <Resource Include="Images\publish-o.png" />
+    <Resource Include="Images\publish-bw.png" />
     <Resource Include="Images\findReplace.ico" />
     <Resource Include="Images\new_window-icon.png" />
     <Resource Include="Images\clear.png" />

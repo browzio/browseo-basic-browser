@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Organiser.Common.Classes;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
@@ -47,6 +48,19 @@ namespace Prospector.Helpers
 
                 WebClient client = new WebClient();
                 client.Encoding = System.Text.Encoding.UTF8;
+                if (GloableProfData.PData != null)
+                {
+                    if (!string.IsNullOrEmpty(GloableProfData.PData.ProxyIP) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyIP) &&
+                        !string.IsNullOrEmpty(GloableProfData.PData.ProxyPort) &&  !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyPort))
+                    {
+                        client.Proxy = new WebProxy(GloableProfData.PData.ProxyIP, Convert.ToInt32(GloableProfData.PData.ProxyPort));
+                        if (!string.IsNullOrEmpty(GloableProfData.PData.ProxyUsername) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyUsername) &&
+                        !string.IsNullOrEmpty(GloableProfData.PData.ProxyPassword) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyPassword))
+                        {
+                            client.Credentials = new NetworkCredential(GloableProfData.PData.ProxyUsername, GloableProfData.PData.ProxyPassword); 
+                        }
+                    }
+                }
                 htmlText = client.DownloadString(url);
                 //htmlText = WebUtility.HtmlDecode(htmlText);
             }

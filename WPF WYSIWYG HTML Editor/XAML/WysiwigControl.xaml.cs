@@ -165,8 +165,8 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
             Initialisation.RibbonComboboxFontSizeInitialisation();
             Initialisation.RibbonComboboxFormatInitionalisation();
 
-            if (ribon.SelectedIndex != 2)
-            grdFtpProjects.Visibility = System.Windows.Visibility.Collapsed;
+           // if (ribon.SelectedIndex != 2)
+            //grdFtpProjects.Visibility = System.Windows.Visibility.Collapsed;
         }
 
 
@@ -180,29 +180,38 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
             }
         }
 
+        private void pbnPubfromVault_Click(object sender, RoutedEventArgs e)
+        {
+            if (DataContext != null && DataContext is XmlRpcVM)
+            {
+                XmlRpcVM vm = DataContext as XmlRpcVM;
+                vm.OnPubFromVaultClick(webBrowserEditor.doc.body.innerHTML);
+            }
+        }
+
         public void SetProfileData(SocialOrganizer.Models.PersonData profile)
         {
-            ftpProjectList.SetProfile(profile);
+            //ftpProjectList.SetProfile(profile);
             //ftpProjectList.SetProfile(profile);
         }
         double preHeight = 0;
         private void Ribbon_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (ribon.SelectedIndex == 2)
-            {
-                if (preHeight < ribon.ActualHeight)
-                preHeight = ribon.ActualHeight;
-                grdFtpProjects.Visibility = System.Windows.Visibility.Visible;
-                if (ribon.Height != 50.0)
-                ribon.Height = 50;
-                webBrowserEditor.unhook();
-            }
-            else
-            {
-                if (preHeight > 0)
-                    ribon.Height = preHeight;
-                grdFtpProjects.Visibility = System.Windows.Visibility.Collapsed;
-            }
+            //if (ribon.SelectedIndex == 2)
+            //{
+            //    if (preHeight < ribon.ActualHeight)
+            //    preHeight = ribon.ActualHeight;
+            //    grdFtpProjects.Visibility = System.Windows.Visibility.Visible;
+            //    if (ribon.Height != 50.0)
+            //    ribon.Height = 50;
+            //    webBrowserEditor.unhook();
+            //}
+            //else
+            //{
+            //    if (preHeight > 0)
+            //        ribon.Height = preHeight;
+            //    grdFtpProjects.Visibility = System.Windows.Visibility.Collapsed;
+            //}
         }
 
         private void btnSpin_Click(object sender, RoutedEventArgs e)
@@ -210,6 +219,7 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
             if (DataContext != null && DataContext is XmlRpcVM)
             {
                 XmlRpcVM vm = DataContext as XmlRpcVM;
+                //tbContrl.Visibility = System.Windows.Visibility.Visible;
                 vm.Spin(webBrowserEditor.doc.body.innerText, tbPostTitle.Text);
             }
         }
@@ -220,7 +230,7 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
             {
                 XmlRpcVM vm = DataContext as XmlRpcVM;
                 vm.ClearSpunTabs();
-                tbContrl.Visibility = System.Windows.Visibility.Collapsed;
+                //tbContrl.Visibility = System.Windows.Visibility.Collapsed;
             }
         }
 

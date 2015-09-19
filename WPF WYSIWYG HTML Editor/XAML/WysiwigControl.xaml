@@ -39,7 +39,7 @@
                                        VerticalAlignment="Bottom"
                                        SnapsToDevicePixels="True" 
                                        Visibility="Collapsed" 
-                                       Source="/Indexer;component/Images/v.png" 
+                                       Source="/WYSIWYG;component/Images/v.png" 
                                        Stretch="Fill" Width="12" Height="12" Margin="3,0,0,3"/>
                             <ContentPresenter Margin="25,0,0,0" VerticalAlignment="Bottom"/>
                         </Grid>
@@ -96,7 +96,7 @@
                         <localHelper:EditableTabHeaderControl Style="{StaticResource EditableTabHeaderControl}">
                             <localHelper:EditableTabHeaderControl.Content>
                                 <!--<StackPanel>-->
-                                    <Binding Path="Title" Mode="TwoWay" />
+                                    <Binding Path="Title" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
                                     <!--<CheckBox IsChecked="{Binding IsChecked}" />-->
                                 <!--</StackPanel>-->
                             </localHelper:EditableTabHeaderControl.Content>
@@ -107,7 +107,7 @@
         </Style>
         <DataTemplate x:Key="ContentTemplate" DataType="{x:Type local:SpinningVM}">
             <Grid>
-                <TextBox AcceptsReturn="True" VerticalScrollBarVisibility="Auto" MaxHeight="415" TextWrapping="Wrap" Text="{Binding Content}" />
+                <TextBox AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Text="{Binding Content, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
             </Grid>
         </DataTemplate>
 
@@ -129,8 +129,20 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Grid Name="grdFtpProjects" Width="150" Grid.Column="1" Grid.RowSpan="2" >
-                <localXaml:FTPProjectsList x:Name="ftpProjectList" />
+            <Grid Name="grdFtpProjects" Grid.Column="1" Grid.RowSpan="2" >
+            <Expander 
+                  ExpandDirection="Right" 
+                  Width="Auto">
+                <Expander.Header>
+                    <TextBlock Text="PBN Vault">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform Angle="90"/>
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                </Expander.Header>
+                <localXaml:PBNVaultUserControl x:Name="ftpProjectList" />
+            </Expander>
+            <!--<localXaml:FTPProjectsList x:Name="ftpProjectList" />-->
             </Grid>
             <Ribbon Name="ribon" Foreground="#333333" Background="WhiteSmoke" Margin="0,-22,0,0" SelectionChanged="Ribbon_SelectionChanged">
                 <Ribbon.ApplicationMenu>
@@ -199,21 +211,21 @@
             </RibbonTab>
                 
             <RibbonTab Header="Publish PBN">
-                    <RibbonGroup Header="Title">
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="5">
-                                <TextBlock Text="Post Title:" Margin="3" VerticalAlignment="Center" />
-                                <TextBox Text="{Binding PostTitle}" Margin="3" Width="200" Name="tbPostTitle" />
-                            </StackPanel>
-                            <CheckBox Content="Spin Title" IsChecked="{Binding IsSpinChecked}" Margin="5" />
+                <RibbonGroup Header="Title">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <TextBlock Text="Post Title:" Margin="3" VerticalAlignment="Center" />
+                            <TextBox Text="{Binding PostTitle}" Margin="3" Width="200" Name="tbPostTitle" />
                         </StackPanel>
-                    </RibbonGroup>
+                        <CheckBox Content="Spin Title" IsChecked="{Binding IsSpinChecked}" Margin="5" />
+                    </StackPanel>
+                </RibbonGroup>
 
-                    <RibbonGroup Header="Settings">
-                        <Button Cursor="Hand" IsEnabled="{Binding EnableBtns}" ToolTip="Platform Settings" Background="Transparent" BorderBrush="Transparent" Command="{Binding SettingsClicked}">
-                            <Image Source="..\Images\settings-icon.png" />
-                        </Button>
-                        <!--<StackPanel>
+                <RibbonGroup Header="Settings">
+                    <Button Cursor="Hand" IsEnabled="{Binding EnableBtns}" ToolTip="Platform Settings" Background="Transparent" BorderBrush="Transparent" Command="{Binding SettingsClicked}">
+                        <Image Source="..\Images\settings-icon.png" />
+                    </Button>
+                    <!--<StackPanel>
                             <DockPanel>
                                 <TextBlock Text="Status: " VerticalAlignment="Center" Margin="3" />
                                 <ComboBox ItemsSource="{Binding StatusTypes}" SelectedIndex="{Binding SIPostStatus,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
@@ -227,34 +239,47 @@
                                           Margin="3" Height="23" Background="#eeeeee" MinWidth="150" />
                             </DockPanel>
                         </StackPanel>-->
-                    </RibbonGroup>
+                </RibbonGroup>
 
-                    <RibbonGroup Header="Publish">
-                        <Button ToolTip="Publish" Cursor="Hand" IsEnabled="{Binding EnableBtns}" Background="Transparent" BorderBrush="Transparent" Name="btnPublishFTP" Click="btnPublish_Click">
-                            <Image Source="..\Images\publish.png" />
-                        </Button>
-                    </RibbonGroup>
+                <RibbonGroup Header="Publish">
+                    <StackPanel Orientation="Horizontal">
+                        <Button ToolTip="Publish from pbns selected in settings" Cursor="Hand" IsEnabled="{Binding EnableBtns}" Margin="2"
+                            Background="Transparent" BorderBrush="Transparent" Name="btnPublishFTP" Click="btnPublish_Click">
+                        <StackPanel Height="80">
+                            <Image Source="..\Images\publish-bw.png" Height="40" Stretch="Uniform" />
+                            <TextBlock Text="From Settings" />
+                        </StackPanel>
+                    </Button>
+                    <Button ToolTip="Publish from selected vaulted pbns" Cursor="Hand" IsEnabled="{Binding EnableBtns}"  Margin="2"
+                            Background="Transparent" BorderBrush="Transparent" Name="pbnPubfromVault" Click="pbnPubfromVault_Click">
+                        <StackPanel Height="80">
+                            <Image Source="..\Images\publish-o.png" Height="40" Stretch="Uniform" />
+                            <TextBlock Text="From Vault" />
+                        </StackPanel>
+                    </Button>
+                    </StackPanel>
+                </RibbonGroup>
 
-                    <RibbonGroup Header="Spin">
-                        <StackPanel Orientation="Horizontal">
-                            <StackPanel>
-                                <RibbonButton x:Name="btnSpin" Cursor="Hand" HorizontalAlignment="Center" Height="40" LargeImageSource="..\Images\spin.png" Click="btnSpin_Click" />
-                                <CheckBox Content="Publish Spun Articles" IsChecked="{Binding UseSpunArticlesChecked}" />
-                            </StackPanel>
-                            <StackPanel Margin="3">
-                                <CheckBox Content="Auto Spin" IsChecked="{Binding AutoSpinChecked}" Margin="5,5,5,8" />
-                                <DockPanel Margin="5" Visibility="{Binding DPtimesToSPinVisible}">
-                                    <TextBlock Text="Times To Spin: " VerticalAlignment="Center" />
-                                    <TextBox Text="{Binding TimesToSpin}" Width="30"/>
-                                </DockPanel>
-                            </StackPanel>
-                            <Button Cursor="Hand" ToolTip="Clear All Spun Tabs" IsEnabled="{Binding EnableBtns}" 
+                <RibbonGroup Header="Spin">
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel>
+                            <RibbonButton x:Name="btnSpin" Cursor="Hand" IsEnabled="{Binding EnableBtns}" HorizontalAlignment="Center" Height="40" LargeImageSource="..\Images\spin.png" Click="btnSpin_Click" />
+                            <CheckBox Content="Publish Spun Articles" IsChecked="{Binding UseSpunArticlesChecked}" />
+                        </StackPanel>
+                        <StackPanel Margin="3">
+                            <CheckBox Content="Auto Spin" IsChecked="{Binding AutoSpinChecked}" Margin="5,5,5,8" />
+                            <DockPanel Margin="5" Visibility="{Binding DPtimesToSPinVisible}">
+                                <TextBlock Text="Times To Spin: " VerticalAlignment="Center" />
+                                <TextBox Text="{Binding TimesToSpin}" Width="30"/>
+                            </DockPanel>
+                        </StackPanel>
+                        <Button Cursor="Hand" ToolTip="Clear All Spun Tabs" IsEnabled="{Binding EnableBtns}" 
                                     Background="Transparent" BorderBrush="Transparent" Name="btnClearAllTabs" Click="btnClearAllTabs_Click">
-                                <StackPanel>
+                            <StackPanel>
                                 <Image Source="..\Images\clear.png" Width="45" />
-                                    <TextBlock Text="Clear" HorizontalAlignment="Center" />
-                                </StackPanel>
-                            </Button>
+                                <TextBlock Text="Clear" HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Button>
 
                         <Button Cursor="Hand" ToolTip="Clear All Spun Tabs" IsEnabled="{Binding EnableBtns}" 
                                     Background="Transparent" BorderBrush="Transparent" Name="btnSpinWindow" Click="btnSpinWindow_Click">
@@ -264,17 +289,18 @@
                             </StackPanel>
                         </Button>
                     </StackPanel>
-                    </RibbonGroup>
+                </RibbonGroup>
 
-                    <RibbonGroup Header="Status">
-                        <TextBlock Text="{Binding Status}" VerticalAlignment="Center" Margin="10" Name="tbStatus" />
-                        <ProgressBar IsIndeterminate="{Binding ProgressBarStart}" Width="{Binding ElementName=tbStatus, Path=ActualWidth}" Height="18" Margin="5" HorizontalAlignment="Center" />
-                    </RibbonGroup>
-                </RibbonTab>
+                <RibbonGroup Header="Status">
+                    <TextBlock Text="{Binding Status}" VerticalAlignment="Center" Margin="10" Name="tbStatus" />
+                    <ProgressBar IsIndeterminate="{Binding ProgressBarStart}" Width="{Binding ElementName=tbStatus, Path=ActualWidth}" Height="18" Margin="5" HorizontalAlignment="Center" />
+                </RibbonGroup>
+            </RibbonTab>
+                
             
                 
-
-
+            
+            
                 <!--<RibbonTab Header="Publish FTP">
 
                 </RibbonTab>-->

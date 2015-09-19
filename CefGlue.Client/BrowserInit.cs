@@ -24,6 +24,7 @@ namespace Xilium.CefGlue.Client
         {
             SitesFilePath = sitesFilePath;
             pData = data;
+            Organiser.Common.Classes.GloableProfData.PData = pData;
 
             try
             {

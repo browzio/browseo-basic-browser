@@ -1,4 +1,5 @@
-﻿using ProjectsList.Helpers;
+﻿using Organiser.Common.Classes;
+using ProjectsList.Helpers;
 using Prospector.Helpers;
 using Prospector.Models;
 using System;
@@ -18,6 +19,9 @@ namespace Prospector.ViewModels
 {
     public class FootPrintsOptionsVM : INotifyPropertyChanged
     {
+        string mozId = "mozscape-b9b47cbb5f";
+        string mozSecret = "f56ecc50e0ccefe18b5aebe7ccd1131f";
+
         public event Action<string> OnClickedSearch = delegate { };
 
         public const int Comment_Backlinks = 0;
@@ -26,6 +30,7 @@ namespace Prospector.ViewModels
         public const int Blogs = 3;
         public const int Link_Roundups = 4;
         public const int Custom = 5;
+        public const int Saved = 6;
 
         private ICommand startSearch;
         public ICommand StartSearch
@@ -48,11 +53,32 @@ namespace Prospector.ViewModels
             set { sendToBrowser = value; }
         }
 
+        public ICommand RanckCheck { get; set; }
+        //SetMoz
+        public ICommand SetMoz { get; set; }
+        
+
         private ICommand export;
         public ICommand Export
         {
             get { return export; }
             set { export = value; }
+        }
+
+        //SaveFootprint
+        private ICommand saveFootprint;
+        public ICommand SaveFootprint
+        {
+            get { return saveFootprint; }
+            set { saveFootprint = value; }
+        }
+
+        //DeleteSavedFootprint
+        private ICommand deleteSavedFootprint;
+        public ICommand DeleteSavedFootprint
+        {
+            get { return deleteSavedFootprint; }
+            set { deleteSavedFootprint = value; }
         }
 
 
@@ -85,6 +111,13 @@ namespace Prospector.ViewModels
             set { comments = value; }
         }
 
+        private ObservableCollection<SavedFootprint> saved;
+        public ObservableCollection<SavedFootprint> SavedFP
+        {
+            get { return saved; }
+            set { saved = value; }
+        }
+
         private ObservableCollection<SearchResult> listResults;
         public ObservableCollection<SearchResult> ListResults
         {
@@ -97,9 +130,10 @@ namespace Prospector.ViewModels
         private List<SearchResult> l_Guest_Posts = new List<SearchResult>();
         private List<SearchResult> l_Link_Roundups = new List<SearchResult>();
         private List<SearchResult> l_Resource_pages = new List<SearchResult>();
-        private List<SearchResult> l_SponsorDonation_links = new List<SearchResult>();
+        //private List<SearchResult> l_SponsorDonation_links = new List<SearchResult>();
         private List<SearchResult> l_Comment_Backlinks = new List<SearchResult>();
         private List<SearchResult> l_Custom = new List<SearchResult>();
+        private List<SearchResult> l_Saved = new List<SearchResult>();
 
         private ObservableCollection<int> maxPages;
         public ObservableCollection<int> MaxPages
@@ -157,6 +191,8 @@ namespace Prospector.ViewModels
             set {
                 tCSelectedTabIndex = value;
                 FootPrintString = Keyword;
+                Visible_SavedFP = false;
+                Visible_savebtn = true;
                 switch (tCSelectedTabIndex)
                 {
                     case Blogs:
@@ -230,7 +266,7 @@ namespace Prospector.ViewModels
                     case Comment_Backlinks:
                         RBOrientation = Orientation.Vertical;
                         Visible_Custom = true;
-                         Visible_CommentSettings = false;
+                        Visible_CommentSettings = false;
                         createSitesListComments();
                         ListResults.Clear();
                         foreach (SearchResult result in l_Comment_Backlinks)
@@ -251,8 +287,28 @@ namespace Prospector.ViewModels
                             ListResults.Add(result);
                         }
                         break;
+
+                    case Saved:
+                        if (SavedFP.Count == 0)
+                        {
+                            createSavedOptions();
+                        }
+                        Visible_SavedFP = true;
+                        FootPrintString = "";
+                        RBOrientation = Orientation.Vertical;
+                        Visible_Custom = false;
+                        Visible_CommentSettings = false;
+                        Visible_savebtn = false;
+                        SISavedFP = 0;
+                        ListResults.Clear();
+                        foreach (SearchResult result in l_Saved)
+                        {
+                            ListResults.Add(result);
+                        }
+                        break;
                 }
                 createTLDsList();
+                if (TCSelectedTabIndex != Saved)
                 setFootprintText();
                 if (PropertyChanged != null)
                 {
@@ -285,6 +341,54 @@ namespace Prospector.ViewModels
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("Visible_Custom"));
+                }
+            }
+        }
+
+        //Visible_SavedFP
+        private bool visible_SavedFP;
+        public bool Visible_SavedFP
+        {
+            get { return visible_SavedFP; }
+            set
+            {
+                visible_SavedFP = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Visible_SavedFP"));
+                }
+            }
+        }
+        //Visible_savebtn
+        private bool visible_savebtn;
+        public bool Visible_savebtn
+        {
+            get { return visible_savebtn; }
+            set
+            {
+                visible_savebtn = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Visible_savebtn"));
+                }
+            }
+        }
+
+        //SISavedFP
+        private int sISavedFP;
+        public int SISavedFP
+        {
+            get { return sISavedFP; }
+            set
+            {
+                sISavedFP = value;
+                if (value >= 0 && SavedFP.Count > 0)
+                {
+                    FootPrintString = SavedFP[value].Footprint;
+                }
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("SISavedFP"));
                 }
             }
         }
@@ -346,12 +450,31 @@ namespace Prospector.ViewModels
             }
         }
 
+        //IsNotSerching
+        private bool isNotSerching;
+        public bool IsNotSerching
+        {
+            get { return isNotSerching; }
+            set
+            {
+                isNotSerching = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("IsNotSerching"));
+                }
+            }
+        }
+
         public FootPrintsOptionsVM()
         {
             StartSearch = new RelayCommand(search);
             SendToBrowser = new RelayCommand(sendLinkToBrowser);
             Clear = new RelayCommand(clearResultsList);
             Export = new RelayCommand(exportLinks);
+            SaveFootprint = new RelayCommand(OnSaveFootprintClicked);
+            DeleteSavedFootprint = new RelayCommand(DeleteSavedFootprintClicked);
+            RanckCheck = new RelayCommand(OnRankCheckCkicked);
+            SetMoz = new RelayCommand(OnSetMozClicked);
 
             WebsitesForBlogs = new ObservableCollection<Footprint>();
             Visible_Custom = true;
@@ -368,6 +491,9 @@ namespace Prospector.ViewModels
             createCommentsSettings();
             CmbTimeframeIndex = 0;
 
+            SavedFP = new ObservableCollection<SavedFootprint>();
+            //createSavedOptions();
+
             ListResults = new ObservableCollection<SearchResult>();
 
             MaxPages = new ObservableCollection<int>();
@@ -376,6 +502,11 @@ namespace Prospector.ViewModels
             MaxPages.Add(3);
 
             RBOrientation = Orientation.Vertical;
+
+            IsNotSerching = true;
+            Visible_savebtn = true;
+
+            setMozIDAndSecret();
         }
 
         #region list options
@@ -539,6 +670,32 @@ namespace Prospector.ViewModels
                 f.PropertyChanged += f_PropertyChanged;
             }
         }
+        private void createSavedOptions()
+        {
+            try
+            {
+                new Thread(() =>
+                {
+                    string savedDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "SavedFootPrints", GloableProfData.PData.ProjectName);
+                    if (!Directory.Exists(savedDir)) return;
+
+                    string filePath = Path.Combine(savedDir, "SaveFootprints.txt");
+                    if (!File.Exists(filePath)) return;
+
+
+                    string[] fileLines = File.ReadAllLines(filePath);
+                    Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        foreach (string line in fileLines)
+                        {
+                            string[] lineData = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                            SavedFP.Add(new SavedFootprint() { Name = lineData[0], Footprint = lineData[1] });
+                        }
+                    });
+                }).Start();
+            }
+            catch { }
+        }
 
         void f_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -597,19 +754,27 @@ namespace Prospector.ViewModels
         private void search(object param)
         {
             Mouse.OverrideCursor = Cursors.Wait;
+            IsNotSerching = false;
 
-            string Query = FootPrintString;
-            Query = Query.Replace("\"", "%22");
-            Query = Query.Trim();
-            Query = Query.Replace(' ', '+');
-            Query = String.Format(@"http://google.com/search?v=1.0&q={0}", Query);
-            Query = Query + TimeFrames[CmbTimeframeIndex].Query;
+            new Thread(() =>
+            {
+                string Query = FootPrintString;
+                Query = Query.Replace("\"", "%22");
+                Query = Query.Trim();
+                Query = Query.Replace(' ', '+');
+                Query = String.Format(@"http://google.com/search?v=1.0&q={0}", Query);
+                Query = Query + TimeFrames[CmbTimeframeIndex].Query;
 
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Search " + Query);
+                Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Search " + Query);
 
-            GetKeywordRankings(Query, MaxPages[CmbMaxPAgesIndex], false);
+                GetKeywordRankings(Query, MaxPages[CmbMaxPAgesIndex], false);
 
-            Mouse.OverrideCursor = null;
+                IsNotSerching = true;
+                Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    Mouse.OverrideCursor = null;
+                });
+            }).Start();
         }
 
         private void sendLinkToBrowser(object obj)
@@ -631,6 +796,133 @@ namespace Prospector.ViewModels
                 {
                     MessageBox.Show("Couldnt open link.");
                 }
+            }
+        }
+
+        private void OnRankCheckCkicked(object param)
+        {
+            Mouse.OverrideCursor = Cursors.Wait;
+            new Thread(() =>
+            {
+                try
+                {
+                    switch ((string)param)
+                    {
+                        case "MOZ":
+                            if (mozId == "" || mozSecret == "")
+                            {
+                                Application.Current.Dispatcher.Invoke((Action)delegate
+                                {
+                                    Mouse.OverrideCursor = null;
+                                });
+                                MessageBox.Show("Set your moz id and secret first.");
+                                return;
+                            }
+                            /*instantiate a new mozscapeAPI object*/
+                            MozscapeAPI mozAPI = new MozscapeAPI();
+
+                            /*build our API URL */
+                            string strAPIURL = mozAPI.CreateAPIURL(mozId, mozSecret, 1, "url metrics", ListResults[SIListResults].Link, "");
+
+                            /*get the results string */
+                            string strResults = mozAPI.FetchResults(strAPIURL);
+
+                            /*parse the results string. The ParseURLMetrics function returns a MozscapeURLLinkMetrics objects */
+                            MozscapeLinkMetric msURLMetrics = mozAPI.ParseURLMetrics(strResults);
+
+                            /*access the object values*/
+                            //string title = msURLMetrics.ut;
+                            //string canonicalURL = msURLMetrics.uu;
+                            //string subdomain = msURLMetrics.ufq;
+                            //string rootDomain = msURLMetrics.upl;
+                            //string strExternalLinks = msURLMetrics.ueid;
+                            //string subdomainLinks = msURLMetrics.feid;
+                            //string rootDomains = msURLMetrics.peid;
+                            //string equityLinks = msURLMetrics.ujid;
+                            //string subdomainsLinking = msURLMetrics.uifq;
+                            //string rootDomainLinkins = msURLMetrics.uipl;
+                            //string links = msURLMetrics.uid;
+                            //string subdomainSubdomainsLinking = msURLMetrics.fid;
+                            //string rootDomainRootDomainsLinking = msURLMetrics.pid;
+                            //string mozRankURLRAW = msURLMetrics.umrr;
+                            //string mozRankURLto10 = msURLMetrics.umrp;
+                            //string mozRankSubDomain10 = msURLMetrics.fmrp;
+                            //string mozRankSubDomainRAW = msURLMetrics.fmrr;
+                            //string mozRankRoot10 = msURLMetrics.pmrp;
+                            //string mozRankRootRAW = msURLMetrics.pmrr;
+                            //string mozTrust10 = msURLMetrics.utrp;
+                            //string mozTrustRAW = msURLMetrics.utrr;
+                            //string mozTrustSub10 = msURLMetrics.ftrp;
+                            //string mozTrustSubRAW = msURLMetrics.ftrr;
+                            //string mozTrustRootRAW = msURLMetrics.ptrr;
+                            //string mozTrustRoot10 = msURLMetrics.ptrp;
+
+                            // string httpStatisCode = msURLMetrics.us;
+
+                            string pageAuthority = msURLMetrics.upa;
+                            string domainAuthority = msURLMetrics.pda;
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                ListResults[SIListResults].PageAuthority = "PA: " + pageAuthority;
+                                ListResults[SIListResults].DomainAuthority = "DA: " + domainAuthority;
+                                ListResults[SIListResults].AuthorityVisible = Visibility.Visible;
+                                Mouse.OverrideCursor = null;
+                            });
+                            //ListResults[SIListResults].AuthorityVisible = Visibility.Visible;
+
+                            //string externalLinks = msURLMetrics.ued;
+                            //string timeLastCrawled = msURLMetrics.ulc;
+                            //var epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                            //DateTime dt = epoch.AddSeconds(Convert.ToInt32(timeLastCrawled));
+                            //timeLastCrawled = dt.ToString();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error: " + ex.Message);
+                    Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        Mouse.OverrideCursor = null;
+                    });
+                }
+            }).Start();
+        }
+
+        private void setMozIDAndSecret()
+        {
+            try
+            {
+                mozId = "";
+                mozSecret = "";
+                string mozDir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "ApiKeys");
+                if (System.IO.Directory.Exists(mozDir))
+                {
+
+                    string filePath = System.IO.Path.Combine(mozDir, "moz.txt");
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        string[] fileText = File.ReadAllText(filePath).Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                        mozId = fileText[0];
+                        mozSecret = fileText[1];
+                    }
+                }
+            }
+            catch { }
+        }
+
+        //OnSetMozClicked
+        private void OnSetMozClicked(object obj)
+        {
+            SaveMozKeysWindow smw = new SaveMozKeysWindow();
+            smw.tbSecret.Text = mozSecret;
+            smw.tbID.Text = mozId;
+            smw.ShowDialog();
+            if (smw.OKClicked)
+            {
+                setMozIDAndSecret();
             }
         }
 
@@ -670,6 +962,10 @@ namespace Prospector.ViewModels
                 case Custom:
                     l_Custom.Clear();
                     break;
+
+                case Saved:
+                    l_Saved.Clear();
+                    break;
             }
         }
 
@@ -706,6 +1002,56 @@ namespace Prospector.ViewModels
             }
             catch { }
         }
+
+        private void OnSaveFootprintClicked(object param)
+        {
+            if (string.IsNullOrWhiteSpace(FootPrintString) || string.IsNullOrEmpty(FootPrintString))
+            {
+                MessageBox.Show("Create a footprint first.");
+                return;
+            }
+            SaveFootprintWindow sfw = new SaveFootprintWindow();
+            sfw.ShowDialog();
+            if (sfw.OkClicked)
+            {
+                if (!string.IsNullOrWhiteSpace(sfw.tbName.Text) && !string.IsNullOrEmpty(sfw.tbName.Text))
+                {
+                    SavedFP.Add(new SavedFootprint() { Name = sfw.tbName.Text, Footprint = FootPrintString });
+                    saveSavedFootprints();
+                }
+            }
+        }
+
+        private void DeleteSavedFootprintClicked(object param)
+        {
+            try
+            {
+                SavedFP.RemoveAt(SISavedFP);
+            }
+            catch { }
+            saveSavedFootprints();
+        }
+
+        private void saveSavedFootprints()
+        {
+            new Thread(() =>
+            {
+                try
+                {
+                    string savedDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "SavedFootPrints", GloableProfData.PData.ProjectName);
+                    if (!Directory.Exists(savedDir)) Directory.CreateDirectory(savedDir);
+
+                    string filePath = Path.Combine(savedDir, "SaveFootprints.txt");
+                    if (File.Exists(filePath)) File.Delete(filePath);
+
+                    foreach (SavedFootprint sfp in SavedFP)
+                    {
+                        File.AppendAllText(filePath, sfp.Name + MyFilesDatabase.SPLITTER + sfp.Footprint + Environment.NewLine);
+                    }
+                }
+                catch { }
+            }).Start();
+        }
         
         public void GetKeywordRankings(string link, int maxSearchPages, bool? includeBing)
         {
@@ -733,6 +1079,8 @@ namespace Prospector.ViewModels
         {
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
+                result.AuthorityVisible = Visibility.Collapsed;
+
                 ListResults.Add(result);
                 switch (tCSelectedTabIndex)
                 {
@@ -766,6 +1114,10 @@ namespace Prospector.ViewModels
 
                     case Custom:
                         l_Custom.Add(result);
+                        break;
+
+                    case Saved:
+                        l_Saved.Add(result);
                         break;
                 }
             });

@@ -201,7 +201,7 @@ namespace RssReader.Mvvm
             Catigories.Add("Pets-&-Animals");
             Catigories.Add("Science-&-Technology");
             Catigories.Add("Sports");
-            Catigories.Add("Travel & Events");
+            Catigories.Add("Travel-&-Events");
 
             SavedFeeds = new ObservableCollection<SavedPostedFeed>();
             getAllSavedFeeds();
