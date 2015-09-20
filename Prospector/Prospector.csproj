@@ -67,6 +67,7 @@
       <DependentUpon>ProspectorTabs.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\booleanToVisible.cs" />
+    <Compile Include="Converters\IsEmptyToBackgroundColorConverter.cs" />
     <Compile Include="Helpers\GoogleCrawler.cs" />
     <Compile Include="Helpers\Lists.cs" />
     <Compile Include="Helpers\WebPageRequests.cs" />
@@ -77,8 +78,8 @@
     <Compile Include="SaveFootprintWindow.xaml.cs">
       <DependentUpon>SaveFootprintWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SaveMozKeysWindow.xaml.cs">
-      <DependentUpon>SaveMozKeysWindow.xaml</DependentUpon>
+    <Compile Include="SetProxyWindow.xaml.cs">
+      <DependentUpon>SetProxyWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\FootPrintsOptionsVM.cs" />
     <Page Include="Controls\GoogleSearchResults.xaml">
@@ -109,7 +110,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="SaveMozKeysWindow.xaml">
+    <Page Include="SetProxyWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

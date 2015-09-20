@@ -8,18 +8,20 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Prospector.Helpers
 {
     public class WebPageRequests
     {
+        public static string pIP, pPort, pUser, pPass;
 
         /// <summary>
         /// Gets the response text for a given url.
         /// </summary>
         /// <param name="url">The url whose text needs to be fetched.</param>
         /// <returns>The text of the response.</returns>
-        public static string GetPage(string url, bool isHideMyAss)
+        public static string GetPage(string url, bool isHideMyAss, bool useProxy)
         {
 
             string htmlText = "";
@@ -48,16 +50,17 @@ namespace Prospector.Helpers
 
                 WebClient client = new WebClient();
                 client.Encoding = System.Text.Encoding.UTF8;
-                if (GloableProfData.PData != null)
+                //client.Headers.Add("user-agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36");
+                if (useProxy)
                 {
-                    if (!string.IsNullOrEmpty(GloableProfData.PData.ProxyIP) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyIP) &&
-                        !string.IsNullOrEmpty(GloableProfData.PData.ProxyPort) &&  !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyPort))
+                    if (!string.IsNullOrEmpty(pIP) && !string.IsNullOrWhiteSpace(pIP) &&
+                        !string.IsNullOrEmpty(pPort) && !string.IsNullOrWhiteSpace(pPort))
                     {
-                        client.Proxy = new WebProxy(GloableProfData.PData.ProxyIP, Convert.ToInt32(GloableProfData.PData.ProxyPort));
-                        if (!string.IsNullOrEmpty(GloableProfData.PData.ProxyUsername) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyUsername) &&
-                        !string.IsNullOrEmpty(GloableProfData.PData.ProxyPassword) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyPassword))
+                        client.Proxy = new WebProxy(pIP, Convert.ToInt32(pPort));
+                        if (!string.IsNullOrEmpty(pUser) && !string.IsNullOrWhiteSpace(pUser) &&
+                        !string.IsNullOrEmpty(pPass) && !string.IsNullOrWhiteSpace(pPass))
                         {
-                            client.Credentials = new NetworkCredential(GloableProfData.PData.ProxyUsername, GloableProfData.PData.ProxyPassword); 
+                            client.Proxy.Credentials = new NetworkCredential(pUser, pPass);
                         }
                     }
                 }
@@ -66,6 +69,7 @@ namespace Prospector.Helpers
             }
             catch (Exception e)
             {
+                MessageBox.Show("Error: " + e.Message);
                 return "Exception Thrown";
             }
             //finally

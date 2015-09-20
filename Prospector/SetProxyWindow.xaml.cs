@@ -16,13 +16,13 @@ using System.Windows.Shapes;
 namespace Prospector
 {
     /// <summary>
-    /// Interaction logic for SaveMozKeysWindow.xaml
+    /// Interaction logic for SetProxyWindow.xaml
     /// </summary>
-    public partial class SaveMozKeysWindow : Window
+    public partial class SetProxyWindow : Window
     {
         public bool OKClicked { get; set; }
 
-        public SaveMozKeysWindow()
+        public SetProxyWindow()
         {
             InitializeComponent();
         }
@@ -31,18 +31,18 @@ namespace Prospector
         {
             try
             {
-                string mozDir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "ApiKeys");
+                string mozDir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "Proxy");
                 if (!System.IO.Directory.Exists(mozDir)) System.IO.Directory.CreateDirectory(mozDir);
 
-                string filePath = System.IO.Path.Combine(mozDir, "moz.txt");
+                string filePath = System.IO.Path.Combine(mozDir, "proxy.txt");
                 if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
 
-                System.IO.File.AppendAllText(filePath, tbID.Text + MyFilesDatabase.SPLITTER + tbSecret.Text);
+                System.IO.File.AppendAllText(filePath, txtIP.Text + MyFilesDatabase.SPLITTER + txtPORT.Text + MyFilesDatabase.SPLITTER + txtUser.Text + MyFilesDatabase.SPLITTER + txtPass.Text);
 
                 OKClicked = true;
             }
             catch { }
-
+            OKClicked = true;
             this.Close();
         }
 

@@ -263,6 +263,21 @@ namespace WPF_WYSIWYG_HTML_Editor
         internal void unhook()
         {
         }
+
+        internal void newthing()
+        {
+            webBrowser = new WebBrowser();
+            webBrowser.PreviewKeyDown += webBrowser_PreviewKeyDown;
+            webBrowser.LoadCompleted += completed;
+            gridwebBrowser.Children.Add(webBrowser);
+            Script.HideScriptErrors(webBrowser, true);
+
+            webBrowser.NavigateToString(Properties.Resources.New);
+            doc = webBrowser.Document as HTMLDocument;
+            doc.designMode = "On";
+            Format.doc = doc;
+            doc.focus();
+        }
     }
 
     public class LowLevelKeyboardListener

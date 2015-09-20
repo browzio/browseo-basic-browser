@@ -1,6 +1,7 @@
 ﻿using CookComputing.XmlRpc;
 using Drupal7.Services;
 using Organiser.Common.Classes;
+using Organiser.Common.Windows;
 using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,8 @@ namespace WPF_WYSIWYG_HTML_Editor
         public ICommand SettingsClicked { get; set; }
         //RefreshPBNVault
         public ICommand RefreshPBNVault { get; set; }
+        //VautContextMenu
+        public ICommand VautContextMenu { get; set; }
 
         //TabsVisible
         private Visibility tabsVisible;
@@ -192,6 +195,7 @@ namespace WPF_WYSIWYG_HTML_Editor
         {
             SettingsClicked = new RelayCommand(OnSettingsClicked);
             RefreshPBNVault = new RelayCommand(OnRefreshPBNVaultClick);
+            VautContextMenu = new RelayCommand(OnVautContextMenuClick);
 
             CmbBoxWPList = new ObservableCollection<SelectedProfile>();
             CmbBoxDrupalList = new ObservableCollection<SelectedProfile>();
@@ -211,22 +215,42 @@ namespace WPF_WYSIWYG_HTML_Editor
         {
             try
             {
-                SavedPBNProjects.Clear();
-                string vaultDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "PBNVault");
-                if (!Directory.Exists(vaultDir)) return;
-
-                string filePath = Path.Combine(vaultDir, "vaultConfig.txt");
-                if (!File.Exists(filePath)) return;
-
-                string[] fileLines = File.ReadAllLines(filePath);
-                foreach (string line in fileLines)
+                switch ((string)param)
                 {
-                    string[] lineInfo = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
-                    SavedPBNProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = lineInfo[2] });
+                    case "SetMozKey":
+                        SaveMozKeysWindow smw = new SaveMozKeysWindow();
+                        smw.tbSecret.Text = MozscapeAPI.mozSecret;
+                        smw.tbID.Text = MozscapeAPI.mozId;
+                        smw.ShowDialog();
+                        if (smw.OKClicked)
+                        {
+                            MyFilesDatabase.SetMozIds();
+                        }
+                        break;
+
+                    case "Refresh":
+                        SavedPBNProjects.Clear();
+                        string vaultDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "PBNVault");
+                        if (!Directory.Exists(vaultDir)) return;
+
+                        string filePath = Path.Combine(vaultDir, "vaultConfig.txt");
+                        if (!File.Exists(filePath)) return;
+
+                        string[] fileLines = File.ReadAllLines(filePath);
+                        foreach (string line in fileLines)
+                        {
+                            string[] lineInfo = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                            SavedPBNProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = lineInfo[2] });
+                        }
+                        break;
+
+                    default:
+                        break;
                 }
             }
             catch { }
         }
+
 
         private void OnSettingsClicked(object param)
         {
@@ -772,6 +796,55 @@ namespace WPF_WYSIWYG_HTML_Editor
         {
             Tabs.Clear();
             TabsVisible = Visibility.Collapsed;
+        }
+
+        private void OnVautContextMenuClick(object param)
+        {
+            switch ((string)param)
+            {
+                case "MozRank":
+                    Mouse.OverrideCursor = Cursors.Wait;
+                    new Thread(() =>
+                    {
+                        try
+                        {
+                            MozscapeAPI mozAPI1 = new MozscapeAPI();
+                            foreach (PBNProject pbnProj in SavedPBNProjects)
+                            {
+                                if (!pbnProj.IsSelected) continue;
+                                PersonData profile = MyFilesDatabase.GetSubProjectPersonData(pbnProj.FilePath);
+                                if (profile.WebAddress == "") continue;
+
+                                string strAPIURL1 = mozAPI1.CreateAPIURL(MozscapeAPI.mozId, MozscapeAPI.mozSecret, 1, "url metrics", profile.WebAddress, "");
+                                string strResults1 = mozAPI1.FetchResults(strAPIURL1);
+                                MozscapeLinkMetric msURLMetrics1 = mozAPI1.ParseURLMetrics(strResults1);
+
+                                string pageAuthority1 = msURLMetrics1.upa;
+                                string domainAuthority1 = msURLMetrics1.pda;
+                                Application.Current.Dispatcher.Invoke((Action)delegate
+                                {
+                                    if (pageAuthority1.Contains('.')) pageAuthority1 = pageAuthority1.Split('.')[0];
+                                    if (domainAuthority1.Contains('.')) domainAuthority1 = domainAuthority1.Split('.')[0];
+                                    pbnProj.PageAuthority = "PA: " + pageAuthority1;
+                                    pbnProj.DomainAuthority = "DA: " + domainAuthority1;
+                                    pbnProj.AuthorityVisible = Visibility.Visible;
+                                    Mouse.OverrideCursor = null;
+                                });
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                Mouse.OverrideCursor = null;
+                            });
+                            MessageBox.Show("Error: " + ex.Message);
+                        }
+                    }).Start();
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

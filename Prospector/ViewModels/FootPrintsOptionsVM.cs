@@ -1,4 +1,5 @@
 ﻿using Organiser.Common.Classes;
+using Organiser.Common.Windows;
 using ProjectsList.Helpers;
 using Prospector.Helpers;
 using Prospector.Models;
@@ -19,9 +20,6 @@ namespace Prospector.ViewModels
 {
     public class FootPrintsOptionsVM : INotifyPropertyChanged
     {
-        string mozId = "mozscape-b9b47cbb5f";
-        string mozSecret = "f56ecc50e0ccefe18b5aebe7ccd1131f";
-
         public event Action<string> OnClickedSearch = delegate { };
 
         public const int Comment_Backlinks = 0;
@@ -32,6 +30,7 @@ namespace Prospector.ViewModels
         public const int Custom = 5;
         public const int Saved = 6;
 
+        #region commands
         private ICommand startSearch;
         public ICommand StartSearch
         {
@@ -56,7 +55,10 @@ namespace Prospector.ViewModels
         public ICommand RanckCheck { get; set; }
         //SetMoz
         public ICommand SetMoz { get; set; }
-        
+        //RefreshSaved
+        public ICommand RefreshSaved { get; set; }
+        //SetProxy
+        public ICommand SetProxy { get; set; }
 
         private ICommand export;
         public ICommand Export
@@ -81,8 +83,10 @@ namespace Prospector.ViewModels
             set { deleteSavedFootprint = value; }
         }
 
+        #endregion
 
-        #region collections  
+
+        #region collections
         private ObservableCollection<Footprint> websitesForBlogs;
         public ObservableCollection<Footprint> WebsitesForBlogs
         {
@@ -450,6 +454,30 @@ namespace Prospector.ViewModels
             }
         }
 
+        //UseProxy
+        private bool useProxy;
+        public bool UseProxy
+        {
+            get { return useProxy; }
+            set
+            {
+                useProxy = value;
+                if (value)
+                {
+                    if (string.IsNullOrEmpty(WebPageRequests.pIP) || string.IsNullOrWhiteSpace(WebPageRequests.pIP))
+                    {
+                        MessageBox.Show("Set your proxy details.");
+                        UseProxy = false;
+                    }
+                }
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("UseProxy"));
+                }
+            }
+        }
+
+
         //IsNotSerching
         private bool isNotSerching;
         public bool IsNotSerching
@@ -465,6 +493,8 @@ namespace Prospector.ViewModels
             }
         }
 
+       
+
         public FootPrintsOptionsVM()
         {
             StartSearch = new RelayCommand(search);
@@ -475,6 +505,8 @@ namespace Prospector.ViewModels
             DeleteSavedFootprint = new RelayCommand(DeleteSavedFootprintClicked);
             RanckCheck = new RelayCommand(OnRankCheckCkicked);
             SetMoz = new RelayCommand(OnSetMozClicked);
+            RefreshSaved = new RelayCommand(OnRefreshSavewdFootprints);
+            SetProxy = new RelayCommand(OnSetProxy);
 
             WebsitesForBlogs = new ObservableCollection<Footprint>();
             Visible_Custom = true;
@@ -506,7 +538,45 @@ namespace Prospector.ViewModels
             IsNotSerching = true;
             Visible_savebtn = true;
 
-            setMozIDAndSecret();
+            MyFilesDatabase.SetMozIds();
+            setProxyDetailes();
+        }
+
+        private void OnSetProxy(object param)
+        {
+            SetProxyWindow spw = new SetProxyWindow();
+            spw.txtIP.Text = WebPageRequests.pIP;
+            spw.txtPORT.Text = WebPageRequests.pPort;
+            spw.txtUser.Text = WebPageRequests.pUser;
+            spw.txtPass.Text = WebPageRequests.pPass;
+            spw.ShowDialog();
+            if (spw.OKClicked)
+            {
+                setProxyDetailes();
+            }
+        }
+
+        private void setProxyDetailes()
+        {
+            new Thread(() => {
+                try
+                {
+                    //pIP, pPort, pUser, pPass
+
+                    string mDir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "Proxy");
+                    if (!System.IO.Directory.Exists(mDir)) return;
+
+                    string filePath = System.IO.Path.Combine(mDir, "proxy.txt");
+                    if (!System.IO.File.Exists(filePath)) return;
+
+                    string[] pDetailes = File.ReadAllText(filePath).Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                    WebPageRequests.pIP = pDetailes[0];
+                    WebPageRequests.pPort = pDetailes[1];
+                    WebPageRequests.pUser = pDetailes[2];
+                    WebPageRequests.pPass = pDetailes[3];
+                }
+                catch { }
+            }).Start();
         }
 
         #region list options
@@ -676,7 +746,7 @@ namespace Prospector.ViewModels
             {
                 new Thread(() =>
                 {
-                    string savedDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "SavedFootPrints", GloableProfData.PData.ProjectName);
+                    string savedDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "SavedFootPrints");
                     if (!Directory.Exists(savedDir)) return;
 
                     string filePath = Path.Combine(savedDir, "SaveFootprints.txt");
@@ -684,14 +754,15 @@ namespace Prospector.ViewModels
 
 
                     string[] fileLines = File.ReadAllLines(filePath);
-                    Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
+                    
                         foreach (string line in fileLines)
                         {
                             string[] lineData = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
-                            SavedFP.Add(new SavedFootprint() { Name = lineData[0], Footprint = lineData[1] });
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                SavedFP.Add(new SavedFootprint() { Name = lineData[0], Footprint = lineData[1] });
+                            });
                         }
-                    });
                 }).Start();
             }
             catch { }
@@ -801,6 +872,16 @@ namespace Prospector.ViewModels
 
         private void OnRankCheckCkicked(object param)
         {
+            if (MozscapeAPI.mozId == "" || MozscapeAPI.mozSecret == "")
+            {
+                //Application.Current.Dispatcher.Invoke((Action)delegate
+                //{
+                //    Mouse.OverrideCursor = null;
+                //});
+                MessageBox.Show("Set your moz id and secret first.");
+                return;
+            }
+
             Mouse.OverrideCursor = Cursors.Wait;
             new Thread(() =>
             {
@@ -809,20 +890,12 @@ namespace Prospector.ViewModels
                     switch ((string)param)
                     {
                         case "MOZ":
-                            if (mozId == "" || mozSecret == "")
-                            {
-                                Application.Current.Dispatcher.Invoke((Action)delegate
-                                {
-                                    Mouse.OverrideCursor = null;
-                                });
-                                MessageBox.Show("Set your moz id and secret first.");
-                                return;
-                            }
+                           
                             /*instantiate a new mozscapeAPI object*/
                             MozscapeAPI mozAPI = new MozscapeAPI();
 
                             /*build our API URL */
-                            string strAPIURL = mozAPI.CreateAPIURL(mozId, mozSecret, 1, "url metrics", ListResults[SIListResults].Link, "");
+                            string strAPIURL = mozAPI.CreateAPIURL(MozscapeAPI.mozId, MozscapeAPI.mozSecret, 1, "url metrics", ListResults[SIListResults].Link, "");
 
                             /*get the results string */
                             string strResults = mozAPI.FetchResults(strAPIURL);
@@ -876,6 +949,29 @@ namespace Prospector.ViewModels
                             //DateTime dt = epoch.AddSeconds(Convert.ToInt32(timeLastCrawled));
                             //timeLastCrawled = dt.ToString();
                             break;
+
+                        case "MOZALL":
+                            MozscapeAPI mozAPI1 = new MozscapeAPI();
+                            foreach (SearchResult res in ListResults)
+                            {
+                                if (res.AuthorityVisible == Visibility.Visible) continue;
+
+                                string strAPIURL1 = mozAPI1.CreateAPIURL(MozscapeAPI.mozId, MozscapeAPI.mozSecret, 1, "url metrics", res.Link, "");
+                                string strResults1 = mozAPI1.FetchResults(strAPIURL1);
+                                MozscapeLinkMetric msURLMetrics1 = mozAPI1.ParseURLMetrics(strResults1);
+
+                                string pageAuthority1 = msURLMetrics1.upa;
+                                string domainAuthority1 = msURLMetrics1.pda;
+                                Application.Current.Dispatcher.Invoke((Action)delegate
+                                {
+                                    res.PageAuthority = "PA: " + pageAuthority1;
+                                    res.DomainAuthority = "DA: " + domainAuthority1;
+                                    res.AuthorityVisible = Visibility.Visible;
+                                    Mouse.OverrideCursor = null;
+                                });
+                            }
+
+                            break;
                         default:
                             break;
                     }
@@ -891,38 +987,22 @@ namespace Prospector.ViewModels
             }).Start();
         }
 
-        private void setMozIDAndSecret()
+        private void OnRefreshSavewdFootprints(object param)
         {
-            try
-            {
-                mozId = "";
-                mozSecret = "";
-                string mozDir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "ApiKeys");
-                if (System.IO.Directory.Exists(mozDir))
-                {
-
-                    string filePath = System.IO.Path.Combine(mozDir, "moz.txt");
-                    if (System.IO.File.Exists(filePath))
-                    {
-                        string[] fileText = File.ReadAllText(filePath).Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
-                        mozId = fileText[0];
-                        mozSecret = fileText[1];
-                    }
-                }
-            }
-            catch { }
+            SavedFP.Clear();
+            createSavedOptions();
         }
 
         //OnSetMozClicked
         private void OnSetMozClicked(object obj)
         {
             SaveMozKeysWindow smw = new SaveMozKeysWindow();
-            smw.tbSecret.Text = mozSecret;
-            smw.tbID.Text = mozId;
+            smw.tbSecret.Text = MozscapeAPI.mozSecret;
+            smw.tbID.Text = MozscapeAPI.mozId;
             smw.ShowDialog();
             if (smw.OKClicked)
             {
-                setMozIDAndSecret();
+                MyFilesDatabase.SetMozIds();
             }
         }
 
@@ -1038,7 +1118,7 @@ namespace Prospector.ViewModels
             {
                 try
                 {
-                    string savedDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "SavedFootPrints", GloableProfData.PData.ProjectName);
+                    string savedDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "SavedFootPrints");
                     if (!Directory.Exists(savedDir)) Directory.CreateDirectory(savedDir);
 
                     string filePath = Path.Combine(savedDir, "SaveFootprints.txt");
@@ -1059,7 +1139,7 @@ namespace Prospector.ViewModels
             googleCrawler.LinkWasAddedToList += new Action<SearchResult, bool>(Crawler_LinkWasAdded);
             googleCrawler.OnPageCountUpdate += new Action<int, int>(Crawler_OnPageAdded);
             googleCrawler.OnReturnResults += new Action<bool>(Crawler_OnesultsReturned);
-            googleCrawler.FindResults(1);
+            googleCrawler.FindResults(UseProxy, 1);
         }
 
         private void Crawler_OnesultsReturned(bool wasProxy)

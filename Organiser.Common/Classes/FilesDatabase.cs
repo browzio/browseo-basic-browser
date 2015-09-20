@@ -773,5 +773,30 @@ namespace Organiser.Common.Classes
                System.Text.ASCIIEncoding.ASCII.GetString(encodedDataAsBytes);
             return returnValue;
         }
+
+        public static void SetMozIds()
+        {
+            new System.Threading.Thread(() =>
+            {
+                try
+                {
+                    MozscapeAPI.mozId = "";
+                    MozscapeAPI.mozSecret = "";
+                    string mozDir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "ApiKeys");
+                    if (System.IO.Directory.Exists(mozDir))
+                    {
+
+                        string filePath = System.IO.Path.Combine(mozDir, "moz.txt");
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            string[] fileText = File.ReadAllText(filePath).Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                            MozscapeAPI.mozId = fileText[0];
+                            MozscapeAPI.mozSecret = fileText[1];
+                        }
+                    }
+                }
+                catch { }
+            }).Start();
+        }
     }
 }

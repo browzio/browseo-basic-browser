@@ -282,6 +282,16 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
 
         #endregion
 
+        private void spander_Expanded(object sender, RoutedEventArgs e)
+        {
+            spander.Width = 400;
+        }
+
+        private void spander_Collapsed(object sender, RoutedEventArgs e)
+        {
+            spander.Width = 24;
+        }
+
         #region Resize
 
 

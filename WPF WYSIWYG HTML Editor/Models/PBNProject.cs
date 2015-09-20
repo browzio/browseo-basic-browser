@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace WPF_WYSIWYG_HTML_Editor.Models
 {
-    public class PBNProject
+    public class PBNProject : INotifyPropertyChanged
     {
         public const int TYPE_WORDPRESS = 0;
         public const int TYPE_DRUPAL = 1;
@@ -15,5 +16,42 @@ namespace WPF_WYSIWYG_HTML_Editor.Models
         public string FilePath { get; set; }
         public int SIType { get; set; }
         public bool IsSelected { get; set; }
+
+        private string domain;
+        public string DomainAuthority
+        {
+            get { return domain; }
+            set { domain = value;
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs("DomainAuthority"));
+            }
+        }
+
+        private string page;
+        public string PageAuthority
+        {
+            get { return page; }
+            set
+            {
+                page = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("PageAuthority"));
+            }
+        }
+
+        private System.Windows.Visibility vis;
+        public System.Windows.Visibility AuthorityVisible
+        {
+            get { return vis; }
+            set
+            {
+                vis = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("AuthorityVisible"));
+            }
+        }
+        
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

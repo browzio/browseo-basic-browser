@@ -42,7 +42,7 @@ namespace Prospector.Helpers
             searchUrl = websiteUrl;
         }
 
-        public void FindResults(int maxThreads = 1)
+        public void FindResults(bool useproxy, int maxThreads = 1)
         {
             didShowmsgBox = false;
             DidCancelSearch = false;
@@ -70,7 +70,7 @@ namespace Prospector.Helpers
                 {
                     taskList.Add(Task.Run(() =>
                             {
-                                loopThroughAngGetResults(list);
+                                loopThroughAngGetResults(list, useproxy);
                             }));
                 }
                 int tasklistcount = taskList.Count;
@@ -85,12 +85,12 @@ namespace Prospector.Helpers
             }
             else
             {
-                loopThroughAngGetResults(searchUrls);
+                loopThroughAngGetResults(searchUrls, useproxy);
             }
         }
 
         bool didShowmsgBox;
-        private void loopThroughAngGetResults(List<MyKeyVal> searchUrls)
+        private void loopThroughAngGetResults(List<MyKeyVal> searchUrls, bool useProxy)
         {
             string[] individualResults;
             for (int i = 0; i < searchUrls.Count; i++)
@@ -100,7 +100,7 @@ namespace Prospector.Helpers
 
                 MyKeyVal url = searchUrls[i];
 
-                string resultPage = WebPageRequests.GetPage(url.link, false);
+                string resultPage = WebPageRequests.GetPage(url.link, false, useProxy);
                 if (resultPage == "Exception Thrown")
                 {
                     OnReturnResults(false);

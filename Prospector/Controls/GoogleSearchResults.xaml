@@ -87,6 +87,12 @@
                             <MouseBinding MouseAction="LeftClick" Command="{Binding RanckCheck}" CommandParameter="MOZ" />
                         </MenuItem.InputBindings>
                     </MenuItem>
+
+                    <MenuItem Header="Moz Check All">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding RanckCheck}" CommandParameter="MOZALL" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListView>

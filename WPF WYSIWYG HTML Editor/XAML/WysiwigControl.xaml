@@ -130,9 +130,11 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid Name="grdFtpProjects" Grid.Column="1" Grid.RowSpan="2" >
-            <Expander 
-                  ExpandDirection="Right" 
-                  Width="Auto">
+            <Expander Name="spander"
+                      Width="24"
+                      Expanded="spander_Expanded"
+                      Collapsed="spander_Collapsed"
+                      ExpandDirection="Right">
                 <Expander.Header>
                     <TextBlock Text="PBN Vault">
                         <TextBlock.LayoutTransform>

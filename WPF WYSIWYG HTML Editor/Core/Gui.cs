@@ -141,7 +141,8 @@ namespace WPF_WYSIWYG_HTML_Editor
 
         public static void newdocument()
         {
-            webBrowser.newWb("");
+           // webBrowser.newWb("");
+            webBrowser.newthing();
         }
 
         public static void newdocumentFile()

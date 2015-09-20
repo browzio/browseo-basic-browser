@@ -19,7 +19,7 @@ namespace BrowserAndFeatures
     {
         protected override void OnStartup(StartupEventArgs e)
         {
-            this.Shutdown();
+            //this.Shutdown();
             base.OnStartup(e);
         }
         //App()
