@@ -840,6 +840,10 @@ namespace WPF_WYSIWYG_HTML_Editor
                             });
                             MessageBox.Show("Error: " + ex.Message);
                         }
+                        Application.Current.Dispatcher.Invoke((Action)delegate
+                        {
+                            Mouse.OverrideCursor = null;
+                        });
                     }).Start();
                     break;
                 default:
