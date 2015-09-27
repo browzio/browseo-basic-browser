@@ -58,12 +58,14 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\BacklinkHistoryLine.cs" />
     <Compile Include="Classes\ExtensionMethods.cs" />
     <Compile Include="Classes\GloableProfData.cs" />
     <Compile Include="Classes\MozscapeAPI.cs" />
     <Compile Include="Classes\MozscapeResults.cs" />
     <Compile Include="Classes\ObservableCollectionEx.cs" />
     <Compile Include="Classes\UsageTracker.cs" />
+    <Compile Include="Classes\ViewModelBase.cs" />
     <Compile Include="Windows\AddLinkDataWindow.xaml.cs">
       <DependentUpon>AddLinkDataWindow.xaml</DependentUpon>
     </Compile>
@@ -72,6 +74,9 @@
     </Compile>
     <Compile Include="Windows\SaveMozKeysWindow.xaml.cs">
       <DependentUpon>SaveMozKeysWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ServerVerifyWindow.xaml.cs">
+      <DependentUpon>ServerVerifyWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="SelectProfileWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -99,6 +104,10 @@
     <Page Include="Windows\SaveMozKeysWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\ServerVerifyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

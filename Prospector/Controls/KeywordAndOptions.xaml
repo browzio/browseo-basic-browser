@@ -83,7 +83,7 @@
                              HorizontalAlignment="Left" Margin="13,8"
                              Visibility="{Binding Path= Visible_Custom,Converter={StaticResource boolToVis}}" />
                     
-                    <CheckBox Content="Use Proxy" IsChecked="{Binding UseProxy}" />
+                    <CheckBox Content="Use Proxy" IsChecked="{Binding UseProxy}" Margin="5" />
                 </StackPanel>
                 
                 <StackPanel Orientation="Horizontal">

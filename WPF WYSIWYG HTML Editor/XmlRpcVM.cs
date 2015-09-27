@@ -23,6 +23,8 @@ using WordPressSharp.Models;
 using WPF_WYSIWYG_HTML_Editor.Helpers;
 using WPF_WYSIWYG_HTML_Editor.Models;
 using WPF_WYSIWYG_HTML_Editor.XAML;
+using mshtml;
+using WPF_WYSIWYG_HTML_Editor.MVVM;
 
 namespace WPF_WYSIWYG_HTML_Editor
 {
@@ -132,6 +134,14 @@ namespace WPF_WYSIWYG_HTML_Editor
             set { savedPBNProjects = value; }
         }
 
+        //SavedMoney
+        private ObservableCollection<PBNProject> savedMoneyProjects;
+        public ObservableCollection<PBNProject> SavedMoneyProjects
+        {
+            get { return savedMoneyProjects; }
+            set { savedMoneyProjects = value; }
+        }
+
         //Tabs
         private ObservableCollection<SpinningVM> tabs;
         public ObservableCollection<SpinningVM> Tabs
@@ -173,6 +183,7 @@ namespace WPF_WYSIWYG_HTML_Editor
                 }
             }
         }
+
         //TimesToSpin
         private int timesToSpin;
         public int TimesToSpin
@@ -188,6 +199,8 @@ namespace WPF_WYSIWYG_HTML_Editor
             }
         }
 
+        public int SIMoney { get; set; }
+
         string errorString = "";
         string successString = "";
 
@@ -201,6 +214,7 @@ namespace WPF_WYSIWYG_HTML_Editor
             CmbBoxDrupalList = new ObservableCollection<SelectedProfile>();
             Tabs = new ObservableCollection<SpinningVM>();
             SavedPBNProjects = new ObservableCollection<PBNProject>();
+            SavedMoneyProjects = new ObservableCollection<PBNProject>();
 
             Status = "Select platforms to pulbilsh to from settings.";
             EnableBtns = true;
@@ -240,7 +254,23 @@ namespace WPF_WYSIWYG_HTML_Editor
                         foreach (string line in fileLines)
                         {
                             string[] lineInfo = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
-                            SavedPBNProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = lineInfo[2] });
+                            SavedPBNProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = lineInfo[2], ProjectName ="(" + lineInfo[3] +")" });
+                        }
+                        break;
+
+                    case "RefreshMoney":
+                        SavedMoneyProjects.Clear();
+                        string vaultDir1 = Path.Combine(MyFilesDatabase.GetBaseDir(), "PBNVault");
+                        if (!Directory.Exists(vaultDir1)) return;
+
+                        string filePath1 = Path.Combine(vaultDir1, "vaultMoneyConfig.txt");
+                        if (!File.Exists(filePath1)) return;
+
+                        string[] fileLines1 = File.ReadAllLines(filePath1);
+                        foreach (string line in fileLines1)
+                        {
+                            string[] lineInfo = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                            SavedMoneyProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = lineInfo[2], ProjectName = "(" + lineInfo[3] + ")" });
                         }
                         break;
 
@@ -345,6 +375,7 @@ namespace WPF_WYSIWYG_HTML_Editor
 
                     errorString = "";
                     successString = "";
+                    
 
                     foreach (SpinningVM spin in Tabs)
                     {
@@ -467,6 +498,34 @@ namespace WPF_WYSIWYG_HTML_Editor
             else
             {
                 successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
+                foreach (PBNProject moneyProj in SavedMoneyProjects)
+                {
+                    PersonData moneyProfile = MyFilesDatabase.GetSubProjectPersonData(moneyProj.FilePath);
+                    if (content.Contains(moneyProfile.WebAddress))
+                    {
+                        Match m;
+                        string HRefPattern = "\\<a.+?href=(?<q>[\"'])(.+?)\\k<q>.*?>([^\\<]+)";
+
+                        try
+                        {
+                            m = Regex.Match(content, HRefPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, TimeSpan.FromSeconds(1));
+                            while (m.Success)
+                            {
+                                string link = m.Groups[1].ToString();
+                                string text = m.Groups[2].ToString();
+                                if (link.Contains(moneyProfile.WebAddress))
+                                {
+                                    BacklinksHistoryVM.SaveLink(moneyProfile, link, text, profile.WebAddress);
+                                }
+                                m = m.NextMatch();
+                            }
+                        }
+                        catch(Exception ex)
+                        {
+                            MessageBox.Show("Error Saveing backlink history. " + ex.Message);
+                        }
+                    }
+                }
             }
 
             d.Logout();
@@ -509,6 +568,38 @@ namespace WPF_WYSIWYG_HTML_Editor
                 try
                 {
                     var id = client.NewPost(post);
+                    Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        OnRefreshPBNVaultClick("RefreshMoney");
+                    });
+                    foreach (PBNProject moneyProj in SavedMoneyProjects)
+                    {
+                        PersonData moneyProfile = MyFilesDatabase.GetSubProjectPersonData(moneyProj.FilePath);
+                        if (content.Contains(moneyProfile.WebAddress))
+                        {
+                            Match m;
+                            string HRefPattern = "\\<a.+?href=(?<q>[\"'])(.+?)\\k<q>.*?>([^\\<]+)";
+
+                            try
+                            {
+                                m = Regex.Match(content, HRefPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, TimeSpan.FromSeconds(1));
+                                while (m.Success)
+                                {
+                                    string link = m.Groups[1].ToString();
+                                    string text = m.Groups[2].ToString();
+                                    if (link.Contains(moneyProfile.WebAddress))
+                                    {
+                                        BacklinksHistoryVM.SaveLink(moneyProfile, link, text, profile.WebAddress);
+                                    }
+                                    m = m.NextMatch();
+                                }
+                            }
+                            catch(Exception ex)
+                            {
+                                MessageBox.Show("Error Saveing backlink history. " + ex.Message);
+                            }
+                        }
+                    }
                 }
                 catch
                 {
@@ -831,6 +922,29 @@ namespace WPF_WYSIWYG_HTML_Editor
                                     Mouse.OverrideCursor = null;
                                 });
                             }
+
+                            foreach (PBNProject pbnProj in SavedMoneyProjects)
+                            {
+                                if (!pbnProj.IsSelected) continue;
+                                PersonData profile = MyFilesDatabase.GetSubProjectPersonData(pbnProj.FilePath);
+                                if (profile.WebAddress == "") continue;
+
+                                string strAPIURL1 = mozAPI1.CreateAPIURL(MozscapeAPI.mozId, MozscapeAPI.mozSecret, 1, "url metrics", profile.WebAddress, "");
+                                string strResults1 = mozAPI1.FetchResults(strAPIURL1);
+                                MozscapeLinkMetric msURLMetrics1 = mozAPI1.ParseURLMetrics(strResults1);
+
+                                string pageAuthority1 = msURLMetrics1.upa;
+                                string domainAuthority1 = msURLMetrics1.pda;
+                                Application.Current.Dispatcher.Invoke((Action)delegate
+                                {
+                                    if (pageAuthority1.Contains('.')) pageAuthority1 = pageAuthority1.Split('.')[0];
+                                    if (domainAuthority1.Contains('.')) domainAuthority1 = domainAuthority1.Split('.')[0];
+                                    pbnProj.PageAuthority = "PA: " + pageAuthority1;
+                                    pbnProj.DomainAuthority = "DA: " + domainAuthority1;
+                                    pbnProj.AuthorityVisible = Visibility.Visible;
+                                    Mouse.OverrideCursor = null;
+                                });
+                            }
                         }
                         catch(Exception ex)
                         {
@@ -846,6 +960,15 @@ namespace WPF_WYSIWYG_HTML_Editor
                         });
                     }).Start();
                     break;
+
+                case "BACKLINK_HISTORY":
+                    BacklinksHistoryWindow bhw = new BacklinksHistoryWindow();
+                    BacklinksHistoryVM vm = new BacklinksHistoryVM();
+                    vm.FillHistoryList(MyFilesDatabase.GetSubProjectPersonData(SavedMoneyProjects[SIMoney].FilePath));
+                    bhw.DataContext = vm;
+                    bhw.Show();
+                    break;
+
                 default:
                     break;
             }

@@ -13,6 +13,7 @@ namespace WPF_WYSIWYG_HTML_Editor.Models
         public const int TYPE_DRUPAL = 1;
 
         public string Name { get; set; }
+        public string ProjectName { get; set; }
         public string FilePath { get; set; }
         public int SIType { get; set; }
         public bool IsSelected { get; set; }

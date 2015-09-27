@@ -27,9 +27,9 @@
             
             <Style TargetType="{x:Type Button}" x:Key="CloseButtonStyle">
                 <Style.Resources>
-                    <sys:Double x:Key="CloseButtonWidth">6.5</sys:Double>
+                    <sys:Double x:Key="CloseButtonWidth">6</sys:Double>
                     <sys:Double x:Key="CloseCircleWidth">12</sys:Double>
-                    <sys:Double x:Key="CloseButtonOffset">3.5</sys:Double>
+                    <sys:Double x:Key="CloseButtonOffset">3.16</sys:Double>
                 </Style.Resources>
                 <Setter Property="Height" Value="{StaticResource CloseCircleWidth}" />
                 <Setter Property="Width" Value="{StaticResource CloseCircleWidth}" />

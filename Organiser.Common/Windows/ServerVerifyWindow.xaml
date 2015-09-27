@@ -1,11 +1,12 @@
-﻿<Window x:Class="Organiser.Common.Windows.AddLinkDataWindow"
+﻿<Window x:Class="Organiser.Common.Windows.ServerVerifyWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        SizeToContent="WidthAndHeight"
-        ResizeMode="NoResize"
-        WindowStartupLocation="CenterScreen"
-        Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico"
-        Title="">
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Organiser.Common.Windows"
+        mc:Ignorable="d"
+        Title="Authentication Required" SizeToContent="Height" ResizeMode="NoResize" Width="500" 
+        Icon="/Organiser.Common;component/Image/browseo (1).ico" WindowStartupLocation="CenterScreen">
     <Window.Resources>
 
         <!--#region flat btns-->
@@ -70,13 +71,26 @@
         <!-- End Flat Button Style -->
         <!--#endregion-->
     </Window.Resources>
-    
-    <StackPanel>
-        <TextBlock Name="tblockInfo" Text="" Margin="5,0,0,0" x:FieldModifier="public" />
-        <TextBox Name="tbInputText" Width="200" Margin="5" x:FieldModifier="public" />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Ok" Margin="5" Click="Button_Click" Width="75" />
-            <Button Content="Cancel" Margin="5" Click="Button_Click_1" Width="75" />
+    <Grid Background="WhiteSmoke">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock x:FieldModifier="public" TextWrapping="Wrap" Name="tBlockinfo" Margin="5" />
+        <StackPanel Grid.Row="1">
+            <DockPanel Margin="5">
+                <TextBlock Text="Username: " Width="65" />
+                <TextBox Name="tbUsername" x:FieldModifier="public"  />
+            </DockPanel>
+            <DockPanel Margin="5">
+                <TextBlock Text="Password: " Width="65" />
+                <TextBox Name="tbPassword" x:FieldModifier="public"  />
+            </DockPanel>
         </StackPanel>
-    </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Center">
+            <Button Content="OK" Width="70" Margin="5" Name="btnOk" Click="btnOk_Click" />
+            <Button Content="Cancel" Width="70" Margin="5" Name="btnCancel" Click="btnCancel_Click" />
+        </StackPanel>
+    </Grid>
 </Window>

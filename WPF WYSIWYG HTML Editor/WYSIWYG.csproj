@@ -75,7 +75,11 @@
     <Compile Include="Models\FTPprofile.cs" />
     <Compile Include="Models\PBNProject.cs" />
     <Compile Include="Models\SelectedProfile.cs" />
+    <Compile Include="MVVM\BacklinksHistoryVM.cs" />
     <Compile Include="SpinningVM.cs" />
+    <Compile Include="XAML\BacklinksHistoryWindow.xaml.cs">
+      <DependentUpon>BacklinksHistoryWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XAML\CreateNewFTPprojectWindow.xaml.cs">
       <DependentUpon>CreateNewFTPprojectWindow.xaml</DependentUpon>
     </Compile>
@@ -99,6 +103,9 @@
     <Compile Include="XAML\HtmlEditor.xaml.cs">
       <DependentUpon>HtmlEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="XAML\MoneyVaultUserControl.xaml.cs">
+      <DependentUpon>MoneyVaultUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XAML\PBNVaultUserControl.xaml.cs">
       <DependentUpon>PBNVaultUserControl.xaml</DependentUpon>
     </Compile>
@@ -115,6 +122,10 @@
       <DependentUpon>WysiwigControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="XmlRpcVM.cs" />
+    <Page Include="XAML\BacklinksHistoryWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="XAML\CreateNewFTPprojectWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -136,6 +147,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="XAML\HtmlEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="XAML\MoneyVaultUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -303,6 +318,10 @@
     <ProjectReference Include="..\WordPressSharp\WordPressSharp.csproj">
       <Project>{7a938355-0b6b-48b7-97fb-c0c09015307b}</Project>
       <Name>WordPressSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\WPFPieChart\WPFPieChartTwo.csproj">
+      <Project>{59210896-68d1-4a34-91cc-8d015eca7061}</Project>
+      <Name>WPFPieChartTwo</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

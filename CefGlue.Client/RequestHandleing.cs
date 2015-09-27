@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Organiser.Common.Windows;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,18 +29,35 @@ namespace Xilium.CefGlue.Client
 
         protected override bool GetAuthCredentials(CefBrowser browser, CefFrame frame, bool isProxy, string host, int port, string realm, string scheme, CefAuthCallback callback)
         {
-            if (BrowserInit.pData != null)
+            if (isProxy)
             {
-                try
+                if (BrowserInit.pData != null)
                 {
-                    callback.Continue(BrowserInit.pData.ProxyUsername, BrowserInit.pData.ProxyPassword);
+                    try
+                    {
+                        callback.Continue(BrowserInit.pData.ProxyUsername, BrowserInit.pData.ProxyPassword);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Faild to set proxy auth credentials");
+                    }
                 }
-                catch
-                {
-                    MessageBox.Show("Faild to set proxy auth credentials");
-                }
+
+                return true;
             }
-            return true;
+            else
+            {
+
+                ServerVerifyWindow svw = new ServerVerifyWindow();
+                svw.tBlockinfo.Text = "A Username and Password are being requested by " + host + ". The site says: '" + realm + "'";
+                svw.ShowDialog();
+                if (svw.OKClicked)
+                {
+                    callback.Continue(svw.tbUsername.Text, svw.tbPassword.Text);
+                    return true;
+                }
+                return false;
+            }
         }
     }
 }

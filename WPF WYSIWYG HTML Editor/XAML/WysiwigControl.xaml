@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:WPF_WYSIWYG_HTML_Editor"
              xmlns:localXaml="clr-namespace:WPF_WYSIWYG_HTML_Editor.XAML"
              xmlns:localHelper="clr-namespace:WPF_WYSIWYG_HTML_Editor.Helpers"
-             mc:Ignorable="d" Loaded="Window_Loaded">
+             mc:Ignorable="d">
     <UserControl.Resources>
 
         <Style x:Key="EmptyCheckBoxFocusVisual">
@@ -129,20 +129,40 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Grid Name="grdFtpProjects" Grid.Column="1" Grid.RowSpan="2" >
+            <Grid Name="grdFtpProjects" Grid.Column="1" Grid.RowSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
             <Expander Name="spander"
                       Width="24"
                       Expanded="spander_Expanded"
                       Collapsed="spander_Collapsed"
                       ExpandDirection="Right">
                 <Expander.Header>
-                    <TextBlock Text="PBN Vault">
+                    <TextBlock Text="PBN Vault" Foreground="Orange">
                         <TextBlock.LayoutTransform>
                             <RotateTransform Angle="90"/>
                         </TextBlock.LayoutTransform>
                     </TextBlock>
                 </Expander.Header>
                 <localXaml:PBNVaultUserControl x:Name="ftpProjectList" />
+            </Expander>
+
+            <Expander Name="spander2"
+                      Width="24"
+                      Expanded="spander2_Expanded"
+                      Collapsed="spander2_Collapsed"
+                      Grid.Column="1"
+                      ExpandDirection="Right">
+                <Expander.Header>
+                    <TextBlock Text="Money Vault" Foreground="Green">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform Angle="90"/>
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                </Expander.Header>
+                <localXaml:MoneyVaultUserControl x:Name="moneyVaultSpander" />
             </Expander>
             <!--<localXaml:FTPProjectsList x:Name="ftpProjectList" />-->
             </Grid>

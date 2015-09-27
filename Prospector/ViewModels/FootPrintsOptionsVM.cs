@@ -386,10 +386,14 @@ namespace Prospector.ViewModels
             set
             {
                 sISavedFP = value;
-                if (value >= 0 && SavedFP.Count > 0)
+                try
                 {
-                    FootPrintString = SavedFP[value].Footprint;
+                    if (value >= 0 && SavedFP.Count > 0)
+                    {
+                        FootPrintString = SavedFP[value].Footprint;
+                    }
                 }
+                catch { }
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("SISavedFP"));
@@ -1122,12 +1126,32 @@ namespace Prospector.ViewModels
                     if (!Directory.Exists(savedDir)) Directory.CreateDirectory(savedDir);
 
                     string filePath = Path.Combine(savedDir, "SaveFootprints.txt");
-                    if (File.Exists(filePath)) File.Delete(filePath);
+                    if (File.Exists(filePath))
+                    {
+                        string[] fileLines = File.ReadAllLines(filePath);
 
+                        foreach (string line in fileLines)
+                        {
+                            string[] lineData = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                            SavedFootprint fpFromFile = new SavedFootprint() { Name = lineData[0], Footprint = lineData[1] };
+                            foreach (SavedFootprint fp in SavedFP)
+                            {
+                                if (fp.Name == fpFromFile.Name) continue;
+                            }
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                SavedFP.Add(fpFromFile);
+                            });
+                        }
+                    }
+
+                    string fileContents = "";
                     foreach (SavedFootprint sfp in SavedFP)
                     {
-                        File.AppendAllText(filePath, sfp.Name + MyFilesDatabase.SPLITTER + sfp.Footprint + Environment.NewLine);
+                        fileContents += sfp.Name + MyFilesDatabase.SPLITTER + sfp.Footprint + Environment.NewLine;
                     }
+
+                    File.WriteAllText(filePath, fileContents);
                 }
                 catch { }
             }).Start();

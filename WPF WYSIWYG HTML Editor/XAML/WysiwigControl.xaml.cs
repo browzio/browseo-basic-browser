@@ -156,6 +156,13 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+           // NewItUp();
+
+           // if (ribon.SelectedIndex != 2)
+           //grdFtpProjects.Visibility = System.Windows.Visibility.Collapsed;
+        }
+        public void NewItUp()
+        {
             Gui.webBrowser = webBrowserEditor;
             Gui.htmlEditor = HtmlEditor1;
             Initialisation.webeditor = this;
@@ -164,11 +171,7 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
             Initialisation.RibbonComboboxFontsInitialisation();
             Initialisation.RibbonComboboxFontSizeInitialisation();
             Initialisation.RibbonComboboxFormatInitionalisation();
-
-           // if (ribon.SelectedIndex != 2)
-            //grdFtpProjects.Visibility = System.Windows.Visibility.Collapsed;
         }
-
 
 
         private void btnPublish_Click(object sender, RoutedEventArgs e)
@@ -291,6 +294,19 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
         {
             spander.Width = 24;
         }
+
+
+        private void spander2_Expanded(object sender, RoutedEventArgs e)
+        {
+            spander2.Width = 400;
+        }
+
+        private void spander2_Collapsed(object sender, RoutedEventArgs e)
+        {
+            spander2.Width = 24;
+        }
+
+
 
         #region Resize
 

@@ -262,6 +262,7 @@ namespace BrowserAndFeatures
                     wvm.SetProfileDate(profile);
                     wisi.DataContext = wvm;
                     wisi.SetProfileData(profile);
+                    wisi.NewItUp();
                 }
             }
             else if (tbControl.SelectedIndex == 4)
