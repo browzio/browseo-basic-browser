@@ -188,7 +188,7 @@ namespace WpfCefDynamBrowser.ViewModels
 
             PropertyChanged += OnPropertyChanged;
 
-            var version = "browe·seo";
+            var version = "Brow·SEO";
             OutputMessage = version;
 
             Title = "New Tab";

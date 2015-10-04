@@ -343,6 +343,12 @@
                             <MouseBinding MouseAction="LeftClick" Command="{Binding VautContextMenu}" CommandParameter="MozRank" />
                         </MenuItem.InputBindings>
                     </MenuItem>
+                    <MenuItem Header="Copy Link">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding VautContextMenu}" CommandParameter="CopyLinkMoney" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    
                     <Separator />
                     <MenuItem Header="Get Backlink History">
                         <MenuItem.InputBindings>

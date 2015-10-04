@@ -80,46 +80,14 @@ namespace DragDropListview.Windows
             {
                 try
                 {
-                    Clipboard.Clear();
-
                     (sender as TextBox).IsReadOnly = true;
                     (sender as TextBox).SelectAll();
-                    Clipboard.SetText((sender as TextBox).Text);
+                    Organiser.Common.Classes.MyFilesDatabase.SetClipboardText((sender as TextBox).Text);
                 }
-                catch (Exception ex)
+                catch 
                 {
-                    try
-                    {
-                        string msg = ex.Message;
-                        msg += Environment.NewLine;
-                        msg += Environment.NewLine;
-                        msg += "The problem:";
-                        msg += Environment.NewLine;
-                        msg += getOpenClipboardWindowText();
-                        MessageBox.Show(msg);
-                    }
-                    catch (Exception ee)
-                    {
-                        MessageBox.Show(ee.Message);
-                    }
                 }
             }
-        }
-
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        static extern IntPtr GetOpenClipboardWindow();
-
-        [System.Runtime.InteropServices.DllImport("user32.dll")]
-        static extern int GetWindowText(int hwnd, StringBuilder text, int count);
-
-        private string getOpenClipboardWindowText()
-        {
-            IntPtr hwnd = GetOpenClipboardWindow();
-            StringBuilder sb = new StringBuilder(501);
-            GetWindowText(hwnd.ToInt32(), sb, 500);
-            return sb.ToString();
-            // example:
-            // skype_plugin_core_proxy_window: 02490E80
         }
     }
 }

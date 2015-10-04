@@ -102,8 +102,11 @@ namespace Organiser.Common
                 //    PersonData pd = MyFilesDatabase.SetProfileFromini(path);
                 //    if (webAddress.Contains(pd.WebAddress.ToLower()))
                 string pname = item.Key;
+                if (pname.Contains("_folder_")) continue;
+
                 if (pname.Contains("_tier_"))
                     pname = pname.Replace("_tier_", "");
+                
                 ProfilesList.Add(pname);
               //  }
                // else

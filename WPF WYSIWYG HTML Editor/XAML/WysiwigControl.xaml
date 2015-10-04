@@ -180,7 +180,7 @@
                     <!--<RibbonButton x:Name="RibbonButtonOpenweb" Label="" SmallImageSource="..\Images\link.png"  HorizontalAlignment="Left" Width="22" Click="RibbonButtonOpenweb_Click"/>-->
                     <!--<RibbonButton x:Name="RibbonButtonSave" Label="" SmallImageSource="..\Images\save.png" Click="RibbonButtonSave_Click"/>-->
                 </RibbonGroup>
-                <RibbonGroup Header="Editor" Width="350">
+                <RibbonGroup Header="Editor" Width="365">
                     <StackPanel>
                         <ComboBox x:Name="RibbonComboboxFormat" Background="#eeeeee" Width="160" Height="21"  Margin="0,0,0,4" HorizontalAlignment="Left" SelectionChanged="RibbonComboboxFormat_SelectionChanged" >
                             <ComboBox.ItemTemplate>
@@ -200,6 +200,7 @@
                             <RibbonButton x:Name="SettingsFontColor" SmallImageSource="..\Images\Color.png" Click="SettingsFontColor_Click"/>
                             <RibbonButton x:Name="SettingsBackColor" SmallImageSource="..\Images\backcolor.png" Click="SettingsBackColor_Click"/>
                             <RibbonButton x:Name="SettingsAddLink" SmallImageSource="..\Images\link.png" Click="SettingsAddLink_Click"/>
+                            <RibbonButton x:Name="SettingsAddVidLink" SmallImageSource="..\Images\RomanE-01.png" Click="SettingsAddVidLink_Click"/>
                             <RibbonButton x:Name="SettingsAddImage" SmallImageSource="..\Images\image.png" Click="SettingsAddImage_Click"/>
                             <RibbonButton x:Name="SettingsLeftAlign" SmallImageSource="..\Images\LeftAlign.png" Click="SettingsLeftAlign_Click"/>
                             <RibbonButton x:Name="SettingsCenter2" SmallImageSource="..\Images\center2.png" Click="SettingsCenter2_Click"/>

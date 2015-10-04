@@ -40,7 +40,10 @@ namespace BrowserAndFeatures
             //Dispatcher.CurrentDispatcher.UnhandledException += CurrentDispatcher_UnhandledException;
             //this.Closed += (sender, args) => { PostQuitMessage(0); };
             InitializeComponent();
-            SetPermissions();
+            //new Thread(() =>{
+                SetPermissions();
+               // 
+            //}).Start();
             SetPersonData();
             (prospector.DataContext as FootPrintsOptionsVM).OnClickedSearch += FeatureCallage_OnClickedSearch;
         }
@@ -95,12 +98,14 @@ namespace BrowserAndFeatures
                 ref key, ref name, ref email);
 
 
+           // App.Current.Dispatcher.Invoke((Action)delegate { 
             if (cbAllowProspector.ToLower() != "true") tabProspector.Visibility = System.Windows.Visibility.Collapsed;
             if (cbAllowRSS.ToLower() != "true") tabrssControl.Visibility = System.Windows.Visibility.Collapsed;
             if (cbAllowPBN.ToLower() != "true") tabrsswisi.Visibility = System.Windows.Visibility.Collapsed;
             if (cbAllowFeedMash.ToLower() != "true") feed.Visibility = System.Windows.Visibility.Collapsed;
             if (cbAllowIndexer.ToLower() != "true") indexer.Visibility = System.Windows.Visibility.Collapsed;
             if (cbYoutube.ToLower() != "true") youtuber.Visibility = System.Windows.Visibility.Collapsed;
+          //  });
         }
 
         public static void decryptLisence(string lisenceText, ref string canSeeProxys, ref string canCreateLisence,
@@ -210,6 +215,7 @@ namespace BrowserAndFeatures
             }
             catch { }
             //browser.SetPersonData(data);
+
             BrowserInit.Init(sitesFilePath, data == null ? profile : data);
 
         }

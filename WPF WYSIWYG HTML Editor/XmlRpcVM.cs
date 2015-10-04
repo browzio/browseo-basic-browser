@@ -200,6 +200,7 @@ namespace WPF_WYSIWYG_HTML_Editor
         }
 
         public int SIMoney { get; set; }
+        public int SIPBN { get; set; }
 
         string errorString = "";
         string successString = "";
@@ -962,16 +963,42 @@ namespace WPF_WYSIWYG_HTML_Editor
                     break;
 
                 case "BACKLINK_HISTORY":
-                    BacklinksHistoryWindow bhw = new BacklinksHistoryWindow();
-                    BacklinksHistoryVM vm = new BacklinksHistoryVM();
-                    vm.FillHistoryList(MyFilesDatabase.GetSubProjectPersonData(SavedMoneyProjects[SIMoney].FilePath));
-                    bhw.DataContext = vm;
-                    bhw.Show();
+                    try
+                    {
+                        BacklinksHistoryWindow bhw = new BacklinksHistoryWindow();
+                        BacklinksHistoryVM vm = new BacklinksHistoryVM();
+                        vm.FillHistoryList(MyFilesDatabase.GetSubProjectPersonData(SavedMoneyProjects[SIMoney].FilePath));
+                        bhw.DataContext = vm;
+                        bhw.Show();
+                    }
+                    catch { }
+                    break;
+
+                case "CopyLinkPBN":
+                    try
+                    {
+                        PersonData profile = MyFilesDatabase.GetSubProjectPersonData(SavedPBNProjects[SIPBN].FilePath);
+                        if (profile == null || string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress)) return;
+                        MyFilesDatabase.SetClipboardText(profile.WebAddress);
+                    }
+                    catch { }
+                    break;
+
+                case "CopyLinkMoney":
+                    try
+                    {
+                        PersonData profile = MyFilesDatabase.GetSubProjectPersonData(SavedMoneyProjects[SIMoney].FilePath);
+                        if (profile == null || string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress)) return;
+                        MyFilesDatabase.SetClipboardText(profile.WebAddress);
+                    }
+                    catch { }
                     break;
 
                 default:
                     break;
             }
         }
+
+
     }
 }

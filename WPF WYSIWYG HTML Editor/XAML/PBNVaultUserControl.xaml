@@ -317,6 +317,7 @@
                  Grid.ColumnSpan="3"
                  Background="WhiteSmoke"
                  SelectionMode="Single"
+                 SelectedIndex="{Binding SIPBN}"
                  Margin="3" BorderThickness="0,0,0,0">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -338,6 +339,11 @@
                     <MenuItem Header="Get Moz Rank">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding VautContextMenu}" CommandParameter="MozRank" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    <MenuItem Header="Copy Link">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding VautContextMenu}" CommandParameter="CopyLinkPBN" />
                         </MenuItem.InputBindings>
                     </MenuItem>
                 </ContextMenu>

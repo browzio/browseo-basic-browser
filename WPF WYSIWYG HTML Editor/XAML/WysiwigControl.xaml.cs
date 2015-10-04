@@ -371,5 +371,10 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
         //}
 
         #endregion
+
+        private void SettingsAddVidLink_Click(object sender, RoutedEventArgs e)
+        {
+            Gui.SettingsAddVidLink();
+        }
     }
 }

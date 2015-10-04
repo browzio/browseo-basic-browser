@@ -83,6 +83,9 @@
     <Compile Include="XAML\CreateNewFTPprojectWindow.xaml.cs">
       <DependentUpon>CreateNewFTPprojectWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="XAML\EmbedWindow.xaml.cs">
+      <DependentUpon>EmbedWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="XAML\FindReplaceWindow.xaml.cs">
       <DependentUpon>FindReplaceWindow.xaml</DependentUpon>
     </Compile>
@@ -127,6 +130,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="XAML\CreateNewFTPprojectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="XAML\EmbedWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -290,6 +297,7 @@
     <Content Include="bin\Debug\WPF WYSIWYG HTML Editor.vshost.exe" />
     <Content Include="bin\Debug\WPF_WYSIWYG_HTML_Editor.exe" />
     <Content Include="bin\Debug\WPF_WYSIWYG_HTML_Editor.pdb" />
+    <Resource Include="Images\RomanE-01.png" />
     <Resource Include="Images\publish-o.png" />
     <Resource Include="Images\publish-bw.png" />
     <Resource Include="Images\findReplace.ico" />

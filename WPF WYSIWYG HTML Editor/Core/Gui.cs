@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using WPF_WYSIWYG_HTML_Editor.XAML;
 
 namespace WPF_WYSIWYG_HTML_Editor
 {
@@ -66,6 +67,14 @@ namespace WPF_WYSIWYG_HTML_Editor
         public static void SettingsAddLink()
         {
             using (Link link = new Link(webBrowser.doc))
+            {
+                link.ShowDialog();
+            }
+        }
+
+        internal static void SettingsAddVidLink()
+        {
+            using (EmbedWindow link = new EmbedWindow(webBrowser.doc))
             {
                 link.ShowDialog();
             }
@@ -149,9 +158,5 @@ namespace WPF_WYSIWYG_HTML_Editor
         {
             webBrowser.newWb(DialogBox.SelectFile());    
         }
-
-
- 
-
     }
 }

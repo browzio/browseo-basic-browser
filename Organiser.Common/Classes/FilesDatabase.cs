@@ -4,6 +4,7 @@ using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Windows;
 
 namespace Organiser.Common.Classes
@@ -798,5 +799,48 @@ namespace Organiser.Common.Classes
                 catch { }
             }).Start();
         }
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        static extern IntPtr GetOpenClipboardWindow();
+
+        [System.Runtime.InteropServices.DllImport("user32.dll")]
+        static extern int GetWindowText(int hwnd, StringBuilder text, int count);
+
+        public static string getOpenClipboardWindowText()
+        {
+            IntPtr hwnd = GetOpenClipboardWindow();
+            StringBuilder sb = new StringBuilder(501);
+            GetWindowText(hwnd.ToInt32(), sb, 500);
+            return sb.ToString();
+            // example:
+            // skype_plugin_core_proxy_window: 02490E80
+        }
+        public static void SetClipboardText(string text)
+        {
+            try
+            {
+                Clipboard.Clear();
+
+                Clipboard.SetText(text);
+            }
+            catch (Exception ex)
+            {
+                try
+                {
+                    string msg = ex.Message;
+                    msg += Environment.NewLine;
+                    msg += Environment.NewLine;
+                    msg += "The problem:";
+                    msg += Environment.NewLine;
+                    msg += getOpenClipboardWindowText();
+                    MessageBox.Show(msg);
+                }
+                catch (Exception ee)
+                {
+                    MessageBox.Show(ee.Message);
+                }
+            }
+        }
+
     }
 }
