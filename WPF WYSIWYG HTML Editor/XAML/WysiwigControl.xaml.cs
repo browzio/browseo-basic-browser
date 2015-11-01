@@ -21,9 +21,9 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
     public partial class WysiwigControl : UserControl
     {
         FindReplaceWindow frw;
-
+        
         public WysiwigControl()
-        {
+          {
             InitializeComponent();
             //lineResizer.DataContext = this;
             //MouseY = 0;
@@ -176,20 +176,30 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
 
         private void btnPublish_Click(object sender, RoutedEventArgs e)
         {
-            if (DataContext != null && DataContext is XmlRpcVM)
+            if (webBrowserEditor.doc.body == null) return;
+            try
             {
-                XmlRpcVM vm = DataContext as XmlRpcVM;
-                vm.OnPublishClick(webBrowserEditor.doc.body.innerHTML);
+                if (DataContext != null && DataContext is XmlRpcVM)
+                {
+                    XmlRpcVM vm = DataContext as XmlRpcVM;
+                    vm.OnPublishClick(webBrowserEditor.doc.body.innerHTML);
+                }
             }
+            catch { }
         }
 
         private void pbnPubfromVault_Click(object sender, RoutedEventArgs e)
         {
-            if (DataContext != null && DataContext is XmlRpcVM)
+            if (webBrowserEditor.doc.body == null) return;
+            try
             {
-                XmlRpcVM vm = DataContext as XmlRpcVM;
-                vm.OnPubFromVaultClick(webBrowserEditor.doc.body.innerHTML);
+                if (DataContext != null && DataContext is XmlRpcVM)
+                {
+                    XmlRpcVM vm = DataContext as XmlRpcVM;
+                    vm.OnPubFromVaultClick(webBrowserEditor.doc.body.innerHTML);
+                }
             }
+            catch { }
         }
 
         public void SetProfileData(SocialOrganizer.Models.PersonData profile)
@@ -247,7 +257,8 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
 
         void sw_OnClickedSpin(string spunText)
         {
-            webBrowserEditor.doc.body.innerText = spunText;
+            if (webBrowserEditor.doc.body == null) return;
+             webBrowserEditor.doc.body.innerText = spunText;
         }
 
         private void btnFindReplace_Click(object sender, RoutedEventArgs e)
@@ -375,6 +386,38 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
         private void SettingsAddVidLink_Click(object sender, RoutedEventArgs e)
         {
             Gui.SettingsAddVidLink();
+        }
+
+        public void AddSetRssFeed(string link, string title, string imglink, string date, string description)
+        {
+            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    int start = Environment.TickCount;
+                    while (webBrowserEditor.doc.readyState != "complete")
+                    {
+                        System.Threading.Thread.Sleep(50);
+                        if (Environment.TickCount - start > 4000)
+                        {
+                            return;
+                        }
+                    }
+
+                    string htmlstring = "<BLOCKQUOTE>";
+
+                    htmlstring += "<H1>" + title + "</H1>";
+                    htmlstring += "<P>" + date + "</P>";
+                    if (imglink != "https:" && imglink != "http:" && !string.IsNullOrEmpty(imglink) && !string.IsNullOrWhiteSpace(imglink))
+                        htmlstring += "<img src=\"" + imglink + "\" />";
+                    htmlstring += "<P>" + description + "</P>";
+                    htmlstring += "<A href=\"" + link + " \" > " + link + " </a>";
+                    htmlstring += "</BLOCKQUOTE>";
+
+                    webBrowserEditor.doc.body.innerHTML += htmlstring;
+                }
+                catch { }
+            });
         }
     }
 }

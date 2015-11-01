@@ -257,18 +257,16 @@ namespace BrowserAndFeatures
                 rssControl.OnLaunchToBrowser += FeatureCallage_OnLaunchToBrowser;
                 rssControl.OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;
                 rssControl.OnLaunchToMasher += rssControl_OnLaunchToMasher;
+                rssControl.OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
                 setevents = true;
             }
             else if (tbControl.SelectedIndex == 3)
             {
                 previndex = tbControl.SelectedIndex;
+
                 if (wisi.DataContext == null)
                 {
-                    WPF_WYSIWYG_HTML_Editor.XmlRpcVM wvm = new WPF_WYSIWYG_HTML_Editor.XmlRpcVM();
-                    wvm.SetProfileDate(profile);
-                    wisi.DataContext = wvm;
-                    wisi.SetProfileData(profile);
-                    wisi.NewItUp();
+                    setwisi();
                 }
             }
             else if (tbControl.SelectedIndex == 4)
@@ -289,6 +287,27 @@ namespace BrowserAndFeatures
             }
         }
 
+        private void setwisi()
+        {
+            WPF_WYSIWYG_HTML_Editor.XmlRpcVM wvm = new WPF_WYSIWYG_HTML_Editor.XmlRpcVM();
+            wvm.SetProfileDate(profile);
+            wisi.DataContext = wvm;
+            wisi.SetProfileData(profile);
+            wisi.NewItUp();
+        }
+
+        private void RssControl_OnSelectedSendToPbn(string link, string title, string imglink, string date, string description)
+        {
+            //tbControl.SelectedIndex = 3;
+            if (wisi.DataContext == null)
+            {
+                
+                tbControl.SelectedIndex = 3;
+                setwisi();
+            }
+
+            wisi.AddSetRssFeed(link, title, imglink, date, description);
+        }
 
         private void youtuber_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {

@@ -28,6 +28,9 @@ namespace DragDropListview
     {
        public const string IMPORT_TYPE_FCS = "fcs";
        public const string IMPORT_TYPE_EB = "eb";
+       public const string IMPORT_TYPE_GLOBAL = "global";
+
+       public const string GLOABLEFOLDERNAME = "GloableBookMarks_G_";
 
         public event Action<int> OnHasReminders = delegate { };//int, amount of reminders
         //public event Action OnRemindersChanged = delegate { };
@@ -247,13 +250,13 @@ namespace DragDropListview
                         Bookmark bmark = new Bookmark();
                         bmark.Name = ebmff.tbName.Text;
                         bmark.Link = ebmff.tbURL.Text;
+                        bmark.ImportType = FoldersAndSitesList[SIFoldersSide].ImportType;
 
                         if (FoldersAndSitesList[SIFoldersSide].IsImported)
                         {
                             bmark.Email = ebmff.Email.Text;
                             bmark.Username = ebmff.Username.Text;
                             bmark.Password = ebmff.Password.Text;
-                            bmark.ImportType = FoldersAndSitesList[SIFoldersSide].ImportType;
                             bmark.IsImported = true;
                         }
 
@@ -312,6 +315,10 @@ namespace DragDropListview
                         {
                             if (!FoldersAndSitesList[SIFoldersSide].IsImported)
                             {
+                                if(FoldersAndSitesList[SIFoldersSide].ImportType == IMPORT_TYPE_GLOBAL)
+                                    FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
+                                (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\icon-global.png"));
+                                else
                                 FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
                                 (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
                             }
@@ -373,6 +380,13 @@ namespace DragDropListview
                         bookmarkFolder_S.BitmapImg = new BitmapImage
                             (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\enterprise buddy.ico"));
                     }
+                    else if(bookmarkTypeWindow.browseoGloable.IsChecked == true)
+                    {
+                        //IMPORT_TYPE_GLOBAL
+                        bookmarkFolder_S.ImportType = IMPORT_TYPE_GLOBAL;
+                        bookmarkFolder_S.BitmapImg = new BitmapImage
+                            (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\icon-global.png"));
+                    }
 
                     FoldersAndSitesList.Add(bookmarkFolder_S);
                     break;
@@ -412,6 +426,10 @@ namespace DragDropListview
                         saveReminder(srw.tbInputedText.Text, srw.dtReminder.Text, true);
                     }
                     break;
+
+                case "Refresh":
+                    RefreshList();
+                    return;
             }
 
             if (!wasImport)
@@ -545,43 +563,58 @@ namespace DragDropListview
 
         private void saveAll()
         {
-         //  saveThread = new Thread(() =>
-          //   {
-           //      lock (mlock)
+            //  saveThread = new Thread(() =>
+            //   {
+            //      lock (mlock)
             //     {
-                     try
-                     {
-                         MyFilesDatabase.DeleteBookmarks(ProjectName);
-                         foreach (FolderVM folderListItem in FoldersAndSitesList)
-                         {
-                             if (folderListItem.IsImported) continue;
+            try
+            {
+                MyFilesDatabase.DeleteBookmarks(ProjectName);
+                MyFilesDatabase.DeleteBookmarks(GLOABLEFOLDERNAME);
+                foreach (FolderVM folderListItem in FoldersAndSitesList)
+                {
+                    if (folderListItem.IsImported) continue;
 
-                             if (folderListItem.IsFolder)
-                             {
-                                 if (folderListItem.Sites.Count > 0)
-                                 {
-                                     foreach (Bookmark bmark in folderListItem.Sites)
-                                     {
-                                         MyFilesDatabase.AppendBookmarkByFolderAnProjName(ProjectName, folderListItem.Name, bmark.Link, bmark.Name, bmark.DateTimeStamp);
-                                     }
-                                 }
-                                 else
-                                 {
-                                     MyFilesDatabase.AppendBookmarkByFolderAnProjNameNoSites(ProjectName, folderListItem.Name);
-                                 }
-                             }
-                             else
-                             {
-                                 MyFilesDatabase.SaveSiteBookmark(folderListItem.Link, folderListItem.Name, ProjectName, folderListItem.DateTimeStamp);
-                             }
-                         }
+                    if (folderListItem.IsFolder && folderListItem.ImportType != IMPORT_TYPE_GLOBAL)
+                    {
+                        if (folderListItem.Sites.Count > 0)
+                        {
+                            foreach (Bookmark bmark in folderListItem.Sites)
+                            {
+                                MyFilesDatabase.AppendBookmarkByFolderAnProjName(ProjectName, folderListItem.Name, bmark.Link, bmark.Name, bmark.DateTimeStamp);
+                            }
+                        }
+                        else
+                        {
+                            MyFilesDatabase.AppendBookmarkByFolderAnProjNameNoSites(ProjectName, folderListItem.Name);
+                        }
+                    }
+                    else if (folderListItem.IsFolder && folderListItem.ImportType == IMPORT_TYPE_GLOBAL)
+                    {
+                        if (folderListItem.Sites.Count > 0)
+                        {
+                            foreach (Bookmark bmark in folderListItem.Sites)
+                            {
+                                MyFilesDatabase.AppendBookmarkByFolderAnProjName(GLOABLEFOLDERNAME, folderListItem.Name, bmark.Link, bmark.Name, bmark.DateTimeStamp);
+                            }
+                        }
+                        else
+                        {
+                            MyFilesDatabase.AppendBookmarkByFolderAnProjNameNoSites(GLOABLEFOLDERNAME, folderListItem.Name);
+                        }
+                    }
+                    else if (!folderListItem.IsFolder && folderListItem.ImportType != IMPORT_TYPE_GLOBAL)
+                    {
+                        MyFilesDatabase.SaveSiteBookmark(folderListItem.Link, folderListItem.Name, ProjectName, folderListItem.DateTimeStamp);
+                    }
+                }
 
-                        // OnListChanged();
-                     }
-                     catch { }
-               //  }
-             //});
-           // saveThread.Start();
+                // OnListChanged();
+            }
+            catch { }
+            //  }
+            //});
+            // saveThread.Start();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -767,6 +800,39 @@ namespace DragDropListview
                 }
                 catch { }
             }
+
+            foreach (KeyValuePair<string, string> folder in MyFilesDatabase.GetBookmarkedFolders(GLOABLEFOLDERNAME))
+            {
+                DirectoryInfo dirInfo = new DirectoryInfo(folder.Key);
+
+                FolderVM bookmarkFolder = new FolderVM();
+                bookmarkFolder.Name = dirInfo.Name;
+                bookmarkFolder.IsFolder = true;
+                bookmarkFolder.ImportType = IMPORT_TYPE_GLOBAL;
+                bookmarkFolder.DateTimeStamp = folder.Value;
+                bookmarkFolder.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\icon-global.png"));
+                bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
+                foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByPath(dirInfo.FullName, GLOABLEFOLDERNAME))
+                {
+                    try
+                    {
+                        string[] siteNname = siteLine.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                        Bookmark bmark = new Bookmark()
+                        {
+                            Link = siteNname[0],
+                            Name = siteNname[1],
+                            BitmapImg = new BitmapImage
+                        (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"))
+                        };
+                        if (siteNname.Length == 3)
+                            bmark.DateTimeStamp = siteNname[2];
+                        bookmarkFolder.Sites.Add(bmark);
+                    }
+                    catch { }
+                }
+
+                FoldersAndSitesList.Add(bookmarkFolder);
+            } 
         }
 
         #region reminders

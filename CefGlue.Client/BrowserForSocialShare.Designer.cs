@@ -36,9 +36,9 @@
             this.browserCntrl1.CBrowser = null;
             this.browserCntrl1.CurrAddress = null;
             this.browserCntrl1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.browserCntrl1.KeyboardHookProcedure = null;
+           // this.browserCntrl1.KeyboardHookProcedure = null;
             this.browserCntrl1.Location = new System.Drawing.Point(0, 0);
-            this.browserCntrl1.MouseHookProcedure = null;
+            //this.browserCntrl1.MouseHookProcedure = null;
             this.browserCntrl1.Name = "browserCntrl1";
             this.browserCntrl1.Size = new System.Drawing.Size(932, 653);
             this.browserCntrl1.TabIndex = 0;

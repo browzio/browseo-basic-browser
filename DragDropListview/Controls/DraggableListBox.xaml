@@ -52,6 +52,7 @@
             </ListBox.ItemTemplate>
             <ListBox.ContextMenu>
                 <ContextMenu>
+                    <MenuItem Header="Refresh" Command="{Binding LVFolderCMenuClick}" CommandParameter="Refresh" />
                     <MenuItem Header="Edit..." Command="{Binding LVFolderCMenuClick}" CommandParameter="Edit" />
                     <MenuItem Header="Add Folder..." Command="{Binding LVFolderCMenuClick}" CommandParameter="AddFolder" />
                     <MenuItem Header="Add Site..." Command="{Binding LVFolderCMenuClick}" CommandParameter="AddSite" />

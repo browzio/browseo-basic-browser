@@ -154,33 +154,57 @@ namespace WpfCefDynamBrowser.Views
             if (e.Key == Key.Enter)
             {
               //  System.Windows.Forms.SendKeys.Send("{ENTER}");
-                InputSimulator.SimulateKeyPress(VirtualKeyCode.RETURN);
+              //  InputSimulator.SimulateKeyPress(VirtualKeyCode.RETURN);
             }
         }
 
-        private void cmbSites_PreviewKeyDown(object sender, KeyEventArgs e)
+        private void cmbSites_PreviewKeyDown(KeyEventArgs e)
         {
-            if (e.Key == Key.Delete || e.Key == Key.Back) return;
-
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {
-                new System.Threading.Thread(() =>
-                {
-                    sites = MyFilesDatabase.GetSites();
-                }).Start();
+                (DataContext as BrowserTabViewModel).NavigateToSelectedSite(cmbSites.textbox.Text);
+                Keyboard.ClearFocus();
+                //new System.Threading.Thread(() =>
+                //{
+                //    sites = MyFilesDatabase.GetSites();
+                //}).Start();
+                return;
+            }
+
+            cmbSites.Focus();
+
+            if (e.Key == Key.Down)
+            {
+                cmbSites.SelectedIndex += 1;
+                return;
+            }
+            else if (e.Key == Key.Up)
+            {
+                if(cmbSites.SelectedIndex >=0 )
+                cmbSites.SelectedIndex -= 1;
                 return;
             }
 
             string curtext = cmbSites.Text;
 
             cmbSites.Items.Clear();
-            if (!cmbSites.IsDropDownOpen && sites.Count > 0) cmbSites.IsDropDownOpen = true;
+
+            cmbSites.Items.Add(curtext);
 
             foreach (string site in sites)
             {
                 if (site.Contains(curtext))
                     cmbSites.Items.Add(site);
             }
+
+            if (!cmbSites.IsDropDownOpen && sites.Count > 0 && cmbSites.Items.Count > 0)
+            {
+                cmbSites.IsDropDownOpen = true;
+                
+            }
+           
+
+            if (e.Key != Key.Enter && e.Key != Key.Left && e.Key != Key.Right) cmbSites.SelectedIndex = 0;
         }
 
         private void SaveSite_Click(object sender, RoutedEventArgs e)
@@ -214,6 +238,7 @@ namespace WpfCefDynamBrowser.Views
         private void btnImpotBookmarks_Click(object sender, RoutedEventArgs e)
         {
             SelectBookmarkImportTypeWindow bookmarkTypeWindow = new SelectBookmarkImportTypeWindow();
+            bookmarkTypeWindow.browseoGloable.Visibility = Visibility.Collapsed;
             bookmarkTypeWindow.ShowDialog();
             if(!bookmarkTypeWindow.OkClicked)return;
             if (bookmarkTypeWindow.browseoProj.IsChecked == true)

@@ -15,6 +15,7 @@ namespace RssReader.Models
     {
         public event Action<string> OnSelectedLaunchLink = delegate { };//send to browser
         public event Action<string> OnSelectedLaunchLinkMasher = delegate { };//send to MAsher
+        public event Action<string,string,string,string,string> OnSelectedSendToPbn = delegate { };//send to MAsher
 
         public ICommand SendToBrowser { get; set; }
 
@@ -34,6 +35,10 @@ namespace RssReader.Models
 
                 case "Masher":
                     OnSelectedLaunchLinkMasher(ListResults[SIListResults].Link);
+                    break;
+
+                case "PBNPOSTER":
+                    OnSelectedSendToPbn(ListResults[SIListResults].Link, ListResults[SIListResults].Title, ListResults[SIListResults].ImageLink, ListResults[SIListResults].Date, ListResults[SIListResults].Description);
                     break;
 
                 default:

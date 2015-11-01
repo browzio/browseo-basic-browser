@@ -34,6 +34,7 @@ namespace RssReader
         public event Action<string, string> OnLaunchToBrowser = delegate { };//link, rsslink
         public event Action<string> OnLaunchToTabBrowser = delegate { };//url
         public event Action<string> OnLaunchToTabMasher = delegate { };//url
+        public event Action<string,string,string,string,string> OnSelectedSendToPbn = delegate { };//send to MAsher
       //  public event Action<string,List<string>> OnImportedTab = delegate { };//tab title, list of rss feeds
 
         public ICommand DockPannelButtonsClick { get; set; }
@@ -114,23 +115,23 @@ namespace RssReader
             //                availrsses.Add(new AvailableTabsAndLinks() { Name = tabTitle });
             //            }
 
-            //            ChooseFolderWindow cfw = new ChooseFolderWindow();
-            //            cfw.DataContext = this;
-            //            cfw.lstItems.ItemsSource = availrsses;
-            //            cfw.ShowDialog();
-            //            if (cfw.OkClicked)
-            //            {
-            //                foreach (AvailableTabsAndLinks availTabs in availrsses)
-            //                {
-            //                    if (availTabs.IsChecked)
-            //                    {
-            //                        OnImportedTab(availTabs.Name, MyFilesDatabase.GetRssFeedLinks(spw.SelectedProjectName, availTabs.Name));
-            //                    }
-            //                }
-            //            }
+                //            ChooseFolderWindow cfw = new ChooseFolderWindow();
+                //            cfw.DataContext = this;
+                //            cfw.lstItems.ItemsSource = availrsses;
+                //            cfw.ShowDialog();
+                //            if (cfw.OkClicked)
+                //            {
+                //                foreach (AvailableTabsAndLinks availTabs in availrsses)
+                //                {
+                //                    if (availTabs.IsChecked)
+                //                    {
+                //                        OnImportedTab(availTabs.Name, MyFilesDatabase.GetRssFeedLinks(spw.SelectedProjectName, availTabs.Name));
+                //                    }
+                //                }
+                //            }
 
-            //        }
-            //break;
+                //        }
+                //break;
 
                 default:
                     break;
@@ -239,6 +240,7 @@ namespace RssReader
                                 rssLink.ListResultVis = true;
                                 rssLink.OnSelectedLaunchLink += rssLink_OnSelectedLaunchLink;
                                 rssLink.OnSelectedLaunchLinkMasher += rssLink_OnSelectedLaunchLinkMasher;
+                                rssLink.OnSelectedSendToPbn += RssLink_OnSelectedSendToPbn; ;
                             }
                             catch
                             {
@@ -295,6 +297,11 @@ namespace RssReader
             {
                 MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
             }
+        }
+
+        private void RssLink_OnSelectedSendToPbn(string link, string title, string imagelink, string date, string description)
+        {
+            OnSelectedSendToPbn(link, title, imagelink, date, description);
         }
 
         void rssLink_OnSelectedLaunchLinkMasher(string link)

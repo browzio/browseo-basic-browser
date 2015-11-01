@@ -173,7 +173,7 @@ namespace WpfCefDynamBrowser.ViewModels
             Address = address;
             AddressEditable = Address;
 
-            GoCommand = new DelegateCommand(Go, () => !String.IsNullOrWhiteSpace(Address));
+            GoCommand = new DelegateCommand(Go);
             BackCommand = new DelegateCommand(Back);
             ForwardCommand = new DelegateCommand(Forward);
             ReloadCommand = new DelegateCommand(Reload);
@@ -384,7 +384,7 @@ namespace WpfCefDynamBrowser.ViewModels
             Address = AddressEditable;
 
             // Part of the Focus hack further described in the OnPropertyChanged() method...
-            Keyboard.ClearFocus();
+            //Keyboard.ClearFocus();
         }
 
         private void Reload()

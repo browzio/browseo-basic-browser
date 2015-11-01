@@ -280,6 +280,12 @@
                                 <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="Masher" />
                             </MenuItem.InputBindings>
                         </MenuItem>
+
+                        <MenuItem Header="Send To PBN Poster">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="PBNPOSTER" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
                     </ContextMenu>
                 </ListBox.ContextMenu>
             </ListView>

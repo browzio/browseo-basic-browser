@@ -549,16 +549,7 @@ namespace WPF_WYSIWYG_HTML_Editor
             }
             catch { publishdt = DateTime.Now; }
 
-            var post = new Post
-            {
-                PostType = "post", // "post" or "page"
-                Title = title,
-                Content = content,
-                PublishDateTime = publishdt,
-                Status = "publish" // "draft" or "publish"
-            };
-
-            using (var client = new WordPressClient(new WordPressSiteConfig
+            using (WordPressClient client = new WordPressClient(new WordPressSiteConfig
             {
                 BaseUrl = profile.WebAddress,
                 BlogId = 1,
@@ -568,6 +559,22 @@ namespace WPF_WYSIWYG_HTML_Editor
             {
                 try
                 {
+                    if (content.Contains("<IMG"))
+                    {
+                        content = getcontentAfterImgUpload(content, client);
+                    }
+
+                    var post = new Post
+                    {
+                        PostType = "post", // "post" or "page"
+                        Title = title,
+                        Content = content,
+                        PublishDateTime = publishdt,
+                        Status = "publish" // "draft" or "publish"
+                    };
+
+                    Status = "Posting to " + profile.WebAddress + ".";
+
                     var id = client.NewPost(post);
                     Application.Current.Dispatcher.Invoke((Action)delegate
                     {
@@ -612,6 +619,41 @@ namespace WPF_WYSIWYG_HTML_Editor
             successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
         }
 
+        private string getcontentAfterImgUpload(string content, WordPressClient client)
+        {
+            Match m;
+            string HRefPattern = @"<img.*?src=""(?<url>.*?)"".*?>";
+
+            try
+            {
+                m = Regex.Match(content, HRefPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, TimeSpan.FromSeconds(1));
+                while (m.Success)
+                {
+                    string link = m.Groups[1].ToString();
+                    Status = "Uploading file " + link + ".";
+                    // string text = m.Groups[2].ToString();
+                    string mime = GetMimeType(link);
+                    Data data = Data.CreateFromFilePath(link.Replace("file:///", ""), mime);
+                    UploadResult uResult = client.UploadFile(data);
+                    content = content.Replace(link, uResult.Url);
+                    m = m.NextMatch();
+                }
+            }
+            catch { }
+
+            return content;
+        }
+
+        private string GetMimeType(string fileName)
+        {
+            string mimeType = "application/unknown";
+            string ext = System.IO.Path.GetExtension(fileName).ToLower();
+            Microsoft.Win32.RegistryKey regKey = Microsoft.Win32.Registry.ClassesRoot.OpenSubKey(ext);
+            if (regKey != null && regKey.GetValue("Content Type") != null)
+                mimeType = regKey.GetValue("Content Type").ToString();
+            return mimeType;
+        }
+
         private void publishSpun(string content, string title = "", bool fromtabs = false)
         {
             EnableBtns = false;
@@ -652,14 +694,6 @@ namespace WPF_WYSIWYG_HTML_Editor
                             title = PostTitle;
                             getSpunContent(ref content, ref title);
                         }
-                        var post = new Post
-                        {
-                            PostType = "post", // "post" or "page"
-                            Title = title == "" ? PostTitle : title,
-                            Content = content,
-                            PublishDateTime = publishdt,
-                            Status = "publish" // "draft" or "publish"
-                        };
 
                         using (var client = new WordPressClient(new WordPressSiteConfig
                         {
@@ -671,6 +705,22 @@ namespace WPF_WYSIWYG_HTML_Editor
                         {
                             try
                             {
+                                if (content.Contains("<IMG"))
+                                {
+                                    content = getcontentAfterImgUpload(content, client);
+                                }
+
+                                var post = new Post
+                                {
+                                    PostType = "post", // "post" or "page"
+                                    Title = title == "" ? PostTitle : title,
+                                    Content = content,
+                                    PublishDateTime = publishdt,
+                                    Status = "publish" // "draft" or "publish"
+                                };
+
+                                Status = "Posting to " + profile.WebAddress + ".";
+
                                 var id = client.NewPost(post);
                             }
                             catch
@@ -922,6 +972,8 @@ namespace WPF_WYSIWYG_HTML_Editor
                                     pbnProj.AuthorityVisible = Visibility.Visible;
                                     Mouse.OverrideCursor = null;
                                 });
+
+                                Thread.Sleep(1100);
                             }
 
                             foreach (PBNProject pbnProj in SavedMoneyProjects)
@@ -945,6 +997,8 @@ namespace WPF_WYSIWYG_HTML_Editor
                                     pbnProj.AuthorityVisible = Visibility.Visible;
                                     Mouse.OverrideCursor = null;
                                 });
+
+                                Thread.Sleep(1100);
                             }
                         }
                         catch(Exception ex)
@@ -953,7 +1007,7 @@ namespace WPF_WYSIWYG_HTML_Editor
                             {
                                 Mouse.OverrideCursor = null;
                             });
-                            MessageBox.Show("Error: " + ex.Message);
+                            MessageBox.Show("If this is a moz restriction wait between 5 - 10 seconds before using there api again. Error: " + ex.Message);
                         }
                         Application.Current.Dispatcher.Invoke((Action)delegate
                         {

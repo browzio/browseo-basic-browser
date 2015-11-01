@@ -32,6 +32,7 @@ namespace RssReader.Controlls
         public event Action<string, string> OnLaunchToBrowser = delegate { };//link, rsslink
         public event Action<string> OnLaunchToTabBrowser = delegate { };//url
         public event Action<string> OnLaunchToMasher = delegate { };//url
+        public event Action<string, string, string, string, string> OnSelectedSendToPbn = delegate { };//send to MAsher
 
         public ObservableCollection<MainViewModel> UserRssTabs { get; set; }
 
@@ -139,10 +140,16 @@ namespace RssReader.Controlls
             vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
             vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
             vm.OnLaunchToTabMasher += vm_OnLaunchToTabMasher;
+            vm.OnSelectedSendToPbn += Vm_OnSelectedSendToPbn;
             // vm.OnImportedTab += vm_OnImportedTab;
             vm.SetProfileData(mProfile);
             vm.setLinks(linksList);
             UserRssTabs.Add(vm);
+        }
+
+        private void Vm_OnSelectedSendToPbn(string link, string title, string imglink, string date, string description)
+        {
+            OnSelectedSendToPbn(link, title, imglink, date, description);
         }
 
         void vm_OnLaunchToTabMasher(string link)
@@ -204,6 +211,7 @@ namespace RssReader.Controlls
                 vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
                 vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
                 vm.OnLaunchToTabMasher += vm_OnLaunchToTabMasher;
+                vm.OnSelectedSendToPbn += Vm_OnSelectedSendToPbn;
                // vm.OnImportedTab += vm_OnImportedTab;
                 vm.SetProfileData(mProfile);
                 UserRssTabs.Add(vm);
@@ -222,6 +230,7 @@ namespace RssReader.Controlls
                     vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
                     vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
                     vm.OnLaunchToTabMasher += vm_OnLaunchToTabMasher;
+                    vm.OnSelectedSendToPbn += Vm_OnSelectedSendToPbn;
                    // vm.OnImportedTab += vm_OnImportedTab;
                     //vm.SetProfileData(mProfile);
                     UserRssTabs.Add(vm);

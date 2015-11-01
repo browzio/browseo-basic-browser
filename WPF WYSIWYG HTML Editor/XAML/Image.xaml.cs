@@ -47,7 +47,7 @@ namespace WPF_WYSIWYG_HTML_Editor
         {
             using (System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog())
             {
-                openFileDialog.InitialDirectory = @"C:\";
+               // openFileDialog.InitialDirectory = @"C:\";
                 openFileDialog.Filter = "jpg files (*.jpg)|*.jpg|All files (*.png.*)|*.png|All files (*.gif)|*.gif|All files (*.*)|*.*";
                 openFileDialog.RestoreDirectory = true;
 

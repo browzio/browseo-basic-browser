@@ -88,6 +88,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controls\EditableComboBox.cs" />
     <Compile Include="Controls\MyComboBox.cs" />
     <Compile Include="Models\WebPageImg.cs" />
     <Compile Include="Models\SavedSite.cs" />
@@ -219,6 +220,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\enterprise buddy.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\icon-global.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

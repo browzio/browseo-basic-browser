@@ -544,6 +544,8 @@ namespace Prospector.ViewModels
 
             MyFilesDatabase.SetMozIds();
             setProxyDetailes();
+
+            //createSavedOptions();
         }
 
         private void OnSetProxy(object param)
@@ -938,6 +940,7 @@ namespace Prospector.ViewModels
 
                             string pageAuthority = msURLMetrics.upa;
                             string domainAuthority = msURLMetrics.pda;
+
                             Application.Current.Dispatcher.Invoke((Action)delegate
                             {
                                 ListResults[SIListResults].PageAuthority = "PA: " + pageAuthority;
@@ -945,6 +948,7 @@ namespace Prospector.ViewModels
                                 ListResults[SIListResults].AuthorityVisible = Visibility.Visible;
                                 Mouse.OverrideCursor = null;
                             });
+
                             //ListResults[SIListResults].AuthorityVisible = Visibility.Visible;
 
                             //string externalLinks = msURLMetrics.ued;
@@ -966,6 +970,7 @@ namespace Prospector.ViewModels
 
                                 string pageAuthority1 = msURLMetrics1.upa;
                                 string domainAuthority1 = msURLMetrics1.pda;
+                                Thread.Sleep(1100);
                                 Application.Current.Dispatcher.Invoke((Action)delegate
                                 {
                                     res.PageAuthority = "PA: " + pageAuthority1;
@@ -982,7 +987,7 @@ namespace Prospector.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error: " + ex.Message);
+                    MessageBox.Show("If this is a moz restriction wait between 5 - 10 seconds before using there api again. Error: " + ex.Message);
                     Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         Mouse.OverrideCursor = null;
@@ -1100,8 +1105,9 @@ namespace Prospector.ViewModels
             {
                 if (!string.IsNullOrWhiteSpace(sfw.tbName.Text) && !string.IsNullOrEmpty(sfw.tbName.Text))
                 {
+                    SavedFP.Clear();
                     SavedFP.Add(new SavedFootprint() { Name = sfw.tbName.Text, Footprint = FootPrintString });
-                    saveSavedFootprints();
+                    saveSavedFootprints(true);
                 }
             }
         }
@@ -1113,10 +1119,10 @@ namespace Prospector.ViewModels
                 SavedFP.RemoveAt(SISavedFP);
             }
             catch { }
-            saveSavedFootprints();
+            saveSavedFootprints(false);
         }
 
-        private void saveSavedFootprints()
+        private void saveSavedFootprints(bool reAdd)
         {
             new Thread(() =>
             {
@@ -1138,10 +1144,13 @@ namespace Prospector.ViewModels
                             {
                                 if (fp.Name == fpFromFile.Name) continue;
                             }
-                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            if (reAdd)
                             {
-                                SavedFP.Add(fpFromFile);
-                            });
+                                Application.Current.Dispatcher.Invoke((Action)delegate
+                                {
+                                    SavedFP.Add(fpFromFile);
+                                });
+                            }
                         }
                     }
 

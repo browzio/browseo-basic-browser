@@ -22,8 +22,6 @@
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
             </ResourceDictionary.MergedDictionaries>
             
-            
-
             <Style TargetType="{x:Type ContextMenu}">
                 <Setter Property="SnapsToDevicePixels" Value="True" />
                 <Setter Property="OverridesDefaultStyle" Value="True" />
@@ -271,21 +269,21 @@
                         </Button.ContextMenu>
                     </Button>
                 
-                    <ComboBox Height="23"
+                    <mControls:MyComboBox Height="23"
                           IsEditable="True"
                           x:Name="cmbSites"
                           IsTextSearchEnabled="False"
-                          PreviewKeyDown="cmbSites_PreviewKeyDown"
+                          OnAfterTextBoxKeyDown="cmbSites_PreviewKeyDown"
                          Text="{Binding AddressEditable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <ComboBox.ItemContainerStyle>
                         <Style TargetType="ComboBoxItem">
                             <Setter Property="Width" Value="{Binding Path=ActualWidth,ElementName=cmbSites}"/>
                         </Style>
                     </ComboBox.ItemContainerStyle>
-                    <ComboBox.InputBindings>
+                    <!--<ComboBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding GoCommand}" />
-                    </ComboBox.InputBindings>
-                </ComboBox>
+                    </ComboBox.InputBindings>-->
+                </mControls:MyComboBox>
 
                 <!--<TextBox Height="23"
                          Text="{Binding AddressEditable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"

@@ -13,6 +13,8 @@ using Organiser.Common;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 using DragDropListview;
+using System.Net;
+using System.IO;
 
 namespace Xilium.CefGlue.Client
 {
@@ -72,67 +74,67 @@ namespace Xilium.CefGlue.Client
 
         #region mouse hooks
 
-        public delegate int HookProc(int nCode, IntPtr wParam, IntPtr lParam);
+        //public delegate int HookProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-        //Declare the hook handle as an int.
-        static int hHookMouse = 0;
-        static int hHookKeyboard = 0;
+        ////Declare the hook handle as an int.
+        //static int hHookMouse = 0;
+        //static int hHookKeyboard = 0;
 
-        //Declare the mouse hook constant.
-        //For other hook types, you can obtain these values from Winuser.h in the Microsoft SDK.
-        private const int WH_KEYBOARD = 13;
-        private const int WH_MOUSE = 7;
-        private const int WM_MOUSEMOVE = 0x0200;
-        private const int WM_LBUTTONDOWN = 0x0201;
+        ////Declare the mouse hook constant.
+        ////For other hook types, you can obtain these values from Winuser.h in the Microsoft SDK.
+        //private const int WH_KEYBOARD = 13;
+        //private const int WH_MOUSE = 7;
+        //private const int WM_MOUSEMOVE = 0x0200;
+        //private const int WM_LBUTTONDOWN = 0x0201;
 
-        //Declare the wrapper managed POINT class.
-        [StructLayout(LayoutKind.Sequential)]
-        public class POINT
-        {
-            public int x;
-            public int y;
-        }
+        ////Declare the wrapper managed POINT class.
+        //[StructLayout(LayoutKind.Sequential)]
+        //public class POINT
+        //{
+        //    public int x;
+        //    public int y;
+        //}
 
-        //Declare the wrapper managed MouseHookStruct class.
-        [StructLayout(LayoutKind.Sequential)]
-        public class MouseHookStruct
-        {
-            public POINT pt;
-            public int hwnd;
-            public int wHitTestCode;
-            public int dwExtraInfo;
-        }
-        public struct KeyboardHookStruct
-        {
-            public int vkCode;
-            public int scanCode;
-            public int flags;
-            public int time;
-            public int dwExtraInfo;
-        }
+        ////Declare the wrapper managed MouseHookStruct class.
+        //[StructLayout(LayoutKind.Sequential)]
+        //public class MouseHookStruct
+        //{
+        //    public POINT pt;
+        //    public int hwnd;
+        //    public int wHitTestCode;
+        //    public int dwExtraInfo;
+        //}
+        //public struct KeyboardHookStruct
+        //{
+        //    public int vkCode;
+        //    public int scanCode;
+        //    public int flags;
+        //    public int time;
+        //    public int dwExtraInfo;
+        //}
 
-        //This is the Import for the SetWindowsHookEx function.
-        //Use this function to install a thread-specific hook.
-        [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
-        public static extern int SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, uint threadId);
+        ////This is the Import for the SetWindowsHookEx function.
+        ////Use this function to install a thread-specific hook.
+        //[DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+        //public static extern int SetWindowsHookEx(int idHook, HookProc lpfn, IntPtr hInstance, uint threadId);
 
-        //This is the Import for the UnhookWindowsHookEx function.
-        //Call this function to uninstall the hook.
-        [DllImport("user32.dll", CharSet = CharSet.Auto,
-         CallingConvention = CallingConvention.StdCall)]
-        public static extern bool UnhookWindowsHookEx(int idHook);
+        ////This is the Import for the UnhookWindowsHookEx function.
+        ////Call this function to uninstall the hook.
+        //[DllImport("user32.dll", CharSet = CharSet.Auto,
+        // CallingConvention = CallingConvention.StdCall)]
+        //public static extern bool UnhookWindowsHookEx(int idHook);
 
-        //This is the Import for the CallNextHookEx function.
-        //Use this function to pass the hook information to the next hook procedure in chain.
-        [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
-        public static extern int CallNextHookEx(int idHook, int nCode, IntPtr wParam, IntPtr lParam);
+        ////This is the Import for the CallNextHookEx function.
+        ////Use this function to pass the hook information to the next hook procedure in chain.
+        //[DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+        //public static extern int CallNextHookEx(int idHook, int nCode, IntPtr wParam, IntPtr lParam);
 
-        [DllImport("user32.dll")]
-        static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr ProcessId);
+        //[DllImport("user32.dll")]
+        //static extern uint GetWindowThreadProcessId(IntPtr hWnd, IntPtr ProcessId);
 
-        public HookProc KeyboardHookProcedure { get; set; }
+        //public HookProc KeyboardHookProcedure { get; set; }
 
-        public HookProc MouseHookProcedure { get; set; }
+        //public HookProc MouseHookProcedure { get; set; }
 
         void CBrowser_BrowserCreated(object sender, EventArgs e)
         {
@@ -178,6 +180,87 @@ namespace Xilium.CefGlue.Client
             if (contextMenueItemID == 999)
             {
                 OnCreateNewTab(huverLunk,false);
+            }
+
+            if (contextMenueItemID == 888)
+            {
+                MyFilesDatabase.SetClipboardText(huverLunk);
+            }
+
+            if (contextMenueItemID == 777)
+            {
+                bool errored = false;
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Filter = "Png files (*.png)|*.png|JPeg files (*.jpeg)|*.jpeg|All files (*.*)|*.*";
+                sfd.FilterIndex = 3;
+                sfd.RestoreDirectory = true;
+                sfd.ShowDialog();
+                System.Threading.Tasks.Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
+                        using (WebClient webClient = new WebClient())
+                        {
+                            byte[] data = webClient.DownloadData(huverLunk);
+
+                            using (MemoryStream mem = new MemoryStream(data))
+                            {
+                                using (var yourImage = Image.FromStream(mem))
+                                {
+                                    // If you want it as Png
+                                    yourImage.Save(sfd.FileName);
+
+                                    // If you want it as Jpeg
+                                    //yourImage.Save("path_of_your_file.jpg", ImageFormat.Jpeg);
+                                }
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            if (CBrowser.Browser.GetMainFrame().Url == null)
+                            {
+                                MessageBox.Show("Failed to save image.");
+                                return;
+                            }
+
+                            using (WebClient webClient = new WebClient())
+                            {
+                                byte[] data = webClient.DownloadData(CBrowser.Browser.GetMainFrame().Url);
+
+                                using (MemoryStream mem = new MemoryStream(data))
+                                {
+                                    using (var yourImage = Image.FromStream(mem))
+                                    {
+                                        // If you want it as Png
+                                        yourImage.Save(sfd.FileName);
+
+                                        // If you want it as Jpeg
+                                        //yourImage.Save("path_of_your_file.jpg", ImageFormat.Jpeg);
+                                    }
+                                }
+                            }
+                        }
+                        catch
+                        {
+                            MessageBox.Show("Failed to save image.");
+                            errored = true;
+                        }
+                    }
+
+                    if (!errored)
+                    {
+                        try
+                        {
+                            //MessageBox.Show("Image downloaded to " + sfd.FileName);
+                            FileInfo fileInfo = new FileInfo(sfd.FileName);
+                            Process.Start(fileInfo.DirectoryName);
+                        }
+                        catch { }
+                    }
+                });
             }
         }
 
@@ -922,17 +1005,17 @@ namespace Xilium.CefGlue.Client
                 components.Dispose();
             }
 
-            if (disposing)
-            {
-                if (hHookKeyboard != 0)
-                {
-                    UnhookWindowsHookEx(hHookKeyboard);
-                }
-                if (hHookMouse != 0)
-                {
-                    UnhookWindowsHookEx(hHookMouse);
-                }
-            }
+            //if (disposing)
+            //{
+            //    if (hHookKeyboard != 0)
+            //    {
+            //        UnhookWindowsHookEx(hHookKeyboard);
+            //    }
+            //    if (hHookMouse != 0)
+            //    {
+            //        UnhookWindowsHookEx(hHookMouse);
+            //    }
+            //}
 
             base.Dispose(disposing);
         }
