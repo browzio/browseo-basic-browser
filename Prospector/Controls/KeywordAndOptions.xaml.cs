@@ -25,5 +25,14 @@ namespace Prospector.Controls
         {
             InitializeComponent();
         }
+
+        private void TextBlock_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        {
+              if(DataContext is FootPrintsOptionsVM)
+            {
+                FootPrintsOptionsVM vm = (DataContext as FootPrintsOptionsVM);
+                vm.SendToTheBrowser("countrycode.org");
+            }  
+        }
     }
 }

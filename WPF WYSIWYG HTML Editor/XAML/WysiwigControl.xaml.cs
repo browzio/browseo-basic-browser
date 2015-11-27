@@ -406,15 +406,41 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
 
                     string htmlstring = "<BLOCKQUOTE>";
 
-                    htmlstring += "<H1>" + title + "</H1>";
-                    htmlstring += "<P>" + date + "</P>";
+                    if (!string.IsNullOrEmpty(title) && !string.IsNullOrWhiteSpace(title))
+                        htmlstring += "<H1>" + title + "</H1>";
+                    if(!string.IsNullOrEmpty(date) && !string.IsNullOrWhiteSpace(date))
+                        htmlstring += "<P>" + date + "</P>";
                     if (imglink != "https:" && imglink != "http:" && !string.IsNullOrEmpty(imglink) && !string.IsNullOrWhiteSpace(imglink))
                         htmlstring += "<img src=\"" + imglink + "\" />";
-                    htmlstring += "<P>" + description + "</P>";
-                    htmlstring += "<A href=\"" + link + " \" > " + link + " </a>";
+                    if (!string.IsNullOrEmpty(description) && !string.IsNullOrWhiteSpace(description))
+                        htmlstring += "<P>" + description + "</P>";
+                    if (!string.IsNullOrEmpty(link) && !string.IsNullOrWhiteSpace(link))
+                        htmlstring += "<A href=\"" + link + " \" > " + link + " </a>";
                     htmlstring += "</BLOCKQUOTE>";
 
                     webBrowserEditor.doc.body.innerHTML += htmlstring;
+                }
+                catch { }
+            });
+        }
+
+        public void AddSetRssFeed(string content)
+        {
+            System.Threading.Tasks.Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    int start = Environment.TickCount;
+                    while (webBrowserEditor.doc.readyState != "complete")
+                    {
+                        System.Threading.Thread.Sleep(50);
+                        if (Environment.TickCount - start > 4000)
+                        {
+                            return;
+                        }
+                    }
+
+                    webBrowserEditor.doc.body.innerText += content;
                 }
                 catch { }
             });

@@ -28,6 +28,7 @@ namespace Xilium.CefGlue.Client
         public event Action<string,bool> OnCreateNewTab = delegate { };
         public event Action<bool> OnBrowserLoadingChanged = delegate { };
         public event Action<string> OnPinIt = delegate { };
+        public event Action<string> OnCurateToPBN = delegate { };
 
         public CefWebBrowser CBrowser { get; set; }
 
@@ -175,6 +176,21 @@ namespace Xilium.CefGlue.Client
                 return;
             }
 
+            if (contextMenueItemID == 666)
+            {
+                try {
+                    //SendKeys.SendWait("^{c}");
+                    CBrowser.Browser.GetMainFrame().Copy();
+                    string text = Clipboard.GetText();
+                    OnCurateToPBN(text);
+                }
+                catch(Exception ex)
+                {
+
+                }
+                return;
+            }
+
             if (huverLunk == null || huverLunk == "") return;
 
             if (contextMenueItemID == 999)
@@ -186,6 +202,8 @@ namespace Xilium.CefGlue.Client
             {
                 MyFilesDatabase.SetClipboardText(huverLunk);
             }
+
+ 
 
             if (contextMenueItemID == 777)
             {

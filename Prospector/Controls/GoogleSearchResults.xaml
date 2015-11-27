@@ -3,9 +3,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converter="clr-namespace:Prospector.Converters" 
              mc:Ignorable="d" 
              Name="uc">
-   
+    <UserControl.Resources>
+        <converter:booleanToVisible x:Key="boolToVis" />
+    </UserControl.Resources>
+
     <Grid Background="#f5f5f5">
         <ListView IsSynchronizedWithCurrentItem="True" Margin="10"
                   ItemsSource="{Binding ListResults}"
@@ -45,6 +49,8 @@
 
                                         <TextBlock Text="{Binding Description, Mode=OneWay}"
                                                    Margin="3"
+                                                   MaxWidth="450"
+                                                   HorizontalAlignment="Left"
                                                    TextWrapping="Wrap"
                                                    Foreground="Black" />
                                         <!--<TextBox Background="Transparent"
@@ -76,19 +82,25 @@
             </ListView.View>
             <ListBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Send To Browser">
+                    <MenuItem Header="View In Browser">
                         <MenuItem.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" />
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="BROWSER" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    
+
+                    <MenuItem Header="Curate It">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="PBNPOSTER" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+
                     <MenuItem Header="Moz Check">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding RanckCheck}" CommandParameter="MOZ" />
                         </MenuItem.InputBindings>
                     </MenuItem>
 
-                    <MenuItem Header="Moz Check All">
+                    <MenuItem Header="Moz Check All" Visibility="{Binding Path= NotVisible_WebHose,Converter={StaticResource boolToVis}}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding RanckCheck}" CommandParameter="MOZALL" />
                         </MenuItem.InputBindings>

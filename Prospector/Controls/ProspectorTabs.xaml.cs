@@ -123,5 +123,14 @@ namespace Prospector.Controls
             btnSaved.Background = (Brush)bc.ConvertFrom("#FFD7D7D7");
             currentSenderContent = (sender as Button).Content.ToString();
         }
+
+        private void btnWebHose_Click(object sender, RoutedEventArgs e)
+        {
+            tbContrl.SelectedIndex = FootPrintsOptionsVM.Webhose;
+            setButtonsWhite();
+            var bc = new BrushConverter();
+            btnWebHose.Background = (Brush)bc.ConvertFrom("#FFD7D7D7");
+            currentSenderContent = (sender as Button).Content.ToString();
+        }
     }
 }

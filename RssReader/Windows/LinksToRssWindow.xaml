@@ -411,7 +411,7 @@
             </Button>
         </StackPanel>
 
-        <TextBox Grid.Column="1" Grid.Row="1" Name="tbInputedText" IsEnabled="{Binding EnableOkBtn}" Text="{Binding InputedText}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" FontFamily="Verdana" FontSize="15" />
+        <TextBox Grid.Column="1" Grid.Row="1" Name="tbInputedText" IsEnabled="{Binding EnableOkBtn}" Text="{Binding InputedText,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" FontFamily="Verdana" FontSize="15" />
         <DockPanel Grid.Row="2" Grid.Column="1">
             <TextBlock Text="Feed Title:" VerticalAlignment="Center" Width="60" Margin="3" />
             <TextBox Text="{Binding SiteName}" Margin="3" />

@@ -79,29 +79,72 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Keyword:"  VerticalAlignment="Center"
                                Visibility="{Binding Path= Visible_Custom,Converter={StaticResource boolToVis}}" />
-                    <TextBox Text="{Binding Keyword,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="200"
-                             HorizontalAlignment="Left" Margin="13,8"
+                    <TextBox Text="{Binding Keyword,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="200" HorizontalAlignment="Left" Margin="13,8"
                              Visibility="{Binding Path= Visible_Custom,Converter={StaticResource boolToVis}}" />
-                    
-                    <CheckBox Content="Use Proxy" IsChecked="{Binding UseProxy}" Margin="5" />
+
+                    <TextBlock Text="Keyword:"  VerticalAlignment="Center"
+                               Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}" />
+                    <TextBox Text="{Binding Keyword,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}" Width="200" HorizontalAlignment="Left" Margin="13,8"
+                             Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}" />
+
+                    <CheckBox Content="Use Proxy" IsChecked="{Binding UseProxy}" Margin="5" Visibility="{Binding Path= NotVisible_WebHose,Converter={StaticResource boolToVis}}"  />
                 </StackPanel>
-                
-                <StackPanel Orientation="Horizontal">
+
+                <StackPanel Orientation="Horizontal" Visibility="{Binding Path= NotVisible_WebHose,Converter={StaticResource boolToVis}}">
                     <TextBlock Text="Footprint:" VerticalAlignment="Top"  Margin="0,8,0,0"/>
                     <TextBox Text="{Binding FootPrintString}" TextWrapping="Wrap" Width="400" Height="40" Margin="8" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}" Margin="0,0,0,3">
+                    <TextBlock Text="Either of these:" TextWrapping="Wrap" Width="59" VerticalAlignment="Top" />
+                    <StackPanel>
+                        <TextBox Text="{Binding SpecificKws}" TextWrapping="Wrap" Width="400"  Margin="1" />
+                        <TextBlock Text="(Coma seperated additional keywords to serch for)"  VerticalAlignment="Top" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}">
+                    <TextBlock Text="Specific Sites:" TextWrapping="Wrap" Width="59" VerticalAlignment="Top" />
+                    <Image Source="/Prospector;component/Images/info.png" Margin="-48,6,0,0" VerticalAlignment="Center" ToolTipService.ShowDuration="15000" 
+                           ToolTip="Enter the top level domain (TLD),&#x0a; for example instead of www.yahoo.com enter yahoo.com" />
+                    <StackPanel>
+                        <TextBox Text="{Binding SpecificSites}" TextWrapping="Wrap" Width="400"  Margin="1" />
+                        <TextBlock Text="(Coma seperated sites to serch in)"  VerticalAlignment="Top" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}">
+                    <TextBlock Text="Country:" VerticalAlignment="Center" TextWrapping="Wrap" Width="52"  />
+                    <TextBox Text="{Binding CountryCode}" TextWrapping="Wrap" Width="40" Margin="8" />
+                    <TextBlock Text="(for USA = US)     " VerticalAlignment="Center"  Margin="1"/>
+                    <TextBlock Text="visit countrycode.org for full list" Foreground="Blue" Cursor="Hand" PreviewMouseUp="TextBlock_PreviewMouseUp"  VerticalAlignment="Top"  Margin="0,13,0,0" />
                 </StackPanel>
 
                 <Button Command="{Binding SaveFootprint}" Content="Save Footprint"
                         Visibility="{Binding Path= Visible_savebtn,Converter={StaticResource boolToVis}}"
                     Style="{StaticResource ButtonStyle}" HorizontalAlignment="Left" Margin="5"/>
             </StackPanel>
-            
-            <StackPanel Margin="10" Grid.Column="1" VerticalAlignment="Top"
-                        Visibility="{Binding Path= Visible_Custom,Converter={StaticResource boolToVis}}">
-                <!--<StackPanel Margin="5,0,0,20" Orientation="Horizontal">-->
-                    <CheckBox Content="Keyword in URL" IsChecked="{Binding Checked_KeywordInUrl}" Margin="2" Height="20" />
-                    <!--<TextBlock Text="Keyword in URL" Margin="2" Height="18"  />-->
-                <!--</StackPanel>-->
+
+            <StackPanel Margin="7" Grid.Column="1" VerticalAlignment="Top" Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}">
+                <StackPanel>
+                    <CheckBox Content="KW In Title" IsChecked="{Binding KWinTitleIsChecked}" Margin="2" />
+                    <CheckBox Content="KW In Content" IsChecked="{Binding KWinContentIsChecked}" Margin="2" />
+                </StackPanel>
+                
+                <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
+                    <TextBlock Text="Performance Score" Margin="4,2,2,2" />
+                    <Image Source="/Prospector;component/Images/info.png" Margin="2" VerticalAlignment="Center" ToolTipService.ShowDuration="15000" 
+                           ToolTip="The score ranges between 0-10,&#x0a; where 0 means that the post didn't do well at all,&#x0a; i.e rarely or was never shared,&#x0a; to 10 which means that the post was on fire,&#x0a; shared thousands of times over on either Twitter,&#x0a; Facebook and other social networks." />
+                </StackPanel>
+                <ComboBox ItemsSource="{Binding PerformanceScores}" 
+                              SelectedIndex="{Binding CmbPerformanceScoresIndex}" 
+                              Margin="2"
+                              Width="100"
+                              Height="22" />
+            </StackPanel>
+
+            <StackPanel Margin="10" Grid.Column="1" VerticalAlignment="Top" Visibility="{Binding Path= Visible_Custom,Converter={StaticResource boolToVis}}">
+                <CheckBox Content="Keyword in URL" IsChecked="{Binding Checked_KeywordInUrl}" Margin="2" Height="20" />
                 
                 <StackPanel Margin="0,10,0,0">
                     <TextBlock Text="Max Results Pages" Margin="4,2,2,2" />
@@ -124,50 +167,31 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Orientation="Horizontal">
-                    <StackPanel Margin="5" Background="{StaticResource groupBg}"
+                <StackPanel Margin="5" Background="{StaticResource groupBg}"
                                     MaxWidth="350"
                                     Visibility="{Binding Path= Visible_Custom,Converter={StaticResource boolToVis}}" 
                                     HorizontalAlignment="Left" VerticalAlignment="Top">
-                        <TextBlock Margin="8" Text="Select Blogs Of Interest" FontWeight="Bold" />
-                        <ItemsControl ItemsSource="{Binding WebsitesForBlogs}" Margin="8">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <RadioButton Content="{Binding Option}" 
+                    <TextBlock Margin="8" Text="Select Blogs Of Interest" FontWeight="Bold" />
+                    <ItemsControl ItemsSource="{Binding WebsitesForBlogs}" Margin="8">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <RadioButton Content="{Binding Option}" 
                                                  Margin="2"
                                                  Height="20"
                                                  Width="160"
                                                  IsChecked="{Binding Checked}"
                                                  GroupName="G1" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel Orientation="{Binding RBOrientation}" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
-                    </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="{Binding RBOrientation}" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </StackPanel>
 
-                    <StackPanel Grid.Column="1"   Margin="5" Background="{StaticResource groupBg}"
-                                    Visibility="{Binding Path= Visible_Custom,Converter={StaticResource boolToVis}}" 
-                                HorizontalAlignment="Left"
-                                VerticalAlignment="Top">
-                            <TextBlock Text="Select TLD" FontWeight="Bold" Margin="8" />
-                            <ItemsControl ItemsSource="{Binding TLDs}" Margin="8">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <WrapPanel>
-                                            <RadioButton Content="{Binding Option}" 
-                                                          Margin="2"
-                                                 IsChecked="{Binding Checked}" 
-                                                 GroupName="G2" />
-                                        </WrapPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-
-                    <StackPanel Grid.Column="2"  Background="{StaticResource groupBg}" Margin="5" 
+                <StackPanel Grid.Column="2"  Background="{StaticResource groupBg}" Margin="5" 
                                 HorizontalAlignment="Left" VerticalAlignment="Top"
                             Visibility="{Binding Path= Visible_CommentSettings,Converter={StaticResource boolToVis}}">
                             <TextBlock Text="Comment Settings" Margin="8"  FontWeight="Bold"/>
@@ -184,7 +208,7 @@
                             </ItemsControl>
                         </StackPanel>
 
-                    <StackPanel Grid.Column="3"  Margin="5" Background="{StaticResource groupBg}"
+               <StackPanel Grid.Column="3"  Margin="5" Background="{StaticResource groupBg}"
                                     Visibility="{Binding Path= Visible_Custom,Converter={StaticResource boolToVis}}" 
                                 HorizontalAlignment="Left" VerticalAlignment="Top">
                         <TextBlock Text="Time Frame" FontWeight="Bold" Margin="4" />
@@ -202,7 +226,68 @@
                             </ComboBox.ItemTemplate>
                         </ComboBox>
                     </StackPanel>
+
+                <!-- region webhose -->
+                <StackPanel Grid.Column="1"   Margin="5" Background="{StaticResource groupBg}" 
+                                Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}" 
+                                MaxWidth="350"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top">
+                    <TextBlock Text="Select Language" FontWeight="Bold" Margin="8" />
+                    <ItemsControl ItemsSource="{Binding Langs}" Margin="8">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Option}" Height="20" Width="160"  Margin="2" IsChecked="{Binding Checked}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="{Binding RBOrientation}" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
                 </StackPanel>
+
+                <StackPanel Grid.Column="1"   Margin="5" Background="{StaticResource groupBg}" 
+                                Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}" 
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top">
+                    <TextBlock Text="Select TLD" FontWeight="Bold" Margin="8" />
+                    <ItemsControl ItemsSource="{Binding TLDs}" Margin="8">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Option}" Height="20" Width="160"  Margin="2" IsChecked="{Binding Checked}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <!--<ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="{Binding RBOrientation}" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>-->
+                    </ItemsControl>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2"   Margin="5" Background="{StaticResource groupBg}" 
+                                Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}" 
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Top">
+                    <TextBlock Text="Select Site Type" FontWeight="Bold" Margin="8" />
+                    <ItemsControl ItemsSource="{Binding SiteTypesWebHose}" Margin="8">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Option}" Height="20" Width="160"  Margin="2" IsChecked="{Binding Checked}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <!--<ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="{Binding RBOrientation}" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>-->
+                    </ItemsControl>
+                </StackPanel>
+                <!-- endregion -->
+
+            </StackPanel>
 
             <Grid Background="#f5f5f5" Visibility="{Binding Path= Visible_SavedFP,Converter={StaticResource boolToVis}}" >
                 <Grid.RowDefinitions>

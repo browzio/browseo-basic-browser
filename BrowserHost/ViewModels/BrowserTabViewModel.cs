@@ -23,6 +23,7 @@ namespace WpfCefDynamBrowser.ViewModels
         public event Action OnRefreshReminders = delegate { };
         public event Action OnRemindersChanged = delegate { };
         public event Action OnRefreshBookmarksList = delegate { };
+        public event Action<string> OnCurateToPBN = delegate { };
 
         private Thickness tabMargin;
         public Thickness TabMargin
@@ -319,6 +320,12 @@ namespace WpfCefDynamBrowser.ViewModels
             WebBrowser.OnBrowserAddressChanged += WebBrowser_OnBrowserAddressChanged;
             WebBrowser.OnBrowserStatusChanged += WebBrowser_OnBrowserStatusChanged;
             WebBrowser.OnCreateNewTab += WebBrowser_OnCreateNewTab;
+            WebBrowser.OnCurateToPBN += WebBrowser_OnCurateToPBN;
+        }
+
+        private void WebBrowser_OnCurateToPBN(string highlighttext)
+        {
+            OnCurateToPBN(highlighttext);
         }
 
         void WebBrowser_OnBrowserStatusChanged(string oMessage)
@@ -331,11 +338,18 @@ namespace WpfCefDynamBrowser.ViewModels
             OnCreateNewTab(url, showNewTab);
         }
 
+        public event Action<string> OnShouldChangePropertyAddress = delegate { };
         void WebBrowser_OnBrowserAddressChanged(string address)
         {
             dontGo = true;
-            AddressEditable = address;
+            OnShouldChangePropertyAddress(address);
+            //AddressEditable = address;
             Organiser.Common.Classes.UsageTracker.AddTraceCookie("Address Changed " + address);
+        }
+
+        public void ChangeAddressEditable(string address)
+        {
+            AddressEditable = address;
         }
 
         void WebBrowser_OnBrowserTitleChanged(string ttl)

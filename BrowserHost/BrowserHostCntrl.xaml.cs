@@ -28,6 +28,7 @@ namespace BrowserHost
         private const string DefaultUrlForAddedTabs = "https://www.google.com";
 
         public ObservableCollection<BrowserTabViewModel> BrowserTabs { get; set; }
+        public event Action<string> OnCurateToPBN = delegate { };
 
         ulong availmem;
         int timesToCheck = 0;
@@ -151,6 +152,7 @@ namespace BrowserHost
                 btvm.OnCreateNewTab += btvm_OnCreateNewTab;
                 btvm.OnAddedBookmark += btvm_OnAddedBookmark;
                 btvm.OnRemindersChanged += btvm_OnRemindersChanged;
+                btvm.OnCurateToPBN += Btvm_OnCurateToPBN;
                 if (BrowserTabs.Count > 0)
                     btvm.TabMargin = new Thickness(-20, 0, 0, 0);
                 else
@@ -177,6 +179,11 @@ namespace BrowserHost
                 //}
                     //scrollview.ScrollToVerticalOffset(9.5);
             });
+        }
+
+        private void Btvm_OnCurateToPBN(string content)
+        {
+            OnCurateToPBN(content);
         }
 
         void btvm_OnRemindersChanged()

@@ -84,6 +84,18 @@ namespace Prospector.Models
             }
         }
 
+        private string published;
+        public string Published
+        {
+            get { return published; }
+            set
+            {
+                published = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Published"));
+            }
+        }
+
         private string pageAuthority;
         public string PageAuthority
         {

@@ -45,7 +45,7 @@ namespace Xilium.CefGlue.Client
                 PersistSessionCookies = true,
                 LogSeverity = CefLogSeverity.Disable,
                 IgnoreCertificateErrors = true,
-                UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36"
+                UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36"
                 //NoSandbox = true
                 //LogFile = "CefGlue.log",
             };

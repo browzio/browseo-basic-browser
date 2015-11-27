@@ -274,6 +274,8 @@
                           x:Name="cmbSites"
                           IsTextSearchEnabled="False"
                           OnAfterTextBoxKeyDown="cmbSites_PreviewKeyDown"
+                         ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                          ScrollViewer.CanContentScroll="False"
                          Text="{Binding AddressEditable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                     <ComboBox.ItemContainerStyle>
                         <Style TargetType="ComboBoxItem">

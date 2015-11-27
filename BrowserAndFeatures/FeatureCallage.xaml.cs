@@ -46,6 +46,9 @@ namespace BrowserAndFeatures
             //}).Start();
             SetPersonData();
             (prospector.DataContext as FootPrintsOptionsVM).OnClickedSearch += FeatureCallage_OnClickedSearch;
+            (prospector.DataContext as FootPrintsOptionsVM).OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
+            prospector.tabKingKontent.Visibility = App.HasKingKintent ? Visibility.Visible : Visibility.Collapsed;
+            browser.OnCurateToPBN += Browser_OnCurateToPBN;
         }
 
         void FeatureCallage_OnClickedSearch(string query)
@@ -307,6 +310,18 @@ namespace BrowserAndFeatures
             }
 
             wisi.AddSetRssFeed(link, title, imglink, date, description);
+        }
+
+        private void Browser_OnCurateToPBN(string content)
+        {
+            if (wisi.DataContext == null)
+            {
+
+                tbControl.SelectedIndex = 3;
+                setwisi();
+            }
+
+            wisi.AddSetRssFeed(content);
         }
 
         private void youtuber_PreviewMouseDown(object sender, MouseButtonEventArgs e)

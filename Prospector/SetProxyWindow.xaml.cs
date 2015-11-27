@@ -37,17 +37,12 @@ namespace Prospector
                 string filePath = System.IO.Path.Combine(mozDir, "proxy.txt");
                 if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
 
-                System.IO.File.AppendAllText(filePath, txtIP.Text + MyFilesDatabase.SPLITTER + txtPORT.Text + MyFilesDatabase.SPLITTER + txtUser.Text + MyFilesDatabase.SPLITTER + txtPass.Text);
+                System.IO.File.AppendAllText(filePath, tbInputedText.Text);
 
                 OKClicked = true;
             }
             catch { }
             OKClicked = true;
-            this.Close();
-        }
-
-        private void btnCancel_Click(object sender, RoutedEventArgs e)
-        {
             this.Close();
         }
     }

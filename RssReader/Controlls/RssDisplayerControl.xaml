@@ -269,7 +269,7 @@
                       SelectedIndex="{Binding SIListResults, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
                 <ListBox.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Send To Browser">
+                        <MenuItem Header="View In Browser">
                             <MenuItem.InputBindings>
                                 <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="Browser" />
                             </MenuItem.InputBindings>
@@ -281,7 +281,7 @@
                             </MenuItem.InputBindings>
                         </MenuItem>
 
-                        <MenuItem Header="Send To PBN Poster">
+                        <MenuItem Header="Curate It">
                             <MenuItem.InputBindings>
                                 <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="PBNPOSTER" />
                             </MenuItem.InputBindings>

@@ -38,6 +38,9 @@ namespace Prospector.Models
             }
         }
 
+        public webhose.Languages LangForWebhose { get; set; }
+        public webhose.SiteTypes SiteTypeWebhose { get; set; }
+
         private string query;
         public string Query
         {

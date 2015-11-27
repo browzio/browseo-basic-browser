@@ -15,12 +15,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using webhose;
 
 namespace Prospector.ViewModels
 {
     public class FootPrintsOptionsVM : INotifyPropertyChanged
     {
         public event Action<string> OnClickedSearch = delegate { };
+        public event Action<string, string, string, string, string> OnSelectedSendToPbn = delegate { };//send to MAsher(link,title,imglink,date,description)
 
         public const int Comment_Backlinks = 0;
         public const int Forum = 1;
@@ -28,7 +30,8 @@ namespace Prospector.ViewModels
         public const int Blogs = 3;
         public const int Link_Roundups = 4;
         public const int Custom = 5;
-        public const int Saved = 6;
+        public const int Webhose = 6;
+        public const int Saved = 7;
 
         #region commands
         private ICommand startSearch;
@@ -138,6 +141,7 @@ namespace Prospector.ViewModels
         private List<SearchResult> l_Comment_Backlinks = new List<SearchResult>();
         private List<SearchResult> l_Custom = new List<SearchResult>();
         private List<SearchResult> l_Saved = new List<SearchResult>();
+        private List<SearchResult> l_Webhose = new List<SearchResult>();
 
         private ObservableCollection<int> maxPages;
         public ObservableCollection<int> MaxPages
@@ -145,7 +149,34 @@ namespace Prospector.ViewModels
             get { return maxPages; }
             set { maxPages = value; }
         }
-        #endregion 
+
+
+        #region webhose
+        private ObservableCollection<Footprint> langs;
+        public ObservableCollection<Footprint> Langs
+        {
+            get { return langs; }
+            set { langs = value; }
+        }
+
+        private ObservableCollection<Footprint> siteTypesWebHose;
+        public ObservableCollection<Footprint> SiteTypesWebHose
+        {
+            get { return siteTypesWebHose; }
+            set { siteTypesWebHose = value; }
+        }
+
+        //PerformanceScores
+        private ObservableCollection<string> performanceScores;
+        public ObservableCollection<string> PerformanceScores
+        {
+            get { return performanceScores; }
+            set { performanceScores = value; }
+        }
+
+        #endregion
+
+        #endregion
 
         private int sIListResults;
         public int SIListResults
@@ -175,6 +206,21 @@ namespace Prospector.ViewModels
             }
         }
 
+        //CmbPerformanceScoresIndex
+        private int cmbPerformanceScoresIndex;
+        public int CmbPerformanceScoresIndex
+        {
+            get { return cmbPerformanceScoresIndex; }
+            set
+            {
+                cmbPerformanceScoresIndex = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("CmbPerformanceScoresIndex"));
+                }
+            }
+        }
+
         private int cmbTimeframeIndex;
         public int CmbTimeframeIndex
         {
@@ -197,6 +243,8 @@ namespace Prospector.ViewModels
                 FootPrintString = Keyword;
                 Visible_SavedFP = false;
                 Visible_savebtn = true;
+                Visible_WebHose = false;
+                NotVisible_WebHose = true;
                 switch (tCSelectedTabIndex)
                 {
                     case Blogs:
@@ -284,9 +332,24 @@ namespace Prospector.ViewModels
                         RBOrientation = Orientation.Vertical;
                         Visible_Custom = false;
                         Visible_CommentSettings = false;
-                        createSitesListComments();
                         ListResults.Clear();
                         foreach (SearchResult result in l_Custom)
+                        {
+                            ListResults.Add(result);
+                        }
+                        break;
+
+                    case Webhose:
+                        FootPrintString = "";
+                        RBOrientation = Orientation.Horizontal;
+                        Visible_Custom = false;
+                        Visible_CommentSettings = false;
+                        Visible_WebHose = true;
+                        NotVisible_WebHose = false;
+                        Visible_savebtn = false;
+                        createSitesListWebhose();
+                        ListResults.Clear();
+                        foreach (SearchResult result in l_Webhose)
                         {
                             ListResults.Add(result);
                         }
@@ -321,6 +384,7 @@ namespace Prospector.ViewModels
             }
         }
 
+        #region visible
         private bool visible_CommentSettings;
         public bool Visible_CommentSettings
         {
@@ -331,6 +395,36 @@ namespace Prospector.ViewModels
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("Visible_CommentSettings"));
+                }
+            }
+        }
+
+        //Visible_WebHose
+        private bool visible_WebHose;
+        public bool Visible_WebHose
+        {
+            get { return visible_WebHose; }
+            set
+            {
+                visible_WebHose = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Visible_WebHose"));
+                }
+            }
+        }
+
+        //NotVisible_WebHose
+        private bool notVisible_WebHose;
+        public bool NotVisible_WebHose
+        {
+            get { return notVisible_WebHose; }
+            set
+            {
+                notVisible_WebHose = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("NotVisible_WebHose"));
                 }
             }
         }
@@ -377,6 +471,7 @@ namespace Prospector.ViewModels
                 }
             }
         }
+        #endregion
 
         //SISavedFP
         private int sISavedFP;
@@ -430,6 +525,51 @@ namespace Prospector.ViewModels
             }
         }
 
+        //SpecificSites
+        private string specificSites;
+        public string SpecificSites
+        {
+            get { return specificSites; }
+            set
+            {
+                specificSites = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("SpecificSites"));
+                }
+            }
+        }
+
+        //SpecificKws
+        private string specificKws;
+        public string SpecificKws
+        {
+            get { return specificKws; }
+            set
+            {
+                specificKws = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("SpecificKws"));
+                }
+            }
+        }
+
+        //CountryCode
+        private string countryCode;
+        public string CountryCode
+        {
+            get { return countryCode; }
+            set
+            {
+                countryCode = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("CountryCode"));
+                }
+            }
+        }
+
         private bool checked_KeywordInUrl;
         public bool Checked_KeywordInUrl
         {
@@ -458,6 +598,36 @@ namespace Prospector.ViewModels
             }
         }
 
+        //KWinTitleIsChecked
+        private bool kWinTitleIsChecked;
+        public bool KWinTitleIsChecked
+        {
+            get { return kWinTitleIsChecked; }
+            set
+            {
+                kWinTitleIsChecked = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("KWinTitleIsChecked"));
+                }
+            }
+        }
+
+        //KWinContentIsChecked
+        private bool kWinContentIsChecked;
+        public bool KWinContentIsChecked
+        {
+            get { return kWinContentIsChecked; }
+            set
+            {
+                kWinContentIsChecked = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("KWinContentIsChecked"));
+                }
+            }
+        }
+
         //UseProxy
         private bool useProxy;
         public bool UseProxy
@@ -481,7 +651,6 @@ namespace Prospector.ViewModels
             }
         }
 
-
         //IsNotSerching
         private bool isNotSerching;
         public bool IsNotSerching
@@ -497,7 +666,10 @@ namespace Prospector.ViewModels
             }
         }
 
-       
+        private List<string> inProxyFileTextArr;
+        string inFileText;
+        int proxyIndex;
+        
 
         public FootPrintsOptionsVM()
         {
@@ -537,10 +709,17 @@ namespace Prospector.ViewModels
             MaxPages.Add(2);
             MaxPages.Add(3);
 
+            Langs = new ObservableCollection<Footprint>();
+            SiteTypesWebHose = new ObservableCollection<Footprint>();
+            PerformanceScores = new ObservableCollection<string>();
+            addAllLangsForWebhose();
+            CmbPerformanceScoresIndex = 0;
+
             RBOrientation = Orientation.Vertical;
 
             IsNotSerching = true;
             Visible_savebtn = true;
+            NotVisible_WebHose = true;
 
             MyFilesDatabase.SetMozIds();
             setProxyDetailes();
@@ -548,13 +727,12 @@ namespace Prospector.ViewModels
             //createSavedOptions();
         }
 
+       
+
         private void OnSetProxy(object param)
         {
             SetProxyWindow spw = new SetProxyWindow();
-            spw.txtIP.Text = WebPageRequests.pIP;
-            spw.txtPORT.Text = WebPageRequests.pPort;
-            spw.txtUser.Text = WebPageRequests.pUser;
-            spw.txtPass.Text = WebPageRequests.pPass;
+            spw.tbInputedText.Text = inFileText;
             spw.ShowDialog();
             if (spw.OKClicked)
             {
@@ -568,6 +746,7 @@ namespace Prospector.ViewModels
                 try
                 {
                     //pIP, pPort, pUser, pPass
+                    proxyIndex = 0;
 
                     string mDir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "Proxy");
                     if (!System.IO.Directory.Exists(mDir)) return;
@@ -575,17 +754,316 @@ namespace Prospector.ViewModels
                     string filePath = System.IO.Path.Combine(mDir, "proxy.txt");
                     if (!System.IO.File.Exists(filePath)) return;
 
-                    string[] pDetailes = File.ReadAllText(filePath).Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
-                    WebPageRequests.pIP = pDetailes[0];
-                    WebPageRequests.pPort = pDetailes[1];
-                    WebPageRequests.pUser = pDetailes[2];
-                    WebPageRequests.pPass = pDetailes[3];
+                    inFileText = File.ReadAllText(filePath);
+                    string[] pDetailes = null;
+
+                    if (inFileText.Contains(MyFilesDatabase.SPLITTER))
+                    {
+                        pDetailes = inFileText.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+
+                        switch (pDetailes.Length - 1)
+                        {
+                            case 0:
+                                inProxyFileTextArr = new string[] { pDetailes[0] }.ToList();
+                                inFileText = pDetailes[0];
+                                File.WriteAllText(filePath, pDetailes[0] + Environment.NewLine);
+                                break;
+                            case 1:
+                                inProxyFileTextArr = new string[] { pDetailes[0] + ":".ToList() }.ToList();
+                                inFileText = pDetailes[0] + ":" + pDetailes[1];
+                                File.WriteAllText(filePath, pDetailes[0] + ":" + pDetailes[1] + Environment.NewLine);
+                                break;
+                            case 2:
+                                inProxyFileTextArr = new string[] { pDetailes[0] + ":" + pDetailes[1] + ":" + pDetailes[2] }.ToList();
+                                inFileText = pDetailes[0] + ":" + pDetailes[1] + ":" + pDetailes[2];
+                                File.WriteAllText(filePath, pDetailes[0] + ":" + pDetailes[1] + ":" + pDetailes[2] + Environment.NewLine);
+                                break;
+                            case 3:
+                                inProxyFileTextArr = new string[] { pDetailes[0] + ":" + pDetailes[1] + ":" + pDetailes[2] + ":" + pDetailes[3] }.ToList();
+                                inFileText = pDetailes[0] + ":" + pDetailes[1] + ":" + pDetailes[2] + ":" + pDetailes[3];
+                                File.WriteAllText(filePath, pDetailes[0] + ":" + pDetailes[1] + ":" + pDetailes[2] + ":" + pDetailes[3] + Environment.NewLine);
+                                break;
+
+                            default:
+                                break;
+                        }
+                        
+                    }
+                    else
+                    {
+                        inProxyFileTextArr = inFileText.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
+                        if (inProxyFileTextArr.Count > 0)
+                        {
+                            inProxyFileTextArr.RemoveAt(inProxyFileTextArr.Count - 1);
+                        }
+                        pDetailes = inProxyFileTextArr[0].Split(':');
+                    }
+
+                    setWebRequestsProxy(pDetailes);
                 }
                 catch { }
             }).Start();
         }
 
+        private void setWebRequestsProxy(string[] pDetailes)
+        {
+            switch (pDetailes.Length - 1)
+            {
+                case 0:
+                    WebPageRequests.pIP = pDetailes[0];
+                    break;
+                case 1:
+                    WebPageRequests.pIP = pDetailes[0];
+                    WebPageRequests.pPort = pDetailes[1];
+                    break;
+                case 2:
+                    WebPageRequests.pIP = pDetailes[0];
+                    WebPageRequests.pPort = pDetailes[1];
+                    WebPageRequests.pUser = pDetailes[2];
+                    break;
+                case 3:
+                    WebPageRequests.pIP = pDetailes[0];
+                    WebPageRequests.pPort = pDetailes[1];
+                    WebPageRequests.pUser = pDetailes[2];
+                    WebPageRequests.pPass = pDetailes[3];
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
         #region list options
+        private void addAllLangsForWebhose()
+        {
+            #region langs
+            Langs.Add(new Footprint()
+            {
+                Option = "Any",
+                Checked = true
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "english",
+                LangForWebhose = webhose.Languages.english
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "arabic",
+                LangForWebhose = webhose.Languages.arabic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "bulgarian",
+                LangForWebhose = webhose.Languages.bulgarian
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "catalan",
+                LangForWebhose = webhose.Languages.catalan
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "chinese",
+                LangForWebhose = webhose.Languages.chinese
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "croatian",
+                LangForWebhose = webhose.Languages.croatian
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "croatian",
+                LangForWebhose = webhose.Languages.croatian
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "czech",
+                LangForWebhose = webhose.Languages.czech
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "danish",
+                LangForWebhose = webhose.Languages.danish
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "estonian",
+                LangForWebhose = webhose.Languages.estonian
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "finnish",
+                LangForWebhose = webhose.Languages.finnish
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "finnish",
+                LangForWebhose = webhose.Languages.finnish
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "french",
+                LangForWebhose = webhose.Languages.french
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "finnish",
+                LangForWebhose = webhose.Languages.finnish
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "german",
+                LangForWebhose = webhose.Languages.german
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "greek",
+                LangForWebhose = webhose.Languages.greek
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "hebrew",
+                LangForWebhose = webhose.Languages.hebrew
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "hungarian",
+                LangForWebhose = webhose.Languages.hungarian
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "icelandic",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "indonesian",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "italian",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "japanese",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "korean",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "latvian",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "lithuanian",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "norwegian",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "persian",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "polish",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "portuguese",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "romanian",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "russian",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "serbian",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "slovak",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "slovenian",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "spanish",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "swedish",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            Langs.Add(new Footprint()
+            {
+                Option = "turkish",
+                LangForWebhose = webhose.Languages.icelandic
+            });
+            #endregion
+
+            #region site types
+            SiteTypesWebHose.Add(new Footprint()
+            {
+                Option = "Any",
+                Checked = true
+            });
+
+            SiteTypesWebHose.Add(new Footprint()
+            {
+                Option = "blogs",
+                SiteTypeWebhose = SiteTypes.blogs
+            });
+
+            SiteTypesWebHose.Add(new Footprint()
+            {
+                Option = "discussions",
+                SiteTypeWebhose = SiteTypes.discussions
+            });
+
+            SiteTypesWebHose.Add(new Footprint()
+            {
+                Option = "news",
+                SiteTypeWebhose = SiteTypes.news
+            });
+            #endregion
+
+            #region performance score
+            PerformanceScores.Add("Any");
+            for (int i = 0; i < 11; i++)
+            {
+                PerformanceScores.Add(Convert.ToString(i));
+            }
+            #endregion
+        }
+
         private void createCommentsSettings()
         {
             Comments.Add(new Footprint() { Option = "Comments Open", Query = "%22post a comment%22", Type = Footprint.TYPE_Comments });
@@ -746,6 +1224,17 @@ namespace Prospector.ViewModels
                 f.PropertyChanged += f_PropertyChanged;
             }
         }
+
+        private void createSitesListWebhose()
+        {
+            WebsitesForBlogs.Clear();
+
+            foreach (Footprint f in WebsitesForBlogs)
+            {
+                f.PropertyChanged += f_PropertyChanged;
+            }
+        }
+
         private void createSavedOptions()
         {
             try
@@ -825,7 +1314,8 @@ namespace Prospector.ViewModels
                 }
             }
 
-            FootPrintString = FootPrintString.Replace("%22", "\"");
+            if(FootPrintString != null)
+                FootPrintString = FootPrintString.Replace("%22", "\"");
         }
 
         private void search(object param)
@@ -835,17 +1325,150 @@ namespace Prospector.ViewModels
 
             new Thread(() =>
             {
-                string Query = FootPrintString;
-                Query = Query.Replace("\"", "%22");
-                Query = Query.Trim();
-                Query = Query.Replace(' ', '+');
-                Query = String.Format(@"http://google.com/search?v=1.0&q={0}", Query);
-                Query = Query + TimeFrames[CmbTimeframeIndex].Query;
+                try {
 
-                Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Search " + Query);
+                    #region webhose
+                    if (TCSelectedTabIndex == FootPrintsOptionsVM.Webhose)
+                    {
+                        WebhoseRequest clientRequest = new WebhoseRequest("d8010e66-8d57-4242-a2e1-22e2ad61a45f");
 
-                GetKeywordRankings(Query, MaxPages[CmbMaxPAgesIndex], false);
+                        //exapmle for query
+                        WebhoseQuery clientQuery = new WebhoseQuery();
 
+                        clientQuery.AddAllTerms(Keyword); // what you want to search
+                                                          //clientQuery.AddSomeTerms("apple iphone", "samsung", "esny"); // words that may be in the search
+
+                        if (!Langs.Any(l => l.Checked && l.Option == "Any"))
+                        {
+                            foreach (Footprint fp in Langs)
+                            {
+                                if (fp.Checked)
+                                {
+                                    clientQuery.AddLanguages(fp.LangForWebhose);
+                                }
+                            }
+                        }
+
+                        if (!TLDs.Any(t => t.Option == "Any" && t.Checked))
+                        {
+                            foreach (Footprint fp in TLDs)
+                            {
+                                if (fp.Checked)
+                                {
+                                    clientQuery.AddSiteSuffix(fp.Option.Replace('.', ' ').ToLower().Trim());
+                                }
+                            }
+                        }
+
+                        //SiteTypesWebHose
+                        if (!SiteTypesWebHose.Any(t => t.Option == "Any" && t.Checked))
+                        {
+                            foreach (Footprint fp in SiteTypesWebHose)
+                            {
+                                if (fp.Checked)
+                                {
+                                    clientQuery.AddSiteTypes(fp.SiteTypeWebhose);
+                                }
+                            }
+                        }
+
+                        // Limit the results to a specific site suffix
+                        if (!string.IsNullOrEmpty(SpecificSites) && !string.IsNullOrWhiteSpace(SpecificSites))
+                        {
+                            string[] splitsites = SpecificSites.Split(',');
+                            clientQuery.AddSites(splitsites);
+                        }
+
+                        //SpecificKws
+                        if (!string.IsNullOrEmpty(SpecificKws) && !string.IsNullOrWhiteSpace(SpecificKws))
+                        {
+                            string[] splitsites = SpecificKws.Split(',');
+                            clientQuery.AddSomeTerms(splitsites);
+                        }
+
+                        if (CmbPerformanceScoresIndex > 0)
+                        {
+                            clientQuery.PerformanceScore = Convert.ToInt32(PerformanceScores[CmbPerformanceScoresIndex]);
+                        }
+
+                        if (KWinTitleIsChecked)
+                        {
+                            clientQuery.Title = Keyword;
+                        }
+
+                        if (KWinContentIsChecked)
+                        {
+                            clientQuery.BodyText = Keyword;
+                        }
+
+                        // filtring by country  
+                        if (!string.IsNullOrWhiteSpace(CountryCode) && !string.IsNullOrEmpty(CountryCode))
+                             clientQuery.AddCountries(CountryCode);
+
+                        clientQuery.ResponseSize = 25;
+
+
+                        WebhoseResponse responceWithQuery = clientRequest.getResponse(clientQuery);
+                        foreach (WebhosePost post in responceWithQuery.posts)
+                        {
+                            string description = post.text;
+                            if(!string.IsNullOrEmpty(description) && !string.IsNullOrWhiteSpace(description) && description.Length > 500)
+                            {
+                                description = description.Substring(0, 500);
+                            }
+
+                            SearchResult sResult = new SearchResult()
+                            {
+                                Title = post.title,
+                                Keyword = Keyword,
+                                Link = post.url,
+                                Description = description,
+                                SearchEngine = "Webhose",
+                                Position = post.ordInThread,
+                                Published = post.published
+                            };
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                ListResults.Add(sResult);
+                                l_Webhose.Add(sResult);
+                            });
+                        }
+
+                        Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector King Kontent Search " + Keyword);
+                        
+                    }
+                    #endregion
+                    else
+                    {
+                        if (UseProxy && inProxyFileTextArr != null)
+                        {
+                            string[] pDetailes = inProxyFileTextArr[proxyIndex].Split(':');
+                            setWebRequestsProxy(pDetailes);
+                            if (proxyIndex < inProxyFileTextArr.Count - 1)
+                            {
+                                proxyIndex++;
+                            }
+                            else
+                            {
+                                proxyIndex = 0;
+                            }
+                        }
+                        string Query = FootPrintString;
+                        Query = Query.Replace("\"", "%22");
+                        Query = Query.Trim();
+                        Query = Query.Replace(' ', '+');
+                        Query = String.Format(@"http://google.com/search?v=1.0&q={0}", Query);
+                        Query = Query + TimeFrames[CmbTimeframeIndex].Query;
+
+                        Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Search " + Query);
+
+                        GetKeywordRankings(Query, MaxPages[CmbMaxPAgesIndex], false);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show("somthing went wrong during the serch. " +ex.Message);
+                }
                 IsNotSerching = true;
                 Application.Current.Dispatcher.Invoke((Action)delegate
                 {
@@ -856,24 +1479,53 @@ namespace Prospector.ViewModels
 
         private void sendLinkToBrowser(object obj)
         {
-            
-            try
-            {
-                OnClickedSearch(ListResults[SIListResults].Link);
-                Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To browser " + ListResults[SIListResults].Link);
-            }
-            catch
+            string commandParam = obj as string;
+
+            if (commandParam == "PBNPOSTER")
             {
                 try
                 {
-                    OnClickedSearch(ListResults[SIListResults - 1].Link);
-                    Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To browser " + ListResults[SIListResults - 1].Link);
+                    OnSelectedSendToPbn(ListResults[SIListResults].Link, ListResults[SIListResults].Title, null, ListResults[SIListResults].Published, ListResults[SIListResults].Description);
+                    Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To pbn " + ListResults[SIListResults].Link);
                 }
                 catch
                 {
-                    MessageBox.Show("Couldnt open link.");
+                    try
+                    {
+                        OnSelectedSendToPbn(ListResults[SIListResults -1].Link, ListResults[SIListResults -1].Title, null, ListResults[SIListResults-1].Published, ListResults[SIListResults-1].Description);
+                        Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To pbn " + ListResults[SIListResults - 1].Link);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Couldnt curate link.");
+                    }
                 }
             }
+            else
+            {
+                try
+                {
+                    OnClickedSearch(ListResults[SIListResults].Link);
+                    Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To browser " + ListResults[SIListResults].Link);
+                }
+                catch
+                {
+                    try
+                    {
+                        OnClickedSearch(ListResults[SIListResults - 1].Link);
+                        Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To browser " + ListResults[SIListResults - 1].Link);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Couldnt open link.");
+                    }
+                }
+            }
+        }
+
+        internal void SendToTheBrowser(string link)
+        {
+            OnClickedSearch(link);
         }
 
         private void OnRankCheckCkicked(object param)
@@ -1050,6 +1702,10 @@ namespace Prospector.ViewModels
 
                 case Custom:
                     l_Custom.Clear();
+                    break;
+
+                case Webhose:
+                    l_Webhose.Clear();
                     break;
 
                 case Saved:

@@ -66,6 +66,7 @@ namespace WpfCefDynamBrowser.Views
 
             (DataContext as BrowserTabViewModel).OnRefreshBookmarksList += BrowserTabView_OnRefreshBookmarksList;
             (DataContext as BrowserTabViewModel).OnRefreshReminders += BrowserTabView_OnRefreshReminders;
+            (DataContext as BrowserTabViewModel).OnShouldChangePropertyAddress += BrowserTabView_OnShouldChangePropertyAddress;
         }
 
         void BrowserTabView_OnRefreshReminders()
@@ -193,6 +194,7 @@ namespace WpfCefDynamBrowser.Views
 
             foreach (string site in sites)
             {
+                if (cmbSites.Items.Count > 7) break;
                 if (site.Contains(curtext))
                     cmbSites.Items.Add(site);
             }
@@ -205,6 +207,14 @@ namespace WpfCefDynamBrowser.Views
            
 
             if (e.Key != Key.Enter && e.Key != Key.Left && e.Key != Key.Right) cmbSites.SelectedIndex = 0;
+        }
+
+        private void BrowserTabView_OnShouldChangePropertyAddress(string addy)
+        {
+            if (!cmbSites.IsKeyboardFocusWithin)
+            {
+                (DataContext as BrowserTabViewModel).ChangeAddressEditable(addy);
+            }
         }
 
         private void SaveSite_Click(object sender, RoutedEventArgs e)

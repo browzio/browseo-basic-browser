@@ -30,7 +30,8 @@ namespace BrowserHost.Controls
 
         private void Textbox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key != Key.Enter)
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl)) return;
+                if (e.Key != Key.Enter)
             {
                 prevIndex = textbox.CaretIndex;
                 if (!string.IsNullOrEmpty(textbox.SelectedText) && !string.IsNullOrWhiteSpace(textbox.SelectedText))
