@@ -132,12 +132,14 @@ namespace WpfCefDynamBrowser.Views
                 string toCheck = site.Replace("http://", "").Replace("https://", "").Replace("www.", "");
                 if (toCheck.Length < curtext.Length) continue;
 
-                try
-                {
-                    if (toCheck.IndexOf(fullCurText, 0, fullCurText.Length) == 0)
-                        cmbSites.Items.Add(site);
-                }
-                catch { }
+                if(toCheck.Contains(fullCurText))
+                    cmbSites.Items.Add(site);
+                //try
+                //{
+                //    if (toCheck.IndexOf(fullCurText, 0, fullCurText.Length) == 0)
+                //        cmbSites.Items.Add(site);
+                //}
+                //catch { }
             }
 
             if (!cmbSites.IsDropDownOpen && cmbSites.Items.Count > 0)

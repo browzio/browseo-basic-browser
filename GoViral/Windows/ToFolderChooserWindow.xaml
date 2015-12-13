@@ -14,11 +14,11 @@
         </ResourceDictionary>
     </Window.Resources>
     <StackPanel>
-        <DockPanel Margin="3">
+        <DockPanel Margin="3" Name="dpName">
             <TextBlock Text="Name:" Width="40" VerticalAlignment="Center" />
             <TextBox Name="tbName" Margin="3" />
         </DockPanel>
-        <DockPanel Margin="3">
+        <DockPanel Margin="3" Name="dpUrl">
             <TextBlock Text="Url:" Width="40" VerticalAlignment="Center" />
             <TextBox Name="tbUrl" Margin="3" />
         </DockPanel>

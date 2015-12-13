@@ -4,23 +4,67 @@ using ProjectsList.Models;
 using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Net;
 using System.Text;
 using System.Windows;
+using System.Linq;
 
 namespace Organiser.Common.Classes
 {
+    public class BrowserSettimgs
+    {
+        public static bool JavaEnabled = true;
+        public static bool JavascriptEnabled = true;
+        public static bool FlashEnabled = true;
+        public static bool SetSysDateEnabled = false;
+
+        private static List<string> timeZoneList;
+        public static List<string> AvailableTimeZones
+        {
+            get
+            {
+                ReadOnlyCollection<TimeZoneInfo> timeZones = TimeZoneInfo.GetSystemTimeZones();
+
+                if (timeZoneList == null)
+                {
+                    BrowserSettimgs.AvailableTimeZones = new List<string>();       
+                    for (int i = 0; i < timeZones.Count; i++)
+                    {
+                        TimeZoneInfo tz = timeZones[i];
+
+                        if (tz.DisplayName == TimeZoneInfo.Local.DisplayName) SITimeZone = i;
+
+                        BrowserSettimgs.AvailableTimeZones.Add(tz.DisplayName);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < timeZones.Count; i++)
+                    {
+                        TimeZoneInfo tz = timeZones[i];    
+                        if (tz.DisplayName == TimeZoneInfo.Local.DisplayName)
+                        {
+                            SITimeZone = i;
+                            break;
+                        }
+                    }
+
+                }
+
+                return timeZoneList;
+            }
+            set { timeZoneList = value; }
+        }
+        public static int SITimeZone { get; set; }
+    }
+
     public class MyFilesDatabase
     {
         public const string SPLITTER = "{[:]}";
 
         public static bool CanSeeProxys = false;
-
-        public static bool JavaEnabled = true;
-        public static bool JavascriptEnabled = true;
-        public static bool FlashEnabled = true;
-        public static bool SetSysDateEnabled = false;
 
         static System.Threading.Thread ramCheckerThread;
         static ulong availmem = 0;
@@ -310,22 +354,57 @@ namespace Organiser.Common.Classes
 
         public static void SaveSession(string projectName, List<string> links)
         {
+            links.Add(
+                BrowserSettimgs.FlashEnabled +
+                "," + BrowserSettimgs.JavaEnabled +
+                "," + BrowserSettimgs.JavascriptEnabled +
+                "," + BrowserSettimgs.SetSysDateEnabled +
+                "," + BrowserSettimgs.SITimeZone);
+
             string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
-            string filePath = Path.Combine(directory, "sites.txt");
+            string filePath = Path.Combine(directory, "sites.txt");    
             File.WriteAllLines(filePath, links.ToArray());
         }
 
-        public static string[] GetSavedSesstion(string projectName)
+        public static List<string> GetSavedSesstion(string projectName)
         {
             string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
-            if (!Directory.Exists(directory)) return new string[] { };
+            if (!Directory.Exists(directory)) return new List<string>();
 
             string filePath = Path.Combine(directory, "sites.txt");
-            if (!File.Exists(filePath)) return new string[] { };
+            if (!File.Exists(filePath)) return new List<string>();
 
-            return File.ReadAllLines(filePath);
+            List<string> fileLines = File.ReadAllLines(filePath).ToList();
+            try
+            {
+                if (fileLines.Count > 0)
+                {
+                   fileLines.RemoveAll(line => string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line));
+                   string lastLine = fileLines[fileLines.Count - 1];
+
+                    if (lastLine.Contains(","))
+                    {
+                        string[] browserSettings = lastLine.Split(',');
+                        BrowserSettimgs.FlashEnabled = Convert.ToBoolean(browserSettings[0]);
+                        BrowserSettimgs.JavaEnabled = Convert.ToBoolean(browserSettings[1]);
+                        BrowserSettimgs.JavascriptEnabled = Convert.ToBoolean(browserSettings[2]);
+                        BrowserSettimgs.SetSysDateEnabled = Convert.ToBoolean(browserSettings[3]);
+                        BrowserSettimgs.SITimeZone = Convert.ToInt32(browserSettings[4]);
+                        if (BrowserSettimgs.SetSysDateEnabled)
+                        {
+                            TimeHelper.StartSetTimeAndZoneProcess(new DateAndTimeZone() { TimeZone = TimeZoneInfo.GetSystemTimeZones()[BrowserSettimgs.SITimeZone] });
+                        }
+                        fileLines.RemoveAt(fileLines.Count - 1);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return fileLines;
         }
         #endregion
 
@@ -596,11 +675,16 @@ namespace Organiser.Common.Classes
 
         public static void DownloadImage(string url)
         {
-            SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "Png files (*.png)|*.png|JPeg files (*.jpg)|*.jpg|All files (*.*)|*.*";
-            sfd.FilterIndex = 0;
-            sfd.RestoreDirectory = true;
-            if (sfd.ShowDialog() != true) return;
+            string saveFileFilename = "";
+            Application.Current.Dispatcher.Invoke((Action)delegate
+            {
+                SaveFileDialog sfd = new SaveFileDialog();
+                sfd.Filter = "Png files (*.png)|*.png|JPeg files (*.jpg)|*.jpg|All files (*.*)|*.*";
+                sfd.FilterIndex = 0;
+                sfd.RestoreDirectory = true;
+                if (sfd.ShowDialog() != true) return;
+                saveFileFilename = sfd.FileName;
+            });
             try
             {
                 using (WebClient webClient = new WebClient())
@@ -613,14 +697,14 @@ namespace Organiser.Common.Classes
                     {
                         using (var yourImage = System.Drawing.Image.FromStream(mem))
                         {
-                            yourImage.Save(sfd.FileName);
+                            yourImage.Save(saveFileFilename);
                         }
                     }
                 }
 
                 try
                 {
-                    FileInfo fileInfo = new FileInfo(sfd.FileName);
+                    FileInfo fileInfo = new FileInfo(saveFileFilename);
                     System.Diagnostics.Process.Start(fileInfo.DirectoryName);
                 }
                 catch { }

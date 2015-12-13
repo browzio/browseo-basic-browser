@@ -82,11 +82,14 @@ namespace Organiser.Common.Classes
 
     public class TimeHelper
     {
-        public static DateAndTimeZone GetNistTime(string ip, string port, string username, string pass)
+        public static DateAndTimeZone GetTimeOfProxy(string ip, string port, string username, string pass)
         {
             WebRequest request = WebRequest.Create(@"http://time.is/");
             if (!string.IsNullOrEmpty(ip) && !string.IsNullOrWhiteSpace(ip) && !string.IsNullOrEmpty(port) && !string.IsNullOrWhiteSpace(port))
-                request.Proxy = new WebProxy(ip, Convert.ToInt32(port)); 
+                request.Proxy = new WebProxy(ip, Convert.ToInt32(port));
+            else
+                return new DateAndTimeZone() { TimeZone = TimeZoneInfo.Local };
+
             if (!string.IsNullOrEmpty(username) && !string.IsNullOrWhiteSpace(username) && !string.IsNullOrEmpty(pass) && !string.IsNullOrWhiteSpace(pass))
                 request.Proxy.Credentials = new NetworkCredential(username, pass);    
 
@@ -134,219 +137,178 @@ namespace Organiser.Common.Classes
 
             return new DateAndTimeZone() { Date = dt, TimeZone = timeZone };
         }
-        static DateAndTimeZone dateAndTimeZone = null;
-        public static void SetTheTimeZone(PersonData pData, bool useFileTime)
+
+        public static void SetOriginalTimeZonesFromFile()
         {
-            try
-            {
-                // SetOriginalTimeZones(pData);
-
-                if (!useFileTime)
-                {
-                    if(dateAndTimeZone == null)
-                        dateAndTimeZone = TimeHelper.GetNistTime(pData.ProxyIP, pData.ProxyPort, pData.ProxyUsername, pData.ProxyPassword);
-                    SYSTEMTIME sysTime = TimeHelper.GetTimeHour();
-
-                    if (dateAndTimeZone.Date.Hour != sysTime.wHour || dateAndTimeZone.Date.Day != sysTime.wDay)
-                    {
-                        TimeHelper.SetTimeAndZone(dateAndTimeZone);
-                    }
-                }
-                else
-                {
-                    TimeZoneInfo timeZone = TimeZoneInfo.Local;
-                    string dir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "OriginalDateTimes");
-                    if (Directory.Exists(dir))
-                    {
-                        string file = System.IO.Path.Combine(dir, "dttzinfo.txt");
-                        if (File.Exists(file))
-                        {
-                            timeZone = TimeZoneInfo.FromSerializedString(File.ReadAllText(file));
-                        }
-                    }
-                    TimeHelper.SetTimeAndZone(new DateAndTimeZone() { TimeZone = timeZone });
-                }
-            }
-            catch(Exception ex)
-            {
-                System.Windows.MessageBox.Show("Failed to set system time make sure your system time is up to date or refresh the session settings to try again. Fail reason" + ex.Message);
-            }
-        }
-
-        public static void SetTimeAndZone(DateAndTimeZone dt)
-        {
-            var process = Process.Start(new ProcessStartInfo
-            {
-                FileName = "tzutil.exe",
-                Arguments = "/s \"" + dt.TimeZone.Id + "\"",
-                UseShellExecute = false,
-                CreateNoWindow = true
-            });
-
-            if (process != null)
-            {
-                process.WaitForExit();
-                try
-                {
-                    process.Kill();
-                }
-                catch { }
-                TimeZoneInfo.ClearCachedData();
-            }
-        }
-
-        public static void SetOriginalTimeZones(PersonData pData, bool ignoreHasProxyInfo = false)
-        {
-            TimeZoneInfo timeZone = TimeZoneInfo.Local;
-
-            string systzstring = timeZone.ToSerializedString();
-
             string dir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "OriginalDateTimes");
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
             string file = System.IO.Path.Combine(dir, "dttzinfo.txt");
-            if (File.Exists(file))
+
+            if (!File.Exists(file)) return;
+            StartSetTimeAndZoneProcess(new DateAndTimeZone() { TimeZone = TimeZoneInfo.FromSerializedString(File.ReadAllText(file)) });    
+        }  
+
+        public static TimeZoneInfo GetOldTZFromFile()
+        {
+            string dir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "OriginalDateTimes");
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+            string file = System.IO.Path.Combine(dir, "dttzinfo.txt");
+            if (!File.Exists(file)) return TimeZoneInfo.Local;
+
+            return TimeZoneInfo.FromSerializedString(File.ReadAllText(file));
+        }
+
+        public static void StartSetTimeAndZoneProcess(DateAndTimeZone dt)
+        {
+            try
             {
-                string OldserializedTZ = File.ReadAllText(file);
-                if (string.IsNullOrEmpty(pData.ProxyIP) || string.IsNullOrWhiteSpace(pData.ProxyIP) || !MyFilesDatabase.SetSysDateEnabled)
+                var process = Process.Start(new ProcessStartInfo
                 {
-                    systzstring = OldserializedTZ;
-                    File.WriteAllText(file, systzstring);
-                    SetTheTimeZone(pData, true);
-                }
-                else
+                    FileName = "tzutil.exe",
+                    Arguments = "/s \"" + dt.TimeZone.Id + "\"",
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                });
+
+                if (process != null)
                 {
-                    if (ignoreHasProxyInfo)
+                    process.WaitForExit();
+                    try
                     {
-                        SetTheTimeZone(pData, true);
+                        process.Kill();
                     }
+                    catch { }
+                    TimeZoneInfo.ClearCachedData();
                 }
             }
-            else
-            {  
-                File.WriteAllText(file, systzstring);
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show("Failed to set system time make sure your system time is up to date or refresh the session settings to try again. Reason: " + ex.Message);
             }
-        }
+        }    
 
-        #region time
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private extern static void GetSystemTime(ref SYSTEMTIME lpSystemTime);
-
-        [DllImport("kernel32.dll", SetLastError = true)]
-        private extern static uint SetSystemTime(ref SYSTEMTIME lpSystemTime);
-
-        [DllImport("kernel32.dll")]
-        static extern uint GetLastError();
-
-        public static SYSTEMTIME GetTimeHour()
-        {
-            // Call the native GetSystemTime method 
-            // with the defined structure.
-            SYSTEMTIME stime = new SYSTEMTIME();
-            GetSystemTime(ref stime);
-
-            return stime;
-
-            // Show the current time.           
-            //MessageBox.Show("Current Time: " +
-            //    stime.wHour.ToString() + ":"
-            //    + stime.wMinute.ToString());
-        }
-        public static void SetTime(SYSTEMTIME hour)
-        {
-            // Call the native GetSystemTime method 
-            // with the defined structure.
-            //SYSTEMTIME systime = new SYSTEMTIME();
-            //GetSystemTime(ref systime);
-
-            // Set the system clock ahead one hour.
-            //systime.wHour = hour;//(ushort)(systime.wHour + 1 % 24);
-            var ret = SetSystemTime(ref hour);
-            uint s = GetLastError();
-            //MessageBox.Show("New time: " + systime.wHour.ToString() + ":"
-            //    + systime.wMinute.ToString());
-        }
-        #endregion
-
-        #region timezones
-        /// <summary>
-        /// [Win32 API call]
-        /// The GetTimeZoneInformation function retrieves the current time-zone parameters. 
-        /// These parameters control the translations between Coordinated Universal Time (UTC) 
-        /// and local time.
-        /// </summary>
-        /// <param name="lpTimeZoneInformation">[out] Pointer to a TIME_ZONE_INFORMATION structure to receive the current time-zone parameters.</param>
-        /// <returns>
-        /// If the function succeeds, the return value is one of the following values.
-        /// <list type="table">
-        /// <listheader>
-        /// <term>Return code/value</term>
-        /// <description>Description</description>
-        /// </listheader>
-        /// <item>
-        /// <term>TIME_ZONE_ID_UNKNOWN == 0</term>
-        /// <description>
-        /// The system cannot determine the current time zone. This error is also returned if you call the SetTimeZoneInformation function and supply the bias values but no transition dates. 
-        /// This value is returned if daylight saving time is not used in the current time zone, because there are no transition dates.
-        /// </description>
-        /// </item>
-        /// <item>
-        /// <term>TIME_ZONE_ID_STANDARD == 1</term>
-        /// <description>
-        /// The system is operating in the range covered by the StandardDate member of the TIME_ZONE_INFORMATION structure.
-        /// </description>
-        /// </item>
-        /// <item>
-        /// <term>TIME_ZONE_ID_DAYLIGHT == 2</term>
-        /// <description>
-        /// The system is operating in the range covered by the DaylightDate member of the TIME_ZONE_INFORMATION structure.
-        /// </description>
-        /// </item>
-        /// </list>
-        /// If the function fails, the return value is TIME_ZONE_ID_INVALID. To get extended error information, call GetLastError.
-        /// </returns>
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        private static extern int GetTimeZoneInformation(out TimeZoneInformation lpTimeZoneInformation);
-
-        /// <summary>
-        /// [Win32 API call]
-        /// The SetTimeZoneInformation function sets the current time-zone parameters. 
-        /// These parameters control translations from Coordinated Universal Time (UTC) 
-        /// to local time.
-        /// </summary>
-        /// <param name="lpTimeZoneInformation">[in] Pointer to a TIME_ZONE_INFORMATION structure that contains the time-zone parameters to set.</param>
-        /// <returns>
-        /// If the function succeeds, the return value is nonzero.
-        /// If the function fails, the return value is zero. To get extended error information, call GetLastError.
-        /// </returns>
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        private static extern bool SetTimeZoneInformation([In] ref TimeZoneInformation lpTimeZoneInformation);
-
-        /// <summary>
-        /// Sets new time-zone information for the local system.
-        /// </summary>
-        /// <param name="tzi">Struct containing the time-zone parameters to set.</param>
-        public static void SetTimeZone(TimeZoneInformation tzi)
-        {
-            // set local system timezone
-            SetTimeZoneInformation(ref tzi);
-        }
-
-        /// <summary>
-        /// Gets current timezone information for the local system.
-        /// </summary>
-        /// <returns>Struct containing the current time-zone parameters.</returns>
-        public static TimeZoneInformation GetTimeZone()
-        {
-            // create struct instance
-            TimeZoneInformation tzi;
-
-            // retrieve timezone info
-            int currentTimeZone = GetTimeZoneInformation(out tzi);
-
-            return tzi;
-        }
-        #endregion
     }
 }
 
+
+//#region time
+//[DllImport("kernel32.dll", SetLastError = true)]
+//private extern static void GetSystemTime(ref SYSTEMTIME lpSystemTime);
+
+//[DllImport("kernel32.dll", SetLastError = true)]
+//private extern static uint SetSystemTime(ref SYSTEMTIME lpSystemTime);
+
+//[DllImport("kernel32.dll")]
+//static extern uint GetLastError();
+
+//public static SYSTEMTIME GetTimeHour()
+//{
+//    // Call the native GetSystemTime method 
+//    // with the defined structure.
+//    SYSTEMTIME stime = new SYSTEMTIME();
+//    GetSystemTime(ref stime);
+
+//    return stime;
+
+//    // Show the current time.           
+//    //MessageBox.Show("Current Time: " +
+//    //    stime.wHour.ToString() + ":"
+//    //    + stime.wMinute.ToString());
+//}
+//public static void SetTime(SYSTEMTIME hour)
+//{
+//    // Call the native GetSystemTime method 
+//    // with the defined structure.
+//    //SYSTEMTIME systime = new SYSTEMTIME();
+//    //GetSystemTime(ref systime);
+
+//    // Set the system clock ahead one hour.
+//    //systime.wHour = hour;//(ushort)(systime.wHour + 1 % 24);
+//    var ret = SetSystemTime(ref hour);
+//    uint s = GetLastError();
+//    //MessageBox.Show("New time: " + systime.wHour.ToString() + ":"
+//    //    + systime.wMinute.ToString());
+//}
+//#endregion
+
+//#region timezones
+///// <summary>
+///// [Win32 API call]
+///// The GetTimeZoneInformation function retrieves the current time-zone parameters. 
+///// These parameters control the translations between Coordinated Universal Time (UTC) 
+///// and local time.
+///// </summary>
+///// <param name="lpTimeZoneInformation">[out] Pointer to a TIME_ZONE_INFORMATION structure to receive the current time-zone parameters.</param>
+///// <returns>
+///// If the function succeeds, the return value is one of the following values.
+///// <list type="table">
+///// <listheader>
+///// <term>Return code/value</term>
+///// <description>Description</description>
+///// </listheader>
+///// <item>
+///// <term>TIME_ZONE_ID_UNKNOWN == 0</term>
+///// <description>
+///// The system cannot determine the current time zone. This error is also returned if you call the SetTimeZoneInformation function and supply the bias values but no transition dates. 
+///// This value is returned if daylight saving time is not used in the current time zone, because there are no transition dates.
+///// </description>
+///// </item>
+///// <item>
+///// <term>TIME_ZONE_ID_STANDARD == 1</term>
+///// <description>
+///// The system is operating in the range covered by the StandardDate member of the TIME_ZONE_INFORMATION structure.
+///// </description>
+///// </item>
+///// <item>
+///// <term>TIME_ZONE_ID_DAYLIGHT == 2</term>
+///// <description>
+///// The system is operating in the range covered by the DaylightDate member of the TIME_ZONE_INFORMATION structure.
+///// </description>
+///// </item>
+///// </list>
+///// If the function fails, the return value is TIME_ZONE_ID_INVALID. To get extended error information, call GetLastError.
+///// </returns>
+//[DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+//private static extern int GetTimeZoneInformation(out TimeZoneInformation lpTimeZoneInformation);
+
+///// <summary>
+///// [Win32 API call]
+///// The SetTimeZoneInformation function sets the current time-zone parameters. 
+///// These parameters control translations from Coordinated Universal Time (UTC) 
+///// to local time.
+///// </summary>
+///// <param name="lpTimeZoneInformation">[in] Pointer to a TIME_ZONE_INFORMATION structure that contains the time-zone parameters to set.</param>
+///// <returns>
+///// If the function succeeds, the return value is nonzero.
+///// If the function fails, the return value is zero. To get extended error information, call GetLastError.
+///// </returns>
+//[DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+//private static extern bool SetTimeZoneInformation([In] ref TimeZoneInformation lpTimeZoneInformation);
+
+///// <summary>
+///// Sets new time-zone information for the local system.
+///// </summary>
+///// <param name="tzi">Struct containing the time-zone parameters to set.</param>
+//public static void SetTimeZone(TimeZoneInformation tzi)
+//{
+//    // set local system timezone
+//    SetTimeZoneInformation(ref tzi);
+//}
+
+///// <summary>
+///// Gets current timezone information for the local system.
+///// </summary>
+///// <returns>Struct containing the current time-zone parameters.</returns>
+//public static TimeZoneInformation GetTimeZone()
+//{
+//    // create struct instance
+//    TimeZoneInformation tzi;
+
+//    // retrieve timezone info
+//    int currentTimeZone = GetTimeZoneInformation(out tzi);
+
+//    return tzi;
+//}
+//#endregion

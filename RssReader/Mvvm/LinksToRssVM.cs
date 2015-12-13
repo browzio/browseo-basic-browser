@@ -771,7 +771,8 @@ namespace RssReader.Mvvm
             //WebBrowserHost.Child = null;
             //WebBrowserHost.Dispose();
             //WebBrowser.DisposeBrowserComponents();
-            WebBrowser.Dispose();
+            if(WebBrowser!=null)
+            WebBrowser.DisposeBrowserComponents();
             //WebBrowserHost = null;
             
         }

@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:WpfCefDynamBrowser.ViewModels"
              xmlns:mControls="clr-namespace:BrowserHost.Controls"
              xmlns:dragNdrop="clr-namespace:DragDropListview.Controls;assembly=DragDropListview"
+             xmlns:commonConvs="clr-namespace:Organiser.Common.Converters;assembly=Organiser.Common"
              mc:Ignorable="d"
              d:DesignWidth="640"
              d:DesignHeight="480">
@@ -14,6 +15,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <commonConvs:OpisiteVisibilityConverter x:Key="convOppositVisibility" /> 
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -115,6 +117,17 @@
                                 <Separator Margin="-30,0,0,0" />
 
                                 <CheckBox Content="Sync Time" ToolTip="Can only be set with session settings" IsChecked="{Binding SetSysDateEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                <Grid>
+                                    <StackPanel Visibility="{Binding VisibleDtPbar}">
+                                        <TextBlock Text="Getting Time Zone" />
+                                        <ProgressBar IsIndeterminate="True" />
+                                    </StackPanel>
+                                    
+                                    <ComboBox SelectedIndex="{Binding SITimeZone}" 
+                                              ItemsSource="{Binding AvailableTimeZones}"
+                                              Visibility="{Binding Path=VisibleDtPbar, Converter={StaticResource convOppositVisibility}}"
+                                              MaxWidth="200" />
+                                </Grid>
 
                                 <Separator Margin="-30,0,0,0" />
 

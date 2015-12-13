@@ -21,13 +21,29 @@ using System.Messaging;
 using System.AddIn.Hosting;
 using System.ComponentModel;
 using Organiser.Common.Classes.Crawler;
-using HostView;
 using System.Security.Permissions;
+using CrawlerContracts.PluginHosting;
+using CrawlerContracts;
+using System.Runtime.Remoting;
+using GoViral.Helpers;
 
 namespace GoViral.ViewModels
 {
-    public class GoViralVM : INotifyPropertyChanged
+    public class GoViralVM : MarshalByRefObject, INotifyPropertyChanged 
     {
+        protected void RaisePropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public override object InitializeLifetimeService()
+        {
+            return null; //live forever
+        }
         public ICommand OnBtnClicked { get; set; }
         public ICommand CTMenuClick { get; set; }
 
@@ -51,15 +67,22 @@ namespace GoViral.ViewModels
                 {
                     SIFolders = 0;
                 }
-                if (sIFolders != value)
-                {
 
-                    sIFolders = value;
-                    RaisePropertyChanged("SIFolders");
-                }
+                sIFolders = value;
+                RaisePropertyChanged("SIFolders");
+                RaisePropertyChanged("SelectedFolder");
             }
         }
-
+        public Folder SelectedFolder
+        {
+            get
+            {
+                if (Folders != null && Folders.Count > 0 && SIFolders > -1)
+                    return Folders[SIFolders];
+                else
+                    return null;
+            }
+        }
 
         private WindowsFormsHost wfh;
         public WindowsFormsHost WebBrowserHost
@@ -68,10 +91,7 @@ namespace GoViral.ViewModels
             {
                 if (wfh == null)
                 {
-                    WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
-                    WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
-                    WebBrowser.init("");
-                    wfh = new WindowsFormsHost() { Child = WebBrowser };
+                    RefreshBrowser();
                 }
                 return wfh;
             }
@@ -89,6 +109,7 @@ namespace GoViral.ViewModels
         }
 
 
+        #region pbar
         private Visibility pBarVisible;
         public Visibility PBarVisible
         {
@@ -115,13 +136,15 @@ namespace GoViral.ViewModels
             get { return loadingStatus; }
             set { loadingStatus = value; RaisePropertyChanged("LoadingStatus"); }
         }
+        #endregion
 
-                                           
         private CrawlerHost mCrawlerHost;
 
         private int lastSelectedIndex = -1;
-        private Task PopulateListTask;
-        private Task InitAddinTask;
+
+        private Task PopulateListTask; 
+        private TaskScheduler uiContextScheduler;
+
         private object mLock = new object();
 
         public GoViralVM()
@@ -136,6 +159,8 @@ namespace GoViral.ViewModels
                 PopulatList();
             }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
 
+            uiContextScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+
             PBarVisible = Visibility.Collapsed;
             IsIndeterminate = true;
         }
@@ -144,7 +169,9 @@ namespace GoViral.ViewModels
         private void On_CTMenuClick(object param)
         {
             if (Folders.Count == 0) return;
-            switch ((string)param)
+            string commandParam = param as string;
+            if (commandParam == null) return;
+            switch (commandParam)
             {
                 case "Edit":
                     Task.Factory.StartNew(() =>
@@ -183,9 +210,28 @@ namespace GoViral.ViewModels
                     }
                     break;
 
-                case "ORDER_Likes":
-                    orderFolderByLikes(Folders[SIFolders]);
+                case "ORDER_PostsByLikes":
+                case "ORDER_PostsByShares":
+                    if (SelectedFolder != null && SelectedFolder.SelectedPageFBGraphData != null)
+                    {
+                        if (SelectedFolder.SelectedPageFBGraphData.posts == null || SelectedFolder.SelectedPageFBGraphData.posts.data == null) return;
+
+                        List<FacebookGraphPostResult> pdOrderd = SelectedFolder.SelectedPageFBGraphData.posts.data.OrderByDescending(l => commandParam == "ORDER_PostsByLikes" ?
+                                                                                                                           (l.likes == null ? 0 : l.likes.summary == null ? 0 : l.likes.summary.total_count) :
+                                                                                                                           (l.shares == null ? 0 : l.shares.count)).ToList();
+                        SelectedFolder.SelectedPageFBGraphData.posts.data.Clear();
+                        foreach (FacebookGraphPostResult pResult in pdOrderd)
+                        {
+                            SelectedFolder.SelectedPageFBGraphData.posts.data.Add(pResult);
+                        }
+
+                        RaisePropertyChanged("SelectedFolder");
+                    }
                     break;
+
+                //case "ORDER_Likes":
+                //    orderFolderByLikes(Folders[SIFolders]);
+                //    break;
 
                 default:
                     break;
@@ -200,8 +246,16 @@ namespace GoViral.ViewModels
                     addNewFolder();
                     break;
 
+                case "MULTILINKS":
+                    OpenMultyLinks(null);
+                    break;
+
                 case "SAVE":
                     Task.Factory.StartNew(()=> { SaveList(); });
+                    break;
+
+                case "REFRESHTOKEN":
+                    WebBrowser.Navigate(Social.FACEBOOK_GRAPH_LINK);
                     break;
 
                 default:
@@ -210,24 +264,52 @@ namespace GoViral.ViewModels
         }
         #endregion
 
-        private Folder orderFolderByLikes(Folder folderToOrder)
+        private void OpenMultyLinks(List<string> links)
         {
-            List<ListOption> orderd = folderToOrder.SavedLinksList.OrderByDescending(s => s.FBGraphData.likes).ToList();
-            folderToOrder.SavedLinksList.Clear();
-            foreach (ListOption o in orderd)
-            {
-                folderToOrder.SavedLinksList.Add(o);
-                if (o.FBGraphData == null || o.FBGraphData.posts == null || o.FBGraphData.posts.data == null) continue;
+            if (displayYouNeedToAddFolderMessage()) return;
 
-                List<FacebookGraphPostResult> res = o.FBGraphData.posts.data.OrderByDescending(p => p == null ? 0 : p.likes == null ? 0 : p.likes.data == null ? 0 : p.likes.data.Count).ToList();
-                o.FBGraphData.posts.data.Clear();
-                foreach (FacebookGraphPostResult p in res)
+            //Application.Current.Dispatcher.Invoke((Action)delegate { });
+            SIFolders = lastSelectedIndex;
+            if (SIFolders == -1) SIFolders = 0;
+
+            Folder folder = Folders[SIFolders];
+
+            ToFolderChooserWindow fcw = new ToFolderChooserWindow() { DataContext = this };
+            fcw.dpName.Visibility = Visibility.Collapsed;
+            fcw.dpUrl.Visibility = Visibility.Collapsed;
+            if (fcw.ShowDialog() == false) return;
+
+            RssFeedsLinksMultiWindow linksWindow = new RssFeedsLinksMultiWindow();
+            if (links != null)
+            {
+                foreach (string link in links)
                 {
-                    folderToOrder.SavedLinksList[folderToOrder.SavedLinksList.IndexOf(o)].FBGraphData.posts.data.Add(p);
+                    linksWindow.tbInputedText.Text += link + Environment.NewLine;
                 }
             }
+            linksWindow.ShowDialog();
+            if (linksWindow.OKClicked)
+            {
+                string[] splitLinks = linksWindow.tbInputedText.Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                foreach (string link in splitLinks)
+                {
+                    string pageName = link;
+                    if (pageName.Contains("https://www.facebook.com/"))
+                    {
+                        pageName = link.Split(new string[] { @"https://www.facebook.com/" }, StringSplitOptions.None)[1];
+                        if (link.Contains("pages/"))
+                            pageName = pageName.Split(new string[] { @"pages/" }, StringSplitOptions.None)[1];
 
-            return folderToOrder;
+                        pageName = pageName.Replace("//", "/");
+                        pageName = pageName.Replace("/", "");
+                    }
+
+                    if (string.IsNullOrEmpty(pageName) || string.IsNullOrWhiteSpace(pageName) ||
+                        string.IsNullOrEmpty(pageName) || string.IsNullOrWhiteSpace(pageName))
+                        continue;
+                    addNewLoToFolder(Folders[SIFolders], pageName, link, null);
+                }
+            }
         }
 
         internal void BeginImageDownload(string full_picture)
@@ -235,7 +317,7 @@ namespace GoViral.ViewModels
             System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
                 PBarVisible = Visibility.Visible;
-                LoadingStatus = "Image Download Began";
+                LoadingStatus = "";
 
                 MyFilesDatabase.DownloadImage(full_picture);
 
@@ -244,199 +326,126 @@ namespace GoViral.ViewModels
             });
         }
 
-        #region crawler
-
         void Folder_OnSelectedCheckStats(Folder folder, string url)
         {
-            if (InitAddinTask == null || InitAddinTask.IsCompleted)
+            new Thread(() =>
             {
-                InitAddinTask = Task.Factory.StartNew(() =>
+                if (!initializeCrawler())
                 {
-                    if (!initializeCrawler())
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    if (url != null)
+                if (url != null)
+                {
+                    addLinkForCrawlerAddInn(url, folder, folder.SavedLinksList[folder.SISavedLinks], null, CrawlerStates.FbGraphCrawl);
+                }
+                else
+                {
+                    foreach (ListOption option in folder.SavedLinksList)
                     {
-                        addLinkForCrawlerAddInn(url, folder, folder.SavedLinksList[folder.SISavedLinks],null, CrawlerStates.FbGraphCrawl);
+                        addLinkForCrawlerAddInn(option.Url, folder, option, null, CrawlerStates.FbGraphCrawl);
                     }
-                    else
-                    {
-                        foreach (ListOption option in folder.SavedLinksList)
-                        {
-                            addLinkForCrawlerAddInn(option.Url, folder, option,null, CrawlerStates.FbGraphCrawl);
-                        }
-                    }
+                }
 
-                    mCrawlerHost.IninAdin(CrawlerStates.FbGraphCrawl);
-                });
-            }
+                mCrawlerHost.IninAdin();
+            }).Start(); 
         }
 
-        internal void LoadAllLikes(FacebookGraphPostResult facebookGraphPostResult, string url)
+        public void BeginAllPhotosScrape(Folder folder, ListOption option)
         {
-            if (InitAddinTask == null || InitAddinTask.IsCompleted)
+            new Thread(() =>
             {
-                InitAddinTask = Task.Factory.StartNew(() =>
+                if (!initializeCrawler())
                 {
-                    if (!initializeCrawler())
-                    {
-                        return;
-                    }
+                    return;
+                }
+                addLinkForCrawlerAddInn(option.Url, folder, option, null, CrawlerStates.LoadAllPhotos);
+                mCrawlerHost.IninAdin();
+            }).Start();
+        }
 
-                    addLinkForCrawlerAddInn(url, null, null, facebookGraphPostResult, CrawlerStates.LikesFromPost);
-                    mCrawlerHost.IninAdin(CrawlerStates.LikesFromPost);
-                });
-            }
+        internal void BeginAllVideosScrape(Folder folder, ListOption option)
+        {
+            new Thread(() =>
+            {
+                if (!initializeCrawler())
+                {
+                    return;
+                }
+                addLinkForCrawlerAddInn(option.Url, folder, option, null, CrawlerStates.LoadAllVideos);
+                mCrawlerHost.IninAdin();
+            }).Start();
         }
 
         private void addLinkForCrawlerAddInn(string url, Folder folder, ListOption option, FacebookGraphPostResult facebookGraphPostResult, CrawlerStates state)
         {
-            CrawlerPreInitState crawlSearchState = new CrawlerPreInitState() { url = url, folder = folder, option = option, graphResult = facebookGraphPostResult , state = state};
+            CrawlerPreInitState crawlSearchState = new CrawlerPreInitState() { url = url, folder = folder, option = option, graphResult = facebookGraphPostResult, state = state };
             mCrawlerHost.PreInitStates.Add(crawlSearchState);
         }
 
-        private bool initializeCrawler()
+        private void Folder_OnCanceledAStatsCheck(ListOption option)
         {
-            if (LoadingStatus != null && LoadingStatus.Contains("Initializing Crawler..."))
-                return false;
-
-            PBarVisible = Visibility.Visible;
-            LoadingStatus = "Initializing Crawler..."; 
-            if (mCrawlerHost == null)
-            {   
-                string path = AppDomain.CurrentDomain.BaseDirectory;
-                Console.WriteLine(path);
-                if (path == @"C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\BrowserAndFeatures\bin\x86\Debug\" ||
-                    path == @"C:\Users\eli\Desktop\move\plugins\WpfHost\bin\Release" ||
-                    path == @"C:\Users\eli\Desktop\move\plugins\WpfHost\bin\Debug" ||
-                    path == @"C:\Users\eli\Desktop\move\All Browseo Install Files")
-                {
-                    string[] ss = AddInStore.Update(path);// (epath);
-                    string[] kk = AddInStore.RebuildAddIns(path);
-                }
-
-                try
-                {
-                    IList<AddInToken> tokens = AddInStore.FindAddIns(typeof(HostView.ProcessorHostView), path);
-                    AddInToken crawlerToken = tokens.SingleOrDefault(t => t.AddInFullName == "Crawler.Crawler");
-
-                    if (crawlerToken != null)
-                    {
-                        ProcessorHostView crawlerAddin = crawlerToken.Activate<HostView.ProcessorHostView>(AddInSecurityLevel.FullTrust);
-
-                        mCrawlerHost = new CrawlerHost(crawlerAddin);
-                        mCrawlerHost.ReportProgress += CrawlerHost_ReportProgress;
-                        mCrawlerHost.OnReportGotGraphData += CrawlerHost_OnReportGotGraphData;
-                        mCrawlerHost.OnReportGotLikesData += CrawlerHost_OnReportGotLikesData;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Could not start crawl process, could not find process tokens.");
-                        PBarVisible = Visibility.Collapsed;
-                        return false;
-                    }
-                }
-                catch
-                {
-                    MessageBox.Show("Could not start crawl process, could not find process tokens.");
-                    PBarVisible = Visibility.Collapsed;
-                    return false;
-                }
-            }
-
-
-            return true;
-        }
-
-        private void CrawlerHost_OnReportGotLikesData(string serializedXMLResult, CrawlerPreInitState preinintState)
-        {
-            if (serializedXMLResult != "N/A")
+            if (mCrawlerHost != null)
             {
-                LikesData likes = serializedXMLResult.XmlDeserializeFromString<LikesData>();
-
-                if (preinintState.graphResult != null && likes != null && likes.likes != null)
+                if (option != null)
                 {
-                    preinintState.likesData = likes;
-                    mCrawlerHost.PostRecrawlLikesStates.Add(preinintState);
-                }
-            }
-
-            removePreInitState(preinintState);
-
-            
-        }
-
-        private void removePreInitState(CrawlerPreInitState preinintState)
-        {
-            mCrawlerHost.PreInitStates.Remove(preinintState);
-
-            LoadingStatus += "END: " + preinintState.url;
-
-            if (mCrawlerHost.PreInitStates.Count == 0)
-            {
-                if (mCrawlerHost.PostInitRecrawlStates.Count > 0)
-                {
-                    foreach (CrawlerPreInitState postRecrawlState in mCrawlerHost.PostInitRecrawlStates)
+                    foreach (CrawlerPreInitState state in mCrawlerHost.PreInitStates.FindAll(s => s.option == option))
                     {
-                        mCrawlerHost.PreInitStates.Add(postRecrawlState);
+                        mCrawlerHost.PreInitStates.Remove(state);
                     }
-
-                    mCrawlerHost.PostInitRecrawlStates.Clear();
-                    mCrawlerHost.IninAdin(CrawlerStates.LikesFromPost);
                 }
                 else
                 {
+                    mCrawlerHost.PreInitStates.Clear();
+                }
+
+                if (mCrawlerHost.PreInitStates.Count == 0)
+                    PBarVisible = Visibility.Collapsed;
+                else
+                    mCrawlerHost.navigateToNextUrl();
+            }
+        }
+
+        #region crawler
+
+        private bool initializeCrawler()
+        {
+            lock (mLock)
+            {
+                if (LoadingStatus != null && LoadingStatus.Contains("Initializing Crawler..."))
+                    return false;
+
+                PBarVisible = Visibility.Visible;
+                LoadingStatus = "Initializing Crawler...";
+
+                if (mCrawlerHost == null)
+                {
                     try
                     {
-                        IsIndeterminate = true;
-                        LoadingStatus = "Ordering Pages And Posts By Likes";
-
-                        Application.Current.Dispatcher.Invoke((Action)delegate
-                        {
-                            if (mCrawlerHost.PostRecrawlLikesStates.Count > 0)
-                            {
-                                foreach (CrawlerPreInitState postReLikesState in mCrawlerHost.PostRecrawlLikesStates)
-                                {
-                                    if (postReLikesState.graphResult.likes == null)
-                                        postReLikesState.likesData = new LikesData();
-                                    if (postReLikesState.graphResult.likes.data == null)
-                                        postReLikesState.graphResult.likes.data = new ObservableCollection<Likes.Data>();
-
-                                    postReLikesState.graphResult.likes.data.Clear();
-                                    foreach (Likes.Data like in postReLikesState.likesData.likes.data)
-                                    {
-                                        postReLikesState.graphResult.likes.data.Add(like);
-                                    }
-                                }
-                                mCrawlerHost.PostRecrawlLikesStates.Clear();
-                            }
-
-                            try
-                            {
-                                List<Folder> orderdFolders = new List<Folder>();
-                                foreach (Folder f in Folders)
-                                {
-                                    orderdFolders.Add(orderFolderByLikes(f));
-                                }
-
-                                Folders.Clear();
-                                foreach (Folder f in orderdFolders)
-                                {
-                                    Folders.Add(f);
-                                }
-                                orderdFolders.Clear();
-                            }
-                            catch { } 
-                        });
-                        
-
-                        PBarVisible = Visibility.Collapsed;
+                        mCrawlerHost = new CrawlerHost();
+                        mCrawlerHost.OnReportProgress += CrawlerHost_ReportProgress;
+                        mCrawlerHost.OnReportGotGraphData += CrawlerHost_OnReportGotGraphData;
+                        mCrawlerHost.OnReportFatalError += MCrawlerHost_OnReportFatalError;
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Could not start crawl process. " + ex.Message);
+                        PBarVisible = Visibility.Collapsed;
+                        LoadingStatus = "Crawler Init Faild.";
+                        mCrawlerHost = null;
+                        return false;
+                    }
                 }
+
+                return true;
             }
+        }
+
+        private void MCrawlerHost_OnReportFatalError(string userMessage, string fullExceptionText)
+        {
+            MessageBox.Show("Crawler Has Stoped. " + userMessage + Environment.NewLine + fullExceptionText);
+            Folder_OnCanceledAStatsCheck(null);  
+            mCrawlerHost = null;
         }
 
         private void CrawlerHost_ReportProgress(string status)
@@ -444,119 +453,123 @@ namespace GoViral.ViewModels
             if (PBarVisible == Visibility.Collapsed) pBarVisible = Visibility.Visible;
 
             LoadingStatus = status;
-            if (mCrawlerHost.PreInitStates.Count > 0)
-            {
-                if(mCrawlerHost.PreInitStates.Any(s=>s.state== CrawlerStates.LikesFromPost))
-                {
-                    IsIndeterminate = false;
-
-                    double total = mCrawlerHost.totalToCrawl - mCrawlerHost.PreInitStates.Count;
-                    total = total / mCrawlerHost.totalToCrawl;  
-                    PBarValue = total * 100;
-
-                    LoadingStatus = LoadingStatus + Environment.NewLine + "Gathering all likes...";
-                }
-            }
         }
 
         private void CrawlerHost_OnReportGotGraphData(string serializedXMLResult, CrawlerPreInitState preinintState)
         {
-            if (serializedXMLResult != "N/A")
+            Task.Factory.StartNew(() =>
             {
-                FacebookGraphData fbgData = serializedXMLResult.XmlDeserializeFromString<FacebookGraphData>();
-                preinintState.option.FBGraphData = fbgData; 
-            }
-            else
-            {
-                MessageBox.Show("Couldnt crawl page " + preinintState.url);
-                removePreInitState(preinintState);
-                return;
-            }
-            if (preinintState.option.FBGraphData != null && preinintState.option.FBGraphData.posts != null && preinintState.option.FBGraphData.posts.data != null)
-            {
-                foreach (FacebookGraphPostResult post in preinintState.option.FBGraphData.posts.data)
-                {
-                    if (post.likes == null) continue;
-                    if (post.likes.data == null) continue;
-
-                    if (post.likes.data.Count == 25)
-                    {
-                        mCrawlerHost.PostInitRecrawlStates.Add(new CrawlerPreInitState() {url = post.id, folder = null, option = null, graphResult = post, state = CrawlerStates.LikesFromPost });
-                    }
-                }
-            }
-            removePreInitState(preinintState);
-        }
-
-        private void Folder_OnCanceledAStatsCheck(ListOption option)
-        {
-            if (mCrawlerHost != null)
-            {
-
                 try
                 {
-                    List<CrawlerPreInitState> theseStates = new List<CrawlerPreInitState>();
-
-                    foreach (CrawlerPreInitState preState in mCrawlerHost.PreInitStates)
+                    if (serializedXMLResult != "N/A")
                     {
-                        switch (preState.state)
+                        switch (preinintState.state)
                         {
                             case CrawlerStates.FbGraphCrawl:
-                                if (preState.option != null)
+                                FacebookGraphData fbgData = serializedXMLResult.XmlDeserializeFromString<FacebookGraphData>();
+                                preinintState.option.FBGraphData = fbgData;
+                                break;
+                            case CrawlerStates.LoadAllPhotos:
+                                if (preinintState.option != null && preinintState.option.FBGraphData != null && preinintState.option.FBGraphData.photos != null)
                                 {
-                                    if (preState.option == option)
+                                    if (preinintState.option.FBGraphData.photos.data == null)
                                     {
-                                        theseStates.Add(preState);
+                                        preinintState.option.FBGraphData.photos.data = new ObservableCollection<Photos.Photo>();
                                     }
+
+                                    List<PhotosGraphData> allcrawledPhotos = serializedXMLResult.XmlDeserializeFromString<List<PhotosGraphData>>();
+                                    if (allcrawledPhotos.Count > 1)
+                                    {
+                                        preinintState.option.FBGraphData.photos.data.Clear();
+                                        foreach (PhotosGraphData pd in allcrawledPhotos)
+                                        {
+                                            if (pd.photos == null) continue;
+                                            foreach (Photos.Photo p in pd.photos.data)
+                                            {
+                                                preinintState.option.FBGraphData.photos.data.Add(p);
+                                            }
+                                        }
+
+                                        preinintState.option.FBGraphData.photos.paging = null;
+                                        RaisePropertyChanged("SelectedFolder");
+                                    }      
                                 }
                                 break;
-                            case CrawlerStates.LikesFromPost:
-                                if (preState.graphResult != null)
+                            case CrawlerStates.LoadAllVideos:
+                                if (preinintState.option != null && preinintState.option.FBGraphData != null && preinintState.option.FBGraphData.videos != null)
                                 {
-                                    try
+                                    if (preinintState.option.FBGraphData.photos.data == null)
                                     {
-                                        if (option.FBGraphData.posts.data.Any(p => p == preState.graphResult))
-                                        {
-                                            theseStates.Add(preState);
-                                        }
+                                        preinintState.option.FBGraphData.videos.data = new ObservableCollection<Videos.Video>();
                                     }
-                                    catch { }
+
+                                    List<VideosGraphData> allcrawledVideos = serializedXMLResult.XmlDeserializeFromString<List<VideosGraphData>>();
+                                    if (allcrawledVideos.Count > 1)
+                                    {
+                                        preinintState.option.FBGraphData.photos.data.Clear();
+                                        foreach (VideosGraphData vd in allcrawledVideos)
+                                        {
+                                            if (vd.videos == null) continue;
+                                            foreach (Videos.Video v in vd.videos.data)
+                                            {
+                                                preinintState.option.FBGraphData.videos.data.Add(v);
+                                            }
+                                        }
+                                        preinintState.option.FBGraphData.videos.paging = null;
+                                        RaisePropertyChanged("SelectedFolder");
+                                    }
+                                    
                                 }
                                 break;
                             default:
                                 break;
                         }
                     }
-
-                    foreach (CrawlerPreInitState state in theseStates)
+                    else
                     {
-                        mCrawlerHost.PreInitStates.Remove(state);
+                        removePreInitState(preinintState);
+                        MessageBox.Show("Couldnt crawl page " + preinintState.url);
+                        return;
                     }
                 }
                 catch
                 {
-                    if (mCrawlerHost.PreInitStates.Count > 0)
-                    {
-                        mCrawlerHost.PreInitStates.RemoveAt(0);
-                    }
                 }
+                removePreInitState(preinintState);
 
-                mCrawlerHost.navigateToNextUrl();
-                if (mCrawlerHost.PreInitStates.Count == 0)
+                if (mCrawlerHost.PreInitStates.Count > 0)
+                    mCrawlerHost.navigateToNextUrl();
+            }, CancellationToken.None, TaskCreationOptions.None, uiContextScheduler);
+        }
+
+        private void removePreInitState(CrawlerPreInitState preinintState)
+        {
+            mCrawlerHost.PreInitStates.Remove(preinintState);
+
+            LoadingStatus += " END";
+
+            if (mCrawlerHost.PreInitStates.Count == 0)
+            {
+                try
+                {
+                    IsIndeterminate = true;
                     PBarVisible = Visibility.Collapsed;
+                }
+                catch { }
             }
         }
         #endregion
 
-
-#region save populate and init folders lists
+        #region save populate and init folders lists
         private void SaveList()
         {
             lock (mLock)
             {
                 try
                 {
-                    PBarVisible = Visibility.Visible;
+                    bool wasvisible = PBarVisible == Visibility.Visible;
+                    if(!wasvisible)
+                        PBarVisible = Visibility.Visible; 
                     LoadingStatus = "Saving Do Not Close Project";
 
                     string saveToDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "GoViral", GloableProfData.PData.ProjectName);
@@ -578,8 +591,9 @@ namespace GoViral.ViewModels
                     //    fileStream.Flush();
                     //}
 
-                    LoadingStatus = "Done";
-                    PBarVisible = Visibility.Collapsed;
+                    LoadingStatus = "Done";    
+                    if (!wasvisible)
+                        PBarVisible = Visibility.Collapsed;
                 }
                 catch (Exception ex)
                 {
@@ -601,27 +615,34 @@ namespace GoViral.ViewModels
 
                 
                 ObservableCollection<Folder> data = File.ReadAllText(saveToFilePath).XmlDeserializeFromString<ObservableCollection<Folder>>();
+               // Folder needsToBeSelected = null;
                 foreach (Folder folder in data)
                 {
                     setFolderEvents(folder);
                     folder.CTMenuClick = new RelayCommand(folder.On_CTMenuClick);
+                    if(folder.SavedLinksList != null)
+                    {
+                        foreach (ListOption lo in folder.SavedLinksList)
+                        {  
+                            lo.OnFBGraphDataChanged += folder.Raise_OnFBGraphDataChanged;  
+                            //if (lo.IsSelected)
+                            //{
+                            //    needsToBeSelected = folder;
+                            //}
+                        }
+                    }
+                    folder.SISavedLinks = 0;
                     Folders.Add(folder);
                 }
-
-                //using (FileStream inStream = File.OpenRead(saveToFilePath))
-                //{
-                //    DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<Folder>));
-                //    ObservableCollection<Folder> data = (ObservableCollection<Folder>)serializer.ReadObject(inStream);
-                //    foreach (Folder folder in data)
-                //    {
-                //        setFolderEvents(folder);
-                //        folder.CTMenuClick = new RelayCommand(folder.On_CTMenuClick);
-                //        Folders.Add(folder);
-                //    }
-                //}
+                if(SelectedFolder != null)
+                {
+                    SelectedFolder.IsEExpanded = true;
+                }
+                RaisePropertyChanged("SelectedFolder"); 
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -636,14 +657,51 @@ namespace GoViral.ViewModels
 
         private void Folder_RaiseSiChanged(Folder folder)
         {
-            SIFolders = Folders.IndexOf(folder);
+            Task.Factory.StartNew(() =>
+            {
+                try
+                {
+                    if (Folders != null && Folders.Count > 0)
+                    {
+                        if (SIFolders != Folders.IndexOf(folder))
+                            SIFolders = Folders.IndexOf(folder);
+                        else
+                            return;
+                        if (folder.SISavedLinks == -1) return;   
+
+                        foreach (Folder f in Folders)
+                        {
+                            if (f != folder)
+                            {
+                                foreach (ListOption o in f.SavedLinksList)
+                                {
+                                    if (o.IsSelected)
+                                    {
+                                        o.IsSelected = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            });
         }
 
-        public async void AsyncAddLinkToList(string link)
+        public async void AsyncAddLinkToList(string link, List<string> multi)
         {
             if (!PopulateListTask.IsCompleted)
             {
                 await PopulateListTask;
+            }
+            if(link == null)
+            {
+                OpenMultyLinks(multi);
+                return;
             }
 
             string name = "";
@@ -656,13 +714,7 @@ namespace GoViral.ViewModels
             SIFolders = lastSelectedIndex;
             if (SIFolders == -1) SIFolders = 0;
 
-            if (Folders.Count == 0)
-            {
-
-                MessageBox.Show("You need to create a folder before pushing links to it.");
-                addNewFolder();
-                return;
-            }
+            if (displayYouNeedToAddFolderMessage()) return;
 
             ToFolderChooserWindow fcw = new ToFolderChooserWindow() { DataContext = this };
             fcw.tbName.Text = name;
@@ -671,7 +723,7 @@ namespace GoViral.ViewModels
             {
                 lastSelectedIndex = SIFolders;
 
-                Folders[SIFolders].SavedLinksList.Add(new ListOption() { Name = fcw.tbName.Text, Url = fcw.tbUrl.Text });
+                addNewLoToFolder(Folders[SIFolders], fcw.tbName.Text, fcw.tbUrl.Text, null);
 
                 Task.Factory.StartNew(() =>
                 {
@@ -679,6 +731,29 @@ namespace GoViral.ViewModels
                 });
             }
 
+        }
+
+        private void addNewLoToFolder(Folder folder, string name, string url, FacebookGraphData facebookGraphData)
+        {
+            ListOption lo = new ListOption() { Name = name, Url = url };
+            if(facebookGraphData != null)
+            {
+                lo.FBGraphData = facebookGraphData;
+            }
+            lo.OnFBGraphDataChanged += Folders[SIFolders].Raise_OnFBGraphDataChanged;
+            folder.SavedLinksList.Add(lo);
+        }
+
+        private bool displayYouNeedToAddFolderMessage()
+        {
+            if (Folders.Count == 0)
+            {
+                MessageBox.Show("You need to create a folder before pushing links to it.");
+                addNewFolder();
+                return true;
+            }
+
+            return false;
         }
 
         private void addNewFolder()
@@ -716,7 +791,12 @@ namespace GoViral.ViewModels
                 fcw.tbUrl.Text = folder.SavedLinksList[folder.SISavedLinks].Url;
                 if (fcw.ShowDialog() == false) return;
 
-                Folders[SIFolders].SavedLinksList.Add(new ListOption() { Name = fcw.tbName.Text, Url = fcw.tbUrl.Text });
+                FacebookGraphData dataToCopyOver = null;
+                if(folder.SavedLinksList[folder.SISavedLinks].FBGraphData != null)
+                {
+                    dataToCopyOver = folder.SavedLinksList[folder.SISavedLinks].FBGraphData.XmlSerializeToString().XmlDeserializeFromString<FacebookGraphData>();
+                } 
+                addNewLoToFolder(Folders[SIFolders], fcw.tbName.Text, fcw.tbUrl.Text, dataToCopyOver);
                 folder.SavedLinksList.Remove(folder.SavedLinksList[folder.SISavedLinks]);
             }
 
@@ -725,9 +805,9 @@ namespace GoViral.ViewModels
                 SaveList();
             });
         }
-#endregion
+        #endregion
 
-#region browser load and events
+        #region browser load and events
         void Folder_OnLoadInBrowser(string url)
         {
             WebBrowser.Navigate(url);
@@ -744,131 +824,400 @@ namespace GoViral.ViewModels
                 BrowserPreviewStatus = "Loading...";
             }
         }
-#endregion
+        
+
+        public void RefreshBrowser()
+        {
+            if (WebBrowser != null)
+                WebBrowser.DisposeBrowserComponents();
+
+            if(wfh != null)
+            {
+                wfh.Child.Dispose();
+            }
+
+            WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
+            WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
+            WebBrowser.init("",
+            BrowserSettimgs.JavascriptEnabled ? CefState.Enabled : CefState.Disabled,
+            BrowserSettimgs.JavaEnabled ? CefState.Enabled : CefState.Disabled,
+            BrowserSettimgs.FlashEnabled ? CefState.Enabled : CefState.Disabled);
+            if (wfh == null)
+                wfh = new WindowsFormsHost();
+
+            wfh.Child = WebBrowser;
+            RaisePropertyChanged("WebBrowserHost");
+        }
 
         public void DisposeBrowser()
         {
             if(WebBrowser!=null)
-                WebBrowser.Dispose();
+                WebBrowser.DisposeBrowserComponents();
 
             if (mCrawlerHost != null)
-                mCrawlerHost.ShutDown();
+                mCrawlerHost.Shutdown();
         }
 
-
-
-#region propchanged
-        protected void RaisePropertyChanged(string name)
-        {
-            if (PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
-            }
-        }
-        public event PropertyChangedEventHandler PropertyChanged;
-#endregion
-    }
-
-    class CrawlerHost : HostView.HostObject
-    { 
-        public event Action<string> ReportProgress = delegate { };  
-        public event Action<string, CrawlerPreInitState> OnReportGotGraphData = delegate { };//likes, url
-        public event Action<string, CrawlerPreInitState> OnReportGotLikesData = delegate { };//likes, url
-
-        public List<CrawlerPreInitState> PreInitStates { get; set; }
-        public List<CrawlerPreInitState> PostInitRecrawlStates { get; set; }
-        public List<CrawlerPreInitState> PostRecrawlLikesStates { get; set; }
-
-        private ProcessorHostView crawlerAddin;
-
-        public int Initialized = 0;
-        public int totalToCrawl;
-
-        public CrawlerHost(ProcessorHostView crawlerAddin)
-        {
-            PreInitStates = new List<CrawlerPreInitState>();
-            PostInitRecrawlStates = new List<CrawlerPreInitState>();
-            PostRecrawlLikesStates = new List<CrawlerPreInitState>();
-
-            this.crawlerAddin = crawlerAddin;
-        }
-
-        internal void IninAdin(CrawlerStates crawlState)
-        {
-            totalToCrawl = PreInitStates.Count;
-
-            if (Initialized == 0)
-            {
-                Initialized = 1;
-                crawlerAddin.Initialize(this);
-                crawlerAddin.SetCrawlerState(Convert.ToInt32(crawlState));
-                crawlerAddin.SetPersonData(GloableProfData.PData.XmlSerializeToString());
-                crawlerAddin.InitializeCefWithCachePath(path: Path.Combine(Organiser.Common.Classes.MyFilesDatabase.GetBaseDir(), "Caches\\" + GloableProfData.PData.ProjectName));
-                
-            }
-            else
-            {
-                crawlerAddin.SetCrawlerState(Convert.ToInt32(crawlState));
-                navigateToNextUrl();
-            }
-        }
-
-#region crawler callbacks
-        public override void ReportInitialized()
-        {
-            if (Initialized == 1)
-            {
-                Initialized = 2;
-                crawlerAddin.SetAccessToken(Social.FACEBOOK_GRAPH_LINK);
-            }
-            else
-            {
-                navigateToNextUrl();
-            }
-        }
-
-        public override void ReportSerializedResult(string serializedXML)
-        {
-            if (PreInitStates.Count > 0)
-            {
-                OnReportGotGraphData(serializedXML, PreInitStates[0]);
-                navigateToNextUrl();
-            }
-        }
-#endregion
-
-        public void navigateToNextUrl()
-        {
-            if (PreInitStates != null && PreInitStates.Count > 0)
-            {
-                ReportProgress("START: " + PreInitStates[0].url);
-                crawlerAddin.SetCrawlerState(Convert.ToInt32(PreInitStates[0].state));
-                crawlerAddin.NavigateToUrl(PreInitStates[0].url);
-            }
-        }
-
-        public void ShutDown()
-        {
-            crawlerAddin.Shutdown(); 
-        }
-
-        public override void ReportSerializedLikesResult(string serializedXML)
-        {
-            if (PreInitStates.Count > 0)
-            {
-                OnReportGotLikesData(serializedXML, PreInitStates[0]);
-                navigateToNextUrl();
-            }
-        }
-    }
-
-    class CrawlerPreInitState
-    {
-        public CrawlerStates state = CrawlerStates.FbGraphCrawl;
-        public LikesData likesData;
-        public FacebookGraphPostResult graphResult;
-        public Folder folder;
-        public ListOption option;
-        public string url;
+        #endregion
     }
 }
+
+
+
+//internal void LoadAllLikes(FacebookGraphPostResult facebookGraphPostResult, string url)
+//{
+//    if (InitAddinTask == null || InitAddinTask.IsCompleted)
+//    {
+//        InitAddinTask = Task.Factory.StartNew(() =>
+//        {
+//            if (!initializeCrawler())
+//            {
+//                return;
+//            }
+
+//            addLinkForCrawlerAddInn(url, null, null, facebookGraphPostResult, CrawlerStates.LikesFromPost);
+//            mCrawlerHost.IninAdin(CrawlerStates.LikesFromPost);
+//        });
+//    }
+//}
+//private void CrawlerHost_OnReportGotLikesData(string serializedXMLResult, CrawlerPreInitState preinintState)
+//{
+//    if (serializedXMLResult != "N/A")
+//    {
+//        LikesData likes = serializedXMLResult.XmlDeserializeFromString<LikesData>();
+
+//        if (preinintState.graphResult != null && likes != null && likes.likes != null)
+//        {
+//            preinintState.likesData = likes;
+//            mCrawlerHost.PostRecrawlLikesStates.Add(preinintState);
+//        }
+//    }
+
+//    removePreInitState(preinintState);
+//}
+//private bool initializeCrawler()
+//{
+//    //if (LoadingStatus != null && LoadingStatus.Contains("Initializing Crawler..."))
+//    //    return false;
+
+//    //PBarVisible = Visibility.Visible;
+//    //LoadingStatus = "Initializing Crawler..."; 
+
+//    // if (mCrawlerHost == null)
+//    //{   
+//    //string path = AppDomain.CurrentDomain.BaseDirectory;
+//    //Console.WriteLine(path);
+//    //if (path == @"C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\BrowserAndFeatures\bin\x86\Debug\" ||
+//    //    path == @"C:\Users\eli\Desktop\move\plugins\WpfHost\bin\Release" ||
+//    //    path == @"C:\Users\eli\Desktop\move\plugins\WpfHost\bin\Debug" ||
+//    //    path == @"C:\Users\eli\Desktop\move\All Browseo Install Files")
+//    //{
+//    //    string[] ss = AddInStore.Update(path);// (epath);
+//    //    string[] kk = AddInStore.RebuildAddIns(path);
+//    //}
+
+//    try
+//    {
+//        //IList<AddInToken> tokens = AddInStore.FindAddIns(typeof(HostView.ProcessorHostView), path);
+//        //AddInToken crawlerToken = tokens.SingleOrDefault(t => t.AddInFullName == "Crawler.Crawler");
+
+//        //if (crawlerToken != null)
+//        //{    
+//        //    ProcessorHostView crawlerAddin = crawlerToken.Activate<HostView.ProcessorHostView>(AddInSecurityLevel.FullTrust);
+
+//        //    mCrawlerHost = new CrawlerHost(crawlerAddin);
+//        //    mCrawlerHost.ReportProgress += CrawlerHost_ReportProgress;
+//        //    mCrawlerHost.OnReportGotGraphData += CrawlerHost_OnReportGotGraphData;
+//        //    //mCrawlerHost.OnReportGotLikesData += CrawlerHost_OnReportGotLikesData;
+//        //}
+//        //else
+//        //{
+//        //    MessageBox.Show("Could not start crawl process, could not find process tokens.");
+//        //    PBarVisible = Visibility.Collapsed;
+//        //    return false;
+//        //}
+
+//        mCrawlerHost = new CrawlerHost();
+//        mCrawlerHost.ReportProgress += CrawlerHost_ReportProgress;
+//        mCrawlerHost.OnReportGotGraphData += CrawlerHost_OnReportGotGraphData;
+//    }
+//    catch (Exception ex)
+//    {
+//        MessageBox.Show("Could not start crawl process, could not find process tokens.");
+//        PBarVisible = Visibility.Collapsed;
+//        return false;
+//    }
+//    //}
+
+
+//    return true;
+//}
+//if (mCrawlerHost.PreInitStates.Count == 0)
+//{
+//    //if (mCrawlerHost.PostInitRecrawlStates.Count > 0)
+//    //{
+//    //    foreach (CrawlerPreInitState postRecrawlState in mCrawlerHost.PostInitRecrawlStates)
+//    //    {
+//    //        mCrawlerHost.PreInitStates.Add(postRecrawlState);
+//    //    }
+
+//    //    mCrawlerHost.PostInitRecrawlStates.Clear();
+//    //    mCrawlerHost.IninAdin(CrawlerStates.LikesFromPost);
+//    //}
+//    //else
+//    //{
+//        try
+//        {
+//            IsIndeterminate = true;
+//            //LoadingStatus = "Ordering Pages And Posts By Likes";
+
+//            //Application.Current.Dispatcher.Invoke((Action)delegate
+//            //{
+//            //    if (mCrawlerHost.PostRecrawlLikesStates.Count > 0)
+//            //    {
+//            //        foreach (CrawlerPreInitState postReLikesState in mCrawlerHost.PostRecrawlLikesStates)
+//            //        {
+//            //            if (postReLikesState.graphResult.likes == null)
+//            //                postReLikesState.likesData = new LikesData();
+//            //            if (postReLikesState.graphResult.likes.data == null)
+//            //                postReLikesState.graphResult.likes.data = new ObservableCollection<Likes.Data>();
+
+//            //            postReLikesState.graphResult.likes.data.Clear();
+//            //            foreach (Likes.Data like in postReLikesState.likesData.likes.data)
+//            //            {
+//            //                postReLikesState.graphResult.likes.data.Add(like);
+//            //            }
+//            //        }
+//            //        mCrawlerHost.PostRecrawlLikesStates.Clear();
+//            //    }
+
+//            //    try
+//            //    {
+//            //        List<Folder> orderdFolders = new List<Folder>();
+//            //        foreach (Folder f in Folders)
+//            //        {
+//            //            orderdFolders.Add(orderFolderByLikes(f));
+//            //        }
+
+//            //        Folders.Clear();
+//            //        foreach (Folder f in orderdFolders)
+//            //        {
+//            //            Folders.Add(f);
+//            //        }
+//            //        orderdFolders.Clear();
+//            //    }
+//            //    catch { } 
+//            //});
+
+
+//            PBarVisible = Visibility.Collapsed;
+//        }
+//        catch { }
+//   // }
+//}
+//if (preinintState.option.FBGraphData != null && preinintState.option.FBGraphData.posts != null && preinintState.option.FBGraphData.posts.data != null)
+//{
+//    foreach (FacebookGraphPostResult post in preinintState.option.FBGraphData.posts.data)
+//    {
+//        if (post.likes == null) continue;
+//        if (post.likes.data == null) continue;
+
+//        if (post.likes.data.Count == 25)
+//        {
+//            mCrawlerHost.PostInitRecrawlStates.Add(new CrawlerPreInitState() { url = post.id, folder = null, option = null, graphResult = post, state = CrawlerStates.LikesFromPost });
+//        }
+//    }
+//}
+//if (mCrawlerHost.PreInitStates.Count > 0)
+//{
+//    if(mCrawlerHost.PreInitStates.Any(s=>s.state== CrawlerStates.LikesFromPost))
+//    {
+//        IsIndeterminate = false;
+
+//        double total = mCrawlerHost.totalToCrawl - mCrawlerHost.PreInitStates.Count;
+//        total = total / mCrawlerHost.totalToCrawl;  
+//        PBarValue = total * 100;
+
+//        LoadingStatus = LoadingStatus + Environment.NewLine + "Gathering all likes...";
+//    }
+//}
+//try
+//{
+//    List<CrawlerPreInitState> theseStates = new List<CrawlerPreInitState>();
+
+//    foreach (CrawlerPreInitState preState in mCrawlerHost.PreInitStates)
+//    {
+//        switch (preState.state)
+//        {
+//            case CrawlerStates.FbGraphCrawl:
+//                if (preState.option != null)
+//                {
+//                    if (preState.option == option)
+//                    {
+//                        theseStates.Add(preState);
+//                    }
+//                }
+//                break;
+//            case CrawlerStates.LikesFromPost:
+//                if (preState.graphResult != null)
+//                {
+//                    try
+//                    {
+//                        if (option.FBGraphData.posts.data.Any(p => p == preState.graphResult))
+//                        {
+//                            theseStates.Add(preState);
+//                        }
+//                    }
+//                    catch { }
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//    }
+
+//    foreach (CrawlerPreInitState state in theseStates)
+//    {
+//        mCrawlerHost.PreInitStates.Remove(state);
+//    }
+//}
+//catch
+//{
+//    if (mCrawlerHost.PreInitStates.Count > 0)
+//    {
+//        mCrawlerHost.PreInitStates.RemoveAt(0);
+//    }
+//}
+//class CrawlerHost : MarshalByRefObject, IHost
+//{
+//    public event Action<string> ReportProgress = delegate { };
+//    public event Action<string, CrawlerPreInitState> OnReportGotGraphData = delegate { };//likes, url
+//    public event Action<string, CrawlerPreInitState> OnReportGotLikesData = delegate { };//likes, url
+
+//    public List<CrawlerPreInitState> PreInitStates { get; set; }
+//    //public List<CrawlerPreInitState> PostInitRecrawlStates { get; set; }
+//    //public List<CrawlerPreInitState> PostRecrawlLikesStates { get; set; }
+
+//    public int HostProcessId { get { return Process.GetCurrentProcess().Id; } }
+
+//    private PluginProcessProxy crawlerPlugin;
+
+//    public int Initialized = 0;
+//    public int totalToCrawl;
+
+//    public CrawlerHost()
+//    {
+//        PreInitStates = new List<CrawlerPreInitState>();
+//        //PostInitRecrawlStates = new List<CrawlerPreInitState>();
+//        //PostRecrawlLikesStates = new List<CrawlerPreInitState>();
+
+//        //crawlerPlugin = new PluginProcessProxy(new PluginStartupInfo()
+//        //{
+//        //    FullAssemblyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Crawler.dll"),
+//        //    MainClass = "Crawler.Crawler",
+//        //    Name = "BrowseoNinjaCrawler",
+//        //    AssemblyName = "Crawler",
+//        //}, this);
+
+//        //RemotingServices.Marshal(this, "BrowseoNinjaCrawlerHost", typeof(CrawlerContracts.IHost));
+//        //crawlerPlugin.StartPluginProcess();
+//        //crawlerPlugin.LoadPlugin();    
+//    }
+
+//    internal void IninAdin(CrawlerStates crawlState)
+//    {
+//        totalToCrawl = PreInitStates.Count;
+
+//        if (Initialized == 0)
+//        {
+//            Initialized = 1;
+//            //crawlerAddin.Initialize(this);
+//            crawlerPlugin.SetCrawlerState(Convert.ToInt32(crawlState));
+//            //crawlerPlugin.SetPersonData(GloableProfData.PData.XmlSerializeToString());
+//            crawlerPlugin.InitializeCefWithCachePath(path: Path.Combine(Organiser.Common.Classes.MyFilesDatabase.GetBaseDir(), "Caches\\" + GloableProfData.PData.ProjectName));
+
+//        }
+//        else
+//        {
+//            //crawlerAddin.SetCrawlerState(Convert.ToInt32(crawlState));
+//            navigateToNextUrl();
+//        }
+//    }
+
+//    public void navigateToNextUrl()
+//    {
+//        if (PreInitStates != null && PreInitStates.Count > 0)
+//        {
+//            new Thread(() =>
+//            {
+//                ReportProgress("START: " + PreInitStates[0].url);
+//                //crawlerAddin.SetCrawlerState(Convert.ToInt32(PreInitStates[0].state));
+//                //crawlerAddin.NavigateToUrl(PreInitStates[0].url);
+//            }).Start();
+//        }
+//    }
+
+//    public void ShutDown()
+//    {
+//        // crawlerAddin.Shutdown(); 
+//    }
+
+//    public void ReportFatalError(string userMessage, string fullExceptionText)
+//    {
+//        Console.WriteLine(userMessage + " " + fullExceptionText);
+//    }
+
+//    public object GetService(Type serviceType)
+//    {
+//        if (serviceType.IsAssignableFrom(GetType())) return this;
+//        return null;
+//    }
+
+//    public void ReportInitialized()
+//    {
+//        if (Initialized == 1)
+//        {
+//            Console.WriteLine("Initialized.");
+//            Initialized = 2;
+//            //crawlerAddin.SetAccessToken(Social.FACEBOOK_GRAPH_LINK);
+//        }
+//        else
+//        {
+//            navigateToNextUrl();
+//        }
+//    }
+
+//    public override object InitializeLifetimeService()
+//    {
+//        return null; // live forever
+//    }
+
+//    //public override void ReportSerializedResult(string serializedXML)
+//    //{
+//    //    if (PreInitStates.Count > 0)
+//    //    {
+//    //        OnReportGotGraphData(serializedXML, PreInitStates[0]);
+//    //        navigateToNextUrl();
+//    //    }
+//    //}
+
+//    //public override void ReportSerializedLikesResult(string serializedXML)
+//    //{
+//    //    if (PreInitStates.Count > 0)
+//    //    {
+//    //        OnReportGotLikesData(serializedXML, PreInitStates[0]);
+//    //        navigateToNextUrl();
+//    //    }
+//    //}
+//}
+
+//[Serializable]
+//class CrawlerPreInitState
+//{
+//    public CrawlerStates state = CrawlerStates.FbGraphCrawl;
+//    public LikesData likesData;
+//    public FacebookGraphPostResult graphResult;
+//    public Folder folder;
+//    public ListOption option;
+//    public string url;
+//}

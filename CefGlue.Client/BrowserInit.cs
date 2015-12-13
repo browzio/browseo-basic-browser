@@ -32,7 +32,7 @@ namespace Xilium.CefGlue.Client
 
             var mainArgs = new CefMainArgs(new string[0] { });
             var app = new DemoApp();
-            //var exitCode = CefRuntime.ExecuteProcess(mainArgs, app);
+            var exitCode = CefRuntime.ExecuteProcess(mainArgs, app, IntPtr.Zero);
 
             var exePath = AppDomain.CurrentDomain.BaseDirectory + "\\BrowserAndFeatures.exe";
             exePath = exePath.Replace("\\\\","\\");
@@ -44,9 +44,11 @@ namespace Xilium.CefGlue.Client
                 PersistSessionCookies = true,
                 LogSeverity = CefLogSeverity.Disable,
                 IgnoreCertificateErrors = true,
-                UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36", 
-                 
-                //NoSandbox = true
+               // UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2556.0 Safari/537.36",
+               // UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36",
+                 UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.106 Safari/537.36",
+
+                NoSandbox = true
                 //LogFile = "CefGlue.log",
             };
 
@@ -66,6 +68,7 @@ namespace Xilium.CefGlue.Client
             
             CefRuntime.Initialize(mainArgs, settings, app, IntPtr.Zero);
 
+            //CefRuntime.AddCrossOriginWhitelistEntry("file", "https", "facebook.com", true);
             //CefRuntime.AddWebPluginDirectory(@"C:\Windows\system32\Macromed\Flash\");
             //CefRuntime.RefreshWebPlugins();
 

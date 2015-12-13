@@ -10,6 +10,9 @@ namespace Organiser.Common.Classes.Crawler
     {
         FbGraphCrawl = 0,
         LikesFromPost = 1,
+        UploadVideoFromFile = 2,
+        LoadAllPhotos = 3,
+        LoadAllVideos = 4,
     }
     public class CrawlerState
     {

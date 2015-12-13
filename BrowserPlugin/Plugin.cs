@@ -36,15 +36,24 @@ namespace BrowserPlugin
 
         public override void OnTabFocused()
         {
-            if (GloableProfData.PData == null) return;
             System.Threading.Tasks.Task.Factory.StartNew(() =>
-            { 
-                TimeHelper.SetOriginalTimeZones(GloableProfData.PData);
-                if (MyFilesDatabase.SetSysDateEnabled)
+            {
+                if (BrowserSettimgs.SetSysDateEnabled)
                 {
-                    TimeHelper.SetTheTimeZone(GloableProfData.PData, false);
+                    try
+                    {
+                        TimeHelper.StartSetTimeAndZoneProcess(new DateAndTimeZone() { TimeZone = TimeZoneInfo.GetSystemTimeZones()[BrowserSettimgs.SITimeZone] });
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
                 }
-            });  
+                else
+                {
+                    TimeHelper.SetOriginalTimeZonesFromFile();
+                }
+            });
         }
 
         public override void SetBrowserPersonData(int birthdayYear, string children, string city, int cmbSelectedIndexDay, int cmbSelectedIndexMonth, int cmbSelectedIndexSex, string country, string dir, string email, string filePath, string firstName, bool inMonney, bool inPBNVault, string lastName, string notes, string password, string phoneNumber, string profileName, string projectDir, string projectName, string proxyIP, string proxyPassword, string proxyPort, string proxyUsername, int sIPBNType, string state, string street, string username, string webAddress, string zip)

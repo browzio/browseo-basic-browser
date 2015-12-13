@@ -41,7 +41,7 @@ namespace BrowserAndFeatures
             if(App.browserinit)
                 BrowserInit.Init();
 
-            //MyFilesDatabase.GetSites(); 
+            MyFilesDatabase.GetSites(); 
 
             (prospector.DataContext as FootPrintsOptionsVM).OnClickedSearch += FeatureCallage_OnClickedSearch;
             (prospector.DataContext as FootPrintsOptionsVM).OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
@@ -53,6 +53,7 @@ namespace BrowserAndFeatures
 
             browser.OnCurateToPBN += Browser_OnCurateToPBN;
             browser.Loaded += Browser_Loaded;
+            browser.OnRefreshedSessionSettings += Browser_OnRefreshedSessionSettings;
         }
 
         //public FeatureCallage(int birthdayYear, string children, string city, int cmbSelectedIndexDay, int cmbSelectedIndexMonth, int cmbSelectedIndexSex, string country, string dir, string email, string filePath, string firstName, bool inMonney, bool inPBNVault, string lastName, string notes, string password, string phoneNumber, string profileName, string projectDir, string projectName, string proxyIP, string proxyPassword, string proxyPort, string proxyUsername, int sIPBNType, string state, string street, string username, string webAddress, string zip)
@@ -175,15 +176,17 @@ namespace BrowserAndFeatures
             RssReader.MainViewModel.isCloseing = true;
             if (goViralVM != null)
                 goViralVM.DisposeBrowser();
+            goViralVM = null;
 
             if(feedMasherVM != null)
                 feedMasherVM.DisposeBrowser();
-
-            //GC.Collect();
+            feedMasherVM = null;
 
 
             browser.CloseAllTabs();
-            BrowserInit.Shutdown(); 
+            BrowserInit.Shutdown();
+
+            GC.Collect(); 
         }
 
         #region other features tabs
@@ -243,7 +246,7 @@ namespace BrowserAndFeatures
                         imw.Show();
                     }
                 }
-                else if (tbControl.SelectedIndex == 6)
+                else if (tbControl.SelectedIndex == 7)
                 {
                     tbControl.SelectedIndex = previndex;
                     if (ytmw == null)
@@ -276,6 +279,14 @@ namespace BrowserAndFeatures
         }
 
         #region uc browser events
+        private void Browser_OnRefreshedSessionSettings()
+        {
+            if (goViralVM != null)
+            {
+                goViralVM.RefreshBrowser();
+            } 
+        }
+
         private void Browser_OnCurateToPBN(string content, string link)
         {
             Application.Current.Dispatcher.Invoke((Action)delegate
@@ -299,10 +310,10 @@ namespace BrowserAndFeatures
             browser.Loaded -= Browser_Loaded;
         }
 
-        private void Browser_OnAddedToGoViral(string link)
+        private void Browser_OnAddedToGoViral(string link, List<string> multiLinks)
         {
             createGoViralVM();
-            goViralVM.AsyncAddLinkToList(link);
+            goViralVM.AsyncAddLinkToList(link, multiLinks);
         }
         #endregion
 

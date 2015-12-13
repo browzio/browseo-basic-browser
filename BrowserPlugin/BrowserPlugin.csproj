@@ -134,9 +134,17 @@
       <Name>CefGlue.Client</Name>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\CrawlerHostViews\CrawlerHostViews.csproj">
-      <Project>{b624c5bb-83f8-48f0-956b-aad1f0554fe3}</Project>
-      <Name>CrawlerHostViews</Name>
+    <ProjectReference Include="..\CrawlerContracts\CrawlerContracts.csproj">
+      <Project>{3749fa3f-e42d-4e28-a77c-68fe06dcd8d2}</Project>
+      <Name>CrawlerContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CrawlerProcess\CrawlerProcess.csproj">
+      <Project>{7b54432e-fb4c-4452-8590-e8d192d6137c}</Project>
+      <Name>CrawlerProcess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Crawler\CrawlerAddIn.csproj">
+      <Project>{509c6eca-af36-4276-9b6f-bc59fc2f75ac}</Project>
+      <Name>CrawlerAddIn</Name>
     </ProjectReference>
     <ProjectReference Include="..\DragDropListview\DragDropListview.csproj">
       <Project>{f2c9dcf4-9c94-4389-9532-e9e7d0412c01}</Project>

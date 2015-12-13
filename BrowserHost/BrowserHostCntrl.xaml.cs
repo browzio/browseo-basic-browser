@@ -31,7 +31,8 @@ namespace BrowserHost
 
         public ObservableCollection<BrowserTabViewModel> BrowserTabs { get; set; }
         public event Action<string, string> OnCurateToPBN = delegate { };
-        public event Action<string> OnAddedToGoViral = delegate { };//link
+        public event Action<string,List<string>> OnAddedToGoViral = delegate { };//link
+        public event Action OnRefreshedSessionSettings = delegate { };
 
         public BrowserHostCntrl()
         {
@@ -148,6 +149,7 @@ namespace BrowserHost
             }
 
             tmpList.Clear();
+            OnRefreshedSessionSettings();
         }
 
         private void Btvm_OnClickedSaveSessionToBookmarks()
@@ -194,9 +196,9 @@ namespace BrowserHost
             OnCurateToPBN(content, link);
         }
 
-        private void Btvm_OnAddedToGoViral(string link)
+        private void Btvm_OnAddedToGoViral(string link, List<string> multilinks)
         {
-            OnAddedToGoViral(link);
+            OnAddedToGoViral(link, multilinks);
         }
         #endregion
 
@@ -271,15 +273,19 @@ namespace BrowserHost
 
         public void CheckAndSetOpenTabs()
         {
+            DragDropMainViewModel.Instance.OnDoubleClickedSite += Instance_OnDoubleClickedSite;
+            DragDropMainViewModel.Instance.OnSelsectedLauncAll += Instance_OnSelsectedLauncAll;
+
             Task.Factory.StartNew(() =>
             {
-                DragDropMainViewModel.Instance.OnDoubleClickedSite += Instance_OnDoubleClickedSite;
-                DragDropMainViewModel.Instance.OnSelsectedLauncAll += Instance_OnSelsectedLauncAll;
-                string[] sites = MyFilesDatabase.GetSavedSesstion(GloableProfData.PData.ProjectName);
-                Instance_OnSelsectedLauncAll(sites);
-                if (sites.Length > 0)
-                    TabControl.SelectedIndex = -1;
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+                List<string> sites = MyFilesDatabase.GetSavedSesstion(GloableProfData.PData.ProjectName);
+                Instance_OnSelsectedLauncAll(sites.ToArray());
+                Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    if (sites.Count > 0)
+                        TabControl.SelectedIndex = -1;
+                });
+            });
         }
 
         private void Instance_OnSelsectedLauncAll(string[] sites)

@@ -632,7 +632,7 @@ namespace WPF_WYSIWYG_HTML_Editor
             DateTime publishdt = DateTime.Now;
             try
             {
-                publishdt = TimeHelper.GetNistTime(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword).Date;
+                publishdt = TimeHelper.GetTimeOfProxy(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword).Date;
             }
             catch { publishdt = DateTime.Now; }
 
@@ -652,7 +652,7 @@ namespace WPF_WYSIWYG_HTML_Editor
                         content = getcontentAfterImgUpload(content, client);
                     }
 
-                    var post = new Post
+                    var post = new WordPressSharp.Models.Post
                     {
                         PostType = "post", // "post" or "page"
                         Title = title,
@@ -792,7 +792,7 @@ namespace WPF_WYSIWYG_HTML_Editor
                         DateTime publishdt = DateTime.Now;
                         try
                         {
-                            publishdt = TimeHelper.GetNistTime(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword).Date;
+                            publishdt = TimeHelper.GetTimeOfProxy(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword).Date;
                         }
                         catch { publishdt = DateTime.Now; }
                         if (UseSpunArticlesChecked)
@@ -816,7 +816,7 @@ namespace WPF_WYSIWYG_HTML_Editor
                                     content = getcontentAfterImgUpload(content, client);
                                 }
 
-                                var post = new Post
+                                var post = new WordPressSharp.Models.Post
                                 {
                                     PostType = "post", // "post" or "page"
                                     Title = title == "" ? PostTitle : title,

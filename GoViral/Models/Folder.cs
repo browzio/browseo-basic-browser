@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -26,7 +27,7 @@ namespace GoViral.Models
         public event Action<Folder,string> OnSelectedCheckStats = delegate { };
         public event Action<Folder> OnSelectedEditOrRemove = delegate { };
         public event Action<ListOption> OnCanceledAStatsCheck = delegate { };
-        public event Action<Folder> RaiseSiChanged = delegate { };
+        public event Action<Folder> RaiseSiChanged = delegate { }; 
 
         [XmlIgnore]
         public ICommand CTMenuClick { get; set; }
@@ -38,13 +39,38 @@ namespace GoViral.Models
             set { folderTitle = value; RaisePropertyChanged("FolderTitle"); }
         }
 
+        private bool isEExpanded;
+        public bool IsEExpanded
+        {
+            get { return isEExpanded; }
+            set
+            {
+                isEExpanded = value;
+                RaisePropertyChanged("IsEExpanded");
+                if (value)
+                {
+                   // RaiseSiChanged(this);
+                }
+                else
+                {
+                    if (SelectedPage != null)
+                    {
+                        SelectedPage.IsSelected = false;
+                    }
+                    SISavedLinks = -1;
+                    RaisePropertyChanged("SISavedLinks");
+                    RaisePropertyChanged("SelectedPageFBGraphData");
+                    RaisePropertyChanged("SelectedPageName");
+                }
+            }
+        }
+
         private ObservableCollection<ListOption> savedLinksList;
         public ObservableCollection<ListOption> SavedLinksList
         {
             get { return savedLinksList; }
             set { savedLinksList = value; }
-        }
-
+        }                          
         public int sISavedLinks;
         public int SISavedLinks
         {
@@ -54,29 +80,57 @@ namespace GoViral.Models
             }
             set
             {
-                if (sISavedLinks != value)
-                {
-                    sISavedLinks = value;
-                    RaiseSiChanged(this);
-                    RaisePropertyChanged("WebBrowserHost");
-                }
+                sISavedLinks = value;
+                
+                if (value == -1) return;
+
+                if (SelectedPage != null)
+                    SelectedPage.IsSelected = true;
+                RaiseSiChanged(this); 
+                RaisePropertyChanged("SelectedPageFBGraphData");
+                RaisePropertyChanged("SelectedPageName");
+                RaisePropertyChanged("SISavedLinks");
+            }
+        } 
+
+        public ListOption SelectedPage
+        {
+            get
+            {
+                if (SavedLinksList.Count > 0 && SISavedLinks >= 0)
+                    return SavedLinksList[SISavedLinks];
+                else
+                    return null;
             }
         }
 
-        private bool isEExpanded;  
-        public bool IsEExpanded
+        public string SelectedPageName
         {
-            get { return isEExpanded; }
-            set { isEExpanded = value; RaisePropertyChanged("WebBrowserHost"); }
+            get
+            {
+                if (SavedLinksList.Count > 0 && SISavedLinks >= 0)
+                    return SavedLinksList[SISavedLinks].Name;
+                else
+                    return null;
+            }
+        } 
+
+        public FacebookGraphData SelectedPageFBGraphData
+        {
+            get
+            {
+                if (SavedLinksList.Count > 0 && SISavedLinks >= 0)
+                    return SavedLinksList[SISavedLinks].FBGraphData;
+                else
+                    return null;
+            }
         }
-
-
+        
 
         public Folder()
         {
             CTMenuClick = new RelayCommand(On_CTMenuClick);
             SavedLinksList = new ObservableCollection<ListOption>(); 
-            SISavedLinks = -1;
         }
 
         public void On_CTMenuClick(object param)
@@ -116,21 +170,38 @@ namespace GoViral.Models
                     OnCanceledAStatsCheck(SavedLinksList[SISavedLinks]);
                     break;
 
-                case "ORDER_Likes":
-                case "ORDER_Shares":
-                    FacebookGraphData fbgData = SavedLinksList[SISavedLinks].FBGraphData;
-                    if (fbgData == null || fbgData.posts == null || fbgData.posts.data==null) return;
+                case "CancelAll":
+                    OnCanceledAStatsCheck(null);
+                    break;
 
-                    List<FacebookGraphPostResult> prListToOrder = fbgData.posts.data.OrderByDescending(l =>
-                    commandParam == "ORDER_Likes" ? 
-                    (l.likes == null ? 0 : l.likes.data == null ? 0 : l.likes.data.Count) : 
-                    (l.shares == null ? 0 : l.shares.count)).ToList();
-                    fbgData.posts.data.Clear();
-                    foreach (FacebookGraphPostResult pResult in prListToOrder)
+                case "ORDER_Likes":  
+                case "ORDER_TalkingAbout":   
+                    List<ListOption> loOrderd = SavedLinksList.OrderByDescending(l => l.FBGraphData == null ? 0 : commandParam == "ORDER_Likes" ? l.FBGraphData.likes : l.FBGraphData.talking_about_count).ToList();
+                    SavedLinksList.Clear();
+                    foreach (ListOption lo in loOrderd)
                     {
-                        fbgData.posts.data.Add(pResult);
+                        SavedLinksList.Add(lo);
                     }
                     break;
+
+                //case "ORDER_PostsByLikes":
+                //case "ORDER_PostsByShares":
+                //    if (SelectedPageFBGraphData != null)
+                //    {
+                //        if (SelectedPageFBGraphData.posts == null || SelectedPageFBGraphData.posts.data == null) return;
+
+                //        List<FacebookGraphPostResult> pdOrderd = SelectedPageFBGraphData.posts.data.OrderByDescending(l => commandParam == "ORDER_PostsByLikes" ?
+                //                                                                                                           (l.likes == null ? 0 : l.likes.summary == null ? 0 : l.likes.summary.total_count) :
+                //                                                                                                           (l.shares == null ? 0 : l.shares.count)).ToList();
+                //        SelectedPageFBGraphData.posts.data.Clear();
+                //        foreach (FacebookGraphPostResult pResult in pdOrderd)
+                //        {
+                //            SelectedPageFBGraphData.posts.data.Add(pResult);
+                //        }
+
+                //        RaisePropertyChanged("SelectedPageFBGraphData");
+                //    }
+                //    break;
 
                 //case "ORDER_Shares":
                 //    FacebookGraphData fbgDataShare = SavedLinksList[SISavedLinks].FBGraphData;
@@ -147,6 +218,11 @@ namespace GoViral.Models
                 default:
                     break;
             }
+        }
+
+        public void Raise_OnFBGraphDataChanged()
+        {
+            RaisePropertyChanged("SelectedPageFBGraphData");
         }
     }
 }

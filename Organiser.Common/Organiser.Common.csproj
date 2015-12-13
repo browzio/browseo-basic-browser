@@ -80,12 +80,15 @@
     <Compile Include="Classes\Lists.cs" />
     <Compile Include="Classes\MozscapeAPI.cs" />
     <Compile Include="Classes\MozscapeResults.cs" />
+    <Compile Include="Classes\NativeMethods.cs" />
     <Compile Include="Classes\ObjectCopier.cs" />
     <Compile Include="Classes\RelayCommand.cs" />
+    <Compile Include="Classes\SetWindowPosFlags.cs" />
     <Compile Include="Classes\TimeHelper.cs" />
     <Compile Include="Classes\UsageTracker.cs" />
     <Compile Include="Classes\ViewModelBase.cs" />
     <Compile Include="Controlls\MyListView.cs" />
+    <Compile Include="Converters\OpisiteVisibilityConverter.cs" />
     <Compile Include="Windows\SetNameAndDataWindow.xaml.cs">
       <DependentUpon>SetNameAndDataWindow.xaml</DependentUpon>
     </Compile>

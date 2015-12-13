@@ -3,9 +3,10 @@
     using Organiser.Common.Classes;
     using SocialOrganizer.Models;
     using System;
-    using System.IO; 
+    using System.IO;
     using System.Windows.Forms;
     using CefGlue;
+    using WindowsForms;
 
     internal sealed class DemoApp : CefApp
     {
@@ -77,7 +78,12 @@
             //https://bitbucket.org/chromiumembedded/cef/commits/e3c1d8632eb43c1c2793d71639f3f5695696a5e8
             //settings.SetOffScreenRenderingBestPerformanceArgs();
 
-            //commandLine.AppendArgument("--disable-web-security");
+            //commandLine.AppendArgument("disable-web-security");
+            //commandLine.AppendArgument("allow-file-access-from-files"); 
+            commandLine.AppendArgument("allow-cross-origin-auth-promp");
+            //commandLine.AppendSwitch("origin-when-crossorigin", "default");
+            //string[] args = commandLine.GetArguments();
+            //--allow-cross-origin-auth-promp
             if (GloableProfData.PData != null && !string.IsNullOrEmpty(GloableProfData.PData.ProxyIP) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyIP))
             {
                 try

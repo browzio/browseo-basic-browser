@@ -18,6 +18,7 @@ namespace Organiser.Common.Classes
         public bool can_post { get; set; }
         public string category { get; set; }
         public int likes { get; set; }
+        public int talking_about_count { get; set; }
 
         public Videos videos { get; set; }
         public Photos photos { get; set; }
@@ -25,8 +26,14 @@ namespace Organiser.Common.Classes
     }
 
     public class Videos
-    {
-        public Video[] data { get; set; }
+    { 
+        private ObservableCollection<Video> mydata;   
+        public ObservableCollection<Video> data
+        {
+            get { return mydata; }
+            set { mydata = value; }
+        }
+
         public Paging paging { get; set; }
    
 
@@ -43,56 +50,40 @@ namespace Organiser.Common.Classes
             public bool embeddable { get; set; }
             public Likes likes { get; set; }
             public SharedPosts sharedposts { get; set; }
+            public Comments comments { get; set; }
         }
-
-        public class SharedPosts
-        {
-            private ObservableCollection<SharedPost> mydata;  
-            public ObservableCollection<SharedPost> data
-            {
-                get { return mydata; }
-                set { mydata = value; }
-            }
-
-            public Paging paging { get; set; }
-
-            public class SharedPost
-            {
-                public string story { get; set; }
-                public string created_time { get; set; }
-                public string id { get; set; }
-            }
-        }
-
-        public class Comments
-        {
-            private ObservableCollection<Coment> mydata;
-            public ObservableCollection<Coment> data
-            {
-                get { return mydata; }
-                set { mydata = value; }
-            }
-
-            public Paging paging { get; set; }
-
-            public class Coment
-            {
-                public string id { get; set; }
-            }
-        }
+    }
+    public class VideosGraphData
+    {
+        public Videos videos { get; set; }
     }
 
     public class Photos
-    {
-        public Photo[] data { get; set; }
+    { 
+        private ObservableCollection<Photo> mydata;
+
+        public ObservableCollection<Photo> data
+        {
+            get { return mydata; }
+            set { mydata = value; }
+        }
+
         public Paging paging { get; set; }
 
         public class Photo
         {
-            public string created_time { get; set; }
+            public string picture { get; set; }
             public string id { get; set; }
-
+            public string link { get; set; }
+            public string updated_time { get; set; }
+            public Images[] images { get; set; }
+            public Likes likes { get; set; }           
+            public Comments comments { get; set; }   
         }
+    }
+    public class PhotosGraphData
+    {
+        public Photos photos { get; set; }
     }
 
     public class Posts
@@ -104,16 +95,10 @@ namespace Organiser.Common.Classes
             get { return mydata; }
             set { mydata = value; }
         }
-
-        //public FacebookGraphPostResult[] data
-        //{
-        //    get;
-        //    set;
-        //}
     }
 
-    public class FacebookGraphPostResult : ViewModelBase
-    {
+    public class FacebookGraphPostResult
+    {   
         [JsonProperty("caption")]
         public string caption { get; set; }
 
@@ -143,6 +128,51 @@ namespace Organiser.Common.Classes
         public Likes likes { get; set; }
     }
 
+    public class SharedPosts
+    {
+        private ObservableCollection<SharedPost> mydata;
+        public ObservableCollection<SharedPost> data
+        {
+            get { return mydata; }
+            set { mydata = value; }
+        }
+
+        public Paging paging { get; set; }
+
+        public class SharedPost
+        {
+            public string story { get; set; }
+            public string created_time { get; set; }
+            public string id { get; set; }
+        }
+    }
+
+    public class Images
+    {
+        public int height { get; set; }
+        public string source { get; set; }
+        public int width { get; set; }
+    }
+
+    public class Comments
+    {
+        private ObservableCollection<Coment> mydata;
+        public ObservableCollection<Coment> data
+        {
+            get { return mydata; }
+            set { mydata = value; }
+        }
+
+        public Paging paging { get; set; }
+
+        public Summary summary { get; set; }
+
+        public class Coment
+        {
+            public string id { get; set; }
+        }
+    }
+
     public class Shares
     {
         [JsonProperty("count")]
@@ -161,6 +191,8 @@ namespace Organiser.Common.Classes
 
         public Paging paging { get; set; }
 
+        public Summary summary { get; set; }
+
         public class Data
         {
             public string id { get; set; }
@@ -176,5 +208,22 @@ namespace Organiser.Common.Classes
     {
         [JsonProperty("next")]
         public string next { get; set; }
+    }
+
+    public class Summary
+    {
+        public int total_count { get; set; }
+        public string order { get; set; }
+        public bool can_like { get; set; }
+        public bool can_comment { get; set; }
+        public bool has_liked { get; set; }
+    }
+
+    public class FBUploadSessionReply
+    {
+        public string upload_session_id { get; set; }
+        public string video_id { get; set; }
+        public string start_offset { get; set; }
+        public string end_offset { get; set; }
     }
 }

@@ -43,6 +43,7 @@
     <Reference Include="System.AddIn.Contract" />
     <Reference Include="System.Data" />
     <Reference Include="System.Messaging" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
@@ -64,7 +65,9 @@
       <DependentUpon>ViralProjectsWithBrowser.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\LinkToImageConverter.cs" />
+    <Compile Include="Converters\PhotoLinkToImageConverter.cs" />
     <Compile Include="Converters\PostIdToUrlConverter.cs" />
+    <Compile Include="Helpers\CrawlerHost.cs" />
     <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\ListOption.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -124,10 +127,9 @@
       <Name>CefGlue.Client</Name>
       <Private>False</Private>
     </ProjectReference>
-    <ProjectReference Include="..\CrawlerHostViews\CrawlerHostViews.csproj">
-      <Project>{b624c5bb-83f8-48f0-956b-aad1f0554fe3}</Project>
-      <Name>CrawlerHostViews</Name>
-      <Private>False</Private>
+    <ProjectReference Include="..\CrawlerContracts\CrawlerContracts.csproj">
+      <Project>{3749fa3f-e42d-4e28-a77c-68fe06dcd8d2}</Project>
+      <Name>CrawlerContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>

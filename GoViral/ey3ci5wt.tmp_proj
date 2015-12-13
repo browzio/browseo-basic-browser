@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0D0B3748-C24C-464A-B051-B06C983831EF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GoViral</RootNamespace>
+    <AssemblyName>GoViral</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\ViralProjectsWithBrowser.xaml.cs">
+      <DependentUpon>ViralProjectsWithBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\LinkToImageConverter.cs" />
+    <Compile Include="Converters\PhotoLinkToImageConverter.cs" />
+    <Compile Include="Converters\PostIdToUrlConverter.cs" />
+    <Compile Include="Helpers\CrawlerHost.cs" />
+    <Compile Include="Models\Folder.cs" />
+    <Compile Include="Models\ListOption.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ViewModels\GoViralVM.cs" />
+    <Compile Include="Windows\ToFolderChooserWindow.xaml.cs">
+      <DependentUpon>ToFolderChooserWindow.xaml</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
+      <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
+      <Name>CefGlue.WindowsForms-old</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj">
+      <Project>{9080d62a-6fe7-41d2-9a77-f3d7f6c33418}</Project>
+      <Name>CefGlue-old</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">
+      <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>
+      <Name>CefGlue.Client</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CrawlerContracts\CrawlerContracts.csproj">
+      <Project>{3749fa3f-e42d-4e28-a77c-68fe06dcd8d2}</Project>
+      <Name>CrawlerContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
+      <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
+      <Name>Organiser.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\bin\x86\Debug\Browseo.BrowserAssemby.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\CefGlue.Client\bin\Debug\Browseo.Client.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\bin\Debug\Browseo.WindowsForms.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\CrawlerContracts\bin\Debug\CrawlerContracts.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\Organiser.Common\bin\Debug\Organiser.Common.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\PresentationCore.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\PresentationFramework.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.AddIn.Contract.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.AddIn.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.DataSetExtensions.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Messaging.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Net.Http.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Remoting.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Serialization.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Windows.Forms.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xaml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\WindowsBase.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\WindowsFormsIntegration.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Controls\ViralProjectsWithBrowser.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Windows\ToFolderChooserWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\GeneratedInternalTypeHelper.g.cs" />
+  </ItemGroup>
+</Project>

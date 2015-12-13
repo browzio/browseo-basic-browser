@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\BrowserAndFeatures\bin\x86\Debug\Contracts\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -24,25 +24,38 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\BrowserPlugin\bin\x86\Release\Contracts\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.AddIn" />
-    <Reference Include="System.AddIn.Contract" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Contract.cs" />
+    <Compile Include="LoadersAndResolvers\AssemblyResolver.cs" />
+    <Compile Include="HostToPluginContract.cs" />
+    <Compile Include="LoadersAndResolvers\IpcServices.cs" />
+    <Compile Include="PluginHostingdelete\PluginProcessProxy.cs" />
+    <Compile Include="PluginHosting\IPlugin.cs" />
+    <Compile Include="PluginHosting\RemotePluginContract.cs" />
+    <Compile Include="HostHosting\IHost.cs" />
+    <Compile Include="LoadersAndResolvers\PluginCreator.cs" />
+    <Compile Include="LoadersAndResolvers\PluginLoader.cs" />
+    <Compile Include="LoadersAndResolvers\PluginLoaderBootstrapper.cs" />
+    <Compile Include="LoadersAndResolvers\PluginStartupInfo.cs" />
+    <Compile Include="LoadersAndResolvers\ProcessMonitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\BrowserAndFeatures\bin\x86\Debug\AddIns\CrawlerAddIn\</OutputPath>
+    <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,7 +26,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\BrowserPlugin\bin\x86\Release\AddIns\CrawlerAddIn\</OutputPath>
+    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -39,12 +39,14 @@
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.AddIn" />
     <Reference Include="System.AddIn.Contract" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Messaging" />
+    <Reference Include="System.Windows" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -71,10 +73,9 @@
       <Name>CefGlue-old</Name>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\CrawlerAddinViews\CrawlerAddinViews.csproj">
-      <Project>{c6bc4517-4d95-4ec7-aac1-36bba4894079}</Project>
-      <Name>CrawlerAddinViews</Name>
-      <Private>False</Private>
+    <ProjectReference Include="..\CrawlerContracts\CrawlerContracts.csproj">
+      <Project>{3749fa3f-e42d-4e28-a77c-68fe06dcd8d2}</Project>
+      <Name>CrawlerContracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>

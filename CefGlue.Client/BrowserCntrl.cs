@@ -56,7 +56,6 @@ namespace Xilium.CefGlue.Client
                 JavaScript = StateJavascript,
                 Java = StateJava,
                 Plugins = StateFlash,
-               // WebGL = CefState.Disabled
             };
             CBrowser.BringToFront();
 

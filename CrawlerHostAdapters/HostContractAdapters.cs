@@ -22,7 +22,7 @@ namespace HostSideAdapter
         public ProcessorContractToViewHostAdapter(Contract.IProcessorContract contract)
         {
             this.contract = contract;
-            contractHandle = new ContractHandle(contract);
+            contractHandle = new ContractHandle(contract);     
         }
         #endregion
 
@@ -77,8 +77,8 @@ namespace HostSideAdapter
 
         #region Public Methods
         public HostObjectViewToContractHostAdapter(HostView.HostObject view)
-        {
-            this.view = view;
+        {                                                         
+            this.view = view;   
         }
 
         public void ReportInitialized()
@@ -93,7 +93,15 @@ namespace HostSideAdapter
 
         public void ReportSerializedResult(string serializedXML)
         {
-            view.ReportSerializedResult(serializedXML);
+            new System.Threading.Thread(() =>
+            {
+                view.ReportSerializedResult(serializedXML);
+            }).Start();
+        }
+
+        public override object InitializeLifetimeService()
+        {
+            return null;
         }
         #endregion
     }

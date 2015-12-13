@@ -24,6 +24,8 @@ using System.Windows.Input;
 using WpfCefDynamBrowser.Views;
 using Xilium.CefGlue;
 using Xilium.CefGlue.Client;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace WpfCefDynamBrowser.ViewModels
 {
@@ -33,7 +35,7 @@ namespace WpfCefDynamBrowser.ViewModels
 
         public event Action<string> OnCreateNewTab = delegate { }; 
         public event Action<string,string> OnCurateToPBN = delegate { };//content,link
-        public event Action<string> OnAddedToGoViral = delegate { };//link
+        public event Action<string, List<string>> OnAddedToGoViral = delegate { };//link
         public event Action OnClickedSaveSession = delegate { };
         public event Action OnClickedDeleteSession = delegate { };
         public event Action OnClickedSaveSessionToBookmarks = delegate { };
@@ -56,12 +58,7 @@ namespace WpfCefDynamBrowser.ViewModels
 
         #endregion
 
-        private Thickness tabMargin;
-        public Thickness TabMargin
-        {
-            get { return tabMargin; }
-            set { tabMargin = value; RaisePropertyChanged("TabMargin"); }
-        }
+        #region browser statuses and messages
 
         private bool isLoading;
         public bool IsLoading
@@ -107,7 +104,9 @@ namespace WpfCefDynamBrowser.ViewModels
                 title = value; RaisePropertyChanged("Title");
             }
         }
+        #endregion
 
+        #region browser hosting
         private BrowserCntrl webBrowser;
         public BrowserCntrl WebBrowser
         {
@@ -130,6 +129,14 @@ namespace WpfCefDynamBrowser.ViewModels
             }
              set { wfh = value; RaisePropertyChanged("WebBrowserHost"); }
         }
+        #endregion
+
+        private Thickness tabMargin;
+        public Thickness TabMargin
+        {
+            get { return tabMargin; }
+            set { tabMargin = value; RaisePropertyChanged("TabMargin"); }
+        }
 
         private Thread CPWthread;  
         private static int lastProfileIndex = 0; //last index for profile picker        
@@ -138,13 +145,13 @@ namespace WpfCefDynamBrowser.ViewModels
         {
             IsLoading = true;
 
-            SetSysDateEnabled = MyFilesDatabase.SetSysDateEnabled;
+            SetSysDateEnabled = BrowserSettimgs.SetSysDateEnabled;
 
             if (setTheBrowser)
             {
-                JavascriptEnabled = MyFilesDatabase.JavascriptEnabled;
-                JavaEnabled = MyFilesDatabase.JavaEnabled;
-                FlashEnabled = MyFilesDatabase.FlashEnabled;  
+                JavascriptEnabled = BrowserSettimgs.JavascriptEnabled;
+                JavaEnabled = BrowserSettimgs.JavaEnabled;
+                FlashEnabled = BrowserSettimgs.FlashEnabled;  
                 SetBrowser(address);
             }
 
@@ -166,8 +173,10 @@ namespace WpfCefDynamBrowser.ViewModels
             OutputMessage = version;
 
             Title = "New Tab";
+            VisibleDtPbar = Visibility.Collapsed;
         }
 
+        #region browser
         public void SetBrowser(string address)
         {
             WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
@@ -318,7 +327,41 @@ namespace WpfCefDynamBrowser.ViewModels
                         MessageBox.Show("Cant complete action make sure the mouse pointer is hovering over the link you want.");
                         return;
                     }
-                    OnAddedToGoViral(HuverLink);
+                    OnAddedToGoViral(HuverLink,null);
+                    break;
+
+                case 444:
+                    SourceVisitor visitor = new SourceVisitor(htmlSource =>
+                    {
+                        try
+                        {
+                            List<string> links = htmlSource.Split(new string[] { "<div class=\"_gll\"><a href=\"" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                            links.RemoveAt(0);
+
+                            List<string> linksToReturn = new List<string>();
+                            foreach (string link in links)
+                            {
+                                string properLink = link;
+
+                                if (properLink.Contains("?"))
+                                    properLink = properLink.Remove(link.IndexOf("?"));
+                                else
+                                    properLink = properLink.Remove(link.IndexOf("\""));
+
+                                linksToReturn.Add(properLink);
+                            }
+
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                OnAddedToGoViral(null, linksToReturn);
+                            });
+                        }
+                        catch
+                        {
+                            MessageBox.Show("Couldnt pull pages.");
+                        }
+                    });
+                    WebBrowser.CBrowser.Browser.GetMainFrame().GetSource(visitor);
                     break;
                 #endregion
 
@@ -1003,6 +1046,7 @@ namespace WpfCefDynamBrowser.ViewModels
             AddressEditable = site;
             WebBrowser.Navigate(site);  
         }
+        #endregion
 
         #region save open session tabs
         private void SaveSessionToBMsClicked()
@@ -1022,6 +1066,28 @@ namespace WpfCefDynamBrowser.ViewModels
         #endregion
 
         #region settings
+        public List<string> AvailableTimeZones
+        {
+            get
+            { 
+                List<string> avail = BrowserSettimgs.AvailableTimeZones;
+                RaisePropertyChanged("SITimeZone");
+                return avail;
+            }
+        }
+        public int SITimeZone
+        {
+            get { return BrowserSettimgs.SITimeZone; }
+            set { BrowserSettimgs.SITimeZone = value; RaisePropertyChanged("SITimeZone"); }
+        }
+
+        private Visibility visibleDtPbar;
+        public Visibility VisibleDtPbar
+        {
+            get { return visibleDtPbar; }
+            set { visibleDtPbar = value; RaisePropertyChanged("VisibleDtPbar"); }
+        }
+
         private bool javascriptEnabled;
         public bool JavascriptEnabled
         {
@@ -1039,8 +1105,7 @@ namespace WpfCefDynamBrowser.ViewModels
         {
             get { return flashEnabled; }
             set { flashEnabled = value; RaisePropertyChanged("FlashEnabled"); }
-        }
-
+        }   
 
         private bool javaEnabled;
         public bool JavaEnabled
@@ -1061,10 +1126,52 @@ namespace WpfCefDynamBrowser.ViewModels
             {
                 setSysDateEnabled = value;
                 RaisePropertyChanged("SetSysDateEnabled");
+
+                Task.Factory.StartNew(() =>
+                {
+                    VisibleDtPbar = Visibility.Visible;
+
+                    if (value)
+                    {
+                        DateAndTimeZone dtz = TimeHelper.GetTimeOfProxy(GloableProfData.PData.ProxyIP,
+                            GloableProfData.PData.ProxyPort,
+                            GloableProfData.PData.ProxyUsername,
+                            GloableProfData.PData.ProxyPassword);
+                        if (dtz != null)
+                        {
+                            for (int i = 0; i < AvailableTimeZones.Count; i++)
+                            {
+                                string displayName = AvailableTimeZones[i];
+                                if (dtz.TimeZone.DisplayName == displayName)
+                                {
+                                    SITimeZone = i;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        TimeZoneInfo fromFile = TimeHelper.GetOldTZFromFile();
+                        ReadOnlyCollection<TimeZoneInfo> timeZones = TimeZoneInfo.GetSystemTimeZones();
+                        for (int i = 0; i < timeZones.Count; i++)
+                        {
+                            TimeZoneInfo tz = timeZones[i];
+                            if (tz.DisplayName == fromFile.DisplayName)
+                            {
+                                SITimeZone = i;
+                                break;
+                            }
+                        }
+                    }
+
+                    VisibleDtPbar = Visibility.Collapsed;
+                });    
             }
         }
 
         bool oldJavaCript, oldJava, oldFlash, oldSysDate;
+        int oldTZSI = 0;
 
         internal void SettingsMenuOpen()
         {
@@ -1072,6 +1179,7 @@ namespace WpfCefDynamBrowser.ViewModels
             oldJava = JavaEnabled;
             oldFlash = FlashEnabled;
             oldSysDate = SetSysDateEnabled;
+            oldTZSI = SITimeZone;
         }
 
         internal void SettingsMenuClosed()
@@ -1080,6 +1188,7 @@ namespace WpfCefDynamBrowser.ViewModels
             JavaEnabled = oldJava;
             FlashEnabled = oldFlash;
             SetSysDateEnabled = oldSysDate;
+            SITimeZone = oldTZSI;
         }
 
         private void OnSettingsCTButtonClick(object param)
@@ -1091,35 +1200,31 @@ namespace WpfCefDynamBrowser.ViewModels
                     break;
 
                 case "SESSION":
-                    MyFilesDatabase.SetSysDateEnabled = SetSysDateEnabled;
-                    MyFilesDatabase.JavascriptEnabled = JavascriptEnabled;
-                    MyFilesDatabase.JavaEnabled = JavaEnabled;
-                    MyFilesDatabase.FlashEnabled = FlashEnabled;
-                    if (MyFilesDatabase.SetSysDateEnabled)
+                    BrowserSettimgs.SetSysDateEnabled = SetSysDateEnabled;
+                    BrowserSettimgs.JavascriptEnabled = JavascriptEnabled;
+                    BrowserSettimgs.JavaEnabled = JavaEnabled;
+                    BrowserSettimgs.FlashEnabled = FlashEnabled;
+                    if (BrowserSettimgs.SetSysDateEnabled)
                     {
-                        if (string.IsNullOrEmpty(GloableProfData.PData.ProxyIP) || string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyIP))
+                        System.Threading.Tasks.Task.Factory.StartNew(() =>
                         {
-                            MyFilesDatabase.SetSysDateEnabled = false;
-                            SetSysDateEnabled = false;
-                            OnRefreshSessionSettings();
-                        }
-                        else
-                        {
-                            System.Threading.Tasks.Task.Factory.StartNew(() =>
+                            try
                             {
-                                TimeHelper.SetOriginalTimeZones(GloableProfData.PData);
-                                TimeHelper.SetTheTimeZone(GloableProfData.PData, (string.IsNullOrEmpty(GloableProfData.PData.ProxyIP) || string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyIP)));
-                                Application.Current.Dispatcher.Invoke((Action)delegate
-                                {
-                                    OnRefreshSessionSettings();
-                                });
+                                TimeHelper.StartSetTimeAndZoneProcess(new DateAndTimeZone() { TimeZone = TimeZoneInfo.GetSystemTimeZones()[SITimeZone] });
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine(ex.Message);
+                            }
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                OnRefreshSessionSettings();
                             });
-                        }
+                        });
                     }
                     else
                     {
-                        if (oldSysDate)
-                            TimeHelper.SetOriginalTimeZones(GloableProfData.PData, true);
+                        if (oldSysDate) TimeHelper.SetOriginalTimeZonesFromFile();
                         OnRefreshSessionSettings();
                     }
                     break;
