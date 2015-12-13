@@ -43,7 +43,7 @@ namespace DragDropListview.Windows
             this.Close();
         }
 
-        internal void SetValues(string name, string url, ObservableCollection<FolderVM> folderAndSiteList, int lastSelectedIndex)
+        public void SetValues(string name, string url, ObservableCollection<FolderVM> folderAndSiteList, int lastSelectedIndex)
         {
             ComboBoxItem item = new ComboBoxItem();
             item.Content = "";

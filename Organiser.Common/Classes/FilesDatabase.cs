@@ -190,6 +190,35 @@ namespace Organiser.Common.Classes
             catch { MessageBox.Show("Project not saved."); }
         }
 
+        public static void DeleteSession(string projectName)
+        {
+            string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
+            if (Directory.Exists(directory))
+            {
+                Directory.Delete(directory, true);
+            }
+        }
+
+        public static void SaveSession(string projectName, List<string> links)
+        {
+            string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+            string filePath = Path.Combine(directory, "sites.txt");
+            File.WriteAllLines(filePath, links.ToArray());
+        }
+
+        public static string[] GetSavedSesstion(string projectName)
+        {
+            string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
+            if (!Directory.Exists(directory)) return new string[] { };
+
+            string filePath = Path.Combine(directory, "sites.txt");
+            if (!File.Exists(filePath)) return new string[] { };
+
+            return File.ReadAllLines(filePath);
+        }
+
         public static void CreatSubProjectUser(PersonData pdata)
         {
             try
@@ -678,6 +707,29 @@ namespace Organiser.Common.Classes
             }
         }
 
+        public static void SaveBookmarkedSession(string projectName, string name, string[] sites)
+        {
+            string directory = Path.Combine(GetBaseDir(), "BookmarkSessions", projectName, name);
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+            string file = Path.Combine(directory, "sites.txt");
+            File.WriteAllLines(file, sites);
+        }
+
+        public static void SaveBookmarkedSession(string projectName, string name, string[] sites, string[] names, string[] dateTimeStamp)
+        {
+            string directory = Path.Combine(GetBaseDir(), "BookmarkSessions", projectName, name);
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+            string[] fileLines = new string[sites.Length];
+            for (int i = 0; i < sites.Length; i++)
+            {
+                fileLines[i] = sites[i] + SPLITTER + names[i] + SPLITTER + dateTimeStamp;
+            }
+            string file = Path.Combine(directory, "sites.txt");
+            File.WriteAllLines(file, fileLines);
+        }
+
         #endregion
 
         #region rss
@@ -841,6 +893,5 @@ namespace Organiser.Common.Classes
                 }
             }
         }
-
     }
 }

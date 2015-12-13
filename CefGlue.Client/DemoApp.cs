@@ -10,6 +10,9 @@
     using System.Text;
     using System.Windows.Forms;
     using Xilium.CefGlue;
+    using System.Threading;
+    using System.Drawing;
+    using System.Drawing.Imaging;
 
     internal sealed class DemoApp : CefApp
     {
@@ -23,6 +26,7 @@
         {
             return _renderProcessHandler;
         }
+        
 
         protected override void OnBeforeCommandLineProcessing(string processType, CefCommandLine commandLine)
         {
@@ -81,15 +85,19 @@
         }
     }
 
-    internal class DemoCefRenderProcessHandler : CefRenderProcessHandler
+    public class DemoCefRenderProcessHandler : CefRenderProcessHandler
     {
         bool hasToInject;
         PersonData profile;
         bool isTumblr;
         int tumblrcounter;
 
+        public static CefV8Value val;
+
         protected override bool OnProcessMessageReceived(CefBrowser browser, CefProcessId sourceProcess, CefProcessMessage message)
         {
+            MessageBox.Show("yo");
+            #region for injection (unused)
             if (message.Name == "NavChange")
             {
                 hasToInject = false;
@@ -120,6 +128,8 @@
 
                 hasToInject = true;
             }
+
+           // BrowserCntrl.OnFinishedExecute("");
 
             return false;
         }
@@ -220,6 +230,286 @@
             //    }
             //}
             //catch { }
+
+            #endregion
         }
+
+        protected override void OnContextCreated(CefBrowser browser, CefFrame frame, CefV8Context context)
+        {
+            base.OnContextCreated(browser, frame, context);
+
+            //CefV8Value obyect = context.GetGlobal();
+            //CefV8Value str = CefV8Value.CreateString("My Value!");
+            //obyect.SetValue("myval", str, CefV8PropertyAttribute.None);
+
+            // CefV8Value.CreateObject(myV8Accesor);
+            //obyect.SetValue("myvalue", CefV8AccessControl.Default, CefV8PropertyAttribute.None);
+
+            //obyect.SetValue("register", CefV8Value.CreateFunction("register", myCefV8Handler), CefV8PropertyAttribute.None);
+        }
+
+        MyCustomCefV8Handler myCefV8Handler = new MyCustomCefV8Handler();
+       // MyV8Accessor myV8Accesor = new MyV8Accessor();
+
+
+        protected override void OnWebKitInitialized()
+        {
+
+            base.OnWebKitInitialized();
+
+            //var nativeFunction =
+            //                    @"var test;
+            //                    if(!test)
+            //                        test = {};
+            //                    (function(){
+            //                        test.myfunc = function() {
+            //                            native function myfunc();
+            //                            return myfunc();
+            //                         }
+            //                    })();";
+
+            var nativeFunction = @"nativeImplementation = function(onSuccess) {
+
+                native function MyNativeFunction(onSuccess);
+
+                return MyNativeFunction(onSuccess);
+
+            };";
+
+            CefRuntime.RegisterExtension("myExtension", nativeFunction, myCefV8Handler);
+        }
+
+        //protected override void OnContextCreated(CefBrowser browser, CefFrame frame, CefV8Context context)
+        //{
+        //    base.OnContextCreated(browser, frame, context);
+
+
+        //}
+    }
+
+    internal class MyV8Accessor : CefV8Accessor
+    {
+        // Variable used for storing the value.
+        string myval_;
+        
+
+        protected override bool Get(string name, CefV8Value obj, out CefV8Value returnValue, out string exception)
+        {
+            exception = "";
+            returnValue = null;
+            if (name == "myvalue")
+            {
+                // Return the value.
+                returnValue = CefV8Value.CreateString(myval_);
+                return true;
+            }
+
+            // Value does not exist.
+            return false;
+        }
+
+        protected override bool Set(string name, CefV8Value obj, CefV8Value value, out string exception)
+        {
+            exception = "";
+
+            if (name == "myvalue")
+            {
+                if (value.IsString)
+                {
+                    // Store the value.
+                    myval_ = value.GetStringValue();
+                }
+                else
+                {
+                    // Throw an exception.
+                    exception = "Invalid value type";
+                }
+                return true;
+            }
+
+            // Value does not exist.
+            return false;
+        }
+    }
+
+    public class MyCustomCefV8Handler : CefV8Handler
+    {
+        //public static string HighlightdHTMLText = "";
+       // public static event Action<string> OnFinishedExecute = delegate { };
+        protected override bool Execute(string name, CefV8Value obj, CefV8Value[] arguments, out CefV8Value returnValue,
+
+            out string exception)
+
+        {
+            if(name == "MyNativeFunction")
+            {
+                var value = arguments[0];
+                if (value.IsString)
+                {
+                    string dir = Path.Combine(MyFilesDatabase.GetBaseDir(), "TempHTML");
+                    if (!Directory.Exists(dir))
+                        Directory.CreateDirectory(dir);
+                    string file = Path.Combine(dir, "html.txt");
+
+                    File.WriteAllText(file, value.GetStringValue());
+                   
+
+                    //OnFinishedExecute(value.GetStringValue());
+                    // MessageBox.Show(value.GetStringValue());
+
+                    
+                    //var message = CefProcessMessage.Create("one");
+                    //var args = message.Arguments;
+                    //args.SetString(0, value.GetStringValue());
+
+                    //var context = CefV8Context.GetCurrentContext();
+                    //context.GetBrowser().SendProcessMessage(CefProcessId.Renderer, message);
+
+                    // var taskRunner = CefTaskRunner.GetForThread(CefThreadId.UI);
+
+                    //  var callback = arguments[0];
+
+                    //new Thread(() =>
+                    //{
+                    //Sleep a bit: to test whether the app remains responsive
+
+                    // taskRunner.PostTask(new CefCallbackTask(context, callback));
+
+                    // }).Start();
+                }
+            }
+
+            //Debugger.Launch();
+
+
+
+            //var context = CefV8Context.GetCurrentContext();
+
+            //var taskRunner = CefTaskRunner.GetForCurrentThread();
+
+            //var callback = arguments[0];
+
+            //new Thread(() =>
+
+            //{
+
+            //    //Sleep a bit: to test whether the app remains responsive
+
+            //    Thread.Sleep(3000);
+
+            //    taskRunner.PostTask(new CefCallbackTask(context, callback));
+
+            //}).Start();
+
+
+
+            returnValue = CefV8Value.CreateBool(true);
+
+            exception = null;
+
+            return true;
+
+        }
+
+    }
+
+    public class CefCallbackTask : CefTask
+
+    {
+       // public static event Action<string> OnFinishedExecute = delegate { };
+
+        private readonly CefV8Context context;
+
+        private readonly CefV8Value callback;
+
+
+
+        public CefCallbackTask(CefV8Context context, CefV8Value callback)
+
+        {
+
+            this.context = context;
+
+            this.callback = callback;
+
+        }
+
+
+
+        protected override void Execute()
+
+        {
+
+            //var callbackArguments = CreateCallbackArguments();
+
+            //callback.ExecuteFunctionWithContext(context, null, callbackArguments);
+            //OnFinishedExecute(callback.GetStringValue());
+            //BrowserCntrl.OnFinishedExecute(callback.GetStringValue());
+        }
+
+
+
+        private CefV8Value[] CreateCallbackArguments()
+        {
+
+            //var imageInBase64EncodedString = LoadImage(@"C:\hamb.jpg");
+
+
+
+            context.Enter();
+
+
+
+           // var imageV8String = CefV8Value.CreateString(imageInBase64EncodedString);
+
+            var featureV8Object = CefV8Value.CreateObject(null);
+
+            var listOfFeaturesV8Array = CefV8Value.CreateArray(1);
+
+
+
+            featureV8Object.SetValue("name", CefV8Value.CreateString("V8"), CefV8PropertyAttribute.None);
+
+            featureV8Object.SetValue("isEnabled", CefV8Value.CreateInt(0), CefV8PropertyAttribute.None);
+
+            featureV8Object.SetValue("isFromJSCode", CefV8Value.CreateBool(false), CefV8PropertyAttribute.None);
+
+
+
+            listOfFeaturesV8Array.SetValue(0, featureV8Object);
+
+            var yo = "";
+
+            context.Exit();
+
+
+
+            return new CefV8Value[] { listOfFeaturesV8Array };
+
+        }
+
+
+
+        private string LoadImage(string fileName)
+        {
+
+            //using (var memoryStream = new MemoryStream())
+
+            //{
+
+            //    var image = Bitmap.FromFile(fileName);
+
+            //    image.Save(memoryStream, ImageFormat.Png);
+
+            //    byte[] imageBytes = memoryStream.ToArray();
+
+            //    return Convert.ToBase64String(imageBytes);
+
+            //}
+
+            return "123";
+
+        }
+
     }
 }

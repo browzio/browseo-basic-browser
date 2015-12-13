@@ -152,6 +152,7 @@
                                Stretch="None" 
                                Source="..\Images\refresh.png" />
                 </Button>
+                
                 <Button Name="openFlyout"  
                     DockPanel.Dock="Right"
                     Click="openFlyout_Click"
@@ -166,21 +167,49 @@
                                Source="../Images/add.png" />
 
                     </Button>
+
+                <Button Name="CP" 
+                    DockPanel.Dock="Right"
+                    ToolTip="Open Copy Paste Window"
+                    Command="{Binding OpenCPCommand}" 
+                    Style="{DynamicResource browser_btn}">
+                        <TextBlock Text="C/P" Margin="0,2,0,0" Foreground="#FFB2B2B2" FontWeight="Bold" FontFamily="Global User Interface" FontSize="13" />
+                    </Button>
+
                 <Button Name="Inject" 
-                    Grid.Column="3"  
-                   
                     DockPanel.Dock="Right"
                     ToolTip="Fill Form With Profile Data"
-                    Command="{Binding InjectCommand}"
+                    Command="{Binding InjectCommand}" 
                     Style="{DynamicResource browser_btn}">
                         <Image 
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
                                Stretch="Uniform" SnapsToDevicePixels="True"
                                Source="../Images/user.png" Opacity="0.4" />
-                    </Button>                
+                    </Button>
+
+                <Button Name="SaveSession" 
+                        DockPanel.Dock="Right"
+                        ToolTip="Save Session"
+                        ContextMenuService.IsEnabled="False"
+                        Click="SaveSession_Click"
+                        Style="{DynamicResource browser_btn}">
+                        <Image Width="17" Height="17"
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center" 
+                               Stretch="Uniform" 
+                               Source="../Images/save-as-xl.png" />
+                        <Button.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Save Session" Command="{Binding SaveSession}" ToolTip="Will overwright your previous saved session" />
+                                <MenuItem Header="Delete Last Session" Command="{Binding DeleteSession}" />
+                                <Separator />
+                                <MenuItem Header="Save Session To Bookmarks" Command="{Binding SaveSessionToBMs}" />
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                </Button>
+
                 <Button Name="SaveSite" 
-                   
                     DockPanel.Dock="Right"
                     ToolTip="Save Site From Navigation Box Text"
                     Click="SaveSite_Click"
@@ -192,7 +221,7 @@
                                Source="../Images/save.png" />
                     </Button>
 
-                  <Button Name="Share" 
+                <Button Name="Share" 
                      Click="Share_Click"
                      DockPanel.Dock="Right"
                      ToolTip="Share Site"
@@ -269,7 +298,7 @@
                         </Button.ContextMenu>
                     </Button>
                 
-                    <mControls:MyComboBox Height="23"
+                <mControls:MyComboBox Height="23"
                           IsEditable="True"
                           x:Name="cmbSites"
                           IsTextSearchEnabled="False"

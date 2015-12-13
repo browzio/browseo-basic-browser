@@ -178,13 +178,38 @@ namespace Xilium.CefGlue.Client
 
             if (contextMenueItemID == 666)
             {
-                try {
-                    //SendKeys.SendWait("^{c}");
-                    CBrowser.Browser.GetMainFrame().Copy();
-                    string text = Clipboard.GetText();
-                    OnCurateToPBN(text);
+                try
+                {
+                    if (CBrowser.Browser.GetMainFrame() == null || CBrowser.Browser.GetMainFrame().Url == null) return;
+
+                    //the javascript
+                    string jsForExecution = "var range = window.getSelection().getRangeAt(0),"+
+                                            "content = range.extractContents(),"+
+                                            "span = document.createElement('SPAN');"+
+                                            "span.appendChild(content);"+
+                                            "var htmltext = span.innerHTML.toString();" +
+                                            "range.insertNode(span);"+
+                                            "nativeImplementation(htmltext);";
+                    CBrowser.Browser.GetMainFrame().ExecuteJavaScript(jsForExecution, CBrowser.Browser.GetMainFrame().Url, 0);
+
+                    string dir = Path.Combine(MyFilesDatabase.GetBaseDir(), "TempHTML");
+                    if (!Directory.Exists(dir))
+                        Directory.CreateDirectory(dir);
+                    string file = Path.Combine(dir, "html.txt");
+
+                    System.Threading.Tasks.Task.Factory.StartNew(()=>
+                    {
+                        while (!File.Exists(file))
+                        {
+                            System.Threading.Thread.Sleep(150);
+                        }
+
+                        OnCurateToPBN(File.ReadAllText(file));
+                        File.Delete(file);
+                    });
+
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
 
                 }
@@ -463,19 +488,19 @@ namespace Xilium.CefGlue.Client
         public void InjectData()
         {
 
-            if (CBrowser.Browser.GetMainFrame().Url == null) return;
+            if (CBrowser.Browser.GetMainFrame() == null || CBrowser.Browser.GetMainFrame().Url == null) return;
             string curUrl = CBrowser.Browser.GetMainFrame().Url;
             //bool isFromMulti = false;
             //string selectedPath = "";
             
-            PersonData profile = BrowserInit.pData;
+            PersonData profile = BrowserInit.pData.Clone() as PersonData;
             if (pdataForImgur == null)
             {
                 bool found = false;
                 bool isImportedList = false;
                 try
                 {
-                    if (DragDropMainViewModel.Instance.FoldersAndSitesList != null && DragDropMainViewModel.Instance.FoldersAndSitesList[DragDropMainViewModel.Instance.SIFoldersSide].IsImported)
+                    if (DragDropMainViewModel.Instance.FoldersAndSitesList != null && DragDropMainViewModel.Instance.FoldersAndSitesList[DragDropMainViewModel.Instance.SIFoldersSide].TypeOfFolder == FolderTypes.Import)
                     {
                         string urltoCheck = curUrl.Substring(curUrl.IndexOf('.') + 1);
                         if (urltoCheck.Contains('.'))

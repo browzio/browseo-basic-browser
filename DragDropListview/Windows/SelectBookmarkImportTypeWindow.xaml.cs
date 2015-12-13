@@ -23,39 +23,6 @@ namespace BrowserHost.Views
         public SelectBookmarkImportTypeWindow()
         {
             InitializeComponent();
-            browseoProj.Checked += browseoProj_Checked;
-            fcs.Checked += fcs_Checked;
-
-        }
-
-        private void browseoProj_Checked(object sender, RoutedEventArgs e)
-        {
-            fcs.Checked -= fcs_Checked;
-            entBud.Checked -= entBud_Checked;
-            browseoProj.Checked -= browseoProj_Checked;
-            browseoGloable.Checked -= browseoGloable_Checked;
-            fcs.IsChecked = false;
-            entBud.IsChecked = false;
-            browseoGloable.IsChecked = false;
-            fcs.Checked += fcs_Checked;
-            browseoProj.Checked += browseoProj_Checked;
-            browseoGloable.Checked += browseoGloable_Checked;
-            entBud.Checked += entBud_Checked;
-        }
-
-        private void fcs_Checked(object sender, RoutedEventArgs e)
-        {
-            fcs.Checked -= fcs_Checked;
-            entBud.Checked -= entBud_Checked;
-            browseoProj.Checked -= browseoProj_Checked;
-            browseoGloable.Checked -= browseoGloable_Checked;
-            browseoProj.IsChecked = false;
-            browseoGloable.IsChecked = false;
-            entBud.IsChecked = false;
-            fcs.Checked += fcs_Checked;
-            browseoProj.Checked += browseoProj_Checked;
-            browseoGloable.Checked += browseoGloable_Checked;
-            entBud.Checked += entBud_Checked;
         }
 
         private void btnOk_Click(object sender, RoutedEventArgs e)
@@ -69,34 +36,23 @@ namespace BrowserHost.Views
             this.Close();
         }
 
-        private void entBud_Checked(object sender, RoutedEventArgs e)
+        private void browseoProj_Checked_1(object sender, RoutedEventArgs e)
         {
-            fcs.Checked -= fcs_Checked;
-            entBud.Checked -= entBud_Checked;
-            browseoProj.Checked -= browseoProj_Checked;
-            browseoGloable.Checked -= browseoGloable_Checked;
-            fcs.IsChecked = false;
-            browseoGloable.IsChecked = false;
-            browseoProj.IsChecked = false;
-            fcs.Checked += fcs_Checked;
-            browseoProj.Checked += browseoProj_Checked;
-            browseoGloable.Checked += browseoGloable_Checked;
-            entBud.Checked += entBud_Checked;
-        }
+            browseoProj.Checked -= browseoProj_Checked_1;
+            browseoGloable.Checked -= browseoProj_Checked_1;
+            fcs.Checked -= browseoProj_Checked_1;
+            entBud.Checked -= browseoProj_Checked_1;
+            rankWyx.Checked -= browseoProj_Checked_1;
 
-        private void browseoGloable_Checked(object sender, RoutedEventArgs e)
-        {
-            fcs.Checked -= fcs_Checked;
-            entBud.Checked -= entBud_Checked;
-            browseoProj.Checked -= browseoProj_Checked;
-            browseoGloable.Checked -= browseoGloable_Checked;
-            fcs.IsChecked = false;
-            browseoProj.IsChecked = false;
-            entBud.IsChecked = false;
-            fcs.Checked += fcs_Checked;
-            browseoProj.Checked += browseoProj_Checked;
-            browseoGloable.Checked += browseoGloable_Checked;
-            entBud.Checked += entBud_Checked;
+            browseoProj.IsChecked = browseoGloable.IsChecked = fcs.IsChecked = entBud.IsChecked = rankWyx.IsChecked = false;
+
+            (sender as CheckBox).IsChecked = true;
+
+            browseoProj.Checked += browseoProj_Checked_1;
+            browseoGloable.Checked += browseoProj_Checked_1;
+            fcs.Checked += browseoProj_Checked_1;
+            entBud.Checked += browseoProj_Checked_1;
+            rankWyx.Checked += browseoProj_Checked_1;
         }
     }
 }

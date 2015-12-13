@@ -58,6 +58,8 @@
                     <MenuItem Header="Add Site..." Command="{Binding LVFolderCMenuClick}" CommandParameter="AddSite" />
                     <MenuItem Header="Delete" Command="{Binding LVFolderCMenuClick}" CommandParameter="Delete" />
                     <Separator />
+                    <MenuItem Header="Open All In Browser" Command="{Binding LVFolderCMenuClick}" CommandParameter="LaunchToBrowser" />
+                    <Separator />
                     <MenuItem Header="Set Reminder" Command="{Binding LVFolderCMenuClick}" CommandParameter="Reminder" />
                 </ContextMenu>
             </ListBox.ContextMenu>

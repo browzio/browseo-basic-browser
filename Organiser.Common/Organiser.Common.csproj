@@ -72,11 +72,17 @@
     <Compile Include="Windows\ChooseFolderWindow.xaml.cs">
       <DependentUpon>ChooseFolderWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\CreateProjectWindow.xaml.cs">
+      <DependentUpon>CreateProjectWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\SaveMozKeysWindow.xaml.cs">
       <DependentUpon>SaveMozKeysWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\ServerVerifyWindow.xaml.cs">
       <DependentUpon>ServerVerifyWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\SetANameWindow.xaml.cs">
+      <DependentUpon>SetANameWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="SelectProfileWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -101,11 +107,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Windows\CreateProjectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\SaveMozKeysWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\ServerVerifyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\SetANameWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

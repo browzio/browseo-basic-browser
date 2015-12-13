@@ -1,12 +1,17 @@
 ﻿using BrowserHost;
 using BrowserHost.Models;
 using BrowserHost.Windows;
+using DragDropListview;
+using DragDropListview.Windows;
+using Organiser.Common;
 using Organiser.Common.Classes;
 using Organiser.Common.Windows;
+using SocialOrganizer.Models;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms.Integration;
 using System.Windows.Input;
@@ -24,6 +29,9 @@ namespace WpfCefDynamBrowser.ViewModels
         public event Action OnRemindersChanged = delegate { };
         public event Action OnRefreshBookmarksList = delegate { };
         public event Action<string> OnCurateToPBN = delegate { };
+        public event Action OnClickedSaveSession = delegate { };
+        public event Action OnClickedDeleteSession = delegate { };
+        public event Action OnClickedSaveSessionToBookmarks = delegate { };
 
         private Thickness tabMargin;
         public Thickness TabMargin
@@ -137,6 +145,8 @@ namespace WpfCefDynamBrowser.ViewModels
             set { sLImageLink = value; }
         }
 
+        private Thread CPWthread;
+
         
         private object evaluateJavaScriptResult;
 
@@ -153,12 +163,18 @@ namespace WpfCefDynamBrowser.ViewModels
         public ICommand ReloadCommand { get; set; }
 
         public ICommand InjectCommand { get; set; }
+        public ICommand OpenCPCommand { get; set; }
         public ICommand SaveSiteCommand { get; set; }
         public ICommand FillListCommand { get; set; }
         public ICommand DeleteSiteMenueItemCommand { get; set; }
         public ICommand NavigateListItemCommand { get; set; }
+        public ICommand SaveSession { get; set; }
+        public ICommand DeleteSession { get; set; }
+        public ICommand SaveSessionToBMs { get; set; }
 
         public ICommand SendToBrowserSocial { get; set; }
+
+        int lastProfileIndex = 0; //last index for profile picker for cp ontop
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -180,10 +196,14 @@ namespace WpfCefDynamBrowser.ViewModels
             ReloadCommand = new DelegateCommand(Reload);
 
             InjectCommand = new DelegateCommand(Inject);
+            OpenCPCommand = new DelegateCommand(OpenCP);
             SaveSiteCommand = new DelegateCommand(SaveSite);
             FillListCommand = new DelegateCommand(FillList);
             DeleteSiteMenueItemCommand = new DelegateCommand(DeleteSiteMenueItem);
             NavigateListItemCommand = new DelegateCommand(NavigateToListItem);
+            SaveSession = new DelegateCommand(SaveSessionClicked);
+            DeleteSession = new DelegateCommand(DeleteSessionClicked);
+            SaveSessionToBMs = new DelegateCommand(SaveSessionToBMsClicked);
 
             SendToBrowserSocial = new RelayCommand(SendToSocialBrowserPopUp);
 
@@ -193,6 +213,21 @@ namespace WpfCefDynamBrowser.ViewModels
             OutputMessage = version;
 
             Title = "New Tab";
+        }
+
+        private void SaveSessionToBMsClicked()
+        {
+            OnClickedSaveSessionToBookmarks();
+        }
+
+        private void DeleteSessionClicked()
+        {
+            OnClickedDeleteSession();
+        }
+
+        private void SaveSessionClicked()
+        {
+            OnClickedSaveSession();
         }
 
         private void SendToSocialBrowserPopUp(object param)
@@ -415,10 +450,92 @@ namespace WpfCefDynamBrowser.ViewModels
         {
             WebBrowser.Back();
         }
-
+       
         private void Inject()
         {
+
             WebBrowser.InjectData();
+        }
+
+        private void OpenCP()
+        {
+            PersonData profile = BrowserInit.pData.Clone() as PersonData;
+            bool usingImport = false;
+            try
+            {
+                if (DragDropMainViewModel.Instance.FoldersAndSitesList != null && DragDropMainViewModel.Instance.FoldersAndSitesList[DragDropMainViewModel.Instance.SIFoldersSide].TypeOfFolder == FolderTypes.Import)
+                {
+                    string urltoCheck = AddressEditable.Substring(AddressEditable.IndexOf('.') + 1);
+                    if (urltoCheck.Contains("."))
+                        urltoCheck = urltoCheck.Split('.')[0];
+                    foreach (Bookmark b in DragDropMainViewModel.Instance.FoldersAndSitesList[DragDropMainViewModel.Instance.SIFoldersSide].Sites)
+                    {
+                        if (!b.IsImported) continue;
+                        string blinkToChek = b.Link.Substring(b.Link.IndexOf('.') + 1);
+                        if (blinkToChek.Contains("."))
+                            blinkToChek = blinkToChek.Split('.')[0];
+                        if (urltoCheck.Contains(blinkToChek))
+                        {
+                            profile.Username = b.Username;
+                            profile.Email = b.Email;
+                            profile.Password = b.Password;
+                            usingImport = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            if (!usingImport && MyFilesDatabase.HasMultipleProfiles(BrowserInit.pData.ProjectDIr))
+            {
+                SelectProfileWindow selectProfile = new SelectProfileWindow(BrowserInit.pData.ProjectName, BrowserInit.pData.ProjectDIr, lastProfileIndex, "");
+                //selectProfile.Closed += selectProfile_Closed;
+                selectProfile.ShowDialog();
+                if (!selectProfile.OkClicked)
+                {
+                    return;
+                }
+                lastProfileIndex = selectProfile.cmProfiles.SelectedIndex;
+                profile = MyFilesDatabase.GetSubProjectPersonData(selectProfile.SelectedProfileFilePath);
+            }
+
+            if (CPWthread == null || !CPWthread.IsAlive)
+            {
+                CPWthread = new Thread(() =>
+                {
+                    CreateProjectWindow projWindow = new CreateProjectWindow();
+                    projWindow.DataContext = profile;
+                    projWindow.btnDelete.Visibility = System.Windows.Visibility.Hidden;
+                    if (!CreateProjectWindow.CanSeeProxys)
+                    {
+                        projWindow.tbProxys.Visibility = System.Windows.Visibility.Collapsed;
+                        projWindow.dpProxys.Visibility = System.Windows.Visibility.Collapsed;
+                    }
+                    projWindow.projName.Text = profile.ProfileName;
+                    projWindow.Topmost = true;
+                    projWindow.WindowStyle = System.Windows.WindowStyle.None;
+                    projWindow.AllowsTransparency = true;
+                    projWindow.Opacity = 0.9;
+                    projWindow.grdinfo.Opacity = 0.9;
+                    projWindow.tbbutton.Text = "Close";
+                    projWindow.IsReadOnly = true;
+                    projWindow.cbSex.IsEnabled = projWindow.spBirth.IsEnabled = projWindow.spPBN.IsEnabled =
+                    projWindow.spMoney.IsEnabled = projWindow.cmbMoney.IsEnabled = projWindow.cmbPbn.IsEnabled = false;
+                    projWindow.Closed += ProjWindow_Closed;
+                    projWindow.Show();
+
+                    System.Windows.Threading.Dispatcher.Run();
+                });
+
+                CPWthread.SetApartmentState(ApartmentState.STA);
+                CPWthread.Start();
+            }
+        }
+
+        private void ProjWindow_Closed(object sender, EventArgs e)
+        {
+            CPWthread = null;
         }
 
         private void NavigateToListItem()

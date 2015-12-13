@@ -47,7 +47,6 @@ namespace BrowserAndFeatures
             SetPersonData();
             (prospector.DataContext as FootPrintsOptionsVM).OnClickedSearch += FeatureCallage_OnClickedSearch;
             (prospector.DataContext as FootPrintsOptionsVM).OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
-            prospector.tabKingKontent.Visibility = App.HasKingKintent ? Visibility.Visible : Visibility.Collapsed;
             browser.OnCurateToPBN += Browser_OnCurateToPBN;
         }
 
@@ -89,7 +88,7 @@ namespace BrowserAndFeatures
         cbAllowFeedMash = "",
         cbAllowIndexer = "",
         cbYoutube = "",
-        key = "", name = "", email = "";
+        key = "", name = "", email = "", hasKK = "";
             decryptLisence(MyFilesDatabase.DecodeFrom64(File.ReadAllText(lisenceFilePath)), ref canSeeProxys, ref canCreateLisence,
                 ref cbAllowProject,
                 ref cbAllowProspector,
@@ -98,7 +97,7 @@ namespace BrowserAndFeatures
                 ref cbAllowFeedMash,
                 ref cbAllowIndexer,
                 ref cbYoutube,
-                ref key, ref name, ref email);
+                ref key, ref name, ref email, ref hasKK);
 
 
            // App.Current.Dispatcher.Invoke((Action)delegate { 
@@ -108,7 +107,9 @@ namespace BrowserAndFeatures
             if (cbAllowFeedMash.ToLower() != "true") feed.Visibility = System.Windows.Visibility.Collapsed;
             if (cbAllowIndexer.ToLower() != "true") indexer.Visibility = System.Windows.Visibility.Collapsed;
             if (cbYoutube.ToLower() != "true") youtuber.Visibility = System.Windows.Visibility.Collapsed;
-          //  });
+            if (canSeeProxys.ToLower() == "true") Organiser.Common.Windows.CreateProjectWindow.CanSeeProxys = true;
+            prospector.tabKingKontent.Visibility = hasKK.ToLower() == "true" ? Visibility.Visible : Visibility.Collapsed;
+            //  });
         }
 
         public static void decryptLisence(string lisenceText, ref string canSeeProxys, ref string canCreateLisence,
@@ -119,7 +120,7 @@ namespace BrowserAndFeatures
             ref string cbAllowFeedMash,
             ref string cbAllowIndexer,
             ref string cbYoutube,
-            ref string key, ref string name, ref string email)
+            ref string key, ref string name, ref string email, ref string hasKK)
         {
             string[] lisenceLines = lisenceText.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
             foreach (string line in lisenceLines)
@@ -168,6 +169,11 @@ namespace BrowserAndFeatures
                     case "Email":
                         email = lineValPairs[1];
                         break;
+
+                    case "hasKK":
+                        hasKK = lineValPairs[1];
+                        break;
+
                     default:
                         break;
                 }
@@ -314,14 +320,17 @@ namespace BrowserAndFeatures
 
         private void Browser_OnCurateToPBN(string content)
         {
-            if (wisi.DataContext == null)
+            Application.Current.Dispatcher.Invoke((Action)delegate
             {
+                if (wisi.DataContext == null)
+                {
 
-                tbControl.SelectedIndex = 3;
-                setwisi();
-            }
+                    tbControl.SelectedIndex = 3;
+                    setwisi();
+                }
 
-            wisi.AddSetRssFeed(content);
+                wisi.injectHtml(content);
+            });
         }
 
         private void youtuber_PreviewMouseDown(object sender, MouseButtonEventArgs e)

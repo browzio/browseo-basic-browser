@@ -54,6 +54,7 @@ namespace WpfCefDynamBrowser.Views
                 dragnDropListview.vm.mPData = BrowserInit.pData;
                 dragnDropListview.vm.FillList();
                 dragnDropListview.vm.FillImportsList();
+                dragnDropListview.vm.FillSessionListFromFile();
                 //dragnDropListview.vm.OnDoubleClickedSite += vm_OnDoubleClickedSite;
                 // dragnDropListview.vm.OnListChanged += vm_OnListChanged;
                 //dragnDropListview.vm.OnRemindersChanged += vm_OnRemindersChanged;
@@ -261,19 +262,38 @@ namespace WpfCefDynamBrowser.Views
                     dragnDropListview.vm.MergeBookMarksFromProjectPath(spw.SelectedProjectName);
                 }
             }
-            else if(bookmarkTypeWindow.fcs.IsChecked == true || bookmarkTypeWindow.entBud.IsChecked == true)
+            else if(bookmarkTypeWindow.fcs.IsChecked == true || bookmarkTypeWindow.entBud.IsChecked == true || bookmarkTypeWindow.rankWyx.IsChecked == true)
             {
                 OpenFileDialog ofd = new OpenFileDialog();
                 ofd.Multiselect = false;
                 ofd.ShowDialog();
                 string path = ofd.FileName;
-                dragnDropListview.vm.MergeFromImport(path, bookmarkTypeWindow.fcs.IsChecked == true ? DragDropListview.DragDropMainViewModel.IMPORT_TYPE_FCS : DragDropListview.DragDropMainViewModel.IMPORT_TYPE_EB);
+
+                string importType = DragDropListview.DragDropMainViewModel.IMPORT_TYPE_FCS;
+                if (bookmarkTypeWindow.entBud.IsChecked == true)
+                    importType = DragDropListview.DragDropMainViewModel.IMPORT_TYPE_EB;
+                else if(bookmarkTypeWindow.rankWyx.IsChecked == true)
+                    importType = DragDropListview.DragDropMainViewModel.IMPORT_TYPE_RANKWYZ;
+
+                dragnDropListview.vm.MergeFromImport(path, importType);
             }
         }
 
         private void Reminders_Click(object sender, RoutedEventArgs e)
         {
             dragnDropListview.vm.OpenReminders();
+        }
+
+        private void SaveSession_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                (sender as Button).ContextMenu.IsEnabled = true;
+                (sender as Button).ContextMenu.PlacementTarget = (sender as Button);
+                (sender as Button).ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+                (sender as Button).ContextMenu.IsOpen = true;
+            }
+            catch { }
         }
     }
 }

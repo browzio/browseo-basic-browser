@@ -17,8 +17,6 @@ namespace BrowserAndFeatures
     [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
     public partial class App : Application
     {
-        public static bool HasKingKintent = false;
-
         protected override void OnStartup(StartupEventArgs e)
         {
             this.Shutdown();

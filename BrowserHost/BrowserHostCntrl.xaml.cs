@@ -1,4 +1,5 @@
 ﻿using DragDropListview;
+using Organiser.Common.Classes;
 using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
@@ -153,6 +154,10 @@ namespace BrowserHost
                 btvm.OnAddedBookmark += btvm_OnAddedBookmark;
                 btvm.OnRemindersChanged += btvm_OnRemindersChanged;
                 btvm.OnCurateToPBN += Btvm_OnCurateToPBN;
+                btvm.OnClickedSaveSession += Btvm_OnClickedSaveSession;
+                btvm.OnClickedDeleteSession += Btvm_OnClickedDeleteSession;
+                btvm.OnClickedSaveSessionToBookmarks += Btvm_OnClickedSaveSessionToBookmarks;
+                btvm.Title = url;
                 if (BrowserTabs.Count > 0)
                     btvm.TabMargin = new Thickness(-20, 0, 0, 0);
                 else
@@ -179,6 +184,35 @@ namespace BrowserHost
                 //}
                     //scrollview.ScrollToVerticalOffset(9.5);
             });
+        }
+
+        private void Btvm_OnClickedSaveSessionToBookmarks()
+        {
+            List<string> links = new List<string>();
+
+            foreach (BrowserTabViewModel btvm in BrowserTabs)
+            {
+                links.Add(btvm.AddressEditable);
+            }
+
+            DragDropMainViewModel.Instance.SaveSession(links);
+        }
+
+        private void Btvm_OnClickedDeleteSession()
+        {
+            MyFilesDatabase.DeleteSession(BrowserInit.pData.ProjectName);
+        }
+
+        private void Btvm_OnClickedSaveSession()
+        {
+            List<string> links = new List<string>();
+
+            foreach (BrowserTabViewModel btvm in BrowserTabs)
+            {
+                links.Add(btvm.AddressEditable);
+            }
+
+            MyFilesDatabase.SaveSession(BrowserInit.pData.ProjectName, links);
         }
 
         private void Btvm_OnCurateToPBN(string content)
@@ -288,10 +322,25 @@ namespace BrowserHost
                 scrollviewer.LineRight();
             e.Handled = true;
         }
-
+       
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             DragDropMainViewModel.Instance.OnDoubleClickedSite += Instance_OnDoubleClickedSite;
+            DragDropMainViewModel.Instance.OnSelsectedLauncAll += Instance_OnSelsectedLauncAll;
+            string[] sites = MyFilesDatabase.GetSavedSesstion(BrowserInit.pData.ProjectName);
+            Instance_OnSelsectedLauncAll(sites);
+            if (sites.Length > 0)
+                TabControl.SelectedIndex = -1;
+
+            this.Loaded -= UserControl_Loaded;
+        }
+
+        private void Instance_OnSelsectedLauncAll(string[] sites)
+        {
+            foreach (string site in sites)
+            {
+                CreateNewTab(site);
+            }
         }
 
         void Instance_OnDoubleClickedSite(string site)

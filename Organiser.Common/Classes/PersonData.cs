@@ -6,7 +6,7 @@ using System.Text;
 
 namespace SocialOrganizer.Models
 {
-    public class PersonData
+    public class PersonData : ICloneable
     {
         public PersonData()
         {
@@ -217,5 +217,10 @@ namespace SocialOrganizer.Models
         }
 
         public string ProjectDIr { get; set; }
+
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
     }
 }

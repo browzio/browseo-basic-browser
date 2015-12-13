@@ -4,7 +4,7 @@
         Title="Select Type" SizeToContent="Height" Width="300"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Icon="/BrowserHost;component/Images/browseo (1).ico">
+        Icon="/DragDropListview;component/Images/browseo (1).ico">
     <Window.Resources>
         <Style x:Key="EmptyCheckBoxFocusVisual">
             <Setter Property="Control.Template">
@@ -101,33 +101,41 @@
         <!-- End Flat Button Style -->
     </Window.Resources>
     <StackPanel Background="WhiteSmoke">
-        <CheckBox Name="browseoProj" Margin="5" x:FieldModifier="public">
+        <CheckBox Name="browseoProj" Margin="5" x:FieldModifier="public" Checked="browseoProj_Checked_1">
             <StackPanel Orientation="Horizontal">
-                <Image Source="/BrowserHost;component/Images/browseo (1).ico" 
+                <Image Source="/DragDropListview;component/Images/browseo (1).ico" 
                        Width="20" />
                 <TextBlock Text="  Browseo Project" />
             </StackPanel>
         </CheckBox>
-        <CheckBox Name="browseoGloable" Margin="5" x:FieldModifier="public" Checked="browseoGloable_Checked">
+        <CheckBox Name="browseoGloable" Margin="5" x:FieldModifier="public" Checked="browseoProj_Checked_1">
             <StackPanel Orientation="Horizontal">
-                <Image Source="/BrowserHost;component/Images/icon-global.png" 
+                <Image Source="/DragDropListview;component/Images/icon-global.png" 
                        Width="20" />
                 <TextBlock Text="  Browseo Global" />
             </StackPanel>
         </CheckBox>
-        <CheckBox Margin="5" Name="fcs" x:FieldModifier="public">
+        <CheckBox Margin="5" Name="fcs" x:FieldModifier="public" Checked="browseoProj_Checked_1">
             <StackPanel Orientation="Horizontal">
-                <Image Source="/BrowserHost;component/Images/fcs icon.png" 
+                <Image Source="/DragDropListview;component/Images/fcs icon.png" 
                        Width="20" />
                 <TextBlock Text="  FCS Networker" />
             </StackPanel>
         </CheckBox>
 
-        <CheckBox Margin="5" Name="entBud" x:FieldModifier="public" Checked="entBud_Checked">
+        <CheckBox Margin="5" Name="entBud" x:FieldModifier="public" Checked="browseoProj_Checked_1">
             <StackPanel Orientation="Horizontal">
-                <Image Source="/BrowserHost;component/Images/enterprise buddy.ico" 
+                <Image Source="/DragDropListview;component/Images/enterprise buddy.ico" 
                        Width="20" />
                 <TextBlock Text="  BE" VerticalAlignment="Center" />
+            </StackPanel>
+        </CheckBox>
+
+        <CheckBox Margin="5" Name="rankWyx" x:FieldModifier="public" Checked="browseoProj_Checked_1">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="/DragDropListview;component/Images/rankwyz-icon-check.png" 
+                       Width="20" />
+                <TextBlock Text="  RANKwyz" VerticalAlignment="Center" />
             </StackPanel>
         </CheckBox>
 
