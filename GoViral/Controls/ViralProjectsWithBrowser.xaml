@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:GoViral.Controls"
              xmlns:converter="clr-namespace:GoViral.Converters"
              xmlns:controls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
+             xmlns:localControls="clr-namespace:GoViral.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="600">
     <UserControl.Resources>
@@ -19,429 +20,343 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
-        </Grid.ColumnDefinitions>
+        <Border BorderThickness="0,1,0,0" BorderBrush="#d0d0d0">
+            <controls:NonReloadingTabControl Name="tbCntrl">
+                <TabItem Header="Dominator" Style="{StaticResource gmailTabStyle}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-        <Expander ExpandDirection="Left">
-            <Expander.Header>
-                <Grid>
-                    <Grid.LayoutTransform>
-                        <RotateTransform Angle="90" />
-                    </Grid.LayoutTransform>
-                    <TextBlock Text="Saved Pages" Foreground="#4c8cf5" />
-                </Grid>
-            </Expander.Header>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Button Content="New Folder" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="NEWFOLDER" />
-                        <Button Content="Multi Links" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="MULTILINKS" />
-                        <Button Content="Save" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="SAVE" />
-                    </StackPanel>
-                    <StackPanel Visibility="{Binding PBarVisible}">
-                        <ProgressBar Height="6" IsIndeterminate="{Binding IsIndeterminate}" Value="{Binding PBarValue}" />
-                        <TextBlock Text="{Binding LoadingStatus}" Foreground="#dd4f43" HorizontalAlignment="Left"  />
-                    </StackPanel>
-                </StackPanel>
-                <!--<ScrollViewer x:Name="MyScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="1">-->
-                    <ListView ItemsSource="{Binding Folders}"
-                              SelectedIndex="{Binding SIFolders, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                              ScrollViewer.CanContentScroll="False"
-                              PreviewMouseWheel="lbFolders_PreviewMouseWheel"
-                              Grid.Row="1"
-                              Name="lbFolders"
-                              MinWidth="150"
-                              MaxWidth="500"
-                              Background="WhiteSmoke"
-                              BorderThickness="0,0,0,0">
-                        <ListView.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem"  BasedOn="{StaticResource MetroListBoxItemStyle}">
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                            <Border x:Name="Bd" 
+                        <Expander ExpandDirection="Left">
+                            <Expander.Header>
+                                <Grid>
+                                    <Grid.LayoutTransform>
+                                        <RotateTransform Angle="90" />
+                                    </Grid.LayoutTransform>
+                                    <TextBlock Text="Saved Pages" Foreground="#4c8cf5" />
+                                </Grid>
+                            </Expander.Header>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Button Content="New Folder" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="NEWFOLDER" />
+                                        <Button Content="Add Links" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="MULTILINKS" />
+                                        <Button Content="Save" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="SAVE" />
+                                    </StackPanel>
+                                    <StackPanel Visibility="{Binding PBarVisible}">
+                                        <ProgressBar Height="6" IsIndeterminate="{Binding IsIndeterminate}" Value="{Binding PBarValue}" />
+                                        <TextBlock Text="{Binding LoadingStatus}" Foreground="#dd4f43" HorizontalAlignment="Left"  />
+                                    </StackPanel>
+                                </StackPanel>
+                                <!--<ScrollViewer x:Name="MyScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="1">-->
+                                <ListView ItemsSource="{Binding Folders}"
+                                          SelectedIndex="{Binding SIFolders, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                          ScrollViewer.CanContentScroll="False"
+                                          PreviewMouseWheel="lbFolders_PreviewMouseWheel"
+                                          Grid.Row="1"
+                                          Name="lbFolders"
+                                          MinWidth="150"
+                                          MaxWidth="500"
+                                          Background="WhiteSmoke"
+                                          BorderThickness="0,0,0,0">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListBoxItem"  BasedOn="{StaticResource MetroListBoxItemStyle}">
+                                            <Setter Property="Template">
+                                                <Setter.Value>
+                                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                        <Border x:Name="Bd" 
                                                     BorderBrush="Transparent" 
                                                     BorderThickness="0"  
                                                     Background="{TemplateBinding Background}" 
                                                     Padding="{TemplateBinding Padding}" 
                                                     SnapsToDevicePixels="True">
-                                                <Grid>
-                                                    <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" 
+                                                            <Grid>
+                                                                <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" 
                                                                       Content="{TemplateBinding Content}" 
                                                                       ContentStringFormat="{TemplateBinding ContentStringFormat}" 
                                                                       HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
                                                                       SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
                                                                       VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                                                    
-                                                    <Rectangle Height="1.5" x:Name="frame" VerticalAlignment="Bottom" Stroke="#FFB2B2B2" StrokeThickness="2"/>
-                                                </Grid>
-                                            </Border>
-                                            
-                                            <ControlTemplate.Triggers>
-                                                <MultiTrigger>
-                                                    <MultiTrigger.Conditions>
-                                                        <Condition Property="IsMouseOver" Value="True"/>
-                                                        <Condition Property="IsSelected" Value="True"/>
-                                                    </MultiTrigger.Conditions>
-                                                    <Setter Property="Background" TargetName="Bd" Value="Transparent" />
-                                                    <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
-                                                </MultiTrigger>
 
-                                                <MultiTrigger>
-                                                    <MultiTrigger.Conditions>
-                                                        <Condition Property="IsSelected" Value="True"/>
-                                                    </MultiTrigger.Conditions>
-                                                    <Setter Property="Background" TargetName="Bd" Value="Transparent" />
-                                                    <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
-                                                </MultiTrigger>
-                                                <Trigger Property="IsEnabled" Value="False">
-                                                    <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </ListView.ItemContainerStyle>
-                        <ListView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel  Margin="0,0,0,0" ScrollViewer.CanContentScroll="True" VerticalAlignment="Top" />
-                            </ItemsPanelTemplate>
-                        </ListView.ItemsPanel>
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Expander ExpandDirection="Down" IsExpanded="{Binding IsEExpanded}">
-                                    <Expander.Header>
-                                        <TextBlock Text="{Binding FolderTitle}" Foreground="#1ba261" />
-                                    </Expander.Header>
-                                    <ListView  ItemsSource="{Binding SavedLinksList}"
-                                               SelectedIndex="{Binding SISavedLinks, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-                                               MinWidth="150"
-                                               Background="WhiteSmoke"
-                                               Name="lbsavedList"
-                                               BorderThickness="0"
-                                               ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                                               ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                                        <ListView.ItemContainerStyle>
-                                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource MetroListBoxItemStyle}">
-                                                <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}"/>
-                                                <Setter Property="Template">
-                                                    <Setter.Value>
-                                                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                                            <Border x:Name="Bd" 
+                                                                <Rectangle Height="1.5" x:Name="frame" VerticalAlignment="Bottom" Stroke="#FFB2B2B2" StrokeThickness="2"/>
+                                                            </Grid>
+                                                        </Border>
+
+                                                        <ControlTemplate.Triggers>
+                                                            <MultiTrigger>
+                                                                <MultiTrigger.Conditions>
+                                                                    <Condition Property="IsMouseOver" Value="True"/>
+                                                                    <Condition Property="IsSelected" Value="True"/>
+                                                                </MultiTrigger.Conditions>
+                                                                <Setter Property="Background" TargetName="Bd" Value="Transparent" />
+                                                                <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
+                                                            </MultiTrigger>
+
+                                                            <MultiTrigger>
+                                                                <MultiTrigger.Conditions>
+                                                                    <Condition Property="IsSelected" Value="True"/>
+                                                                </MultiTrigger.Conditions>
+                                                                <Setter Property="Background" TargetName="Bd" Value="Transparent" />
+                                                                <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
+                                                            </MultiTrigger>
+                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                                            </Trigger>
+                                                        </ControlTemplate.Triggers>
+                                                    </ControlTemplate>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel  Margin="0,0,0,0" ScrollViewer.CanContentScroll="True" VerticalAlignment="Top" />
+                                        </ItemsPanelTemplate>
+                                    </ListView.ItemsPanel>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Expander ExpandDirection="Down" IsExpanded="{Binding IsEExpanded}">
+                                                <Expander.Header>
+                                                    <TextBlock Text="{Binding FolderTitle}" Foreground="#1ba261" />
+                                                </Expander.Header>
+                                                <ListView  ItemsSource="{Binding SavedLinksList}"
+                                                           SelectedIndex="{Binding SISavedLinks, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                                           Width="475"
+                                                           Background="WhiteSmoke"
+                                                           Name="lbsavedList"
+                                                           BorderThickness="0"
+                                                           ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                                           ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                                    <ListView.ItemContainerStyle>
+                                                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource MetroListBoxItemStyle}">
+                                                            <Setter Property="IsSelected" Value="{Binding Path=IsSelected, Mode=TwoWay}"/>
+                                                            <Setter Property="Template">
+                                                                <Setter.Value>
+                                                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                                                        <Border x:Name="Bd" 
                                                                         BorderBrush="Transparent" 
                                                                         BorderThickness="0"  
                                                                         Background="{TemplateBinding Background}" 
                                                                         Padding="{TemplateBinding Padding}">
-                                                                <Grid>
-                                                                    <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" 
+                                                                            <Grid>
+                                                                                <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" 
                                                                                           Content="{TemplateBinding Content}" 
                                                                                           ContentStringFormat="{TemplateBinding ContentStringFormat}" 
                                                                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
                                                                                           SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
                                                                                           VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                                                                    <Rectangle Height="1.5" x:Name="frame" VerticalAlignment="Top" StrokeDashArray="1 2" Stroke="#FFB2B2B2" StrokeThickness="2"/>
-                                                                </Grid>
+                                                                                <Rectangle Height="1.5" x:Name="frame" VerticalAlignment="Top" StrokeDashArray="1 2" Stroke="#FFB2B2B2" StrokeThickness="2"/>
+                                                                            </Grid>
 
-                                                            </Border>
-                                                            <ControlTemplate.Triggers>
-                                                                <MultiTrigger>
-                                                                    <MultiTrigger.Conditions>
-                                                                        <Condition Property="IsMouseOver" Value="True"/>
-                                                                        <Condition Property="IsSelected" Value="True"/>
-                                                                    </MultiTrigger.Conditions>
-                                                                    <Setter Property="Background" TargetName="Bd" Value="WhiteSmoke" />
-                                                                    <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
-                                                                </MultiTrigger>
+                                                                        </Border>
+                                                                        <ControlTemplate.Triggers>
+                                                                            <MultiTrigger>
+                                                                                <MultiTrigger.Conditions>
+                                                                                    <Condition Property="IsMouseOver" Value="True"/>
+                                                                                    <Condition Property="IsSelected" Value="True"/>
+                                                                                </MultiTrigger.Conditions>
+                                                                                <Setter Property="Background" TargetName="Bd" Value="WhiteSmoke" />
+                                                                                <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
+                                                                            </MultiTrigger>
 
-                                                                <Trigger Property="IsSelected" Value="False">
-                                                                    <Setter Property="Background" TargetName="Bd" Value="White" />
-                                                                    <Setter Property="Stroke" TargetName="frame" Value="#FFB2B2B2" />
-                                                                </Trigger>
+                                                                            <Trigger Property="IsSelected" Value="False">
+                                                                                <Setter Property="Background" TargetName="Bd" Value="White" />
+                                                                                <Setter Property="Stroke" TargetName="frame" Value="#FFB2B2B2" />
+                                                                            </Trigger>
 
-                                                                <Trigger Property="IsSelected" Value="True">
-                                                                    <Setter Property="Background" TargetName="Bd" Value="WhiteSmoke" />
-                                                                    <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
-                                                                </Trigger>
+                                                                            <Trigger Property="IsSelected" Value="True">
+                                                                                <Setter Property="Background" TargetName="Bd" Value="WhiteSmoke" />
+                                                                                <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
+                                                                            </Trigger>
 
-                                                                <Trigger Property="IsMouseOver" Value="True">
-                                                                    <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
-                                                                </Trigger>
+                                                                            <Trigger Property="IsMouseOver" Value="True">
+                                                                                <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
+                                                                            </Trigger>
 
-                                                                <Trigger Property="IsEnabled" Value="False">
-                                                                    <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
-                                                                </Trigger>
-                                                            </ControlTemplate.Triggers>
-                                                        </ControlTemplate>
-                                                    </Setter.Value>
-                                                </Setter>
-                                            </Style>
-                                        </ListView.ItemContainerStyle>
-                                        <ListView.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid Margin="3,3,3,10" PreviewMouseDown="StackPanel_PreviewMouseDown">
-                                                    <Grid.RowDefinitions>
-                                                        <RowDefinition Height="Auto" />
-                                                        <RowDefinition Height="Auto" />
-                                                    </Grid.RowDefinitions>
-                                                    <TextBlock Text="{Binding Name}" />
-                                                    <TextBox Style="{StaticResource TextboxGray}" IsReadOnly="True" Text="{Binding Url}" PreviewMouseDown="TextBox_PreviewMouseDown" Grid.Row="1" />
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ListView.ItemTemplate>
-                                        <ListView.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="View" Command="{Binding CTMenuClick}" CommandParameter="View" />
-                                                <MenuItem Header="Edit" Command="{Binding CTMenuClick}" CommandParameter="Edit" />
-                                                <MenuItem Header="Delete" Command="{Binding CTMenuClick}" CommandParameter="Delete" />
-                                                <Separator Margin="-30,0,0,0" />
-                                                <MenuItem Header="Order By Likes" Command="{Binding CTMenuClick}" CommandParameter="ORDER_Likes" />
-                                                <MenuItem Header="Order By Talking About" Command="{Binding CTMenuClick}" CommandParameter="ORDER_TalkingAbout" />
-                                                <Separator Margin="-30,0,0,0" />
-                                                <MenuItem Header="Crawl Page Stats" Command="{Binding CTMenuClick}" CommandParameter="Stats" />
-                                                <MenuItem Header="Crawl All Stats" Command="{Binding CTMenuClick}" CommandParameter="StatsAll" />
-                                                <Separator Margin="-30,0,0,0" />
-                                                <MenuItem Header="Cancel Crawl Check" Command="{Binding CTMenuClick}" CommandParameter="Cancel" />
-                                                <MenuItem Header="Cancel Crawl All" Command="{Binding CTMenuClick}" CommandParameter="CancelAll" />
-                                        </ContextMenu>
-                                        </ListView.ContextMenu>
-                                    </ListView>
-                                </Expander>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
-                        <ListView.ContextMenu>
-                            <ContextMenu>
-                                <ContextMenu.Style>
-                                    <Style TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}">
-                                        <Setter Property="Visibility" Value="Visible" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Folders.Count}" Value="0">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ContextMenu.Style>
-                                <!--<MenuItem Header="Order Pages By Likes" Command="{Binding CTMenuClick}" CommandParameter="ORDER_Likes" />
-                                    <Separator Margin="-30,0,0,0" />-->
-                                <MenuItem Header="Edit" Command="{Binding CTMenuClick}" CommandParameter="Edit" />
-                                <MenuItem Header="Delete" Command="{Binding CTMenuClick}" CommandParameter="Delete" />
-                            </ContextMenu>
-                        </ListView.ContextMenu>
-                    </ListView>
-                <!--</ScrollViewer>-->
-            </Grid>
-        </Expander>
-
-        <Expander ExpandDirection="Right"  Grid.Column="2">
-            <Expander.Header>
-                <Grid>
-                    <Grid.LayoutTransform>
-                        <RotateTransform Angle="90" />
-                    </Grid.LayoutTransform>
-                    <TextBlock Text="Page Info" Foreground="#4c8cf5" />
-                </Grid>
-            </Expander.Header>
-            <Expander.Style>
-                <Style TargetType="Expander">
-                    <Style.Triggers>
-                        <DataTrigger Binding="{Binding SelectedFolder}" Value="x:Null">
-                            <Setter Property="IsExpanded" Value="False" />
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding SelectedFolder.SISavedLinks}" Value="-1">
-                            <Setter Property="IsExpanded" Value="False" />
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                        <DataTrigger Binding="{Binding SelectedFolder.SavedLinksList.Count}" Value="0">
-                            <Setter Property="IsExpanded" Value="False" />
-                            <Setter Property="Visibility" Value="Collapsed" />
-                        </DataTrigger>
-                    </Style.Triggers>
-                </Style>
-            </Expander.Style>
-            <Grid  Background="WhiteSmoke">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <StackPanel Orientation="Horizontal" Margin="4">
-                    <TextBlock Text="{Binding SelectedFolder.SelectedPageName}" FontWeight="Bold" FontSize="14.667" />
-                </StackPanel>
-                
-                <ScrollViewer x:Name="MyScrollViewerFBContent"  
-                                  Grid.Row="1"
-                                  MaxWidth="500"
-                                  HorizontalScrollBarVisibility="Disabled" 
-                                  VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <StackPanel Width="480">
-                            <!--#region header-->
-                            <StackPanel.Resources>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="MinWidth" Value="80" />
-                                    <Setter Property="MaxWidth" Value="390" />
-                                    <Setter Property="TextWrapping" Value="Wrap" />
-                                </Style>
-                            </StackPanel.Resources>
-                            <StackPanel Orientation="Horizontal" Margin="4">
-                                <TextBlock Text="link:" />
-                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.link}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="4">
-                                <TextBlock Text="category:" />
-                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.category}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="4">
-                                <TextBlock Text="founded:" />
-                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.founded}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="4">
-                                <TextBlock Text="about:" />
-                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.about}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="4">
-                                <TextBlock Text="can post:" />
-                                <TextBlock Text="{Binding SelectedPageFBGraphData.can_post}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="4">
-                                <TextBlock Text="talking about" />
-                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.talking_about_count}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="4">
-                                <TextBlock Text="likes" />
-                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.likes}" />
-                            </StackPanel>
-                            <!--#endregion-->
-                            <Expander ExpandDirection="Down" Name="ExPhotos">
-                                <Expander.Header>
-                                    <TextBlock Text="Photos" Foreground="#ffce44" />
-                                </Expander.Header>
-                                <StackPanel>
-                                    <ListView ItemsSource="{Binding SelectedFolder.SelectedPageFBGraphData.photos.data}" Name="lvPics"
-                                          PreviewMouseWheel="lvVideos_PreviewMouseWheel"
-                                          MouseLeave="lvVideos_MouseLeave"
-                                          MouseEnter="lvVideos_MouseEnter">
-                                    <ListView.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <WrapPanel />
-                                        </ItemsPanelTemplate>
-                                    </ListView.ItemsPanel>
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel>
-                                                <StackPanel.Resources>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="MinWidth" Value="80" />
-                                                        <Setter Property="MaxWidth" Value="390" />
-                                                        <Setter Property="TextWrapping" Value="Wrap" />
-                                                    </Style>
-                                                </StackPanel.Resources>
-                                                <Image Name="imgPics" Width="150" Height="150" Stretch="None" PreviewMouseDown="imgVideo_PreviewMouseDown"
-                                                                                       Tag="{Binding link}" 
-                                                                                       Source="{Binding picture,IsAsync=True, Converter={StaticResource photolinktoimgcov}}">
-                                                    <Image.ToolTip>
-                                                        <ToolTip ToolTipService.ShowDuration="15000">
-                                                            <StackPanel>
-                                                                <StackPanel.Resources>
-                                                                    <Style TargetType="TextBlock">
-                                                                        <Setter Property="MinWidth" Value="80" />
-                                                                        <Setter Property="MaxWidth" Value="390" />
-                                                                        <Setter Property="TextWrapping" Value="Wrap" />
-                                                                    </Style>
-                                                                </StackPanel.Resources>
-                                                                <StackPanel Orientation="Horizontal" Margin="1">
-                                                                    <TextBlock Text="updated time:" />
-                                                                    <TextBlock Text="{Binding updated_time}" />
-                                                                </StackPanel>
-                                                                <StackPanel Orientation="Horizontal" Margin="1">
-                                                                    <TextBlock Text="comment count:" />
-                                                                    <TextBlock Text="{Binding comments.summary.total_count}" />
-                                                                </StackPanel>
-                                                                <StackPanel Orientation="Horizontal" Margin="1">
-                                                                    <TextBlock Text="likes:" />
-                                                                    <TextBlock Text="{Binding likes.summary.total_count}" />
-                                                                </StackPanel>
-                                                            </StackPanel>
-                                                        </ToolTip>
-                                                    </Image.ToolTip>
-                                                    <Image.ContextMenu>
+                                                                            <Trigger Property="IsEnabled" Value="False">
+                                                                                <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
+                                                                            </Trigger>
+                                                                        </ControlTemplate.Triggers>
+                                                                    </ControlTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </Style>
+                                                    </ListView.ItemContainerStyle>
+                                                    <ListView.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid PreviewMouseDown="StackPanel_PreviewMouseDown">
+                                                                <Grid.RowDefinitions>
+                                                                    <RowDefinition Height="Auto" />
+                                                                    <RowDefinition Height="Auto" />
+                                                                </Grid.RowDefinitions>
+                                                                <TextBlock Text="{Binding Name}" Width="465" Margin="0,3,0,2" FontSize="14" />
+                                                                <TextBox Style="{StaticResource TextboxGray}" IsReadOnly="True" Text="{Binding Url}" PreviewMouseDown="TextBox_PreviewMouseDown" Grid.Row="1" Width="465" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ListView.ItemTemplate>
+                                                    <ListView.ContextMenu>
                                                         <ContextMenu>
-                                                            <MenuItem Name="Copy" Header="Copy Link" Tag="{Binding link}" Click="miVids_Click" />
-                                                            <MenuItem Name="Download" Header="Download Image" Tag="{Binding images}" Click="miPhotosPhotoDownload" />
+                                                            <MenuItem Header="View" Command="{Binding CTMenuClick}" CommandParameter="View" />
+                                                            <MenuItem Header="Edit" Command="{Binding CTMenuClick}" CommandParameter="Edit" />
+                                                            <MenuItem Header="Delete" Command="{Binding CTMenuClick}" CommandParameter="Delete" />
+                                                            <Separator Margin="-30,0,0,0" />
+                                                            <MenuItem Header="Order By Likes" Command="{Binding CTMenuClick}" CommandParameter="ORDER_Likes" />
+                                                            <MenuItem Header="Order By Talking About" Command="{Binding CTMenuClick}" CommandParameter="ORDER_TalkingAbout" />
+                                                            <Separator Margin="-30,0,0,0" />
+                                                            <MenuItem Header="Crawl Page Stats" Command="{Binding CTMenuClick}" CommandParameter="Stats" />
+                                                            <MenuItem Header="Crawl All Stats" Command="{Binding CTMenuClick}" CommandParameter="StatsAll" />
+                                                            <Separator Margin="-30,0,0,0" />
+                                                            <MenuItem Header="Cancel Crawl Check" Command="{Binding CTMenuClick}" CommandParameter="Cancel" />
+                                                            <MenuItem Header="Cancel Crawl All" Command="{Binding CTMenuClick}" CommandParameter="CancelAll" />
                                                         </ContextMenu>
-                                                    </Image.ContextMenu>
-                                                </Image>
-                                                <StackPanel Orientation="Horizontal" Margin="1">
-                                                    <TextBlock Text="comments:" />
-                                                    <TextBlock Text="{Binding comments.summary.total_count}" />
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="1">
-                                                    <TextBlock Text="likes:" />
-                                                    <TextBlock Text="{Binding likes.summary.total_count}" />
-                                                </StackPanel>
-                                            </StackPanel>
+                                                    </ListView.ContextMenu>
+                                                </ListView>
+                                            </Expander>
                                         </DataTemplate>
                                     </ListView.ItemTemplate>
+                                    <ListView.ContextMenu>
+                                        <ContextMenu>
+                                            <ContextMenu.Style>
+                                                <Style TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Folders.Count}" Value="0">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ContextMenu.Style>
+                                            <!--<MenuItem Header="Order Pages By Likes" Command="{Binding CTMenuClick}" CommandParameter="ORDER_Likes" />
+                                    <Separator Margin="-30,0,0,0" />-->
+                                            <MenuItem Header="Edit" Command="{Binding CTMenuClick}" CommandParameter="Edit" />
+                                            <MenuItem Header="Delete" Command="{Binding CTMenuClick}" CommandParameter="Delete" />
+                                        </ContextMenu>
+                                    </ListView.ContextMenu>
                                 </ListView>
-                                    <TextBlock Text="Load All Photos..." HorizontalAlignment="Right" Name="tbLoadMorePhotos" PreviewMouseUp="tbLoadMorePhotos_PreviewMouseUp" Tag="{Binding SelectedFolder}">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock" BasedOn="{StaticResource tbLinkStyle}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.photos.data}" Value="{x:Null}">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.photos.data.Count}" Value="0">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.photos.paging}" Value="{x:Null}">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.photos.paging.next}" Value="{x:Null}">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
+                                <!--</ScrollViewer>-->
+                            </Grid>
+                        </Expander>
+
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <DockPanel>
+                                <TextBlock Text="{Binding BrowserPreviewStatus}" VerticalAlignment="Center" DockPanel.Dock="Left" HorizontalAlignment="Left" MaxWidth="250" />
+                                <Button Content="Refresh User Token" DockPanel.Dock="Right" Width="150" Command="{Binding OnBtnClicked}" HorizontalAlignment="Right" CommandParameter="REFRESHTOKEN" />
+                            </DockPanel>
+
+                            <ContentPresenter Grid.Row="1"
+                              HorizontalAlignment="Stretch" 
+                              VerticalAlignment="Stretch"
+                              Content="{Binding WebBrowserHost}" />
+                        </Grid>
+
+                        <Expander ExpandDirection="Right"  Grid.Column="2">
+                            <Expander.Header>
+                                <Grid>
+                                    <Grid.LayoutTransform>
+                                        <RotateTransform Angle="90" />
+                                    </Grid.LayoutTransform>
+                                    <TextBlock Text="Page Info" Foreground="#4c8cf5" />
+                                </Grid>
+                            </Expander.Header>
+                            <Expander.Style>
+                                <Style TargetType="Expander">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedFolder}" Value="x:Null">
+                                            <Setter Property="IsExpanded" Value="False" />
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SelectedFolder.SISavedLinks}" Value="-1">
+                                            <Setter Property="IsExpanded" Value="False" />
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SelectedFolder.SavedLinksList.Count}" Value="0">
+                                            <Setter Property="IsExpanded" Value="False" />
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Expander.Style>
+                            <Grid  Background="WhiteSmoke">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Orientation="Horizontal" Margin="4">
+                                    <TextBlock Text="{Binding SelectedFolder.SelectedPageName}" FontWeight="Bold" FontSize="14.667" />
                                 </StackPanel>
-                            </Expander>
-                            <Expander ExpandDirection="Down" Name="ExVideos">
-                                <Expander.Header>
-                                    <TextBlock Text="Videos" Foreground="#ffce44" />
-                                </Expander.Header>
-                                <StackPanel>
-                                    <ListView ItemsSource="{Binding SelectedFolder.SelectedPageFBGraphData.videos.data}" Name="lvVideos"
-                                                  PreviewMouseWheel="lvVideos_PreviewMouseWheel"
-                                                  MouseLeave="lvVideos_MouseLeave"
-                                                  MouseEnter="lvVideos_MouseEnter">
-                                        <ListView.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <WrapPanel />
-                                            </ItemsPanelTemplate>
-                                        </ListView.ItemsPanel>
-                                        <ListView.ItemTemplate>
-                                            <DataTemplate>
+
+                                <ScrollViewer x:Name="MyScrollViewerFBContent"  
+                                              Grid.Row="1"
+                                              MaxWidth="500"
+                                              HorizontalScrollBarVisibility="Disabled" 
+                                              VerticalScrollBarVisibility="Auto">
+                                    <StackPanel>
+                                        <StackPanel Width="480">
+                                            <!--#region header-->
+                                            <StackPanel.Resources>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="MinWidth" Value="80" />
+                                                    <Setter Property="MaxWidth" Value="390" />
+                                                    <Setter Property="TextWrapping" Value="Wrap" />
+                                                </Style>
+                                            </StackPanel.Resources>
+                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                <TextBlock Text="link:" />
+                                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.link}" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                <TextBlock Text="category:" />
+                                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.category}" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                <TextBlock Text="founded:" />
+                                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.founded}" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                <TextBlock Text="about:" />
+                                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.about}" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                <TextBlock Text="can post:" />
+                                                <TextBlock Text="{Binding SelectedPageFBGraphData.can_post}" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                <TextBlock Text="talking about" />
+                                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.talking_about_count}" />
+                                            </StackPanel>
+                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                <TextBlock Text="likes" />
+                                                <TextBlock Text="{Binding SelectedFolder.SelectedPageFBGraphData.likes}" />
+                                            </StackPanel>
+                                            <!--#endregion-->
+                                            <Expander ExpandDirection="Down" Name="ExPhotos">
+                                                <Expander.Header>
+                                                    <TextBlock Text="Photos" Foreground="#ffce44" />
+                                                </Expander.Header>
                                                 <StackPanel>
-                                                    <StackPanel.Resources>
-                                                        <Style TargetType="TextBlock">
-                                                            <Setter Property="MinWidth" Value="80" />
-                                                            <Setter Property="MaxWidth" Value="390" />
-                                                            <Setter Property="TextWrapping" Value="Wrap" />
-                                                        </Style>
-                                                    </StackPanel.Resources>
-                                                    <Image Name="imgVideo" Width="150" Height="150" Stretch="None" PreviewMouseDown="imgVideo_PreviewMouseDown"
-                                                                                           Tag="{Binding permalink_url}" 
-                                                                                           Source="{Binding picture,IsAsync=True, Converter={StaticResource linktoimgcov}}">
-                                                        <Image.ToolTip>
-                                                            <ToolTip ToolTipService.ShowDuration="15000">
+                                                    <ListView ItemsSource="{Binding SelectedFolder.SelectedPageFBGraphData.photos.data}" Name="lvPics"
+                                                              PreviewMouseWheel="lvVideos_PreviewMouseWheel"
+                                                              MouseLeave="lvVideos_MouseLeave"
+                                                              MouseEnter="lvVideos_MouseEnter">
+                                                        <ListView.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <WrapPanel />
+                                                            </ItemsPanelTemplate>
+                                                        </ListView.ItemsPanel>
+                                                        <ListView.ItemTemplate>
+                                                            <DataTemplate>
                                                                 <StackPanel>
                                                                     <StackPanel.Resources>
                                                                         <Style TargetType="TextBlock">
@@ -450,20 +365,43 @@
                                                                             <Setter Property="TextWrapping" Value="Wrap" />
                                                                         </Style>
                                                                     </StackPanel.Resources>
+                                                                    <Image Name="imgPics" Width="150" Height="150" Stretch="None" PreviewMouseDown="imgVideo_PreviewMouseDown"
+                                                                                       Tag="{Binding link}" 
+                                                                                       Source="{Binding picture,IsAsync=True, Converter={StaticResource photolinktoimgcov}}">
+                                                                        <Image.ToolTip>
+                                                                            <ToolTip ToolTipService.ShowDuration="15000">
+                                                                                <StackPanel>
+                                                                                    <StackPanel.Resources>
+                                                                                        <Style TargetType="TextBlock">
+                                                                                            <Setter Property="MinWidth" Value="80" />
+                                                                                            <Setter Property="MaxWidth" Value="390" />
+                                                                                            <Setter Property="TextWrapping" Value="Wrap" />
+                                                                                        </Style>
+                                                                                    </StackPanel.Resources>
+                                                                                    <StackPanel Orientation="Horizontal" Margin="1">
+                                                                                        <TextBlock Text="updated time:" />
+                                                                                        <TextBlock Text="{Binding updated_time}" />
+                                                                                    </StackPanel>
+                                                                                    <StackPanel Orientation="Horizontal" Margin="1">
+                                                                                        <TextBlock Text="comment count:" />
+                                                                                        <TextBlock Text="{Binding comments.summary.total_count}" />
+                                                                                    </StackPanel>
+                                                                                    <StackPanel Orientation="Horizontal" Margin="1">
+                                                                                        <TextBlock Text="likes:" />
+                                                                                        <TextBlock Text="{Binding likes.summary.total_count}" />
+                                                                                    </StackPanel>
+                                                                                </StackPanel>
+                                                                            </ToolTip>
+                                                                        </Image.ToolTip>
+                                                                        <Image.ContextMenu>
+                                                                            <ContextMenu>
+                                                                                <MenuItem Name="Copy" Header="Copy Link" Tag="{Binding link}" Click="miVids_Click" />
+                                                                                <MenuItem Name="Download" Header="Download Image" Tag="{Binding images}" Click="miPhotosPhotoDownload" />
+                                                                            </ContextMenu>
+                                                                        </Image.ContextMenu>
+                                                                    </Image>
                                                                     <StackPanel Orientation="Horizontal" Margin="1">
-                                                                        <TextBlock Text="description:" />
-                                                                        <TextBlock Text="{Binding description}" />
-                                                                    </StackPanel>
-                                                                    <StackPanel Orientation="Horizontal" Margin="1">
-                                                                        <TextBlock Text="length:" />
-                                                                        <TextBlock Text="{Binding length}" />
-                                                                    </StackPanel>
-                                                                    <StackPanel Orientation="Horizontal" Margin="1">
-                                                                        <TextBlock Text="updated time:" />
-                                                                        <TextBlock Text="{Binding updated_time}" />
-                                                                    </StackPanel>
-                                                                    <StackPanel Orientation="Horizontal" Margin="1">
-                                                                        <TextBlock Text="comment count:" />
+                                                                        <TextBlock Text="comments:" />
                                                                         <TextBlock Text="{Binding comments.summary.total_count}" />
                                                                     </StackPanel>
                                                                     <StackPanel Orientation="Horizontal" Margin="1">
@@ -471,168 +409,255 @@
                                                                         <TextBlock Text="{Binding likes.summary.total_count}" />
                                                                     </StackPanel>
                                                                 </StackPanel>
-                                                            </ToolTip>
-                                                        </Image.ToolTip>
-                                                        <Image.ContextMenu>
-                                                            <ContextMenu>
-                                                                <MenuItem Name="Copy" Header="Copy Link" Tag="{Binding permalink_url}" Click="miVids_Click" />
-                                                                <MenuItem Name="Download" Header="Download Video" Tag="{Binding source}" Click="miVids_Click" />
-                                                            </ContextMenu>
-                                                        </Image.ContextMenu>
-                                                    </Image>
-                                                    <StackPanel Orientation="Horizontal" Margin="1">
-                                                        <TextBlock Text="comments:" />
-                                                        <TextBlock Text="{Binding comments.summary.total_count}" />
-                                                    </StackPanel>
-                                                    <StackPanel Orientation="Horizontal" Margin="1">
-                                                        <TextBlock Text="likes:" />
-                                                        <TextBlock Text="{Binding likes.summary.total_count}" />
-                                                    </StackPanel>
+                                                            </DataTemplate>
+                                                        </ListView.ItemTemplate>
+                                                    </ListView>
+                                                    <TextBlock Text="Load All Photos..." HorizontalAlignment="Right" Name="tbLoadMorePhotos" PreviewMouseUp="tbLoadMorePhotos_PreviewMouseUp" Tag="{Binding SelectedFolder}">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource tbLinkStyle}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.photos.data}" Value="{x:Null}">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.photos.data.Count}" Value="0">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.photos.paging}" Value="{x:Null}">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.photos.paging.next}" Value="{x:Null}">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
                                                 </StackPanel>
-                                            </DataTemplate>
-                                        </ListView.ItemTemplate>
-                                    </ListView>
-                                    <TextBlock Text="Load All Videos..." HorizontalAlignment="Right" Name="tbLoadMoreVideos" PreviewMouseUp="tbLoadMoreVideos_PreviewMouseUp"  Tag="{Binding SelectedFolder}">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock" BasedOn="{StaticResource tbLinkStyle}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.videos.data}" Value="{x:Null}">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.videos.data.Count}" Value="0">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.videos.paging}" Value="{x:Null}">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.videos.paging.next}" Value="{x:Null}">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </StackPanel>
-                            </Expander>
-                            <Label Content="latests 100 posts" FontWeight="Bold" />
-                        </StackPanel>
-                        <StackPanel Name="spSelectedFBData" PreviewMouseWheel="spSelectedFBData_PreviewMouseWheel">
-                                <ListView ItemsSource="{Binding SelectedFolder.SelectedPageFBGraphData.posts.data}" 
-                                              ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
-                                              Name="lvPosts"
-                                              BorderThickness="0,0,0,0">
-                                    <ListView.ItemTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Name="spPosts">
-                                                <StackPanel.Resources>
-                                                    <Style TargetType="TextBlock">
-                                                        <Setter Property="MinWidth" Value="80" />
-                                                        <Setter Property="MaxWidth" Value="390" />
-                                                        <Setter Property="TextWrapping" Value="Wrap" />
-                                                    </Style>
-                                                </StackPanel.Resources>
-                                                <StackPanel Orientation="Horizontal" Margin="4">
-                                                    <TextBlock Text="caption:" />
-                                                    <TextBlock Text="{Binding caption}" />
+                                            </Expander>
+                                            <Expander ExpandDirection="Down" Name="ExVideos">
+                                                <Expander.Header>
+                                                    <TextBlock Text="Videos" Foreground="#ffce44" />
+                                                </Expander.Header>
+                                                <StackPanel>
+                                                    <ListView ItemsSource="{Binding SelectedFolder.SelectedPageFBGraphData.videos.data}" Name="lvVideos"
+                                                  PreviewMouseWheel="lvVideos_PreviewMouseWheel"
+                                                  MouseLeave="lvVideos_MouseLeave"
+                                                  MouseEnter="lvVideos_MouseEnter">
+                                                        <ListView.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <WrapPanel />
+                                                            </ItemsPanelTemplate>
+                                                        </ListView.ItemsPanel>
+                                                        <ListView.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <StackPanel>
+                                                                    <StackPanel.Resources>
+                                                                        <Style TargetType="TextBlock">
+                                                                            <Setter Property="MinWidth" Value="80" />
+                                                                            <Setter Property="MaxWidth" Value="390" />
+                                                                            <Setter Property="TextWrapping" Value="Wrap" />
+                                                                        </Style>
+                                                                    </StackPanel.Resources>
+                                                                    <Image Name="imgVideo" Width="150" Height="150" Stretch="None" PreviewMouseDown="imgVideo_PreviewMouseDown"
+                                                                                           Tag="{Binding permalink_url}" 
+                                                                                           Source="{Binding picture,IsAsync=True, Converter={StaticResource linktoimgcov}}">
+                                                                        <Image.ToolTip>
+                                                                            <ToolTip ToolTipService.ShowDuration="15000">
+                                                                                <StackPanel>
+                                                                                    <StackPanel.Resources>
+                                                                                        <Style TargetType="TextBlock">
+                                                                                            <Setter Property="MinWidth" Value="80" />
+                                                                                            <Setter Property="MaxWidth" Value="390" />
+                                                                                            <Setter Property="TextWrapping" Value="Wrap" />
+                                                                                        </Style>
+                                                                                    </StackPanel.Resources>
+                                                                                    <StackPanel Orientation="Horizontal" Margin="1">
+                                                                                        <TextBlock Text="description:" />
+                                                                                        <TextBlock Text="{Binding description}" />
+                                                                                    </StackPanel>
+                                                                                    <StackPanel Orientation="Horizontal" Margin="1">
+                                                                                        <TextBlock Text="length:" />
+                                                                                        <TextBlock Text="{Binding length}" />
+                                                                                    </StackPanel>
+                                                                                    <StackPanel Orientation="Horizontal" Margin="1">
+                                                                                        <TextBlock Text="updated time:" />
+                                                                                        <TextBlock Text="{Binding updated_time}" />
+                                                                                    </StackPanel>
+                                                                                    <StackPanel Orientation="Horizontal" Margin="1">
+                                                                                        <TextBlock Text="comment count:" />
+                                                                                        <TextBlock Text="{Binding comments.summary.total_count}" />
+                                                                                    </StackPanel>
+                                                                                    <StackPanel Orientation="Horizontal" Margin="1">
+                                                                                        <TextBlock Text="likes:" />
+                                                                                        <TextBlock Text="{Binding likes.summary.total_count}" />
+                                                                                    </StackPanel>
+                                                                                </StackPanel>
+                                                                            </ToolTip>
+                                                                        </Image.ToolTip>
+                                                                        <Image.ContextMenu>
+                                                                            <ContextMenu>
+                                                                                <MenuItem Name="Copy" Header="Copy Link" Tag="{Binding permalink_url}" Click="miVids_Click" />
+                                                                                <MenuItem Name="Download" Header="Download Video" Tag="{Binding source}" Click="miVids_Click" />
+                                                                            </ContextMenu>
+                                                                        </Image.ContextMenu>
+                                                                    </Image>
+                                                                    <StackPanel Orientation="Horizontal" Margin="1">
+                                                                        <TextBlock Text="comments:" />
+                                                                        <TextBlock Text="{Binding comments.summary.total_count}" />
+                                                                    </StackPanel>
+                                                                    <StackPanel Orientation="Horizontal" Margin="1">
+                                                                        <TextBlock Text="likes:" />
+                                                                        <TextBlock Text="{Binding likes.summary.total_count}" />
+                                                                    </StackPanel>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ListView.ItemTemplate>
+                                                    </ListView>
+                                                    <TextBlock Text="Load All Videos..." HorizontalAlignment="Right" Name="tbLoadMoreVideos" PreviewMouseUp="tbLoadMoreVideos_PreviewMouseUp"  Tag="{Binding SelectedFolder}">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock" BasedOn="{StaticResource tbLinkStyle}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.videos.data}" Value="{x:Null}">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.videos.data.Count}" Value="0">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.videos.paging}" Value="{x:Null}">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding SelectedFolder.SelectedPageFBGraphData.videos.paging.next}" Value="{x:Null}">
+                                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
                                                 </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="4">
-                                                    <TextBlock Width="70" Text="message:" />
-                                                    <TextBlock Text="{Binding message}" />
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="4">
-                                                    <TextBlock Text="picture:" />
-                                                    <Image MaxWidth="150" MaxHeight="150"
+                                            </Expander>
+                                            <Label Content="latests 100 posts" FontWeight="Bold" />
+                                        </StackPanel>
+                                        <StackPanel Name="spSelectedFBData" PreviewMouseWheel="spSelectedFBData_PreviewMouseWheel">
+                                            <ListView ItemsSource="{Binding SelectedFolder.SelectedPageFBGraphData.posts.data}" 
+                                                      ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
+                                                      Name="lvPosts"
+                                                      BorderThickness="0,0,0,0">
+                                                <ListView.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Name="spPosts">
+                                                            <StackPanel.Resources>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="MinWidth" Value="80" />
+                                                                    <Setter Property="MaxWidth" Value="390" />
+                                                                    <Setter Property="TextWrapping" Value="Wrap" />
+                                                                </Style>
+                                                            </StackPanel.Resources>
+
+                                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                                <TextBlock Text="caption:" />
+                                                                <TextBlock Text="{Binding caption}" />
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                                <TextBlock Width="70" Text="message:" />
+                                                                <TextBlock Text="{Binding message}" />
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                                <TextBlock Text="picture:" />
+                                                                <Image MaxWidth="150" MaxHeight="150"
                                                                Source="{Binding picture,IsAsync=True, Converter={StaticResource linktoimgcov}}">
-                                                        <Image.ContextMenu>
-                                                            <ContextMenu>
-                                                                <MenuItem Header="Download" Name="fbPostImages" Click="fbPostImages_Click" Tag="{Binding full_picture}" />
-                                                            </ContextMenu>
-                                                        </Image.ContextMenu>
-                                                    </Image>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="4">
-                                                    <TextBlock Text="post url:" />
-                                                    <TextBlock PreviewMouseDown="tbPostLink_PreviewMouseDown"
-                                                                  TextWrapping="NoWrap"
-                                                                  MaxWidth="388"
-                                                                  Name="tbPostUrl"
-                                                                  Style="{StaticResource tbLinkStyle}">
-                                                        <TextBlock.Text>
-                                                            <MultiBinding Converter="{StaticResource idtolinkconv}" UpdateSourceTrigger="PropertyChanged">
-                                                                <Binding Path="id" />
-                                                                <Binding Path="DataContext.SelectedFolder.SelectedPageFBGraphData.link" ElementName="lvPosts"  />
-                                                            </MultiBinding>
-                                                        </TextBlock.Text>
-                                                        <TextBlock.ContextMenu>
-                                                            <ContextMenu>
-                                                                <MenuItem Header="Copy" Name="miCopyLink" Click="miCopyLink_Click" 
-                                                                              Tag="{Binding ElementName=tbPostUrl, Path=Text}">
-                                                                </MenuItem>
-                                                            </ContextMenu>
-                                                        </TextBlock.ContextMenu>
-                                                    </TextBlock>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="4">
-                                                    <TextBlock Text="link:" />
-                                                    <TextBlock Text="{Binding link}" Name="tbPostLink"
-                                                                   PreviewMouseDown="tbPostLink_PreviewMouseDown"
-                                                                   TextWrapping="NoWrap" MaxWidth="388"
-                                                                   Style="{StaticResource tbLinkStyle}">
-                                                        <TextBlock.ContextMenu>
-                                                            <ContextMenu>
-                                                                <MenuItem Header="Copy" Click="miCopyLink_Click" 
-                                                                              Tag="{Binding ElementName=tbPostLink, Path=Text}" />
-                                                            </ContextMenu>
-                                                        </TextBlock.ContextMenu>
-                                                    </TextBlock>
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="4">
-                                                    <TextBlock Width="70" Text="description:" />
-                                                    <TextBlock Text="{Binding description}" />
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="4">
-                                                    <TextBlock Text="updated time:" />
-                                                    <TextBlock Text="{Binding updated_time}" />
-                                                </StackPanel>
-                                                <StackPanel Orientation="Horizontal" Margin="4">
-                                                    <TextBlock Text="shares:" />
-                                                    <TextBlock Text="{Binding shares.count}" />
-                                                </StackPanel>
-                                                <StackPanel Margin="4" Orientation="Horizontal">
-                                                    <TextBlock Text="Likes:" />
-                                                    <TextBlock Text="{Binding likes.summary.total_count}" />
-                                                </StackPanel>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </ListView.ItemTemplate>
-                                    <ListView.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="Order By Likes" Command="{Binding CTMenuClick}" CommandParameter="ORDER_PostsByLikes" />
-                                            <MenuItem Header="Order By Shares" Command="{Binding CTMenuClick}" CommandParameter="ORDER_PostsByShares" />
-                                        </ContextMenu>
-                                    </ListView.ContextMenu>
-                                </ListView>
-                            </StackPanel>
-                    </StackPanel>
-                </ScrollViewer>
-            </Grid>
-        </Expander>
-
-
-        <Grid Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <DockPanel>
-                <TextBlock Text="{Binding BrowserPreviewStatus}" VerticalAlignment="Center" DockPanel.Dock="Left" HorizontalAlignment="Left" MaxWidth="250" />
-                <Button Content="Refresh User Token" DockPanel.Dock="Right" Width="150" Command="{Binding OnBtnClicked}" HorizontalAlignment="Right" CommandParameter="REFRESHTOKEN" />
-            </DockPanel>
-            
-            <ContentPresenter Grid.Row="1"
-                              HorizontalAlignment="Stretch" 
-                              VerticalAlignment="Stretch"
-                              Content="{Binding WebBrowserHost}" />
-        </Grid>
+                                                                    <Image.ContextMenu>
+                                                                        <ContextMenu>
+                                                                            <MenuItem Header="Download" Name="fbPostImages" Click="fbPostImages_Click" Tag="{Binding full_picture}" />
+                                                                        </ContextMenu>
+                                                                    </Image.ContextMenu>
+                                                                </Image>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                                <TextBlock Text="post url:" />
+                                                                <TextBlock PreviewMouseDown="tbPostLink_PreviewMouseDown"
+                                                                          TextWrapping="NoWrap"
+                                                                          Width="388"
+                                                                          Name="tbPostUrl"
+                                                                          Style="{StaticResource tbLinkStyle}">
+                                                                    <TextBlock.Text>
+                                                                        <MultiBinding Converter="{StaticResource idtolinkconv}" UpdateSourceTrigger="PropertyChanged">
+                                                                            <Binding Path="id" />
+                                                                            <Binding Path="DataContext.SelectedFolder.SelectedPageFBGraphData.link" ElementName="lvPosts"  />
+                                                                        </MultiBinding>
+                                                                    </TextBlock.Text>
+                                                                    <TextBlock.ContextMenu>
+                                                                        <ContextMenu>
+                                                                            <MenuItem Header="Copy" Name="miCopyLink" Click="miCopyLink_Click" 
+                                                                                      Tag="{Binding ElementName=tbPostUrl, Path=Text}">
+                                                                            </MenuItem>
+                                                                            <MenuItem Header="Sync" Name="miSync" Click="miCopyLink_Click" 
+                                                                                      Tag="{Binding ElementName=tbPostUrl, Path=Text}">
+                                                                            </MenuItem>
+                                                                        </ContextMenu>
+                                                                    </TextBlock.ContextMenu>
+                                                                </TextBlock>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                                <TextBlock Text="link:" />
+                                                                <TextBlock Text="{Binding link}" Name="tbPostLink"
+                                                                           PreviewMouseDown="tbPostLink_PreviewMouseDown"
+                                                                           TextWrapping="NoWrap" Width="388"
+                                                                           Style="{StaticResource tbLinkStyle}">
+                                                                    <TextBlock.ContextMenu>
+                                                                        <ContextMenu>
+                                                                            <MenuItem Header="Copy" Click="miCopyLink_Click" Tag="{Binding ElementName=tbPostLink, Path=Text}" />
+                                                                        </ContextMenu>
+                                                                    </TextBlock.ContextMenu>
+                                                                </TextBlock>
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                                <TextBlock Width="70" Text="description:" />
+                                                                <TextBlock Text="{Binding description}" />
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                                <TextBlock Text="updated time:" />
+                                                                <TextBlock Text="{Binding updated_time}" />
+                                                            </StackPanel>
+                                                            <StackPanel Orientation="Horizontal" Margin="4">
+                                                                <TextBlock Text="shares:" />
+                                                                <TextBlock Text="{Binding shares.count}" />
+                                                            </StackPanel>
+                                                            <StackPanel Margin="4" Orientation="Horizontal">
+                                                                <TextBlock Text="Likes:" />
+                                                                <TextBlock Text="{Binding likes.summary.total_count}" />
+                                                            </StackPanel>
+                                                            <Button Content="Add To Sorter" Name="cbSync" Click="cbSync_Click" Margin="5" HorizontalAlignment="Left" Width="100">
+                                                                <Button.Tag>
+                                                                    <MultiBinding Converter="{StaticResource idtolinkconv}" UpdateSourceTrigger="PropertyChanged">
+                                                                        <Binding Path="id" />
+                                                                        <Binding Path="DataContext.SelectedFolder.SelectedPageFBGraphData.link" ElementName="lvPosts"  />
+                                                                    </MultiBinding>
+                                                                </Button.Tag>
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </ListView.ItemTemplate>
+                                                <ListView.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Order By Likes" Command="{Binding CTMenuClick}" CommandParameter="ORDER_PostsByLikes" />
+                                                        <MenuItem Header="Order By Shares" Command="{Binding CTMenuClick}" CommandParameter="ORDER_PostsByShares" />
+                                                    </ContextMenu>
+                                                </ListView.ContextMenu>
+                                            </ListView>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Grid>
+                        </Expander>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Post Sorter" Style="{StaticResource gmailTabStyle}">
+                    <localControls:SharedPostsUserControl x:Name="ucSyncedPosts" />
+                </TabItem>
+                <TabItem Header="Search" Style="{StaticResource gmailTabStyle}">
+                    <localControls:SearchUserControl x:Name="ucSearch" x:FieldModifier="public" />
+                </TabItem>
+            </controls:NonReloadingTabControl>
+        </Border>
     </Grid>
 </UserControl>

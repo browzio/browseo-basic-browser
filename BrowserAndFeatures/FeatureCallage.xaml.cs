@@ -56,19 +56,6 @@ namespace BrowserAndFeatures
             browser.OnRefreshedSessionSettings += Browser_OnRefreshedSessionSettings;
         }
 
-        //public FeatureCallage(int birthdayYear, string children, string city, int cmbSelectedIndexDay, int cmbSelectedIndexMonth, int cmbSelectedIndexSex, string country, string dir, string email, string filePath, string firstName, bool inMonney, bool inPBNVault, string lastName, string notes, string password, string phoneNumber, string profileName, string projectDir, string projectName, string proxyIP, string proxyPassword, string proxyPort, string proxyUsername, int sIPBNType, string state, string street, string username, string webAddress, string zip)
-        //{
-        //    InitializeComponent();
-
-        //    SetPersonData();
-        //    //SetPersonData(birthdayYear, children, city, cmbSelectedIndexDay, cmbSelectedIndexMonth, cmbSelectedIndexSex, country, dir, email, filePath, firstName, inMonney, inPBNVault, lastName, notes, password, phoneNumber, profileName, projectDir, projectName, proxyIP, proxyPassword, proxyPort, proxyUsername, sIPBNType, state, street, username, webAddress, zip);
-
-        //    (prospector.DataContext as FootPrintsOptionsVM).OnClickedSearch += FeatureCallage_OnClickedSearch;
-        //    (prospector.DataContext as FootPrintsOptionsVM).OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
-        //    browser.OnCurateToPBN += Browser_OnCurateToPBN;
-        //}
-
-
         #region setup data
         public void SetPermissions(bool allowProspector, bool allowRSS, bool allowPBN, bool allowFeedMash, bool allowIndexer, bool allowYoutube, bool canSeeProxys, bool hasKK)
         { 
@@ -126,6 +113,8 @@ namespace BrowserAndFeatures
         {
             string path = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Temp");
             string sitesFilePath = System.IO.Path.Combine(File.ReadAllText(path + "\\info.txt"), "ProjectData.ini");
+            //string sitesFilePath = System.IO.Path.Combine(@"C:\Users\eli\AppData\Local\RAWSocialOrganizer\Projects\worpress", "ProjectData.ini");
+            //string sitesFilePath = System.IO.Path.Combine(@"C:\Users\eli\AppData\Local\RAWSocialOrganizer\Projects\microsoft rename", "ProjectData.ini");
             IniFile ini = new IniFile(sitesFilePath);
             PersonData profile = new PersonData();
             try
@@ -175,7 +164,16 @@ namespace BrowserAndFeatures
         {
             RssReader.MainViewModel.isCloseing = true;
             if (goViralVM != null)
+            {
                 goViralVM.DisposeBrowser();
+                if (ucGoViral.ucSearch != null)
+                {
+                    if(ucGoViral.ucSearch.ViewModel != null)
+                    {
+                        ucGoViral.ucSearch.ViewModel.ShutDown();
+                    }
+                }
+            }
             goViralVM = null;
 
             if(feedMasherVM != null)

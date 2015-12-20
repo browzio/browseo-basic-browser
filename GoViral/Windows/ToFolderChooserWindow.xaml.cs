@@ -19,6 +19,8 @@ namespace GoViral.Windows
     /// </summary>
     public partial class ToFolderChooserWindow : Window
     {
+       // public bool SelectProject { get; set; }
+
         public ToFolderChooserWindow()
         {
             InitializeComponent();
@@ -38,5 +40,12 @@ namespace GoViral.Windows
                 this.Close();
             }
         }
+
+        //private void btnSelectNewProj_Click(object sender, RoutedEventArgs e)
+        //{
+        //    this.DialogResult = true;
+        //    SelectProject = true;
+        //    this.Close();
+        //}
     }
 }

@@ -74,9 +74,11 @@
     <Compile Include="Classes\DelegateCommand.cs" />
     <Compile Include="Classes\DelegateCommandT.cs" />
     <Compile Include="Classes\ExtensionMethods.cs" />
-    <Compile Include="Classes\FacebookGraphResult.cs" />
+    <Compile Include="Classes\Facebook\FacebookGraphResult.cs" />
+    <Compile Include="Classes\Facebook\FacebookGraphSearch.cs" />
     <Compile Include="Classes\FlexibleMessageBox.cs" />
     <Compile Include="Classes\GloableProfData.cs" />
+    <Compile Include="Classes\ImageAsyncHelper.cs" />
     <Compile Include="Classes\Lists.cs" />
     <Compile Include="Classes\MozscapeAPI.cs" />
     <Compile Include="Classes\MozscapeResults.cs" />
@@ -85,9 +87,11 @@
     <Compile Include="Classes\RelayCommand.cs" />
     <Compile Include="Classes\SetWindowPosFlags.cs" />
     <Compile Include="Classes\TimeHelper.cs" />
+    <Compile Include="Classes\TrackedThread.cs" />
     <Compile Include="Classes\UsageTracker.cs" />
     <Compile Include="Classes\ViewModelBase.cs" />
     <Compile Include="Controlls\MyListView.cs" />
+    <Compile Include="Converters\ElementSizeMathConverter.cs" />
     <Compile Include="Converters\OpisiteVisibilityConverter.cs" />
     <Compile Include="Windows\SetNameAndDataWindow.xaml.cs">
       <DependentUpon>SetNameAndDataWindow.xaml</DependentUpon>

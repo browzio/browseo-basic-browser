@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico"
         WindowStartupLocation="CenterScreen"
-        Title="Choose Folder" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
+        Title="Choose Folder" ResizeMode="NoResize" SizeToContent="WidthAndHeight" SnapsToDevicePixels="True" MaxHeight="650">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -11,7 +11,7 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -32,7 +32,10 @@
             </ListBox.ItemTemplate>
         </ListBox>
 
-        <Button Content="Ok" Grid.Row="3" Width="100" Margin="5" Click="Button_Click" Style="{StaticResource FlatbtnStyle}" />
-        
+        <StackPanel Grid.Row="3">
+            <Button Content="Ok" Margin="5" Click="Button_Click" Style="{StaticResource FlatbtnStyle}" />
+            <Button Content="Load All Projects" Margin="5" Name="btnLoadAllProjects" Visibility="Collapsed" x:FieldModifier="public" Click="btnLoadAllProjects_Click" Style="{StaticResource FlatbtnStyle}" />
+        </StackPanel>
+
     </Grid>
 </Window>

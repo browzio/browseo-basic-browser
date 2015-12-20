@@ -132,27 +132,16 @@ namespace Organiser.Common.Classes
                 foreach (System.IO.DirectoryInfo dirInfo in subDirs)
                 {
                     string ProjName = dirInfo.Name;
-                    if (ProjName.Contains("_tier_"))
+                    if (!dirInfo.GetFiles().Any(f => f.Name.Contains("UserData")) && !ProjName.Contains("_folder"))
                     {
-                        ProjName = ProjName.Replace("_tier_", "");
-                    }
-                    //UserData
-                    //checkif is profile
-                    bool add = true;
-                    foreach (FileInfo file in dirInfo.GetFiles())
-                    {
-                        if(file.Name.Contains("UserData"))
+                        if (ProjName.Contains("_tier_"))
                         {
-                            add = false;
-                            break;
+                            ProjName = ProjName.Replace("_tier_", "");
                         }
-                    }
-                    if (add)
-                    {
                         projects.Add(new KeyValuePair<string, string>(ProjName, dirInfo.FullName));
-                        // Resursive call for each subdirectory.
-                        WalkDirectoryTree(dirInfo, ref projects);
                     }
+
+                    WalkDirectoryTree(dirInfo, ref projects);
                 }
             }
         }

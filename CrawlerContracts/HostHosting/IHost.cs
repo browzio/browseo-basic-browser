@@ -23,8 +23,6 @@ namespace CrawlerContracts
 
 
         void ReportInitialized();
-        void ReportSerializedResult(string serializedFBresult);
-
-        void navigateToNextUrl();
+        void ReportSerializedResult(string serializedFBresult);   
     }
 }

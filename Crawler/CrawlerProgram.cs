@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Organiser.Common.Classes;
 using Organiser.Common.Classes.Crawler;
+using Organiser.Common.Classes.Facebook;
 using SocialOrganizer.Models;
 using System;
 using System.AddIn;
@@ -266,8 +267,25 @@ namespace Crawler
 
         public void NavigateToUrl(string url)
         {
-            string pageName = getPageNameFromUrl(url);
-            preRegetAccessToken = AccessToken;
+            string pageName = url;
+
+            switch (crawlerState)
+            {
+                case CrawlerStates.FbGraphCrawl:
+                case CrawlerStates.LoadAllPhotos:
+                case CrawlerStates.LoadAllVideos:
+                    if (!url.Contains("https://www.facebook.com/"))
+                    {
+                        OnReportSerializedResult("N/A");
+                        return;
+                    }
+                    pageName = getPageNameFromUrl(url);
+                    preRegetAccessToken = AccessToken;
+                    break;
+                default:
+                    break;
+            }
+
 
             switch (crawlerState)
             {
@@ -296,50 +314,39 @@ namespace Crawler
                     browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                     break;
 
-                case CrawlerStates.UploadVideoFromFile:
-                    #region uloadLink
-                    //using (System.Net.WebClient client = new System.Net.WebClient())
-                    //{
-                    //    client.Proxy = MyFilesDatabase.GetRequestsProxy();
-                    //    byte[] response =
-                    //    client.UploadValues("https://graph-video.facebook.com/564872245/videos", new System.Collections.Specialized.NameValueCollection()
-                    //    {
-                    //        { "file_url", "https://video.xx.fbcdn.net/hvideo-xap1/v/t43.1792-2/12345014_965592126849084_2001058288_n.mp4?efg=eyJybHIiOjE1MDAsInJsYSI6MTAyNCwidmVuY29kZV90YWciOiJzdmVfaGQifQ%3D%3D&rl=1500&vabr=441&oh=8067e5b5d2e1b95c0313c91cdbfa571f&oe=568F52A6" },
-                    //        { "access_token", AccessToken } ,
-                    //        { "embeddable", "true"},
-                    //    });
-
-                    //    string result = System.Text.Encoding.UTF8.GetString(response);
-                    //}
-
-
-                    //string link = "https://video.xx.fbcdn.net/hvideo-xtf1/v/t43.1792-2/1416059_953832134670875_796264961_n.mp4?efg=eyJybHIiOjE1MDAsInJsYSI6MTAyNCwidmVuY29kZV90YWciOiJzdmVfaGQifQ%3D%3D&rl=1500&vabr=728&oh=cbdccd93fbcabdbbc5f35d6d7939364f&oe=569042B6";
-                    //link = link.Replace("?", "%3F");
-                    //link = link.Replace("=", "%3D");
-                    //link = link.Replace("&", "%26");
-                    //string uploadVideoUrl = "https://graph-video.facebook.com/564872245/videos?file_url=" + link + "&access_token=" + AccessToken;
-                    //using (CefRequest request = CefRequest.Create())
-                    //{
-                    //    System.Collections.Specialized.NameValueCollection headers = new System.Collections.Specialized.NameValueCollection();
-                    //    headers.Add("Content-Type", "application/x-www-form-urlencoded");
-
-                    //    request.Set(uploadVideoUrl, "POST", null, headers);
-
-                    //    browser.GetMainFrame().LoadRequest(request);
-                    //}
-                    #endregion
-
-                    //string filePath = @"C:\Users\eli\Desktop\11234179_10153357986963057_1600224766_n.mp4";
-                    //fileBytes = File.ReadAllBytes(filePath);
-                    //string uploadFromLocalLink = "https://graph-video.facebook.com/v2.5/564872245/videos?upload_phase=start&file_size="+ fileBytes.Length+ "&access_token=" + AccessToken;
-                    //sendPostData(uploadFromLocalLink);
+                case CrawlerStates.GraphSearch_Pages:
+                    //search?q=bodybuilding&type=page&limit=500&fields=about,description,id,link,founded,can_post,category,talking_about_count,likes,picture{url}
+                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                        "&type=page&limit=500&fields=about,description,id,link,name,founded,can_post,category,talking_about_count,likes,picture{url}&access_token=" + AccessToken; 
+                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                     break;
 
-                case CrawlerStates.LikesFromPost:
-                    //ContinuedLikesCrawl = null;
-                    //browser.GetMainFrame().LoadUrl(
-                    //    "https://graph.facebook.com/v2.5/" + url +
-                    //    "?fields=likes.limit(1000000000)&access_token=" + AccessToken);
+                case CrawlerStates.GraphSearch_Groups:
+                    //search?q=bodybuilding&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy //to url = https://www.facebook.com/groups/787206314630616
+                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                       "&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy&access_token=" + AccessToken; 
+                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                    break;
+
+                case CrawlerStates.GraphSearch_Events:
+                    //v2.3 search?q=bodybuilding&type=event&limit=500&fields=description,id,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true) https://www.facebook.com/events/787206314630616
+                    preRegetTokenUrl = "https://graph.facebook.com/v2.3/search?q=" + pageName +
+                       "&type=event&limit=500&fields=description,id,name,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true)&access_token=" + AccessToken; 
+                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                    break;
+
+                case CrawlerStates.GraphSearch_Places:
+                    //search?q=bodybuilding&type=place&limit=300&fields=about,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,picture{url},location
+                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                       "&type=place&limit=200&fields=about,id,name,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,picture{url},location&access_token=" + AccessToken;
+                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                    break;
+
+                case CrawlerStates.GraphSearch_Users:
+                    //search?q=bodybuilding&type=user&limit=500&fields=name,id,link,picture //other then that need to crawl
+                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                       "&type=user&limit=500&fields=name,id,link,picture&access_token=" + AccessToken;
+                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                     break;
 
                 default:
@@ -441,12 +448,12 @@ namespace Crawler
                         GetMoreVideos(json);
                         break;
 
-                    case CrawlerStates.LikesFromPost:
-                        //AddToLikes(json);
-                        break;
-
-                    case CrawlerStates.UploadVideoFromFile:
-                        //UploadingVideo(json);
+                    case CrawlerStates.GraphSearch_Pages:
+                    case CrawlerStates.GraphSearch_Groups: 
+                    case CrawlerStates.GraphSearch_Events:   
+                    case CrawlerStates.GraphSearch_Places: 
+                    case CrawlerStates.GraphSearch_Users:
+                        OnReportSerializedResult(json);
                         break;
                     default:
                         break;
@@ -454,9 +461,75 @@ namespace Crawler
             }
             catch
             {
-
+                OnReportSerializedResult("N/A");
             }
         }
+
+        //private void GetSearchedPages(string json)
+        //{
+        //    //Debugger.Break();
+        //    try
+        //    {
+        //       // var jsonfile = JsonConvert.DeserializeObject<PagesResult>(json);
+        //        OnReportSerializedResult(json);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        OnReportSerializedResult("N/A");
+        //    }
+        //}
+
+        //private void GetSearchedGroups(string json)
+        //{
+        //    try
+        //    {
+        //        //var jsonfile = JsonConvert.DeserializeObject<GroupsResult>(json);
+        //        OnReportSerializedResult(json);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        OnReportSerializedResult("N/A");
+        //    }
+        //}
+
+        //private void GetSearchedEvents(string json)
+        //{
+        //    try
+        //    {
+        //        //var jsonfile = JsonConvert.DeserializeObject<EventsResult>(json);
+        //        OnReportSerializedResult(json);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        OnReportSerializedResult("N/A");
+        //    }
+        //}
+
+        //private void GetSearchedPlaces(string json)
+        //{
+        //    try
+        //    {
+        //        //var jsonfile = JsonConvert.DeserializeObject<PlacesResult>(json);
+        //        OnReportSerializedResult(json);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        OnReportSerializedResult("N/A");
+        //    }
+        //}
+
+        //private void GetSearchedUsers(string json)
+        //{
+        //    try
+        //    {
+        //        //var jsonfile = JsonConvert.DeserializeObject<PersonsResult>(json);
+        //        OnReportSerializedResult(json);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        OnReportSerializedResult("N/A");
+        //    }
+        //}
 
         private void GetMoreVideos(string json)
         {
@@ -533,11 +606,9 @@ namespace Crawler
         private void GetAllPageStats(string source, string url)
         {
             try
-            {
-
+            { 
                 var jsonfile = JsonConvert.DeserializeObject<FacebookGraphData>(source);
-                OnReportSerializedResult(jsonfile.XmlSerializeToString());
-                //NavigateToUrl("https://www.facebook.com/VapingCheap/");
+                OnReportSerializedResult(jsonfile.XmlSerializeToString()); 
             }
             catch (Exception ex)
             {
@@ -571,110 +642,6 @@ namespace Crawler
             return null; // live forever
         }
     }
-
-    //internal class DemoCefApp : CefApp
-    //{
-    //}
-
-    //internal class DemoCefClient : CefClient
-    //{
-    //    private readonly DemoCefLoadHandler _loadHandler;
-    //    private readonly DemoCefRenderHandler _renderHandler;
-
-    //    public DemoCefClient(int windowWidth, int windowHeight)
-    //    {
-    //        _renderHandler = new DemoCefRenderHandler(windowWidth, windowHeight);
-    //        _loadHandler = new DemoCefLoadHandler();
-    //    }
-
-    //    protected override CefRenderHandler GetRenderHandler()
-    //    {
-    //        return _renderHandler;
-    //    }
-
-    //    protected override CefLoadHandler GetLoadHandler()
-    //    {
-    //        return _loadHandler;
-    //    }
-    //}
-
-    //internal class DemoCefLoadHandler : CefLoadHandler
-    //{
-    //    protected override void OnLoadStart(CefBrowser browser, CefFrame frame)
-    //    {
-    //        // A single CefBrowser instance can handle multiple requests
-    //        //   for a single URL if there are frames (i.e. <FRAME>, <IFRAME>).
-    //        if (frame.IsMain)
-    //        {
-    //            Console.WriteLine("START: {0}", browser.GetMainFrame().Url);
-    //        }
-    //    }
-
-    //    protected override void OnLoadEnd(CefBrowser browser, CefFrame frame, int httpStatusCode)
-    //    {
-    //        if (frame.IsMain)
-    //        {
-    //            Console.WriteLine("END: {0}, {1}", browser.GetMainFrame().Url, httpStatusCode);
-    //        }
-    //    }
-    //}
-
-    //internal class DemoCefRenderHandler : CefRenderHandler
-    //{
-    //    private readonly int _windowHeight;
-    //    private readonly int _windowWidth;
-
-    //    public DemoCefRenderHandler(int windowWidth, int windowHeight)
-    //    {
-    //        _windowWidth = windowWidth;
-    //        _windowHeight = windowHeight;
-    //    }
-
-    //    protected override bool GetRootScreenRect(CefBrowser browser, ref CefRectangle rect)
-    //    {
-    //        return GetViewRect(browser, ref rect);
-    //    }
-
-    //    protected override bool GetScreenPoint(CefBrowser browser, int viewX, int viewY, ref int screenX, ref int screenY)
-    //    {
-    //        screenX = viewX;
-    //        screenY = viewY;
-    //        return true;
-    //    }
-
-    //    protected override bool GetViewRect(CefBrowser browser, ref CefRectangle rect)
-    //    {
-    //        rect.X = 0;
-    //        rect.Y = 0;
-    //        rect.Width = _windowWidth;
-    //        rect.Height = _windowHeight;
-    //        return true;
-    //    }
-
-    //    protected override bool GetScreenInfo(CefBrowser browser, CefScreenInfo screenInfo)
-    //    {
-    //        return false;
-    //    }
-
-    //    protected override void OnPopupSize(CefBrowser browser, CefRectangle rect)
-    //    {
-    //    }
-
-    //    protected override void OnPaint(CefBrowser browser, CefPaintElementType type, CefRectangle[] dirtyRects, IntPtr buffer, int width, int height)
-    //    {
-    //        // Save the provided buffer (a bitmap image) as a PNG.
-    //        var bitmap = new Bitmap(width, height, width * 4, PixelFormat.Format32bppRgb, buffer);
-    //        bitmap.Save("LastOnPaint.png", ImageFormat.Png);
-    //    }
-
-    //    protected override void OnScrollOffsetChanged(CefBrowser browser)
-    //    {
-    //    }
-
-    //    protected override void OnCursorChange(CefBrowser browser, IntPtr cursorHandle, CefCursorType type, CefCursorInfo customCursorInfo)
-    //    { 
-    //    }
-    //}
 
     internal class DemoCefApp : CefApp
     {
@@ -928,3 +895,157 @@ namespace Crawler
         }
     }
 }
+
+
+
+//    case CrawlerStates.UploadVideoFromFile:
+//    #region uloadLink
+//    //using (System.Net.WebClient client = new System.Net.WebClient())
+//    //{
+//    //    client.Proxy = MyFilesDatabase.GetRequestsProxy();
+//    //    byte[] response =
+//    //    client.UploadValues("https://graph-video.facebook.com/564872245/videos", new System.Collections.Specialized.NameValueCollection()
+//    //    {
+//    //        { "file_url", "https://video.xx.fbcdn.net/hvideo-xap1/v/t43.1792-2/12345014_965592126849084_2001058288_n.mp4?efg=eyJybHIiOjE1MDAsInJsYSI6MTAyNCwidmVuY29kZV90YWciOiJzdmVfaGQifQ%3D%3D&rl=1500&vabr=441&oh=8067e5b5d2e1b95c0313c91cdbfa571f&oe=568F52A6" },
+//    //        { "access_token", AccessToken } ,
+//    //        { "embeddable", "true"},
+//    //    });
+
+//    //    string result = System.Text.Encoding.UTF8.GetString(response);
+//    //}
+
+
+//    //string link = "https://video.xx.fbcdn.net/hvideo-xtf1/v/t43.1792-2/1416059_953832134670875_796264961_n.mp4?efg=eyJybHIiOjE1MDAsInJsYSI6MTAyNCwidmVuY29kZV90YWciOiJzdmVfaGQifQ%3D%3D&rl=1500&vabr=728&oh=cbdccd93fbcabdbbc5f35d6d7939364f&oe=569042B6";
+//    //link = link.Replace("?", "%3F");
+//    //link = link.Replace("=", "%3D");
+//    //link = link.Replace("&", "%26");
+//    //string uploadVideoUrl = "https://graph-video.facebook.com/564872245/videos?file_url=" + link + "&access_token=" + AccessToken;
+//    //using (CefRequest request = CefRequest.Create())
+//    //{
+//    //    System.Collections.Specialized.NameValueCollection headers = new System.Collections.Specialized.NameValueCollection();
+//    //    headers.Add("Content-Type", "application/x-www-form-urlencoded");
+
+//    //    request.Set(uploadVideoUrl, "POST", null, headers);
+
+//    //    browser.GetMainFrame().LoadRequest(request);
+//    //}
+//    #endregion
+
+//    //string filePath = @"C:\Users\eli\Desktop\11234179_10153357986963057_1600224766_n.mp4";
+//    //fileBytes = File.ReadAllBytes(filePath);
+//    //string uploadFromLocalLink = "https://graph-video.facebook.com/v2.5/564872245/videos?upload_phase=start&file_size="+ fileBytes.Length+ "&access_token=" + AccessToken;
+//    //sendPostData(uploadFromLocalLink);
+//    break;
+
+//case CrawlerStates.LikesFromPost:
+//    //ContinuedLikesCrawl = null;
+//    //browser.GetMainFrame().LoadUrl(
+//    //    "https://graph.facebook.com/v2.5/" + url +
+//    //    "?fields=likes.limit(1000000000)&access_token=" + AccessToken);
+//    break;
+
+
+
+//internal class DemoCefApp : CefApp
+//{
+//}
+
+//internal class DemoCefClient : CefClient
+//{
+//    private readonly DemoCefLoadHandler _loadHandler;
+//    private readonly DemoCefRenderHandler _renderHandler;
+
+//    public DemoCefClient(int windowWidth, int windowHeight)
+//    {
+//        _renderHandler = new DemoCefRenderHandler(windowWidth, windowHeight);
+//        _loadHandler = new DemoCefLoadHandler();
+//    }
+
+//    protected override CefRenderHandler GetRenderHandler()
+//    {
+//        return _renderHandler;
+//    }
+
+//    protected override CefLoadHandler GetLoadHandler()
+//    {
+//        return _loadHandler;
+//    }
+//}
+
+//internal class DemoCefLoadHandler : CefLoadHandler
+//{
+//    protected override void OnLoadStart(CefBrowser browser, CefFrame frame)
+//    {
+//        // A single CefBrowser instance can handle multiple requests
+//        //   for a single URL if there are frames (i.e. <FRAME>, <IFRAME>).
+//        if (frame.IsMain)
+//        {
+//            Console.WriteLine("START: {0}", browser.GetMainFrame().Url);
+//        }
+//    }
+
+//    protected override void OnLoadEnd(CefBrowser browser, CefFrame frame, int httpStatusCode)
+//    {
+//        if (frame.IsMain)
+//        {
+//            Console.WriteLine("END: {0}, {1}", browser.GetMainFrame().Url, httpStatusCode);
+//        }
+//    }
+//}
+
+//internal class DemoCefRenderHandler : CefRenderHandler
+//{
+//    private readonly int _windowHeight;
+//    private readonly int _windowWidth;
+
+//    public DemoCefRenderHandler(int windowWidth, int windowHeight)
+//    {
+//        _windowWidth = windowWidth;
+//        _windowHeight = windowHeight;
+//    }
+
+//    protected override bool GetRootScreenRect(CefBrowser browser, ref CefRectangle rect)
+//    {
+//        return GetViewRect(browser, ref rect);
+//    }
+
+//    protected override bool GetScreenPoint(CefBrowser browser, int viewX, int viewY, ref int screenX, ref int screenY)
+//    {
+//        screenX = viewX;
+//        screenY = viewY;
+//        return true;
+//    }
+
+//    protected override bool GetViewRect(CefBrowser browser, ref CefRectangle rect)
+//    {
+//        rect.X = 0;
+//        rect.Y = 0;
+//        rect.Width = _windowWidth;
+//        rect.Height = _windowHeight;
+//        return true;
+//    }
+
+//    protected override bool GetScreenInfo(CefBrowser browser, CefScreenInfo screenInfo)
+//    {
+//        return false;
+//    }
+
+//    protected override void OnPopupSize(CefBrowser browser, CefRectangle rect)
+//    {
+//    }
+
+//    protected override void OnPaint(CefBrowser browser, CefPaintElementType type, CefRectangle[] dirtyRects, IntPtr buffer, int width, int height)
+//    {
+//        // Save the provided buffer (a bitmap image) as a PNG.
+//        var bitmap = new Bitmap(width, height, width * 4, PixelFormat.Format32bppRgb, buffer);
+//        bitmap.Save("LastOnPaint.png", ImageFormat.Png);
+//    }
+
+//    protected override void OnScrollOffsetChanged(CefBrowser browser)
+//    {
+//    }
+
+//    protected override void OnCursorChange(CefBrowser browser, IntPtr cursorHandle, CefCursorType type, CefCursorInfo customCursorInfo)
+//    { 
+//    }
+//}

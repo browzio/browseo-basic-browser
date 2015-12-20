@@ -31,6 +31,7 @@ namespace GoViral.ViewModels
 {
     public class GoViralVM : MarshalByRefObject, INotifyPropertyChanged 
     {
+        #region propchanged and marshal
         protected void RaisePropertyChanged(string name)
         {
             if (PropertyChanged != null)
@@ -38,12 +39,15 @@ namespace GoViral.ViewModels
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
         }
+       
 
         public event PropertyChangedEventHandler PropertyChanged;
         public override object InitializeLifetimeService()
         {
             return null; //live forever
         }
+        #endregion
+
         public ICommand OnBtnClicked { get; set; }
         public ICommand CTMenuClick { get; set; }
 
@@ -140,10 +144,11 @@ namespace GoViral.ViewModels
 
         private CrawlerHost mCrawlerHost;
 
-        private int lastSelectedIndex = -1;
-
         private Task PopulateListTask; 
         private TaskScheduler uiContextScheduler;
+
+        private int lastSelectedIndex = -1;
+        private string resultsErrors = "";
 
         private object mLock = new object();
 
@@ -526,10 +531,8 @@ namespace GoViral.ViewModels
                         }
                     }
                     else
-                    {
-                        removePreInitState(preinintState);
-                        MessageBox.Show("Couldnt crawl page " + preinintState.url);
-                        return;
+                    { 
+                        resultsErrors += "Could not crawl " + preinintState.url + Environment.NewLine;             
                     }
                 }
                 catch
@@ -550,12 +553,14 @@ namespace GoViral.ViewModels
 
             if (mCrawlerHost.PreInitStates.Count == 0)
             {
-                try
+                IsIndeterminate = true;
+                PBarVisible = Visibility.Collapsed;
+
+                if (resultsErrors != "")
                 {
-                    IsIndeterminate = true;
-                    PBarVisible = Visibility.Collapsed;
+                    FlexibleMessageBox.Show(resultsErrors);
+                    resultsErrors = "";
                 }
-                catch { }
             }
         }
         #endregion

@@ -205,8 +205,7 @@ namespace Organiser.Common.Classes
     }
 
     public class Paging
-    {
-        [JsonProperty("next")]
+    {  
         public string next { get; set; }
     }
 

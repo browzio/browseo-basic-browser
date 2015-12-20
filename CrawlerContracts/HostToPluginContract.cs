@@ -113,7 +113,7 @@ namespace Contract
             var info = new ProcessStartInfo
             {
                 Arguments = mName + " " + quotedAssemblyPath,
-                CreateNoWindow = true,
+                CreateNoWindow = false,
                 UseShellExecute = false,
                 FileName = processName
             };
@@ -132,7 +132,8 @@ namespace Contract
                 throw new InvalidOperationException("Crawler process did not respond within timeout period");
             }
 
-            string hostChannelName = startupInfo.Name + "." + Process.GetCurrentProcess().Id;
+            string hostChannelName = startupInfo.Name + "." + Guid.NewGuid();
+            //string hostChannelName = startupInfo.Name + "." + Process.GetCurrentProcess().Id;
             IpcServices.RegisterChannel(hostChannelName);
 
             RemotePlugin = (IRemotePlugin)Activator.GetObject(typeof(IRemotePlugin), "ipc://" + mName + "/BrowseoNinjaCrawlerLoader");

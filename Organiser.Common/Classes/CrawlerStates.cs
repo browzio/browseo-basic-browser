@@ -8,14 +8,13 @@ namespace Organiser.Common.Classes.Crawler
 {
     public enum CrawlerStates
     {
-        FbGraphCrawl = 0,
-        LikesFromPost = 1,
-        UploadVideoFromFile = 2,
-        LoadAllPhotos = 3,
-        LoadAllVideos = 4,
-    }
-    public class CrawlerState
-    {
-        public CrawlerStates State { get; set; }
+        FbGraphCrawl = 0,        
+        LoadAllPhotos = 1,
+        LoadAllVideos = 2,
+        GraphSearch_Pages = 3,
+        GraphSearch_Groups = 4,
+        GraphSearch_Events = 5,
+        GraphSearch_Places = 6,
+        GraphSearch_Users = 7,
     }
 }

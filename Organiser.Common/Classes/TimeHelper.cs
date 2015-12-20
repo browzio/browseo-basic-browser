@@ -114,6 +114,8 @@ namespace Organiser.Common.Classes
                 string date = html.Split(new string[] { @"title=""Click for calendar"">" }, StringSplitOptions.None)[1];
                 date = date.Substring(0, date.IndexOf("</div>"));
 
+                if(!html.Contains(@"<span>Time zone: </span>"))return new DateAndTimeZone() { Date = dt, TimeZone = timeZone };
+
                 string timezone = html.Split(new string[] { @"<span>Time zone: </span>" }, StringSplitOptions.None)[1];
                 timezone = timezone.Split(new string[] { @"<a href=""/" }, StringSplitOptions.None)[1];
                 timezone = timezone.Substring(0, timezone.IndexOf("\">"));

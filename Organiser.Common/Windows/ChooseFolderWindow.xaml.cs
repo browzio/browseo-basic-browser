@@ -20,6 +20,7 @@ namespace Organiser.Common.Windows
     public partial class ChooseFolderWindow : Window
     {
         public bool OkClicked { get; set; }
+        public bool LoadAllClicked { get; set; }
 
         public ChooseFolderWindow()
         {
@@ -29,6 +30,13 @@ namespace Organiser.Common.Windows
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             OkClicked = true;
+            this.Close();
+        }
+
+        private void btnLoadAllProjects_Click(object sender, RoutedEventArgs e)
+        {
+            OkClicked = true;
+            LoadAllClicked = true;
             this.Close();
         }
     }

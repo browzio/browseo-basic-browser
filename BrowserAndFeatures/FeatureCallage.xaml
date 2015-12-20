@@ -38,7 +38,7 @@
             <TabItem Header="Feed Masher" Name="feed" Style="{StaticResource gmailTabStyle90}">
                 <rssReaders:LinksToRssUserControl Name="ucFeedMasher" />
             </TabItem>
-            <TabItem Header="FB Dominator" Name="tabGoViral" Style="{StaticResource gmailTabStyle90}">
+            <TabItem Header="FB Conver·SEO" Name="tabGoViral" Style="{StaticResource gmailTabStyle90}">
                 <goVival:ProjectsWithBrowser Name="ucGoViral"  />
             </TabItem>
             <TabItem Header="Indexer" Name="indexer" Style="{StaticResource gmailTabStyle90}">

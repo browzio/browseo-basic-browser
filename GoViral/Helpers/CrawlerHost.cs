@@ -25,7 +25,7 @@ namespace GoViral.Helpers
         public string url;
     }
 
-    public class CrawlerHost :IHost
+    public class CrawlerHost : IHost
     {
         public event Action<string, string> OnReportFatalError = delegate { };
         public event Action<string> OnReportProgress = delegate { };
@@ -38,7 +38,6 @@ namespace GoViral.Helpers
         public int Initialized = 0;
         public int totalToCrawl;
 
-        private object mLock = new object();
         public CrawlerHost()
         {
             PreInitStates = new List<CrawlerPreInitState>();
@@ -70,52 +69,6 @@ namespace GoViral.Helpers
                 navigateToNextUrl();
             }
         }
-        #endregion
-
-        internal void IninAdin()
-        {
-            lock (mLock)
-            {
-                totalToCrawl = PreInitStates.Count;
-
-                if (Initialized == 0)
-                {
-                    Initialized = 1;
-                    HostToPluginContract.SetPersonData(GloableProfData.PData.XmlSerializeToString());
-                    HostToPluginContract.InitializeCefWithCachePath(path: Path.Combine(Organiser.Common.Classes.MyFilesDatabase.GetBaseDir(), "Caches\\" + GloableProfData.PData.ProjectName));  
-                }
-                else
-                {
-                    navigateToNextUrl();
-                }
-            }
-        }
-
-        public void navigateToNextUrl()
-        {
-            if (PreInitStates != null && PreInitStates.Count > 0 && Initialized == 2)
-            {
-                new Thread(navigate).Start();
-                //HostToPluginContract.SetCrawlerState(Convert.ToInt32(PreInitStates[0].state));
-                //HostToPluginContract.NavigateToUrl(PreInitStates[0].url);
-            }
-        }
-
-        private void navigate()
-        {
-            lock (mLock)
-            {
-                if (PreInitStates.Count == 0) return;
-                OnReportProgress("START: " + PreInitStates[0].url);
-                HostToPluginContract.SetCrawlerState(Convert.ToInt32(PreInitStates[0].state));
-                HostToPluginContract.NavigateToUrl(PreInitStates[0].url);
-            }
-        }
-
-        public void Shutdown()
-        {
-            HostToPluginContract.Shutdown(); 
-        }
 
         public void ReportFatalError(string userMessage, string fullExceptionText)
         {
@@ -127,9 +80,41 @@ namespace GoViral.Helpers
         {
             if (PreInitStates.Count > 0)
             {
-                OnReportGotGraphData(serializedFBresult, PreInitStates[0]);
-                //navigateToNextUrl();
+                OnReportGotGraphData(serializedFBresult, PreInitStates[0]);        
             }
+        }
+        #endregion
+
+        internal void IninAdin()
+        {   
+            totalToCrawl = PreInitStates.Count;
+
+            if (Initialized == 0)
+            {
+                Initialized = 1;
+                HostToPluginContract.SetPersonData(GloableProfData.PData.XmlSerializeToString());
+                HostToPluginContract.InitializeCefWithCachePath(path: Path.Combine(Organiser.Common.Classes.MyFilesDatabase.GetBaseDir(), "Caches\\" + GloableProfData.PData.ProjectName));
+            }
+            else
+            {
+                navigateToNextUrl();
+            }
+        }
+
+        public void navigateToNextUrl()
+        {
+            if (PreInitStates != null && PreInitStates.Count > 0 && Initialized == 2)
+            {
+                if (PreInitStates.Count == 0) return;
+                OnReportProgress("START: " + PreInitStates[0].url);
+                HostToPluginContract.SetCrawlerState(Convert.ToInt32(PreInitStates[0].state));
+                HostToPluginContract.NavigateToUrl(PreInitStates[0].url);
+            }
+        }
+
+        public void Shutdown()
+        {
+            HostToPluginContract.Shutdown(); 
         }
     }
 }

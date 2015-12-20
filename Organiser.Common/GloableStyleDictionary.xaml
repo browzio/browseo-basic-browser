@@ -906,7 +906,7 @@
         <Grid Background="WhiteSmoke">
             <Grid.RowDefinitions>
                 <!--<RowDefinition MaxHeight="18"/>-->
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="*" />
                 <!--<RowDefinition MaxHeight="18"/>-->
             </Grid.RowDefinitions>
             <!--<Grid.Background>

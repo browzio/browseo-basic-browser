@@ -1,0 +1,264 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{13A55AE8-28AB-4DDB-9BC3-BABFD7D64FEA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>WPF_WYSIWYG_HTML_Editor</RootNamespace>
+    <AssemblyName>WYSIWYG</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Core\DialogBox.cs" />
+    <Compile Include="Core\Format.cs" />
+    <Compile Include="Core\Gui.cs" />
+    <Compile Include="Core\HideScriptErrors.cs" />
+    <Compile Include="Core\Initialisation.cs" />
+    <Compile Include="FTP_VM.cs" />
+    <Compile Include="Helpers\EditableTabHeaderControl.cs" />
+    <Compile Include="Helpers\Spinner.cs" />
+    <Compile Include="Models\FTPprofile.cs" />
+    <Compile Include="Models\PBNProject.cs" />
+    <Compile Include="Models\SelectedProfile.cs" />
+    <Compile Include="MVVM\BacklinksHistoryVM.cs" />
+    <Compile Include="SpinningVM.cs" />
+    <Compile Include="XAML\BacklinksHistoryWindow.xaml.cs">
+      <DependentUpon>BacklinksHistoryWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\CreateNewFTPprojectWindow.xaml.cs">
+      <DependentUpon>CreateNewFTPprojectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\EmbedWindow.xaml.cs">
+      <DependentUpon>EmbedWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\FindReplaceWindow.xaml.cs">
+      <DependentUpon>FindReplaceWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\FTPProjectsList.xaml.cs">
+      <DependentUpon>FTPProjectsList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\Image.xaml.cs">
+      <DependentUpon>Image.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\Link.xaml.cs">
+      <DependentUpon>Link.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\HtmlEditor.xaml.cs">
+      <DependentUpon>HtmlEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\MoneyVaultUserControl.xaml.cs">
+      <DependentUpon>MoneyVaultUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\PBNVaultUserControl.xaml.cs">
+      <DependentUpon>PBNVaultUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\SelectPlatformWindow.xaml.cs">
+      <DependentUpon>SelectPlatformWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\SpinWindow.xaml.cs">
+      <DependentUpon>SpinWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\WebBrowser.xaml.cs">
+      <DependentUpon>WebBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\WysiwigControl.xaml.cs">
+      <DependentUpon>WysiwigControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XmlRpcVM.cs" />
+    <Compile Include="Core\Items.cs" />
+    <Compile Include="XAML\WebEditor.xaml.cs">
+      <DependentUpon>WebEditor.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\New.html" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Drupal7.Services\Drupal7.Services.csproj">
+      <Project>{4f6c5819-0ee7-4c69-8012-b0afa3d901f0}</Project>
+      <Name>Drupal7.Services</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
+      <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
+      <Name>Organiser.Common</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\WordPressSharp\WordPressSharp.csproj">
+      <Project>{7a938355-0b6b-48b7-97fb-c0c09015307b}</Project>
+      <Name>WordPressSharp</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\WPFPieChart\WPFPieChartTwo.csproj">
+      <Project>{59210896-68d1-4a34-91cc-8d015eca7061}</Project>
+      <Name>WPFPieChartTwo</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WordPressSharp\packages\xmlrpcnet.3.0.0.266\lib\net20\CookComputing.XmlRpcV2.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\Drupal7.Services\bin\Debug\Drupal7.Services.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Microsoft.NET\Primary Interop Assemblies\Microsoft.mshtml.dll">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </ReferencePath>
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\Organiser.Common\bin\Debug\Organiser.Common.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\PresentationCore.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\PresentationFramework.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.DataSetExtensions.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Drawing.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Windows.Controls.Ribbon.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Windows.Forms.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xaml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\WindowsBase.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WordPressSharp\bin\Debug\WordPressSharp.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPFPieChart\bin\x86\Debug\WPFPieChartTwo.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\BacklinksHistoryWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\CreateNewFTPprojectWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\EmbedWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\FindReplaceWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\FTPProjectsList.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\Image.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\Link.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\HtmlEditor.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\MoneyVaultUserControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\PBNVaultUserControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\SelectPlatformWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\SpinWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\WebEditor.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\WebBrowser.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\XAML\WysiwigControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\WPF WYSIWYG HTML Editor\obj\Debug\GeneratedInternalTypeHelper.g.cs" />
+  </ItemGroup>
+</Project>

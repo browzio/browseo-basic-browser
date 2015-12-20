@@ -8,7 +8,7 @@ namespace Organiser.Common.Classes
 {
     public class ViewModelBase : INotifyPropertyChanged
     {
-        protected void RaisePropertyChanged(string name)
+        public void RaisePropertyChanged(string name)
         {
             if (PropertyChanged != null)
             {

@@ -26,6 +26,13 @@ namespace GoViral.Controls
         public ProjectsWithBrowser()
         {
             InitializeComponent();
+            ucSyncedPosts.OnBrowserNavigateToUrl += UcSyncedPosts_OnBrowserNavigateToUrl;
+        }
+
+        private void UcSyncedPosts_OnBrowserNavigateToUrl(string url)
+        {
+            tbCntrl.SelectedIndex = 0;
+            (this.DataContext as GoViral.ViewModels.GoViralVM).WebBrowser.Navigate(url);
         }
 
         private void StackPanel_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -144,13 +151,29 @@ namespace GoViral.Controls
         private void miCopyLink_Click(object sender, RoutedEventArgs e)
         {
             string url = Convert.ToString((sender as MenuItem).Tag);
+            string header = Convert.ToString((sender as MenuItem).Header);
             if (string.IsNullOrEmpty(url) || string.IsNullOrWhiteSpace(url))
             {
                 url = linkTextForCopy;
                 if (string.IsNullOrEmpty(url) || string.IsNullOrWhiteSpace(url))
                     return;
             }
-            MyFilesDatabase.SetClipboardText(url);
+            if (header == "Copy")
+            {
+                MyFilesDatabase.SetClipboardText(url);
+            }
+            else if (header == "Sync")
+            {
+                string pageName = "";
+                if((this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder != null)
+                {
+                    if((this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder.SelectedPage != null)
+                    {
+                        pageName = (this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder.SelectedPage.Name;
+                    }
+                }
+                ucSyncedPosts.ViewModel.AddUrlToSavedProjectList(pageName, url,null);
+            }
         }
 
         private void imgVideo_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -251,6 +274,44 @@ namespace GoViral.Controls
             Models.ListOption option = folder.SelectedPage;
             if (folder == null || option == null) return;
             (this.DataContext as ViewModels.GoViralVM).BeginAllVideosScrape(folder, option);
+        }
+
+        List<KeyValuePair<string, string>> ToSendSyncLinks = new List<KeyValuePair<string, string>>();
+
+
+        Organiser.Common.Windows.RssFeedsLinksMultiWindow multiWindowForLinksAdd;
+
+        private void cbSync_Click(object sender, RoutedEventArgs e)
+        {
+            if(multiWindowForLinksAdd == null)
+            {
+                multiWindowForLinksAdd = new Organiser.Common.Windows.RssFeedsLinksMultiWindow();
+                multiWindowForLinksAdd.Closed += MultiWindowForLinksAdd_Closed;
+                multiWindowForLinksAdd.Title = "Page Name , Url";
+                multiWindowForLinksAdd.Show();
+            }
+            string link = Convert.ToString((sender as Button).Tag);
+            if (link == null) return;
+
+            string pageName = "";
+            if ((this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder != null)
+            {
+                if ((this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder.SelectedPage != null)
+                {
+                    pageName = (this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder.SelectedPage.Name;
+                }
+            }
+
+            multiWindowForLinksAdd.tbInputedText.Text += pageName + " , " + link + Environment.NewLine;
+        }
+
+        private void MultiWindowForLinksAdd_Closed(object sender, EventArgs e)
+        {
+            if (multiWindowForLinksAdd.OKClicked)
+            {
+                ucSyncedPosts.ViewModel.AddUrlToSavedProjectList("", "", multiWindowForLinksAdd.tbInputedText.Text);
+                multiWindowForLinksAdd = null;
+            }
         }
     }
 }
