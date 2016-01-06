@@ -39,8 +39,6 @@ namespace RssReader.Controlls
         public ICommand SelectFolderSelect_Click { get; set; }
         ObservableCollection<AvailableTabsAndLinks> AvailrssesForImports;
 
-        private PersonData mProfile;
-
         public RssTabbedControl()
         {
             InitializeComponent();
@@ -135,14 +133,8 @@ namespace RssReader.Controlls
                         MessageBox.Show("Tab " + tabTitle + " already exists.");
                         return;
                     }
-            
-            MainViewModel vm = new MainViewModel() { TabTitle = tabTitle };
-            vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
-            vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
-            vm.OnLaunchToTabMasher += vm_OnLaunchToTabMasher;
-            vm.OnSelectedSendToPbn += Vm_OnSelectedSendToPbn;
-            // vm.OnImportedTab += vm_OnImportedTab;
-            vm.SetProfileData(mProfile);
+
+            MainViewModel vm = GetNewVM(tabTitle,true);
             vm.setLinks(linksList);
             UserRssTabs.Add(vm);
         }
@@ -159,11 +151,6 @@ namespace RssReader.Controlls
 
         #endregion
 
-        private void ContextMenu_Opened(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void CloseTab(object sender, ExecutedRoutedEventArgs e)
         {
             if (UserRssTabs.Count > 0)
@@ -176,7 +163,7 @@ namespace RssReader.Controlls
                     if (vm != null)
                     {
                         UserRssTabs.Remove(vm);
-                        MyFilesDatabase.RemoveDeleteRssTab(mProfile, vm.TabTitle);
+                        MyFilesDatabase.RemoveDeleteRssTab(GloableProfData.PData, vm.TabTitle);
                     }
                 }
                 catch { }
@@ -192,7 +179,7 @@ namespace RssReader.Controlls
 
         private void CreateNewTab()
         {
-            AddLinkDataWindow stnw = new AddLinkDataWindow();
+            SetNameAndDataWindow stnw = new SetNameAndDataWindow();
             stnw.Title = "Create New Tab";
             stnw.tblockInfo.Text = "Name for tab.";
             stnw.ShowDialog();
@@ -207,38 +194,36 @@ namespace RssReader.Controlls
                     }
                 }
 
-                MainViewModel vm = new MainViewModel() { TabTitle = stnw.tbInputText.Text };
-                vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
-                vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
-                vm.OnLaunchToTabMasher += vm_OnLaunchToTabMasher;
-                vm.OnSelectedSendToPbn += Vm_OnSelectedSendToPbn;
-               // vm.OnImportedTab += vm_OnImportedTab;
-                vm.SetProfileData(mProfile);
-                UserRssTabs.Add(vm);
+                
+                UserRssTabs.Add(GetNewVM(stnw.tbInputText.Text, false));
             }
         }
 
-        public void SetProfileData(PersonData profile)
+        private MainViewModel GetNewVM(string tabTitle, bool refresh)
         {
-            if (mProfile == null)
-            {
-                mProfile = profile;
-                List<string> tabList = MyFilesDatabase.GetRssFeedLinksTabsTitle(mProfile);
-                foreach (string tabTitle in tabList)
-                {
-                    MainViewModel vm = new MainViewModel() { TabTitle = tabTitle };
-                    vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
-                    vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
-                    vm.OnLaunchToTabMasher += vm_OnLaunchToTabMasher;
-                    vm.OnSelectedSendToPbn += Vm_OnSelectedSendToPbn;
-                   // vm.OnImportedTab += vm_OnImportedTab;
-                    //vm.SetProfileData(mProfile);
-                    UserRssTabs.Add(vm);
-                }
-                if(UserRssTabs.Count > 0)
-                    UserRssTabs[0].SetProfileData(mProfile);
-            }
+            MainViewModel vm = new MainViewModel() { TabTitle = tabTitle };
+            vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
+            vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
+            vm.OnLaunchToTabMasher += vm_OnLaunchToTabMasher;
+            vm.OnSelectedSendToPbn += Vm_OnSelectedSendToPbn; 
+             
+            if(refresh)
+                vm.RefreshRssFeed(false);
+            return vm;
         }
+
+        public void InitTabs()
+        {
+            List<string> tabList = MyFilesDatabase.GetRssFeedLinksTabsTitle(GloableProfData.PData);
+            foreach (string tabTitle in tabList)
+            {
+                UserRssTabs.Add(GetNewVM(tabTitle, false));
+            }
+            if (UserRssTabs.Count > 0)
+                UserRssTabs[0].RefreshRssFeed(false);
+        }
+
+
 
         void vm_OnLaunchToTabBrowser(string url)
         {
@@ -254,16 +239,9 @@ namespace RssReader.Controlls
         {
             try
             {
-                UserRssTabs[tbContrl.SelectedIndex].SetProfileData(mProfile);
+                UserRssTabs[tbContrl.SelectedIndex].RefreshRssFeed(true);
             }
             catch { }
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            //LinksToRssWindow ltrw = new LinksToRssWindow();
-            //ltrw.DataContext = new LinksToRssVM();
-            //ltrw.Show();
         }
     }
 }

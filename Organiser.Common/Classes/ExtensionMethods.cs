@@ -8,8 +8,7 @@ namespace Organiser.Common.Classes
 {
     public static class ExtensionMethods
     {
-        public static int RemoveAllThese<T>(
-            this ObservableCollection<T> coll, Func<T, bool> condition)
+        public static int RemoveAllThese<T>(this ObservableCollection<T> coll, Func<T, bool> condition)
         {
             var itemsToRemove = coll.Where(condition).ToList();
 

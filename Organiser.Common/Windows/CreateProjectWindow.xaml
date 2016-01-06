@@ -9,91 +9,37 @@
         SizeToContent="WidthAndHeight"
         Title="Project And Profile Details" MouseLeftButtonDown="Window_MouseLeftButtonDown">
     <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-        <!-- Flat Button Style -->
-        <Color x:Key="DefaultColor" A="255" R="240" G ="240" B="240"/>
-        <Color x:Key="HighlightColor" A="255" R="229" G ="229" B="229"/>
-        <Color x:Key="PressedColor" A="255" R="215" G ="215" B="215"/>
+            <Style x:Key="EntryFieldStyle" TargetType="Grid" >
+                <Setter Property="HorizontalAlignment" Value="Stretch" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="Margin" Value="0,0" />
+            </Style>
 
-        <SolidColorBrush x:Key="DefaultBrush" Color="{StaticResource DefaultColor}" />
-        <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}" />
-        <SolidColorBrush x:Key="PressedBrush" Color="{StaticResource PressedColor}" />
+            <Style TargetType="{x:Type TextBox}">
+                <Setter Property="Margin" Value="2,3" />
+                <Setter Property="Width" Value="285" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+            </Style>
+            <Style TargetType="{x:Type TextBlock}">
+                <Setter Property="Margin" Value="5,3" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="VerticalAlignment" Value="Center" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+            </Style>
+            <Style TargetType="{x:Type ComboBox}">
+                <Setter Property="Height" Value="23" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+            </Style>
 
-        <Style TargetType="Button" x:Key="FlatButtonStyle">
-            <Setter Property="Background" Value="{StaticResource DefaultBrush}" />
-            <Setter Property="BorderThickness" Value="0.6" />
-            <Setter Property="BorderBrush" Value="DarkGray" />
-            <Setter Property="Height" Value="22" />
-            <Setter Property="Margin" Value="3" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}"
-                                CornerRadius="0">
-                            <ContentControl Content="{TemplateBinding Content}" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource HighlightBrush}" />
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="{StaticResource PressedBrush}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style TargetType="ComboBox" x:Key="FlatComboBoxStyle">
-            <Setter Property="Background" Value="{StaticResource DefaultBrush}" />
-            <Setter Property="BorderThickness" Value="0.6" />
-            <Setter Property="BorderBrush" Value="DarkGray" />
-            <Setter Property="Height" Value="22" />
-            <Setter Property="Margin" Value="3" />
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource HighlightBrush}" />
-                </Trigger>
-                <!--<Trigger Property="MouseDown" Value="True">
-                    <Setter Property="Background" Value="{StaticResource PressedBrush}" />
-                </Trigger>-->
-            </Style.Triggers>
-        </Style>
-        <!-- End Flat Button Style -->
-
-        <SolidColorBrush x:Key="brushWatermarkBackground" Color="White" />
-        <SolidColorBrush x:Key="brushWatermarkForeground" Color="LightSteelBlue" />
-        <SolidColorBrush x:Key="brushWatermarkBorder" Color="Indigo" />
-
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <!--<local:TextInputToVisibilityConverter x:Key="TextInputToVisibilityConverter" />-->
-
-        <Style x:Key="EntryFieldStyle" TargetType="Grid" >
-            <Setter Property="HorizontalAlignment" Value="Stretch" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Margin" Value="0,0" />
-        </Style>
-
-        <Style TargetType="{x:Type TextBox}">
-            <Setter Property="Margin" Value="2,3" />
-            <Setter Property="Width" Value="285" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-        </Style>
-        <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="Margin" Value="5,3" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-        </Style>
-        <Style TargetType="{x:Type ComboBox}">
-            <Setter Property="Height" Value="23" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-        </Style>
+            <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <!--<local:TextInputToVisibilityConverter x:Key="TextInputToVisibilityConverter" />-->
+        </ResourceDictionary>
     </Window.Resources>
     <Border Name="topBar" DockPanel.Dock="Top" >
         <Grid HorizontalAlignment="Center" Name="grdinfo" VerticalAlignment="Center" Margin="3" Background="WhiteSmoke" x:FieldModifier="public">
@@ -224,7 +170,6 @@
                   Width="285"
                   Name="cbSex"
                   x:FieldModifier="public"
-                  Style="{StaticResource FlatComboBoxStyle}"
                   HorizontalAlignment="Left"/>
 
             <TextBlock Text="Birth Date: " Grid.Row="10" />
@@ -232,19 +177,14 @@
                 <TextBlock Text="day:" />
                 <ComboBox ItemsSource="{Binding DayList}" 
                       Margin="5,0,0,0" 
-                      SelectedIndex="{Binding CmbSelectedIndexDay}"
-                      Style="{StaticResource FlatComboBoxStyle}"/>
+                      SelectedIndex="{Binding CmbSelectedIndexDay}" />
                 <TextBlock Text="month:" Margin="5,0,0,0" />
                 <ComboBox ItemsSource="{Binding MonthList}" 
                       Margin="5,0,0,0" 
-                      SelectedIndex="{Binding CmbSelectedIndexMonth}"
-                      Style="{StaticResource FlatComboBoxStyle}" />
+                      SelectedIndex="{Binding CmbSelectedIndexMonth}" />
                 <TextBlock Text="Year:" Margin="5,0,0,0"  />
                 <TextBox Text="{Binding BirthdayYear}" Width="70" Margin="5,3,0,3" />
             </StackPanel>
-
-            <!--<TextBlock Text="Address: " Grid.Row="11" />
-        <TextBox Text="{Binding Address}" Grid.Column="1"  Grid.Row="11" />-->
 
             <TextBlock Text="Street: " Grid.Row="11" />
             <TextBox Text="{Binding Street}" Grid.Column="1"  Grid.Row="11" PreviewMouseDown="projName_MouseLeftButtonUp" />
@@ -278,8 +218,7 @@
                       HorizontalAlignment="Left"
                       Grid.Column="1"
                       x:FieldModifier="public" Name="cmbPbn"
-                      SelectedIndex="{Binding SIPBNType}"
-                      Style="{StaticResource FlatComboBoxStyle}" />
+                      SelectedIndex="{Binding SIPBNType}" />
 
             <StackPanel Orientation="Horizontal" Grid.Row="19" x:FieldModifier="public" Name="spMoney">
                 <TextBlock Text="Money Site: " Width="68"  />
@@ -292,16 +231,11 @@
                       x:FieldModifier="public" Name="cmbMoney"
                       HorizontalAlignment="Left"
                       Grid.Column="1"
-                      SelectedIndex="{Binding SIPBNType}"
-                      Style="{StaticResource FlatComboBoxStyle}" />
+                      SelectedIndex="{Binding SIPBNType}" />
 
             <Grid Grid.ColumnSpan="2" VerticalAlignment="Bottom" Grid.Row="20" HorizontalAlignment="Center" Width="{Binding Path=ActualWidth,ElementName=grdinfo}">
-                <Button  Click="Button_Click" HorizontalAlignment="Center"   Style="{StaticResource FlatButtonStyle}" >
+                <Button  Click="Button_Click" HorizontalAlignment="Center"   Style="{StaticResource FlatbtnStyle}" >
                     <TextBlock HorizontalAlignment="Center" Text="Save New" Name="tbbutton" FontWeight="Normal" x:FieldModifier="public" />
-                </Button>
-
-                <Button Margin="5" HorizontalAlignment="Right" DockPanel.Dock="Right" x:FieldModifier="public" Click="btnDelete_Click" Name="btnDelete" Style="{StaticResource FlatButtonStyle}" >
-                    <TextBlock HorizontalAlignment="Center" Text="Delete" FontWeight="Normal"  />
                 </Button>
             </Grid>
         </Grid>

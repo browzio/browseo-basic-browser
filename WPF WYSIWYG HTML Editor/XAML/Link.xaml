@@ -10,13 +10,13 @@
         <!--<Button HorizontalAlignment="Left" Height="24" Margin="535,97,0,0" VerticalAlignment="Top" Width="34" Click="Button_Click" >
             <Image Source="../Resources/folder.png"/>
         </Button>-->
-        <Button x:Name="ButtonOK" HorizontalAlignment="Left" Height="30" Margin="190,147,0,0" VerticalAlignment="Top" Width="92" Click="ButtonOK_Click" >
+        <Button x:Name="ButtonOK" HorizontalAlignment="Left" Height="30" Margin="360,147,0,0" VerticalAlignment="Top" Width="92" Click="ButtonOK_Click" >
             <StackPanel Orientation="Horizontal">
                 <TextBlock>OK</TextBlock>
                 <Image Source="../Resources/ok.png" Height="16" Width="16" Margin="10,0,0,0"/>
             </StackPanel>
         </Button>
-        <Button x:Name="ButtonCancel" HorizontalAlignment="Left" Height="30" Margin="297,147,0,0" VerticalAlignment="Top" Width="92" Click="ButtonCancel_Click" >
+        <Button x:Name="ButtonCancel" HorizontalAlignment="Left" Height="30" Margin="477,147,0,0" VerticalAlignment="Top" Width="92" Click="ButtonCancel_Click" >
             <StackPanel Orientation="Horizontal">
                 <TextBlock>Cancel</TextBlock>
                 <Image Source="../Resources/cancel.png" Height="16" Width="16" Margin="10,0,0,0"/>

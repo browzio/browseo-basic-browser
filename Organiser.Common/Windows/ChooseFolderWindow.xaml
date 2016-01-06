@@ -5,45 +5,11 @@
         WindowStartupLocation="CenterScreen"
         Title="Choose Folder" ResizeMode="NoResize" SizeToContent="WidthAndHeight">
     <Window.Resources>
-        <!-- Flat Button Style -->
-        <Color x:Key="DefaultColor" A="255" R="240" G ="240" B="240"/>
-        <Color x:Key="HighlightColor" A="255" R="229" G ="229" B="229"/>
-        <Color x:Key="PressedColor" A="255" R="215" G ="215" B="215"/>
-
-        <SolidColorBrush x:Key="DefaultBrush" Color="{StaticResource DefaultColor}" />
-        <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}" />
-        <SolidColorBrush x:Key="PressedBrush" Color="{StaticResource PressedColor}" />
-
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource DefaultBrush}" />
-            <Setter Property="BorderThickness" Value="0.6" />
-            <Setter Property="BorderBrush" Value="DarkGray" />
-            <Setter Property="Height" Value="22" />
-            <Setter Property="Margin" Value="3" />
-            <Setter Property="HorizontalAlignment" Value="Center" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}"
-                                CornerRadius="0">
-                            <ContentControl Content="{TemplateBinding Content}" HorizontalAlignment="Center" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource HighlightBrush}" />
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="Background" Value="{StaticResource PressedBrush}" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <!-- End Flat Button Style -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
     
     <Grid>
@@ -54,8 +20,8 @@
         </Grid.RowDefinitions>
         
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-            <Button Content="Select All" Width="100" Margin="5" Command="{Binding SelectFolderSelect_Click}" CommandParameter="All" />
-            <Button Content="Select None" Width="100" Margin="5" Command="{Binding SelectFolderSelect_Click}" CommandParameter="None" />
+            <Button Content="Select All" Width="100" Margin="5" Command="{Binding SelectFolderSelect_Click}" CommandParameter="All" Style="{StaticResource FlatbtnStyle}" />
+            <Button Content="Select None" Width="100" Margin="5" Command="{Binding SelectFolderSelect_Click}" CommandParameter="None" Style="{StaticResource FlatbtnStyle}" />
         </StackPanel>
         
         <ListBox Grid.Row="1" Name="lstItems" x:FieldModifier="public" IsSynchronizedWithCurrentItem="True">
@@ -65,8 +31,8 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-       
-        <Button Content="Ok" Grid.Row="3" Width="100" Margin="5" Click="Button_Click" />
+
+        <Button Content="Ok" Grid.Row="3" Width="100" Margin="5" Click="Button_Click" Style="{StaticResource FlatbtnStyle}" />
         
     </Grid>
 </Window>

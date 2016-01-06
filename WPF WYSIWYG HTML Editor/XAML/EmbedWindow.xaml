@@ -15,7 +15,7 @@
             <TextBlock Text="Enter Link:" Margin="5" />
             <TextBox x:Name="link" HorizontalAlignment="Left" Height="24"  TextWrapping="Wrap" VerticalAlignment="Top" Width="400" Margin="5" />
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Center">
+        <StackPanel Orientation="Horizontal" Grid.Row="1" HorizontalAlignment="Right">
         <Button x:Name="ButtonOK" HorizontalAlignment="Left" Height="30" Margin="10" VerticalAlignment="Top" Width="92" Click="ButtonOK_Click" >
             <StackPanel Orientation="Horizontal">
                 <TextBlock>OK</TextBlock>

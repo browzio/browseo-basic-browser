@@ -251,12 +251,49 @@ namespace WPF_WYSIWYG_HTML_Editor
                         string filePath = Path.Combine(vaultDir, "vaultConfig.txt");
                         if (!File.Exists(filePath)) return;
 
-                        string[] fileLines = File.ReadAllLines(filePath);
-                        foreach (string line in fileLines)
+                        List<string> fileLines = File.ReadAllLines(filePath).ToList();
+                        List<string> linesToRemove = new List<string>();
+                        List<string> linesToAdd = new List<string>();
+
+                        for (int i = 0; i < fileLines.Count; i++)
                         {
+                            string line = fileLines[i];
                             string[] lineInfo = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
-                            SavedPBNProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = lineInfo[2], ProjectName ="(" + lineInfo[3] +")" });
+                            string DirPath = lineInfo[2];
+
+                            if (!Directory.Exists(DirPath) || (!File.Exists(Path.Combine(DirPath, "UserData.ini")) && !File.Exists(Path.Combine(DirPath, "ProjectData.ini"))))
+                            {
+                                linesToRemove.Add(lineInfo[0] + MyFilesDatabase.SPLITTER + lineInfo[1] + MyFilesDatabase.SPLITTER + DirPath + MyFilesDatabase.SPLITTER + lineInfo[3]);
+
+                                DirPath = MyFilesDatabase.FindProjectDirByName(lineInfo[3], lineInfo[0]);
+                                if (DirPath != "")
+                                    linesToAdd.Add(lineInfo[0] + MyFilesDatabase.SPLITTER + lineInfo[1] + MyFilesDatabase.SPLITTER + DirPath + MyFilesDatabase.SPLITTER + lineInfo[3]);
+                            }
+
+                            if (DirPath != "")
+                                SavedPBNProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = DirPath, ProjectName = "(" + lineInfo[3] + ")" }); 
                         }
+
+                        if (linesToRemove.Count > 0)
+                        {
+                            foreach (string ind in linesToRemove)
+                            {
+                                fileLines.Remove(ind);
+                            }
+                            foreach (string l in linesToAdd)
+                            {
+                                fileLines.Add(l);
+                            }
+
+                            File.WriteAllLines(filePath, fileLines);
+                        }
+
+
+                        //foreach (string line in fileLines)
+                        //{
+                        //    string[] lineInfo = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.RemoveEmptyEntries);
+                        //    SavedPBNProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = lineInfo[2], ProjectName ="(" + lineInfo[3] +")" });
+                        //}
                         break;
 
                     case "RefreshMoney":
@@ -267,12 +304,50 @@ namespace WPF_WYSIWYG_HTML_Editor
                         string filePath1 = Path.Combine(vaultDir1, "vaultMoneyConfig.txt");
                         if (!File.Exists(filePath1)) return;
 
-                        string[] fileLines1 = File.ReadAllLines(filePath1);
-                        foreach (string line in fileLines1)
+                        List<string> fileLines1 = File.ReadAllLines(filePath1).ToList();
+                        List<string> linesToRemove1 = new List<string>();
+                        List<string> linesToAdd1 = new List<string>();
+
+                        for (int i = 0; i < fileLines1.Count; i++)
                         {
+                            string line = fileLines1[i];
                             string[] lineInfo = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
-                            SavedMoneyProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = lineInfo[2], ProjectName = "(" + lineInfo[3] + ")" });
+                            string DirPath = lineInfo[2];
+
+                            if (!Directory.Exists(DirPath) || (!File.Exists(Path.Combine(DirPath, "UserData.ini")) && !File.Exists(Path.Combine(DirPath, "ProjectData.ini"))))
+                            {
+                                linesToRemove1.Add(lineInfo[0] + MyFilesDatabase.SPLITTER + lineInfo[1] + MyFilesDatabase.SPLITTER + DirPath + MyFilesDatabase.SPLITTER + lineInfo[3]);
+
+                                DirPath = MyFilesDatabase.FindProjectDirByName(lineInfo[3], lineInfo[0]);
+                                if (DirPath != "")
+                                    linesToAdd1.Add(lineInfo[0] + MyFilesDatabase.SPLITTER + lineInfo[1] + MyFilesDatabase.SPLITTER + DirPath + MyFilesDatabase.SPLITTER + lineInfo[3]);
+                            }
+
+                            if (DirPath != "")
+                                SavedMoneyProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = DirPath, ProjectName = "(" + lineInfo[3] + ")" });
                         }
+
+                        if (linesToRemove1.Count > 0)
+                        {
+                            foreach (string l in linesToRemove1)
+                            {
+                                fileLines1.Remove(l);
+                            }
+                                  
+
+                            foreach (string l in linesToAdd1)
+                            {
+                                fileLines1.Add(l);
+                            }
+
+                            File.WriteAllLines(filePath1, fileLines1);
+                        }
+
+                        //foreach (string line in fileLines1)
+                        //{
+                        //    string[] lineInfo = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                        //    SavedMoneyProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = lineInfo[2], ProjectName = "(" + lineInfo[3] + ")" });
+                        //}
                         break;
 
                     default:
@@ -433,10 +508,15 @@ namespace WPF_WYSIWYG_HTML_Editor
                         }
                     }
 
-                    if (successString != "")
-                        MessageBox.Show(successString);
-                    if (errorString != "")
-                        MessageBox.Show(errorString);
+                    Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        if (successString != "" && errorString == "")
+                            FlexibleMessageBox.Show(successString);
+                        else if (errorString != "" && successString == "")
+                            FlexibleMessageBox.Show(errorString);
+                        else
+                            FlexibleMessageBox.Show(successString + Environment.NewLine + "Errors:" + Environment.NewLine + errorString);
+                    });
 
                     Status = "Done : )   ";
                 }
@@ -534,24 +614,32 @@ namespace WPF_WYSIWYG_HTML_Editor
 
         private void publishFromVaultWP(PBNProject pbnProj, string title, string content)
         {
+            if (string.IsNullOrEmpty(content) || string.IsNullOrWhiteSpace(content))
+            {
+                errorString += "content cannot be empty. " + Environment.NewLine;
+                return;
+            }
+
             PersonData profile = MyFilesDatabase.GetSubProjectPersonData(pbnProj.FilePath);
             if (string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress))
             {
                 errorString += "Website in profile data cannot be empty. " + profile.ProfileName + Environment.NewLine;
                 return;
             }
+
             Status = "Posting to " + profile.WebAddress + ".";
 
             DateTime publishdt = DateTime.Now;
             try
             {
-                publishdt = GetNistTime(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword);
+                publishdt = TimeHelper.GetNistTime(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword).Date;
             }
             catch { publishdt = DateTime.Now; }
 
+            string link = profile.WebAddress;
             using (WordPressClient client = new WordPressClient(new WordPressSiteConfig
             {
-                BaseUrl = profile.WebAddress,
+                BaseUrl = link,
                 BlogId = 1,
                 Username = profile.Username,
                 Password = profile.Password,
@@ -573,9 +661,15 @@ namespace WPF_WYSIWYG_HTML_Editor
                         Status = "publish" // "draft" or "publish"
                     };
 
-                    Status = "Posting to " + profile.WebAddress + ".";
+                    Status = "Posting to " + link + ".";
 
                     var id = client.NewPost(post);
+                    
+                    try
+                    {
+                        link = client.GetPost(Convert.ToInt32(id)).Link;
+                    }
+                    catch { }
                     Application.Current.Dispatcher.Invoke((Action)delegate
                     {
                         OnRefreshPBNVaultClick("RefreshMoney");
@@ -593,11 +687,11 @@ namespace WPF_WYSIWYG_HTML_Editor
                                 m = Regex.Match(content, HRefPattern, RegexOptions.IgnoreCase | RegexOptions.Compiled, TimeSpan.FromSeconds(1));
                                 while (m.Success)
                                 {
-                                    string link = m.Groups[1].ToString();
+                                    string mlink = m.Groups[1].ToString();
                                     string text = m.Groups[2].ToString();
-                                    if (link.Contains(moneyProfile.WebAddress))
+                                    if (mlink.Contains(moneyProfile.WebAddress))
                                     {
-                                        BacklinksHistoryVM.SaveLink(moneyProfile, link, text, profile.WebAddress);
+                                        BacklinksHistoryVM.SaveLink(moneyProfile, mlink, text, moneyProfile.WebAddress);
                                     }
                                     m = m.NextMatch();
                                 }
@@ -609,14 +703,14 @@ namespace WPF_WYSIWYG_HTML_Editor
                         }
                     }
                 }
-                catch
+                catch(Exception ex)
                 {
-                    errorString += "Unable to post to " + profile.WebAddress + Environment.NewLine;
+                    errorString += "Unable to post to " + profile.WebAddress +" " + ex.Message + Environment.NewLine;
                     return;
                 }
             }
 
-            successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
+            successString += "Post succesfull to " + link + Environment.NewLine;
         }
 
         private string getcontentAfterImgUpload(string content, WordPressClient client)
@@ -630,16 +724,28 @@ namespace WPF_WYSIWYG_HTML_Editor
                 while (m.Success)
                 {
                     string link = m.Groups[1].ToString();
-                    Status = "Uploading file " + link + ".";
-                    // string text = m.Groups[2].ToString();
-                    string mime = GetMimeType(link);
-                    Data data = Data.CreateFromFilePath(link.Replace("file:///", ""), mime);
-                    UploadResult uResult = client.UploadFile(data);
-                    content = content.Replace(link, uResult.Url);
+                    try
+                    { 
+                        Status = "Uploading file " + link + ".";
+                        // string text = m.Groups[2].ToString();
+                        string mime = GetMimeType(link);
+                        Data data = Data.CreateFromFilePath(link.Replace("file:///", ""), mime);
+                        UploadResult uResult = client.UploadFile(data);
+                        content = content.Replace(link, uResult.Url);
+                    }
+                    catch (Exception ex)
+                    {
+                        errorString += "Image upload failed " + ex.Message+Environment.NewLine;
+                        content = content.Replace(link,"");
+                    }
+                    
                     m = m.NextMatch();
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                errorString += "Image upload failed " + ex.Message + Environment.NewLine;
+            }
 
             return content;
         }
@@ -686,7 +792,7 @@ namespace WPF_WYSIWYG_HTML_Editor
                         DateTime publishdt = DateTime.Now;
                         try
                         {
-                            publishdt = GetNistTime(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword);
+                            publishdt = TimeHelper.GetNistTime(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword).Date;
                         }
                         catch { publishdt = DateTime.Now; }
                         if (UseSpunArticlesChecked)
@@ -870,40 +976,9 @@ namespace WPF_WYSIWYG_HTML_Editor
             }
         }
 
-        public static DateTime GetNistTime(string ip,string port,string username,string pass)
-        {
-            DateTime dateTime = DateTime.MinValue;
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create("http://nist.time.gov/actualtime.cgi?lzbc=siqm9b");
-            request.Method = "GET";
-            request.Accept = "text/html, application/xhtml+xml, */*";
-            request.UserAgent = "Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.1; Trident/6.0)";
-            request.ContentType = "application/x-www-form-urlencoded";
-            request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.NoCacheNoStore); //No caching
-
-            if (!string.IsNullOrEmpty(ip) && !string.IsNullOrWhiteSpace(ip) &&
-                !string.IsNullOrEmpty(port) && !string.IsNullOrWhiteSpace(port))
-                request.Proxy = new WebProxy(ip, Convert.ToInt32(port)); // You may or may not need this
-            if (!string.IsNullOrEmpty(username) && !string.IsNullOrWhiteSpace(username) &&
-               !string.IsNullOrEmpty(pass) && !string.IsNullOrWhiteSpace(pass))
-                request.Proxy.Credentials = new NetworkCredential(username, pass);
-
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                StreamReader stream = new StreamReader(response.GetResponseStream());
-                string html = stream.ReadToEnd();//<timestamp time=\"1395772696469995\" delay=\"1395772696469995\"/>
-                string time = Regex.Match(html, @"(?<=\btime="")[^""]*").Value;
-                double milliseconds = Convert.ToInt64(time) / 1000.0;
-                dateTime = new DateTime(1970, 1, 1).AddMilliseconds(milliseconds);
-            }
-
-            return dateTime;
-        }
-
         public void SetProfileDate(PersonData profile)
         {
-            List<KeyValuePair<string, string>> directoryValues = MyFilesDatabase.GetSubProjectsFolders(profile.ProjectDIr, profile.ProjectName);
+            List<KeyValuePair<string, string>> directoryValues = MyFilesDatabase.GetSubProjectsFolders(profile.ProjectDir, profile.ProjectName);
             foreach (KeyValuePair<string, string> prof in directoryValues)
             {
                 CmbBoxWPList.Add(new SelectedProfile() { ProfileName = prof.Key, Path = prof.Value });

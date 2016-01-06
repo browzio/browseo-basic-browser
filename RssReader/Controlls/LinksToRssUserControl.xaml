@@ -1,0 +1,121 @@
+﻿<UserControl x:Class="RssReader.Controlls.LinksToRssUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:RssReader.Controlls"
+             xmlns:conv="clr-namespace:RssReader.Converter"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="700">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <conv:FalseToVisConverter x:Key="falseToVis" />
+            <BooleanToVisibilityConverter x:Key="boolToVis" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="WhiteSmoke">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="130" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Button Command="{Binding BtnClicked}" CommandParameter="Refresh" ToolTip="Refresh" Margin="3"  Width="25" Height="25"  HorizontalAlignment="Left">
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/refresh.png"  
+                   ToolTip="Refresh" SnapsToDevicePixels="True" Stretch="Uniform" />
+            </Button> 
+            
+            <ListBox  Grid.Row="1"
+                     ItemsSource="{Binding SavedFeeds}" 
+                     Background="WhiteSmoke"
+                     IsEnabled="{Binding EnableOkBtn}"
+                     Name="lbDates"
+                     SelectedIndex="{Binding SISavedFeeds}"
+                     Margin="3"
+                     IsSynchronizedWithCurrentItem="True" BorderThickness="0,0,0,0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding FeedTitle}" Margin="4" Cursor="Hand" Foreground="{Binding ForeColorIsLocalProject}" />
+                            <TextBlock Text="{Binding ProjectName}" FontSize="10.667" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+                <ListBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Remove From Server" Command="{Binding LbContextMenuClicked}" CommandParameter="Remove" />
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+            </ListBox>
+        </Grid>
+
+
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="35" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <CheckBox Content="RSS Mashup" VerticalAlignment="Center" IsEnabled="{Binding EnableOkBtn}" Margin="5,0,0,0" IsChecked="{Binding IsRssMashup}" />
+            <Button Content="ClearData" Margin="3" Width="90" HorizontalAlignment="Right"
+                        IsEnabled="{Binding EnableOkBtn}"
+                        Command="{Binding BtnClicked}" CommandParameter="ClearData" />
+            
+            <TextBox Grid.Row="1" Name="tbInputedText" IsEnabled="{Binding EnableOkBtn}" Text="{Binding InputedText,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
+                             AcceptsReturn="True" VerticalScrollBarVisibility="Auto" FontFamily="Verdana" FontSize="15" />
+
+            <DockPanel Grid.Row="2">
+                <TextBlock Text="Feed Title:" VerticalAlignment="Center" Width="60" Margin="3" />
+                <TextBox Text="{Binding SiteName}" Margin="3" />
+            </DockPanel>
+
+            <DockPanel Grid.Row="3" Margin="3">
+                <TextBlock Text="Category" VerticalAlignment="Center" Margin="3" />
+                <ComboBox ItemsSource="{Binding Catigories}"
+                      IsEnabled="{Binding EnableOkBtn}"
+                      SelectedIndex="{Binding SICategories}"
+                          Margin="3"
+                      Cursor="Hand"
+                      Background="#eeeeee" />
+            </DockPanel>
+
+            <Button Content="Mash It" Grid.Row="4" Margin="3"
+                        IsEnabled="{Binding EnableOkBtn}" Visibility="{Binding Converter={StaticResource boolToVis}, Path=EnableOkBtn}"
+                        Command="{Binding BtnClicked}" CommandParameter="MashIT" />
+
+            <DockPanel  Grid.Row="4" Margin="3"  Visibility="{Binding Converter={StaticResource falseToVis}, Path=EnableOkBtn}">
+                <TextBlock DockPanel.Dock="Left" Text="{Binding Status}" Margin="3" VerticalAlignment="Center" />
+                <ProgressBar DockPanel.Dock="Right" IsIndeterminate="True" />
+            </DockPanel>
+            <TextBox Grid.Row="5" Visibility="{Binding ResultsVisible}" Text="{Binding OutputedLinks}" VerticalScrollBarVisibility="Auto" FontFamily="Verdana" FontSize="15" />
+        </Grid>
+
+        <Grid Grid.Column="2" Width="{Binding BrowserVisible}" HorizontalAlignment="Right">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="30" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <TextBlock Text="{Binding BrowserPreviewStatus}" VerticalAlignment="Center" />
+            <ContentPresenter DockPanel.Dock="Right" Grid.RowSpan="6" Name="host" Grid.Row="1"
+                                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                                  Content="{Binding WebBrowserHost}"  />
+        </Grid>
+
+    </Grid>
+</UserControl>

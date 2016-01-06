@@ -1,7 +1,7 @@
-﻿using Indexer;
+﻿using GoViral.ViewModels;
+using Indexer;
 using Organiser.Common.Classes;
 using PData.FilesReader;
-using ProjectsList.Helpers;
 using Prospector.ViewModels;
 using RssReader.Mvvm;
 using RssReader.Windows;
@@ -36,157 +36,97 @@ namespace BrowserAndFeatures
     {
         public FeatureCallage()
         {
-            //AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
-            //Dispatcher.CurrentDispatcher.UnhandledException += CurrentDispatcher_UnhandledException;
-            //this.Closed += (sender, args) => { PostQuitMessage(0); };
             InitializeComponent();
-            //new Thread(() =>{
-                SetPermissions();
-               // 
-            //}).Start();
-            SetPersonData();
+
+            if(App.browserinit)
+                BrowserInit.Init();
+
+            //MyFilesDatabase.GetSites(); 
+
             (prospector.DataContext as FootPrintsOptionsVM).OnClickedSearch += FeatureCallage_OnClickedSearch;
             (prospector.DataContext as FootPrintsOptionsVM).OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
-            browser.OnCurateToPBN += Browser_OnCurateToPBN;
-        }
-
-        void FeatureCallage_OnClickedSearch(string query)
-        {
-            browser.SearchFor(query);
-            tbControl.SelectedIndex = 0;
-        }
-
-        //void CurrentDispatcher_UnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
-        //{
-        //    e.Handled = true;
-        //    MessageBox.Show("CLR Dispatcher unhandled exception: " + e.Exception.Message);
-        //}
-
-        //void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        //{
             
-        //    var exception = e.ExceptionObject as Exception;
-        //    var message = exception == null ? "null" : exception.Message;
-        //    MessageBox.Show("CLR unhandled exception: " + message);
+            rssControl.OnLaunchToBrowser += RssControl_OnLaunchToBrowser; ;
+            rssControl.OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;
+            rssControl.OnLaunchToMasher += rssControl_OnLaunchToMasher;
+            rssControl.OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
+
+            browser.OnCurateToPBN += Browser_OnCurateToPBN;
+            browser.Loaded += Browser_Loaded;
+        }
+
+        //public FeatureCallage(int birthdayYear, string children, string city, int cmbSelectedIndexDay, int cmbSelectedIndexMonth, int cmbSelectedIndexSex, string country, string dir, string email, string filePath, string firstName, bool inMonney, bool inPBNVault, string lastName, string notes, string password, string phoneNumber, string profileName, string projectDir, string projectName, string proxyIP, string proxyPassword, string proxyPort, string proxyUsername, int sIPBNType, string state, string street, string username, string webAddress, string zip)
+        //{
+        //    InitializeComponent();
+
+        //    SetPersonData();
+        //    //SetPersonData(birthdayYear, children, city, cmbSelectedIndexDay, cmbSelectedIndexMonth, cmbSelectedIndexSex, country, dir, email, filePath, firstName, inMonney, inPBNVault, lastName, notes, password, phoneNumber, profileName, projectDir, projectName, proxyIP, proxyPassword, proxyPort, proxyUsername, sIPBNType, state, street, username, webAddress, zip);
+
+        //    (prospector.DataContext as FootPrintsOptionsVM).OnClickedSearch += FeatureCallage_OnClickedSearch;
+        //    (prospector.DataContext as FootPrintsOptionsVM).OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
+        //    browser.OnCurateToPBN += Browser_OnCurateToPBN;
         //}
 
 
         #region setup data
-        private void SetPermissions()
-        {
-            //MyFilesDatabase
-            string dir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Lisence");
-            if (!Directory.Exists(dir)) App.Current.Shutdown();
-            string lisenceFilePath = System.IO.Path.Combine(dir, "Lisence.browseoLisence");
-            if (!File.Exists(lisenceFilePath)) App.Current.Shutdown();
-
-            string canSeeProxys = "", canCreateLisence = "",
-        cbAllowProject = "",
-        cbAllowProspector = "",
-        cbAllowRSS = "",
-        cbAllowPBN = "",
-        cbAllowFeedMash = "",
-        cbAllowIndexer = "",
-        cbYoutube = "",
-        key = "", name = "", email = "", hasKK = "";
-            decryptLisence(MyFilesDatabase.DecodeFrom64(File.ReadAllText(lisenceFilePath)), ref canSeeProxys, ref canCreateLisence,
-                ref cbAllowProject,
-                ref cbAllowProspector,
-                ref cbAllowRSS,
-                ref cbAllowPBN,
-                ref cbAllowFeedMash,
-                ref cbAllowIndexer,
-                ref cbYoutube,
-                ref key, ref name, ref email, ref hasKK);
-
-
-           // App.Current.Dispatcher.Invoke((Action)delegate { 
-            if (cbAllowProspector.ToLower() != "true") tabProspector.Visibility = System.Windows.Visibility.Collapsed;
-            if (cbAllowRSS.ToLower() != "true") tabrssControl.Visibility = System.Windows.Visibility.Collapsed;
-            if (cbAllowPBN.ToLower() != "true") tabrsswisi.Visibility = System.Windows.Visibility.Collapsed;
-            if (cbAllowFeedMash.ToLower() != "true") feed.Visibility = System.Windows.Visibility.Collapsed;
-            if (cbAllowIndexer.ToLower() != "true") indexer.Visibility = System.Windows.Visibility.Collapsed;
-            if (cbYoutube.ToLower() != "true") youtuber.Visibility = System.Windows.Visibility.Collapsed;
-            if (canSeeProxys.ToLower() == "true") Organiser.Common.Windows.CreateProjectWindow.CanSeeProxys = true;
-            prospector.tabKingKontent.Visibility = hasKK.ToLower() == "true" ? Visibility.Visible : Visibility.Collapsed;
-            //  });
+        public void SetPermissions(bool allowProspector, bool allowRSS, bool allowPBN, bool allowFeedMash, bool allowIndexer, bool allowYoutube, bool canSeeProxys, bool hasKK)
+        { 
+            if (!allowProspector) tabProspector.Visibility = System.Windows.Visibility.Collapsed;
+            if (!allowRSS) tabrssControl.Visibility = System.Windows.Visibility.Collapsed;
+            if (!allowPBN) tabrsswisi.Visibility = System.Windows.Visibility.Collapsed;
+            if (!allowFeedMash) feed.Visibility = System.Windows.Visibility.Collapsed;
+            if (!allowIndexer) indexer.Visibility = System.Windows.Visibility.Collapsed;
+            if (!allowYoutube) youtuber.Visibility = System.Windows.Visibility.Collapsed;
+            if (!hasKK) prospector.tabKingKontent.Visibility = System.Windows.Visibility.Collapsed;
+            if (canSeeProxys) MyFilesDatabase.CanSeeProxys = true;
         }
 
-        public static void decryptLisence(string lisenceText, ref string canSeeProxys, ref string canCreateLisence,
-            ref string cbAllowProject,
-            ref string cbAllowProspector,
-            ref string cbAllowRSS,
-            ref string cbAllowPBN,
-            ref string cbAllowFeedMash,
-            ref string cbAllowIndexer,
-            ref string cbYoutube,
-            ref string key, ref string name, ref string email, ref string hasKK)
+        public void SetPersonData(int birthdayYear, string children, string city, int cmbSelectedIndexDay, int cmbSelectedIndexMonth, int cmbSelectedIndexSex, string country, string dir, string email, string filePath, string firstName, bool inMonney, bool inPBNVault, string lastName, string notes, string password, string phoneNumber, string profileName, string projectDir, string projectName, string proxyIP, string proxyPassword, string proxyPort, string proxyUsername, int sIPBNType, string state, string street, string username, string webAddress, string zip)
         {
-            string[] lisenceLines = lisenceText.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            foreach (string line in lisenceLines)
+            PersonData profile = new PersonData()
             {
-                string[] lineValPairs = line.Split('=');
-                switch (lineValPairs[0])
-                {
-                    case "CanSeeProxys":
-                        canSeeProxys = lineValPairs[1];
-                        break;
+                BirthdayYear = birthdayYear,
+                Children = children,
+                City = city,
+                CmbSelectedIndexDay = cmbSelectedIndexDay,
+                CmbSelectedIndexMonth = cmbSelectedIndexMonth,
+                CmbSelectedIndexSex = cmbSelectedIndexSex,
+                Country = country,
+                Dir = dir,
+                Email = email,
+                FilePath = filePath,
+                FirstName = firstName,
+                InMonney = inMonney,
+                InPBNVault = inPBNVault,
+                LastName = lastName,
+                Notes = notes,
+                Password = password,
+                PhoneNumber = phoneNumber,
+                ProfileName = profileName,
+                ProjectDir = projectDir,
+                ProjectName = projectName,
+                ProxyIP = proxyIP,
+                ProxyPassword = proxyPassword,
+                ProxyPort = proxyPort,
+                ProxyUsername = proxyUsername,
+                SIPBNType = sIPBNType,
+                State = state,
+                Street = street,
+                Username = username,
+                WebAddress = webAddress,
+                Zip = zip,
+            };
 
-                    case "CanCreateLisence":
-                        canCreateLisence = lineValPairs[1];
-                        break;
-
-                    case "cbAllowProject":
-                        cbAllowProject = lineValPairs[1];
-                        break;
-                    case "cbAllowProspector":
-                        cbAllowProspector = lineValPairs[1];
-                        break;
-                    case "cbAllowRSS":
-                        cbAllowRSS = lineValPairs[1];
-                        break;
-                    case "cbAllowPBN":
-                        cbAllowPBN = lineValPairs[1];
-                        break;
-                    case "cbAllowFeedMash":
-                        cbAllowFeedMash = lineValPairs[1];
-                        break;
-                    case "cbAllowIndexer":
-                        cbAllowIndexer = lineValPairs[1];
-                        break;
-                    case "cbYoutube":
-                        cbYoutube = lineValPairs[1];
-                        break;
-
-                    case "Key":
-                        key = lineValPairs[1];
-                        break;
-
-                    case "Name":
-                        name = lineValPairs[1];
-                        break;
-
-                    case "Email":
-                        email = lineValPairs[1];
-                        break;
-
-                    case "hasKK":
-                        hasKK = lineValPairs[1];
-                        break;
-
-                    default:
-                        break;
-                }
-            }
+            BrowserInit.Init(profile);
+            //browser.OpenTabsFromPastSessions();
         }
 
-        PersonData profile;
-        public void SetPersonData(PersonData data = null)
+        public static void SetPersonData()
         {
             string path = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Temp");
             string sitesFilePath = System.IO.Path.Combine(File.ReadAllText(path + "\\info.txt"), "ProjectData.ini");
             IniFile ini = new IniFile(sitesFilePath);
-            profile = new PersonData();
+            PersonData profile = new PersonData();
             try
             {
                 profile.ProjectName = ini.IniReadValue("Data", "ProjectName");
@@ -215,110 +155,128 @@ namespace BrowserAndFeatures
                     profile.CmbSelectedIndexMonth = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayMonth"));
                 }
                 catch { }
-                profile.ProjectDIr = sitesFilePath.Replace("\\ProjectData.ini", "");
+                profile.ProjectDir = sitesFilePath.Replace("\\ProjectData.ini", "");
                 try
                 {
                     profile.BirthdayYear = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayYear"));
                 }
                 catch { }
             }
-            catch { }
-            //browser.SetPersonData(data);
+            catch { }  
 
-            BrowserInit.Init(sitesFilePath, data == null ? profile : data);
-
+            BrowserInit.Init(profile);
+            //browser.OpenTabsFromPastSessions();
         }
 
         #endregion
 
-        internal void close()
-        {
-            browser.CloseAllTabs();
-        }
-
         public void CloseAll()
         {
-            //if (login != null && didLogin)
-            //    login.Logout();
             RssReader.MainViewModel.isCloseing = true;
-            close();
-            BrowserInit.Shutdown();
-        }
+            if (goViralVM != null)
+                goViralVM.DisposeBrowser();
 
-        void FeatureCallage_OnLaunchToBrowser(string link, string rssLink)
-        {
-            browser.LaunchNewWindowToLink(link, rssLink);
+            if(feedMasherVM != null)
+                feedMasherVM.DisposeBrowser();
+
+            //GC.Collect();
+
+
+            browser.CloseAllTabs();
+            BrowserInit.Shutdown(); 
         }
 
         #region other features tabs
 
-        bool setevents = false;
         int previndex;
-        Indexer.MainWindow imw;
-        LinksToRssWindow ltrw;
+        Indexer.MainWindow imw; 
         Youtuber.MainWindow ytmw;
+        GoViralVM goViralVM; 
+        LinksToRssVM feedMasherVM;
+
         private void tbControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (tbControl.SelectedIndex == 2 && !setevents)
+            if (previndex != tbControl.SelectedIndex && tbControl.SelectedIndex<6)
             {
-                previndex = tbControl.SelectedIndex;
-                rssControl.SetProfileData(profile);
-                rssControl.OnLaunchToBrowser += FeatureCallage_OnLaunchToBrowser;
-                rssControl.OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;
-                rssControl.OnLaunchToMasher += rssControl_OnLaunchToMasher;
-                rssControl.OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
-                setevents = true;
-            }
-            else if (tbControl.SelectedIndex == 3)
-            {
-                previndex = tbControl.SelectedIndex;
-
-                if (wisi.DataContext == null)
+                if (tbControl.SelectedIndex == 2 && rssControl.UserRssTabs.Count <=0)
                 {
-                    setwisi();
+                    previndex = tbControl.SelectedIndex;
+                    rssControl.InitTabs();
                 }
-            }
-            else if (tbControl.SelectedIndex == 4)
-            {
-                tbControl.SelectedIndex = previndex;
-            }
-            else if (tbControl.SelectedIndex == 5) 
-            {
-                tbControl.SelectedIndex = previndex;
-            }
-            else if(tbControl.SelectedIndex == 6)
-            {
-                tbControl.SelectedIndex = previndex;
+                else if (tbControl.SelectedIndex == 3)
+                {
+                    previndex = tbControl.SelectedIndex;
+
+                    if (wisi.DataContext == null)
+                    {
+                        setwisi();
+                    }
+                }
+                else if (tbControl.SelectedIndex == 4)
+                {
+                    previndex = tbControl.SelectedIndex;
+                    crreateFeedMAsherContext(); 
+                }
+                else if (tbControl.SelectedIndex == 5)
+                {
+                    previndex = tbControl.SelectedIndex;
+                    { 
+                        createGoViralVM();
+                    } 
+                }
+                else
+                {
+                    previndex = tbControl.SelectedIndex;
+                }
             }
             else
             {
-                previndex = tbControl.SelectedIndex;
+                if (tbControl.SelectedIndex == 6)
+                {
+                    tbControl.SelectedIndex = previndex;
+                    if (imw == null)
+                    {
+                        imw = new Indexer.MainWindow();
+                        imw.Title = "Indexer - One Link On A Line keep http://";
+                        imw.Topmost = true;
+                        imw.Closed += ltrw_Closed;
+                        imw.Show();
+                    }
+                }
+                else if (tbControl.SelectedIndex == 6)
+                {
+                    tbControl.SelectedIndex = previndex;
+                    if (ytmw == null)
+                    {
+                        ytmw = new Youtuber.MainWindow();
+                        ytmw.Topmost = true;
+                        ytmw.Closed += ltrw_Closed;
+                        ytmw.Show();
+                    }
+                }
             }
         }
 
-        private void setwisi()
+        private void crreateFeedMAsherContext()
         {
-            WPF_WYSIWYG_HTML_Editor.XmlRpcVM wvm = new WPF_WYSIWYG_HTML_Editor.XmlRpcVM();
-            wvm.SetProfileDate(profile);
-            wisi.DataContext = wvm;
-            wisi.SetProfileData(profile);
-            wisi.NewItUp();
-        }
-
-        private void RssControl_OnSelectedSendToPbn(string link, string title, string imglink, string date, string description)
-        {
-            //tbControl.SelectedIndex = 3;
-            if (wisi.DataContext == null)
+            if (feedMasherVM == null)
             {
-                
-                tbControl.SelectedIndex = 3;
-                setwisi();
+                feedMasherVM = new LinksToRssVM(); 
+                ucFeedMasher.DataContext = feedMasherVM;
             }
-
-            wisi.AddSetRssFeed(link, title, imglink, date, description);
         }
 
-        private void Browser_OnCurateToPBN(string content)
+        private void createGoViralVM()
+        {
+            if (goViralVM == null)
+            {
+                goViralVM = new GoViralVM();
+                ucGoViral.DataContext = goViralVM;   
+            }
+        }
+
+        #region uc browser events
+        private void Browser_OnCurateToPBN(string content, string link)
         {
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
@@ -329,66 +287,66 @@ namespace BrowserAndFeatures
                     setwisi();
                 }
 
-                wisi.injectHtml(content);
+                wisi.injectHtml(content, link);
             });
         }
 
-        private void youtuber_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void Browser_Loaded(object sender, RoutedEventArgs e)
         {
-            if (ytmw == null)
-            {
-                ytmw = new Youtuber.MainWindow();
-                ytmw.Topmost = true;
-                ytmw.Closed += ltrw_Closed;
-                ytmw.Show();
-            }
+            browser.CheckAndSetOpenTabs();
+            browser.OnAddedToGoViral += Browser_OnAddedToGoViral;
+
+            browser.Loaded -= Browser_Loaded;
         }
 
-        private void indexer_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void Browser_OnAddedToGoViral(string link)
         {
-            if (imw == null)
-            {
-                imw = new Indexer.MainWindow();
-                imw.Title = "Indexer - One Link On A Line keep http://";
-                imw.Topmost = true;
-                imw.Closed += ltrw_Closed;
-                imw.Show();
-            }
+            createGoViralVM();
+            goViralVM.AsyncAddLinkToList(link);
+        }
+        #endregion
+
+        void FeatureCallage_OnClickedSearch(string query)
+        {
+            browser.SearchFor(query);
+            tbControl.SelectedIndex = 0;
         }
 
-        private void feed_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void RssControl_OnLaunchToBrowser(string link, string rssLink)
         {
-            if (ltrw == null)
-            {
-                ltrw = new LinksToRssWindow();
-                ltrw.DataContext = new LinksToRssVM(profile, ltrw);
-                ltrw.Topmost = true;
-                ltrw.Closed += ltrw_Closed;
-                ltrw.Show();
+            browser.LaunchNewWindowToLink(link, rssLink);
+        }
+
+        private void setwisi()
+        {
+            WPF_WYSIWYG_HTML_Editor.XmlRpcVM wvm = new WPF_WYSIWYG_HTML_Editor.XmlRpcVM();
+            wvm.SetProfileDate(GloableProfData.PData);
+            wisi.DataContext = wvm;
+            wisi.SetProfileData(GloableProfData.PData);
+            wisi.NewItUp();
+        }
+
+        private void RssControl_OnSelectedSendToPbn(string link, string title, string imglink, string date, string description)
+        {
+            //tbControl.SelectedIndex = 3;
+            if (wisi.DataContext == null)
+            {  
+                tbControl.SelectedIndex = 3;
+                setwisi();
             }
+
+            wisi.AddSetRssFeed(link, title, imglink, date, description);
         }
 
         void rssControl_OnLaunchToMasher(string link)
         {
-            if (ltrw == null)
-            {
-                ltrw = new LinksToRssWindow();
-                ltrw.DataContext = new LinksToRssVM(profile, ltrw);
-                ltrw.Topmost = true;
-                ltrw.Closed += ltrw_Closed;
-                (ltrw.DataContext as LinksToRssVM).AddMasherLink(link);
-                ltrw.Show();
-            }
-            else
-            {
-                (ltrw.DataContext as LinksToRssVM).AddMasherLink(link);
-            }
+            crreateFeedMAsherContext();
+            feedMasherVM.AddMasherLink(link);
         }
 
         void ltrw_Closed(object sender, EventArgs e)
         {
-            ytmw = null;
-            ltrw = null;
+            ytmw = null; 
             imw = null;
         }
         #endregion

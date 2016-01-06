@@ -5,114 +5,15 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfCefDynamBrowser.ViewModels"
              xmlns:mControls="clr-namespace:BrowserHost.Controls"
-             xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:dragNdrop="clr-namespace:DragDropListview.Controls;assembly=DragDropListview"
              mc:Ignorable="d"
              d:DesignWidth="640"
-             d:DesignHeight="480"
-             SizeChanged="UserControl_SizeChanged">
-    <!--xmlns:dragNdrop="clr-namespace:WpfDragDropTreeView.Controls;assembly=WpfDragDropTreeView"-->
+             d:DesignHeight="480">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            
-            <Style TargetType="{x:Type ContextMenu}">
-                <Setter Property="SnapsToDevicePixels" Value="True" />
-                <Setter Property="OverridesDefaultStyle" Value="True" />
-                <Setter Property="Grid.IsSharedSizeScope" Value="true" />
-                <Setter Property="HasDropShadow" Value="True" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ContextMenu}">
-                            <Border x:Name="Border" Background="WhiteSmoke" Padding="0" BorderThickness="0">
-                             
-                                    <ItemsPresenter />
-                                
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
-            <DrawingImage x:Key="ReloadImage" x:Shared="False">
-                <DrawingImage.Drawing>
-                    <DrawingGroup>
-                        <DrawingGroup.Children>
-                            <GeometryDrawing Brush="Black" Geometry="F1 M 3.116,3.08267C 1.01867,5.156 0,7.70534 0,10.668L 0,10.668C 0,13.6307 1.01867,16.1187 3.116,18.1933L 3.116,18.1933C 5.21467,20.2653 7.79067,21.3333 10.7867,21.3333L 10.7867,21.3333C 13.784,21.3333 16.3,20.2653 18.3987,18.1933L 18.3987,18.1933C 19.536,17.1253 20.3147,15.94 20.8533,14.5787L 15.8213,12.6827C 15.5813,13.2733 15.1027,13.8667 14.6227,14.4013L 14.6227,14.4013C 13.544,15.4667 12.284,16 10.7867,16L 10.7867,16C 9.288,16 8.03067,15.4667 6.952,14.4013L 6.952,14.4013C 5.93333,13.3933 5.39333,12.148 5.39333,10.668L 5.39333,10.668C 5.39333,9.18534 5.93333,7.94134 6.952,6.87467L 6.952,6.87467C 8.03067,5.868 9.288,5.33333 10.7867,5.33333L 10.7867,5.33333C 12.224,5.33333 13.484,5.808 14.5027,6.756L 14.6227,6.87467L 12.5827,8.88933C 12.4027,9.00667 12.4027,9.12533 12.3427,9.244L 12.3427,9.244C 12.284,9.42267 12.284,9.48267 12.3427,9.54134L 12.3427,9.54134C 12.4027,9.65867 12.4627,9.71867 12.5827,9.71867L 20.6147,9.77867C 20.6747,9.77867 20.7947,9.71867 20.9133,9.71867L 20.9133,9.71867C 21.0333,9.6 21.0933,9.48267 21.2133,9.364L 21.2133,9.364C 21.2733,9.244 21.3333,9.12533 21.3333,9.06667L 21.2133,1.12667L 21.2133,1.06667C 21.2133,0.949335 21.1533,0.949335 21.0933,0.890669L 21.0933,0.890669C 21.0933,0.890669 21.0333,0.890669 21.0333,0.830669L 21.0333,0.830669C 20.9733,0.830669 20.9133,0.890669 20.7947,0.890669L 20.7947,0.890669C 20.6747,0.949335 20.4947,1.008 20.4347,1.12667L 18.3987,3.14L 18.336,2.964C 16.24,1.008 13.784,0.00133514 10.7867,0.00133514L 10.7867,0.00133514C 7.79067,0.00133514 5.21467,1.008 3.116,3.08267 Z " />
-                        </DrawingGroup.Children>
-                    </DrawingGroup>
-                </DrawingImage.Drawing>
-            </DrawingImage>
-
-            <SolidColorBrush x:Key="BorderBrush" Color="#FFe4f6fa"/>
-            <LinearGradientBrush x:Key="TabControlBackgroundBrush" EndPoint="0.5,0" StartPoint="0.5,1">
-                <GradientStop Color="#FFa9cde7" Offset="0"/>
-                <GradientStop Color="#FFe7f4fc" Offset="0.3"/>
-                <GradientStop Color="#FFf2fafd" Offset="0.85"/>
-                <GradientStop Color="#FFe4f6fa" Offset="1"/>
-            </LinearGradientBrush>
-
-            <Style TargetType="Button" x:Key="browser_btn">
-                <Setter Property="Height" Value="22" />
-                <Setter Property="MinWidth" Value="22" />
-                <Setter Property="Margin" Value="5,0,0,0" />
-                <Setter Property="ClipToBounds" Value="True" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border 
-                                    Background="Transparent" x:Name="bd">
-                                 <ContentControl Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="2"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" TargetName="bd" Value="#ececec" />
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter Property="Background" Value="#c7c7c7" TargetName="bd"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-              
-            </Style>
-            <Style TargetType="Button" x:Key="ButtonStyle">
-                <Setter Property="Height" Value="23" />
-                <Setter Property="Margin" Value="0" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border 
-                                Background="#a1a5ad" Cursor="Hand"
-                                Padding="{TemplateBinding Padding}" MinWidth="95"
-                                CornerRadius="0" x:Name="Border">
-                                <ContentControl Content="{TemplateBinding Content}"
-                                                HorizontalAlignment="Center" Margin="7,0"
-                                                VerticalAlignment="Center" TextElement.Foreground="White"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="Border" Property="Background">
-                                        <Setter.Value>
-                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                <GradientStop Color="#FF376ED4" Offset="0"/>
-                                                <GradientStop Color="#FF588DF0" Offset="0.332"/>
-                                            </LinearGradientBrush>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -120,40 +21,40 @@
             <Border  VerticalAlignment="Top"
                      DockPanel.Dock="Top" Height="28"
                      BorderBrush="#FFd3d3d3" BorderThickness="0,0,0,1">
-            <DockPanel>
-                <Button Command="{Binding BackCommand}"  ToolTip="Back" Style="{DynamicResource browser_btn}">
+                <DockPanel>
+                    <Button Command="{Binding BackCommand}"  ToolTip="Back" Style="{DynamicResource browser_btn}">
                         <Grid HorizontalAlignment="Left" Height="18" VerticalAlignment="Bottom" Width="18" >
                             <Path Data="M12.71873,3.0490813 L12.719011,13.408316 4.698245,8.2381057 z" Fill="#FFC7C7C7" Margin="4.583,3,4.25,3.521" Stretch="Fill"/>
                         </Grid>
                     </Button>
-                <Button Command="{Binding ForwardCommand}"
+                    <Button Command="{Binding ForwardCommand}"
                         ToolTip="Forward"
                         Style="{DynamicResource browser_btn}">
                         <Grid  Height="18" Width="18">
                             <Path Data="M12.71873,3.0490813 L12.719011,13.408316 4.698245,8.2381057 z" Fill="#FFC7C7C7" Margin="4.583,3,4.25,3.521" Stretch="Fill" RenderTransformOrigin="0.5,0.5">
-                            <Path.RenderTransform>
-                                <TransformGroup>
-                                    <ScaleTransform ScaleY="1" ScaleX="-1"/>
-                                    <SkewTransform AngleY="0" AngleX="0"/>
-                                    <RotateTransform Angle="0"/>
-                                    <TranslateTransform/>
-                                </TransformGroup>
-                            </Path.RenderTransform>
-                        </Path>
-    </Grid>
-                </Button>
-                <Button
+                                <Path.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleY="1" ScaleX="-1"/>
+                                        <SkewTransform AngleY="0" AngleX="0"/>
+                                        <RotateTransform Angle="0"/>
+                                        <TranslateTransform/>
+                                    </TransformGroup>
+                                </Path.RenderTransform>
+                            </Path>
+                        </Grid>
+                    </Button>
+                    <Button
                         Command="{Binding ReloadCommand}" 
                         ToolTip="Refresh" Margin="0,0,7,0"
                         Style="{DynamicResource browser_btn}">
-                    <Image 
+                        <Image 
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
                                Stretch="None" 
-                               Source="..\Images\refresh.png" />
-                </Button>
-                
-                <Button Name="openFlyout"  
+                               Source="pack://application:,,,/Organiser.Common;component/Image/refresh.png" />
+                    </Button>
+
+                    <Button Name="openFlyout"  
                     DockPanel.Dock="Right"
                     Click="openFlyout_Click"
                     ToolTip="Open Saved Sites"
@@ -164,11 +65,70 @@
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
                                Stretch="None" 
-                               Source="../Images/add.png" />
+                               Source="pack://application:,,,/Organiser.Common;component/Image/add.png" />
 
                     </Button>
 
-                <Button Name="CP" 
+                    <Button Name="Settings" 
+                        DockPanel.Dock="Right"
+                        ToolTip="Browser Settings" 
+                        ContextMenuService.IsEnabled="False"
+                        Click="BtnWithContextMenue_Click"
+                        Style="{DynamicResource browser_btn}">
+                        <Image Width="17" Height="17"
+                               HorizontalAlignment="Center" 
+                               VerticalAlignment="Center" 
+                               Stretch="Uniform" 
+                               Source="pack://application:,,,/Organiser.Common;component/Image/settings2.png" />
+                        <Button.ContextMenu>
+                            <ContextMenu Name="cmBrowserSettings" Opened="cmBrowserSettings_Opened" Closed="cmBrowserSettings_Closed">
+                                <ContextMenu.Resources>
+                                    <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Foreground" Value="White" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource FlatbtnStyle}">
+                                        <Setter Property="Width" Value="100" />
+                                        <Setter Property="Margin" Value="0,3,3,3" />
+                                        <Setter Property="BorderBrush" Value="Black" />
+                                        <Setter Property="BorderThickness" Value="0.7" />
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="False">
+                                                <Setter Property="Background" Value="White" />
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ContextMenu.Resources>
+                                <MenuItem Header="Save Session" Command="{Binding SaveSession}" />
+                                <MenuItem Header="Delete Last Session" Command="{Binding DeleteSession}" />
+                                <MenuItem Header="Save Session To Bookmarks" Command="{Binding SaveSessionToBMs}" />
+                                
+                                <Separator Margin="-30,0,0,0" />
+                                
+                                <CheckBox Content="Flash Enabled" IsChecked="{Binding FlashEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                <CheckBox Content="Javascript Enabled" IsChecked="{Binding JavascriptEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                <CheckBox Content="Java Enabled" IsChecked="{Binding JavaEnabled, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <Separator Margin="-30,0,0,0" />
+
+                                <CheckBox Content="Sync Time" ToolTip="Can only be set with session settings" IsChecked="{Binding SetSysDateEnabled, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <Separator Margin="-30,0,0,0" />
+
+                                <DockPanel>
+                                    <Button Content="Apply To Tab" Command="{Binding SettingsCTClick}" CommandParameter="TAB" Click="cmsBtn_Click" 
+                                            DockPanel.Dock="Left" />
+                                        <Button Content="Apply To Session" Command="{Binding SettingsCTClick}" CommandParameter="SESSION" Click="cmsBtn_Click"
+                                            DockPanel.Dock="Right" />
+                                </DockPanel>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+
+                    <Button Name="CP" 
                     DockPanel.Dock="Right"
                     ToolTip="Open Copy Paste Window"
                     Command="{Binding OpenCPCommand}" 
@@ -176,40 +136,18 @@
                         <TextBlock Text="C/P" Margin="0,2,0,0" Foreground="#FFB2B2B2" FontWeight="Bold" FontFamily="Global User Interface" FontSize="13" />
                     </Button>
 
-                <Button Name="Inject" 
+                    <Button Name="Inject" 
                     DockPanel.Dock="Right"
                     ToolTip="Fill Form With Profile Data"
                     Command="{Binding InjectCommand}" 
                     Style="{DynamicResource browser_btn}">
-                        <Image 
-                               HorizontalAlignment="Center" 
+                        <Image HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
-                               Stretch="Uniform" SnapsToDevicePixels="True"
-                               Source="../Images/user.png" Opacity="0.4" />
+                               Stretch="None" 
+                               Source="pack://application:,,,/Organiser.Common;component/Image/user.png" Opacity="0.4" />
                     </Button>
 
-                <Button Name="SaveSession" 
-                        DockPanel.Dock="Right"
-                        ToolTip="Save Session"
-                        ContextMenuService.IsEnabled="False"
-                        Click="SaveSession_Click"
-                        Style="{DynamicResource browser_btn}">
-                        <Image Width="17" Height="17"
-                               HorizontalAlignment="Center" 
-                               VerticalAlignment="Center" 
-                               Stretch="Uniform" 
-                               Source="../Images/save-as-xl.png" />
-                        <Button.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="Save Session" Command="{Binding SaveSession}" ToolTip="Will overwright your previous saved session" />
-                                <MenuItem Header="Delete Last Session" Command="{Binding DeleteSession}" />
-                                <Separator />
-                                <MenuItem Header="Save Session To Bookmarks" Command="{Binding SaveSessionToBMs}" />
-                            </ContextMenu>
-                        </Button.ContextMenu>
-                </Button>
-
-                <Button Name="SaveSite" 
+                    <Button Name="SaveSite" 
                     DockPanel.Dock="Right"
                     ToolTip="Save Site From Navigation Box Text"
                     Click="SaveSite_Click"
@@ -218,76 +156,76 @@
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
                                Stretch="None" 
-                               Source="../Images/save.png" />
+                               Source="pack://application:,,,/Organiser.Common;component/Image/save.png" />
                     </Button>
 
-                <Button Name="Share" 
-                     Click="Share_Click"
+                    <Button Name="btnShare" 
+                     Click="BtnWithContextMenue_Click"
                      DockPanel.Dock="Right"
                      ToolTip="Share Site"
                      Style="{DynamicResource browser_btn}">
                         <TextBlock Text="Share"  FontSize="10" Foreground="#c7c7c7" Margin="0,0,0,0"/>
                         <Button.ContextMenu>
-                            <ContextMenu Width="450" >
-                              
-                                <StackPanel Orientation="Horizontal" Margin="-27,0,0,0" HorizontalAlignment="Center">
-                                    <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="facebook"
+                            <ContextMenu>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="facebook"
                                                                 Click="Button_Click_1">
                                         <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png" 
                                                                    ToolTip="facebook"
                                                                    Width="18" Height="18" />
                                     </Button>
 
-                                    <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="google"
+                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="google"
                                                                 Click="Button_Click_1">
                                         <Image Source="pack://application:,,,/Organiser.Common;component/Image/googleplus-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="google+" />
                                     </Button>
 
-                                    <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="digg"
+                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="digg"
                                                                 Click="Button_Click_1">
                                         <Image Source="pack://application:,,,/Organiser.Common;component/Image/digg-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="digg" />
                                     </Button>
 
-                                    <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="pintrest"
+                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="pintrest"
                                                                 Click="Button_Click_1">
                                         <Image Source="pack://application:,,,/Organiser.Common;component/Image/Pinterest-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="pintrest" />
                                     </Button>
 
-                                    <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="reddit"
+                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="reddit"
                                                                 Click="Button_Click_1">
                                         <Image Source="pack://application:,,,/Organiser.Common;component/Image/reddit-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="reddit" />
                                     </Button>
 
-                                    <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="stumbleupon"
+                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="stumbleupon"
                                                                 Click="Button_Click_1">
                                         <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="stumbleupon" />
                                     </Button>
 
-                                    <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="tumblr"
+                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="tumblr"
                                                                 Click="Button_Click_1">
                                         <Image Source="pack://application:,,,/Organiser.Common;component/Image/tumblr-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="tumblr" />
                                     </Button>
 
-                                    <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="twitter"
+                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="twitter"
                                                                 Click="Button_Click_1">
                                         <Image Source="pack://application:,,,/Organiser.Common;component/Image/twitter-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="twitter" />
                                     </Button>
 
-                                    <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="wordpress"
+                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="wordpress"
                                                                 Click="Button_Click_1">
                                         <Image Source="pack://application:,,,/Organiser.Common;component/Image/wordpress-icon.png" 
                                                                    Width="18" Height="18"
@@ -297,8 +235,8 @@
                             </ContextMenu>
                         </Button.ContextMenu>
                     </Button>
-                
-                <mControls:MyComboBox Height="23"
+
+                    <mControls:MyComboBox Height="23"
                           IsEditable="True"
                           x:Name="cmbSites"
                           IsTextSearchEnabled="False"
@@ -306,17 +244,17 @@
                          ScrollViewer.VerticalScrollBarVisibility="Hidden"
                                           ScrollViewer.CanContentScroll="False"
                          Text="{Binding AddressEditable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    <ComboBox.ItemContainerStyle>
-                        <Style TargetType="ComboBoxItem">
-                            <Setter Property="Width" Value="{Binding Path=ActualWidth,ElementName=cmbSites}"/>
-                        </Style>
-                    </ComboBox.ItemContainerStyle>
-                    <!--<ComboBox.InputBindings>
+                        <ComboBox.ItemContainerStyle>
+                            <Style TargetType="ComboBoxItem">
+                                <Setter Property="Width" Value="{Binding Path=ActualWidth,ElementName=cmbSites}"/>
+                            </Style>
+                        </ComboBox.ItemContainerStyle>
+                        <!--<ComboBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding GoCommand}" />
                     </ComboBox.InputBindings>-->
-                </mControls:MyComboBox>
+                    </mControls:MyComboBox>
 
-                <!--<TextBox Height="23"
+                    <!--<TextBox Height="23"
                          Text="{Binding AddressEditable, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          GotKeyboardFocus="OnTextBoxGotKeyboardFocus"
                          GotMouseCapture="OnTextBoxGotMouseCapture">
@@ -324,31 +262,45 @@
                         <KeyBinding Key="Enter" Command="{Binding GoCommand}" />
                     </TextBox.InputBindings>
                 </TextBox>-->
-            </DockPanel>
+                </DockPanel>
             </Border>
 
             <StatusBar DockPanel.Dock="Bottom">
-                <Controls:MetroProgressBar
+                <!--<Controls:MetroProgressBar
                             HorizontalAlignment="Right"
+                             IsIndeterminate="{Binding IsLoading}"
+                             Width="100"
+                             Height="16"
+                             Margin="3" />-->
+                <ProgressBar HorizontalAlignment="Right"
                              IsIndeterminate="{Binding IsLoading}"
                              Width="100"
                              Height="16"
                              Margin="3" />
                 <TextBlock Text="{Binding StatusMessage}" />
                 <Separator />
+                <TextBlock Text="{Binding HuverLink}" />
+                <Separator />
                 <TextBlock Text="{Binding OutputMessage}" />
             </StatusBar>
             <Grid Background="#FFF0F0F0" Name="browserGrd">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <Rectangle>
                     <Rectangle.Fill>
                         <VisualBrush TileMode="Tile"
-                                     Viewport="0,0,500,90"
+                                     Viewport="0,0,150,150"
                                      ViewportUnits="Absolute"
                                      Opacity="0.05">
                             <VisualBrush.Visual>
-                                <StackPanel>
-                                    <TextBlock Margin="6,12" FontWeight="Bold">brow·seo</TextBlock>
-                                </StackPanel>
+                                <Border BorderBrush="#FFF0F0F0" BorderThickness="4">
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock FontWeight="Bold" Margin="0,0,0,10" FontSize="16" Text="Brow·SEO" />
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico" Stretch="Fill"  Margin="0,0,0,-80"  Width="45" Height="45" />
+                                    </StackPanel>
+                                </Border>
                             </VisualBrush.Visual>
                             <VisualBrush.Transform>
                                 <RotateTransform Angle="-22.5" />
@@ -358,8 +310,104 @@
                 </Rectangle>
 
                 <ContentPresenter Content="{Binding WebBrowserHost}" Name="host" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-                
-                <Controls:FlyoutsControl Panel.ZIndex="1"  x:Name="flyOutsControl">
+
+                <Expander Name="flyOut" 
+                          ExpandDirection="Right"
+                          Style="{StaticResource AnimatedExpanderStyle}"
+                          Grid.Column="1"
+                          Header="Bookmarks"
+                          Visibility="Collapsed"
+                          IsExpanded="False">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="70" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Name="btnCloseFlyout" Click="btnCloseFlyout_Click" ToolTip="Collapse"
+                                Grid.Column="0" VerticalAlignment="Center" Margin="10,0,0,0" HorizontalAlignment="Left" Height="45">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="ClipToBounds" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="Transparent">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.LayoutTransform>
+                                                            <TransformGroup>
+                                                                <TransformGroup.Children>
+                                                                    <TransformCollection>
+                                                                        <RotateTransform Angle="-90"/>
+                                                                    </TransformCollection>
+                                                                </TransformGroup.Children>
+                                                            </TransformGroup>
+                                                        </Grid.LayoutTransform>
+                                                        <Ellipse x:Name="circle" HorizontalAlignment="Center" Height="40" Width="40" Stroke="Black" VerticalAlignment="Center" StrokeThickness="1" />
+                                                        <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5"
+                                                              HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="#797878"
+                                                              StrokeThickness="2" VerticalAlignment="Center" Height="11" 
+                                                             Margin="10,10,10,10" Stretch="Fill" Width="20"/>
+                                                    </Grid>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Stroke" TargetName="circle" Value="#FF787878" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter Property="Stroke" Value="#FF515151" TargetName="circle"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <TextBlock Grid.ColumnSpan="3" Text="Saved Sites" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="26.667"  />
+                        
+                        <Button Content="Export All Bookmarks" Name="btnExportAllBookmarks" Grid.Column="0" Grid.Row="1" 
+                                    VerticalAlignment="Bottom"
+                                    Margin="10,5,5,5" Click="btnExportAllBookmarks_Click" />
+                        <Button Content="Import Bookmarks" Name="btnImpotBookmarks" Grid.Column="1"  Grid.Row="1"  HorizontalAlignment="Left"
+                                    VerticalAlignment="Bottom"
+                                    Margin="5" Click="btnImpotBookmarks_Click" />
+                        <Button Name="Reminders" Grid.Column="2" Style="{DynamicResource browser_btn}"  Grid.Row="1"  Click="Reminders_Click" 
+                                    Width="50" Height="50" HorizontalAlignment="Left" Cursor="Hand">
+                            <StackPanel>
+                                <Border Name="borderNotification" Visibility="Collapsed" CornerRadius="999" Margin="10,0,0,-10" Width="20" Height="20" BorderThickness="0.5" BorderBrush="Black" Opacity="0.5">
+                                    <Border.Background>
+                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                            <GradientStop Color="#FFBB0000"/>
+                                            <GradientStop Color="#FFBB0000" Offset="1"/>
+                                            <GradientStop Color="#FFFF0000" Offset="0.522"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                    <TextBlock Foreground="White" FontWeight="Bold" FontSize="11" Name="tbNotificationCount" HorizontalAlignment="Center"></TextBlock>
+                                </Border>
+                                <Image  HorizontalAlignment="Center" Height="25" Width="25" VerticalAlignment="Center" Stretch="Uniform" SnapsToDevicePixels="True" 
+                                        Source="pack://application:,,,/Organiser.Common;component/Image/reminder.png" Opacity="0.4" />
+                            </StackPanel>
+                        </Button>
+                        <dragNdrop:DraggableListBox Width="310" Grid.Row="2" Grid.ColumnSpan="3" Margin="10" BorderThickness="0"/>
+                    </Grid>
+                </Expander>
+            </Grid>
+        </DockPanel>
+    </Grid>
+</UserControl>
+
+
+<!--<Controls:FlyoutsControl Panel.ZIndex="1"  x:Name="flyOutsControl">
                     <Controls:Flyout Theme="Light" x:Name="flyOut" Header="Saved Sites" Position="Right" 
                                  ClosingFinished="flyOut_ClosingFinished"
                                  Background="#f5f5f5"
@@ -376,10 +424,10 @@
                             </Grid.ColumnDefinitions>
                             <Button Content="Export All Bookmarks" Name="btnExportAllBookmarks" Grid.Column="0" 
                                     VerticalAlignment="Bottom"
-                                    Style="{DynamicResource ButtonStyle}" Margin="10,5,5,5" Click="btnExportAllBookmarks_Click" />
+                                    Margin="10,5,5,5" Click="btnExportAllBookmarks_Click" />
                             <Button Content="Import Bookmarks" Name="btnImpotBookmarks" Grid.Column="1" HorizontalAlignment="Left"
                                     VerticalAlignment="Bottom"
-                                    Style="{DynamicResource ButtonStyle}" Margin="5" Click="btnImpotBookmarks_Click" />
+                                    Margin="5" Click="btnImpotBookmarks_Click" />
                             <Button Name="Reminders" Grid.Column="2" Style="{DynamicResource browser_btn}" Click="Reminders_Click" 
                                     Width="50" Height="50" HorizontalAlignment="Left" Cursor="Hand">
                                 <StackPanel>
@@ -397,41 +445,7 @@
                                         Source="../Images/reminder.png" Opacity="0.4" />
                                 </StackPanel>
                             </Button>
-                            <dragNdrop:DraggableListBox Width="310" Name="dragnDropListview" Grid.Row="1" Grid.ColumnSpan="3" Margin="10" BorderThickness="0"/>
+                            <dragNdrop:DraggableListBox Width="310" Grid.Row="1" Grid.ColumnSpan="3" Margin="10" BorderThickness="0"/>
                         </Grid>
-                        <!--<dragNdrop:DraggableTreeview Width="275" Name="dragnDropTreeview" />-->
-                        <!--<ListBox ItemsSource="{Binding Path=SitesList}" 
-                                 SelectedIndex="{Binding SISitesList}"
-                                 Background="WhiteSmoke" 
-                                 Width="200">
-                            <ListBox.InputBindings>
-                                <MouseBinding Gesture="LeftDoubleClick"
-                                              Command="{Binding NavigateListItemCommand}"/>
-                            </ListBox.InputBindings>
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Site}" 
-                                               Width="{Binding Path=ActualWidth, 
-                                                    RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}}" >
-                                        <TextBlock.InputBindings>
-                                            <MouseBinding MouseAction="LeftDoubleClick"
-                                                          Command="{Binding DataContext.NavigateListItemCommand,
-                                                                RelativeSource={RelativeSource FindAncestor,  
-                                                                AncestorType ={x:Type UserControl}}}" />
-                                        </TextBlock.InputBindings>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                            <ListBox.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Name="deleteSiteMenueItem" Header="Delete" Command="{Binding DeleteSiteMenueItemCommand}" />
-                                </ContextMenu>
-                            </ListBox.ContextMenu>
-                        </ListBox>-->
                     </Controls:Flyout>
-                </Controls:FlyoutsControl>
-                
-            </Grid>
-        </DockPanel>
-    </Grid>
-</UserControl>
+                </Controls:FlyoutsControl>-->

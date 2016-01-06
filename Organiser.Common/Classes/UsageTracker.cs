@@ -9,11 +9,11 @@ namespace Organiser.Common.Classes
 {
     public class UsageTracker
     {
-        const string SPLITTER = "qwertyuiiioop"; 
-
-        public static string ProjectName;
+        const string SPLITTER = "qwertyuiiioop";   
 
         private static List<KeyValuePair<string, string>> UsageList;
+
+        static object mLock = new object();
 
         public static void AddTraceCookie(string traceType)
         {
@@ -37,22 +37,25 @@ namespace Organiser.Common.Classes
 
         public static void SaveAllTrackedDataList()
         {
-            var datetime = DateTime.Now;
-            var date = datetime.Date;
-            var dtString = date.Day + "_" + datetime.Month + "_" + datetime.Year;
-
-            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Track", ProjectName, dtString);
-            if (!Directory.Exists(dirPath))
+            lock (mLock)
             {
-                Directory.CreateDirectory(dirPath);
-            }
+                var datetime = DateTime.Now;
+                var date = datetime.Date;
+                var dtString = date.Day + "_" + datetime.Month + "_" + datetime.Year;
 
-            string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Track", ProjectName,dtString, "Usage.txt");
-            foreach (KeyValuePair<string, string> trackCookie in UsageList)
-            {
-                string line = trackCookie.Key + SPLITTER + trackCookie.Value;
-                line = MyFilesDatabase.EncodeTo64(line);
-                File.AppendAllText(filePath, line + Environment.NewLine);
+                string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Track", GloableProfData.PData.ProjectName, dtString);
+                if (!Directory.Exists(dirPath))
+                {
+                    Directory.CreateDirectory(dirPath);
+                }
+
+                string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Track", GloableProfData.PData.ProjectName, dtString, "Usage.txt");
+                foreach (KeyValuePair<string, string> trackCookie in UsageList)
+                {
+                    string line = trackCookie.Key + SPLITTER + trackCookie.Value;
+                    line = MyFilesDatabase.EncodeTo64(line);
+                    File.AppendAllText(filePath, line + Environment.NewLine);
+                }
             }
         }
     }

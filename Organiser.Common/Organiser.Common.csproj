@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Organiser.Common</RootNamespace>
     <AssemblyName>Organiser.Common</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -41,10 +41,20 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.AddIn" />
+    <Reference Include="System.AddIn.Contract" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -59,15 +69,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Classes\BacklinkHistoryLine.cs" />
+    <Compile Include="Classes\ConsoleManager.cs" />
+    <Compile Include="Classes\CrawlerStates.cs" />
+    <Compile Include="Classes\DelegateCommand.cs" />
+    <Compile Include="Classes\DelegateCommandT.cs" />
     <Compile Include="Classes\ExtensionMethods.cs" />
+    <Compile Include="Classes\FacebookGraphResult.cs" />
+    <Compile Include="Classes\FlexibleMessageBox.cs" />
     <Compile Include="Classes\GloableProfData.cs" />
+    <Compile Include="Classes\Lists.cs" />
     <Compile Include="Classes\MozscapeAPI.cs" />
     <Compile Include="Classes\MozscapeResults.cs" />
-    <Compile Include="Classes\ObservableCollectionEx.cs" />
+    <Compile Include="Classes\ObjectCopier.cs" />
+    <Compile Include="Classes\RelayCommand.cs" />
+    <Compile Include="Classes\TimeHelper.cs" />
     <Compile Include="Classes\UsageTracker.cs" />
     <Compile Include="Classes\ViewModelBase.cs" />
-    <Compile Include="Windows\AddLinkDataWindow.xaml.cs">
-      <DependentUpon>AddLinkDataWindow.xaml</DependentUpon>
+    <Compile Include="Controlls\MyListView.cs" />
+    <Compile Include="Windows\SetNameAndDataWindow.xaml.cs">
+      <DependentUpon>SetNameAndDataWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\ChooseFolderWindow.xaml.cs">
       <DependentUpon>ChooseFolderWindow.xaml</DependentUpon>
@@ -75,31 +95,38 @@
     <Compile Include="Windows\CreateProjectWindow.xaml.cs">
       <DependentUpon>CreateProjectWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\RssFeedsLinksMultiWindow.xaml.cs">
+      <DependentUpon>RssFeedsLinksMultiWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\SaveMozKeysWindow.xaml.cs">
       <DependentUpon>SaveMozKeysWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\ServerVerifyWindow.xaml.cs">
       <DependentUpon>ServerVerifyWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\SetANameWindow.xaml.cs">
-      <DependentUpon>SetANameWindow.xaml</DependentUpon>
-    </Compile>
-    <Page Include="SelectProfileWindow.xaml">
+    <Page Include="GloableStyleDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="RoundScrollBarStyle.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Classes\ErrorModeContext.cs" />
+    <Page Include="Windows\SelectProfileWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Compile Include="Classes\FilesDatabase.cs" />
     <Compile Include="Classes\IniFile.cs" />
     <Compile Include="Classes\PersonData.cs" />
     <Compile Include="Classes\ProjectData.cs" />
     <Compile Include="Classes\Social.cs" />
     <Compile Include="Controlls\NonReloadingTabControl.cs" />
-    <Compile Include="SelectProfileWindow.xaml.cs">
+    <Compile Include="Windows\SelectProfileWindow.xaml.cs">
       <DependentUpon>SelectProfileWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Windows\AddLinkDataWindow.xaml">
+    <Page Include="Windows\SetNameAndDataWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -111,15 +138,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\RssFeedsLinksMultiWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Windows\SaveMozKeysWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Windows\ServerVerifyWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\SetANameWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -142,6 +169,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -206,6 +234,57 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Image\setup-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\v.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\add.png" />
+    <Resource Include="Image\facebook.png" />
+    <Resource Include="Image\save.png" />
+    <Resource Include="Image\user.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\reminder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\settings2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\save-as-xl.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\icon-global.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\fcs icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\enterprise buddy.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\enterprise buddy.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\closed_folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\new_document.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\rankwyz-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\rankwyz-icon-check.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\restore.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\info.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\close.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

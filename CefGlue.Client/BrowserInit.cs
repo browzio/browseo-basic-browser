@@ -1,4 +1,5 @@
-﻿using SocialOrganizer.Models;
+﻿using Organiser.Common.Classes;
+using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,16 +16,13 @@ using System.Windows.Forms;
 namespace Xilium.CefGlue.Client
 {
     public static class BrowserInit
-    {
-
-        public static PersonData pData;
-        public static string SitesFilePath;
-
-        public static void Init(string sitesFilePath, PersonData data = null)
+    {  
+        public static void Init(PersonData data = null)
         {
-            SitesFilePath = sitesFilePath;
-            pData = data;
-            Organiser.Common.Classes.GloableProfData.PData = pData;
+            if (data != null)
+            {
+                GloableProfData.PData = data;
+            }
 
             try
             {
@@ -34,24 +32,28 @@ namespace Xilium.CefGlue.Client
 
             var mainArgs = new CefMainArgs(new string[0] { });
             var app = new DemoApp();
-            var exitCode = CefRuntime.ExecuteProcess(mainArgs, app);
+            //var exitCode = CefRuntime.ExecuteProcess(mainArgs, app);
 
-            var exePath = AppDomain.CurrentDomain.BaseDirectory;
+            var exePath = AppDomain.CurrentDomain.BaseDirectory + "\\BrowserAndFeatures.exe";
+            exePath = exePath.Replace("\\\\","\\");
             var settings = new CefSettings
             {
-                BrowserSubprocessPath = exePath + "\\BrowserAndFeatures.exe",
+                BrowserSubprocessPath = exePath,
                 SingleProcess = false,
                 MultiThreadedMessageLoop = true,
                 PersistSessionCookies = true,
                 LogSeverity = CefLogSeverity.Disable,
                 IgnoreCertificateErrors = true,
-                UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36"
+                UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36", 
+                 
                 //NoSandbox = true
                 //LogFile = "CefGlue.log",
             };
-            if (pData != null)
+
+
+            if (GloableProfData.PData != null)
             {
-                string path = Path.Combine(Organiser.Common.Classes.MyFilesDatabase.GetBaseDir(), "Caches\\" + pData.ProjectName);
+                string path = Path.Combine(Organiser.Common.Classes.MyFilesDatabase.GetBaseDir(), "Caches\\" + GloableProfData.PData.ProjectName);
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
                 settings.CachePath = path;
@@ -62,12 +64,11 @@ namespace Xilium.CefGlue.Client
                 Application.Idle += (sender, e) => { CefRuntime.DoMessageLoopWork(); };
             }
             
-            CefRuntime.Initialize(mainArgs, settings, app);
+            CefRuntime.Initialize(mainArgs, settings, app, IntPtr.Zero);
 
             //CefRuntime.AddWebPluginDirectory(@"C:\Windows\system32\Macromed\Flash\");
             //CefRuntime.RefreshWebPlugins();
 
-            Organiser.Common.Classes.UsageTracker.ProjectName = pData.ProjectName;
             Organiser.Common.Classes.UsageTracker.AddTraceCookie("Browser Started");
 
             Application.EnableVisualStyles();
@@ -77,6 +78,80 @@ namespace Xilium.CefGlue.Client
             //CefRuntime.AddWebPluginPath(@"C:\Windows\System32\Macromed\Flash\pepflashplayer64_18_0_0_209.dll");
             //CefRuntime.RefreshWebPlugins();
         }
+
+        public static void SetPersonData(int birthdayYear, string children, string city, int cmbSelectedIndexDay, int cmbSelectedIndexMonth, int cmbSelectedIndexSex, string country, string dir, string email, string filePath, string firstName, bool inMonney, bool inPBNVault, string lastName, string notes, string password, string phoneNumber, string profileName, string projectDir, string projectName, string proxyIP, string proxyPassword, string proxyPort, string proxyUsername, int sIPBNType, string state, string street, string username, string webAddress, string zip)
+        {
+            if (GloableProfData.PData == null)
+            {
+                GloableProfData.PData = new PersonData()
+                {
+                    BirthdayYear = birthdayYear,
+                    Children = children,
+                    City = city,
+                    CmbSelectedIndexDay = cmbSelectedIndexDay,
+                    CmbSelectedIndexMonth = cmbSelectedIndexMonth,
+                    CmbSelectedIndexSex = cmbSelectedIndexSex,
+                    Country = country,
+                    Dir = dir,
+                    Email = email,
+                    FilePath = filePath,
+                    FirstName = firstName,
+                    InMonney = inMonney,
+                    InPBNVault = inPBNVault,
+                    LastName = lastName,
+                    Notes = notes,
+                    Password = password,
+                    PhoneNumber = phoneNumber,
+                    ProfileName = profileName,
+                    ProjectDir = projectDir,
+                    ProjectName = projectName,
+                    ProxyIP = proxyIP,
+                    ProxyPassword = proxyPassword,
+                    ProxyPort = proxyPort,
+                    ProxyUsername = proxyUsername,
+                    SIPBNType = sIPBNType,
+                    State = state,
+                    Street = street,
+                    Username = username,
+                    WebAddress = webAddress,
+                    Zip = zip,
+                };
+            }
+            else
+            {
+                GloableProfData.PData.BirthdayYear = birthdayYear;
+                GloableProfData.PData.Children = children;
+                GloableProfData.PData.City = city;
+                GloableProfData.PData.CmbSelectedIndexDay = cmbSelectedIndexDay;
+                GloableProfData.PData.CmbSelectedIndexMonth = cmbSelectedIndexMonth;
+                GloableProfData.PData.CmbSelectedIndexSex = cmbSelectedIndexSex;
+                GloableProfData.PData.Country = country;
+                GloableProfData.PData.Dir = dir;
+                GloableProfData.PData.Email = email;
+                GloableProfData.PData.FilePath = filePath;
+                GloableProfData.PData.FirstName = firstName;
+                GloableProfData.PData.InMonney = inMonney;
+                GloableProfData.PData.InPBNVault = inPBNVault;
+                GloableProfData.PData.LastName = lastName;
+                GloableProfData.PData.Notes = notes;
+                GloableProfData.PData.Password = password;
+                GloableProfData.PData.PhoneNumber = phoneNumber;
+                GloableProfData.PData.ProfileName = profileName;
+                GloableProfData.PData.ProjectDir = projectDir;
+                GloableProfData.PData.ProjectName = projectName;
+                GloableProfData.PData.ProxyIP = proxyIP;
+                GloableProfData.PData.ProxyPassword = proxyPassword;
+                GloableProfData.PData.ProxyPort = proxyPort;
+                GloableProfData.PData.ProxyUsername = proxyUsername;
+                GloableProfData.PData.SIPBNType = sIPBNType;
+                GloableProfData.PData.State = state;
+                GloableProfData.PData.Street = street;
+                GloableProfData.PData.Username = username;
+                GloableProfData.PData.WebAddress = webAddress;
+                GloableProfData.PData.Zip = zip; 
+            }
+        }
+
 
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern int SetErrorMode(int wMode);

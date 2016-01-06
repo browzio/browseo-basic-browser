@@ -41,6 +41,7 @@
     <Reference Include="CookComputing.XmlRpcV2, Version=3.0.0.0, Culture=neutral, PublicKeyToken=a7d6e17aa302004d, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\WordPressSharp\packages\xmlrpcnet.3.0.0.266\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <EmbedInteropTypes>True</EmbedInteropTypes>
@@ -70,7 +71,6 @@
     <Compile Include="Core\Initialisation.cs" />
     <Compile Include="FTP_VM.cs" />
     <Compile Include="Helpers\EditableTabHeaderControl.cs" />
-    <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="Helpers\Spinner.cs" />
     <Compile Include="Models\FTPprofile.cs" />
     <Compile Include="Models\PBNProject.cs" />
@@ -204,8 +204,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="bin\Debug\WPF WYSIWYG HTML Editor.vshost.exe.config" />
-    <None Include="bin\Debug\WPF_WYSIWYG_HTML_Editor.exe.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -291,12 +289,6 @@
     <Resource Include="Resources\web.png" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\Debug\CookComputing.XmlRpcV2.dll" />
-    <Content Include="bin\Debug\WordPressSharp.dll" />
-    <Content Include="bin\Debug\WordPressSharp.pdb" />
-    <Content Include="bin\Debug\WPF WYSIWYG HTML Editor.vshost.exe" />
-    <Content Include="bin\Debug\WPF_WYSIWYG_HTML_Editor.exe" />
-    <Content Include="bin\Debug\WPF_WYSIWYG_HTML_Editor.pdb" />
     <Resource Include="Images\RomanE-01.png" />
     <Resource Include="Images\publish-o.png" />
     <Resource Include="Images\publish-bw.png" />
@@ -304,8 +296,6 @@
     <Resource Include="Images\new_window-icon.png" />
     <Resource Include="Images\clear.png" />
     <Resource Include="Images\spin.png" />
-    <Resource Include="Images\browseo %281%29.ico" />
-    <Resource Include="Images\v.png" />
     <Resource Include="Images\settings-icon.png" />
   </ItemGroup>
   <ItemGroup>
@@ -318,22 +308,26 @@
     <ProjectReference Include="..\Drupal7.Services\Drupal7.Services.csproj">
       <Project>{4f6c5819-0ee7-4c69-8012-b0afa3d901f0}</Project>
       <Name>Drupal7.Services</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
       <Name>Organiser.Common</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\WordPressSharp\WordPressSharp.csproj">
       <Project>{7a938355-0b6b-48b7-97fb-c0c09015307b}</Project>
       <Name>WordPressSharp</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\WPFPieChart\WPFPieChartTwo.csproj">
       <Project>{59210896-68d1-4a34-91cc-8d015eca7061}</Project>
       <Name>WPFPieChartTwo</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="bin\Release\" />
+    <Resource Include="Images\refresh-icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

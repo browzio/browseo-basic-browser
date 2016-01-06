@@ -1,6 +1,5 @@
 ﻿using Organiser.Common.Classes;
-using Organiser.Common.Windows;
-using ProjectsList.Helpers;
+using Organiser.Common.Windows;  
 using Prospector.Helpers;
 using Prospector.Models;
 using System;
@@ -791,11 +790,7 @@ namespace Prospector.ViewModels
                     }
                     else
                     {
-                        inProxyFileTextArr = inFileText.Split(new string[] { Environment.NewLine }, StringSplitOptions.None).ToList();
-                        if (inProxyFileTextArr.Count > 0)
-                        {
-                            inProxyFileTextArr.RemoveAt(inProxyFileTextArr.Count - 1);
-                        }
+                        inProxyFileTextArr = inFileText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList(); 
                         pDetailes = inProxyFileTextArr[0].Split(':');
                     }
 
@@ -1457,7 +1452,7 @@ namespace Prospector.ViewModels
                         Query = Query.Replace("\"", "%22");
                         Query = Query.Trim();
                         Query = Query.Replace(' ', '+');
-                        Query = String.Format(@"http://google.com/search?v=1.0&q={0}", Query);
+                        Query = String.Format(@"https://google.com/search?v=1.0&q={0}", Query);
                         Query = Query + TimeFrames[CmbTimeframeIndex].Query;
 
                         Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Search " + Query);

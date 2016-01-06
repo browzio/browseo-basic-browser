@@ -16,8 +16,10 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms.Integration;
 using System.Windows.Input;
 using System.Xml;
+using Xilium.CefGlue.Client;
 
 namespace RssReader.Mvvm
 {
@@ -25,9 +27,8 @@ namespace RssReader.Mvvm
     {
         private const string POST_SPLITTER = "({[:]})";
 
-        public ICommand OkClicked { get; set; }
-        public ICommand LbContextMenuClicked { get; set; }
-        public ICommand ModeClicked { get; set; }
+        public ICommand BtnClicked { get; set; }
+        public ICommand LbContextMenuClicked { get; set; }    
 
         private ObservableCollection<SavedPostedFeed> savedFeeds;
         public ObservableCollection<SavedPostedFeed> SavedFeeds
@@ -49,9 +50,8 @@ namespace RssReader.Mvvm
                     OutputedLinks = "";
                     SiteName = "";
                     IsRssMashup = false;
-                    SavedListVisible = Visibility.Collapsed;
                     ResultsVisible = Visibility.Collapsed;
-
+                    BrowserVisible = 0;
                 }
                 else if (value >= 0 && SavedFeeds.Count > 0)
                 {
@@ -61,22 +61,25 @@ namespace RssReader.Mvvm
                     OutputedLinks = SavedFeeds[value].FeedResult;
                     IsRssMashup = SavedFeeds[value].FeedIsRssMashup;
                     ResultsVisible = Visibility.Visible;
-                    SavedListVisible = Visibility.Visible;
+
+                    try
+                    {
+                        BrowserPreviewStatus = "Loading " + OutputedLinks.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)[1];
+                        WebBrowser.Navigate(OutputedLinks.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)[1]);
+                        BrowserVisible = 600;
+                    }
+                    catch { }
                 }
                 else if (value >= 0 && SavedFeeds.Count <= 0)
                 {
-                    Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        MessageBox.Show(mParent, "No saved posted feeds.");
-                    });
+                    MessageBox.Show("No saved posted feeds.");
                 }
 
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("SISavedFeeds"));
             }
         }
-
-
+                                     
         private ObservableCollection<string> catigories;
         public ObservableCollection<string> Catigories
         {
@@ -92,6 +95,62 @@ namespace RssReader.Mvvm
                 sICategories = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("SICategories"));
+            }
+        }
+
+        private WindowsFormsHost wfh;
+        public WindowsFormsHost WebBrowserHost
+        {
+            get
+            {
+                if (wfh == null)
+                {
+                    WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
+                    WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
+                    WebBrowser.init("");
+                    wfh = new WindowsFormsHost() { Child = WebBrowser };
+                }
+                return wfh;
+            }
+            set
+            {
+                wfh = value; if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("WebBrowserHost")); ;
+            }
+        }
+
+        private void WebBrowser_OnBrowserLoadingChanged(bool isLoading)
+        {
+            if (!isLoading)
+            {
+                BrowserPreviewStatus = "Preview.";
+            }
+        }
+
+        public BrowserCntrl WebBrowser { get; set; }
+
+        private int browserVisible;
+        public int BrowserVisible
+        {
+            get { return browserVisible; }
+            set
+            {
+                browserVisible = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("BrowserVisible"));
+            }
+        }
+
+        // BrowserPreviewStatus
+        private string browserPreviewStatus;
+        public string BrowserPreviewStatus
+        {
+            get { return browserPreviewStatus; }
+            set
+            {
+                browserPreviewStatus = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("BrowserPreviewStatus"));
             }
         }
 
@@ -153,6 +212,17 @@ namespace RssReader.Mvvm
             }
         }
 
+        private string status;    
+        public string Status
+        {
+            get { return status; }
+            set { status = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Status"));
+            }
+        }
+
+
         private Visibility resultsVisible;
         public Visibility ResultsVisible
         {
@@ -161,87 +231,70 @@ namespace RssReader.Mvvm
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs("ResultsVisible"));
             }
-        }
-        
-        private Visibility savedListVisible;
-        public Visibility SavedListVisible
-        {
-            get { return savedListVisible; }
-            set
-            {
-                savedListVisible = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("SavedListVisible"));
-            }
-        }
+        }  
 
-        private PersonData mPData;
-        private Window mParent;
-
-        public LinksToRssVM(PersonData pData, Window parent) 
+        public LinksToRssVM() 
         {
             Organiser.Common.Classes.UsageTracker.AddTraceCookie("Opened Rss Masher");
 
-            mPData = pData;
-            mParent = parent;
-
             Catigories = new ObservableCollection<string>();
-            Catigories.Add("Autos-and-Vehicles");
+            Catigories.Add("AutosAndVehicles");
             Catigories.Add("Comedy");
             Catigories.Add("Education");
-            Catigories.Add("Film-&-Animation");
+            Catigories.Add("FilmAndAnimation");
             Catigories.Add("Health");
             Catigories.Add("Business");
             Catigories.Add("Gaming");
-            Catigories.Add("Howto-&-Style");
+            Catigories.Add("HowtoAndStyle");
             Catigories.Add("Music");
-            Catigories.Add("News-&-Politics");
-            Catigories.Add("Nonprofits-&-Activism");
-            Catigories.Add("People-&-Blogs");
-            Catigories.Add("Pets-&-Animals");
-            Catigories.Add("Science-&-Technology");
+            Catigories.Add("NewsAndPolitics");
+            Catigories.Add("NonprofitsAndActivism");
+            Catigories.Add("PeopleAndBlogs");
+            Catigories.Add("PetsAndAnimals");
+            Catigories.Add("ScienceAndTechnology");
             Catigories.Add("Sports");
-            Catigories.Add("Travel-&-Events");
+            Catigories.Add("TravelAndEvents");
 
             SavedFeeds = new ObservableCollection<SavedPostedFeed>();
-            getAllSavedFeeds();
+            //getAllSavedFeeds();
 
-            OkClicked = new RelayCommand(btn_OkClicked);
+            BtnClicked = new RelayCommand(btn_Clicked);
             LbContextMenuClicked = new RelayCommand(ON_LbContextMenuClicked);
-            ModeClicked = new RelayCommand(On_NewModeClicked);
 
             EnableOkBtn = true;
             SISavedFeeds = -1;
         }
-        private void On_NewModeClicked(object param)
-        {
-            switch ((string)param)
-            {
-                case "New":
-                    SISavedFeeds = -1;
-                    break;
-
-                case "Edit":
-                    SISavedFeeds = 0;
-                    break;
-
-                default: 
-                    break;
-            }
-        }
-
 
         public void AddMasherLink(string link)
         {
             InputedText += link + Environment.NewLine;
         }
 
-        #region posting
-
-        private void btn_OkClicked(object obj)
+        private void btn_Clicked(object obj)
         {
-            if (string.IsNullOrEmpty(InputedText) || string.IsNullOrWhiteSpace(InputedText) ||
-                string.IsNullOrWhiteSpace(SiteName) || string.IsNullOrEmpty(SiteName)) return;
+            switch ((string)obj)
+            {
+                case "Refresh":
+                    getAllSavedFeeds();
+                    break;
+
+                case "MashIT":
+                    mashIt();
+                    break;
+
+                case "ClearData":
+                    SISavedFeeds = -1;
+                    break;
+                default:
+                    break;
+            }
+        }
+         
+        #region posting
+        private void mashIt()
+        {
+            if (string.IsNullOrEmpty(InputedText) || string.IsNullOrWhiteSpace(InputedText) ||string.IsNullOrWhiteSpace(SiteName) || string.IsNullOrEmpty(SiteName))
+                return;
             new System.Threading.Thread(() =>
             {
                 if (SiteName.Contains(" "))
@@ -251,24 +304,25 @@ namespace RssReader.Mvvm
 
                 EnableOkBtn = false;
                 OutputedLinks = "";
+                string errors = "";
                 ResultsVisible = Visibility.Collapsed;
-
-                Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    Mouse.OverrideCursor = Cursors.Wait;
-                });
 
                 try
                 {
+                    Status = "Getting links ready.";
+
                     SyndicationFeed feed = new SyndicationFeed(SiteName.Replace("-", " "), "", new Uri("http://rssey.com"));
                     List<SyndicationItem> items = new List<SyndicationItem>();
 
-                    string[] linksArray = InputedText.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+                    string[] linksArray = InputedText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string link in linksArray)
                     {
                         try
-                        {
+                        { 
                             if (string.IsNullOrEmpty(link) || string.IsNullOrWhiteSpace(link)) continue;
+
+                            Status = "Adding link " + link;
+
                             string linkToAdd = link;
                             if (linkToAdd.Contains("https"))
                                 linkToAdd = linkToAdd.Replace("https", "http");
@@ -302,11 +356,8 @@ namespace RssReader.Mvvm
                         }
                         catch
                         {
-                            Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        if (!string.IsNullOrEmpty(link) && !string.IsNullOrWhiteSpace(link))
-                            MessageBox.Show(mParent, "Incompatible link " + link);
-                    });
+                            if (!string.IsNullOrEmpty(link) && !string.IsNullOrWhiteSpace(link))
+                                errors += "Incompatible link: " + link + Environment.NewLine;
                         }
                     }
 
@@ -320,6 +371,7 @@ namespace RssReader.Mvvm
                     }
 
                     #region -- Output feed to a file --
+                    Status = "Getting file ready.";
                     string mainFile = Path.Combine(MyFilesDatabase.GetBaseDir(), "TempForRss", "feed.xml");
                     using (FileStream fs = new FileStream(mainFile, FileMode.Create))
                     {
@@ -344,11 +396,15 @@ namespace RssReader.Mvvm
                     {
                         client.Credentials = new NetworkCredential("bedbugsb", "[+=KJIp^T~nf");
 
+                        Status = "Uploading " + Catigories[SICategories] + "/" + SiteName + ".xml"; 
+
                         client.UploadFile("ftp://192.185.150.11/public_html/rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".xml", "STOR", mainFile);
 
-                        string htmltext = client.DownloadString("http://rssey.com/rsstohtml/rss2html.php?XMLFILE=" + "http://rssey.com/" + Catigories[SICategories] + "/" + SiteName +".xml");
+                        string htmltext = client.DownloadString("http://rssey.com/rsstohtml/rss2html.php?XMLFILE=" + "http://rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".xml");
                         string htmlFile = Path.Combine(MyFilesDatabase.GetBaseDir(), "TempForRss", "feed.html");
                         File.WriteAllText(htmlFile, htmltext);
+
+                        Status = "Uploading " + Catigories[SICategories] + "/" + SiteName + ".html";
                         client.UploadFile("ftp://192.185.150.11/public_html/rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".html", "STOR", htmlFile);
 
                         client.Dispose();
@@ -358,55 +414,58 @@ namespace RssReader.Mvvm
                 catch (Exception ex)
                 {
                     failed = true;
-                    Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    MessageBox.Show(mParent, "Upload Faild: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                });
+                    MessageBox.Show("Upload Faild: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
                 string thexmlSite = "http://rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".xml";
                 string thehtmlSite = "http://rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".html";
 
-                EnableOkBtn = true;
+               
                 OutputedLinks = thexmlSite + Environment.NewLine + thehtmlSite;
                 SaveRssSiteLine(thexmlSite);
 
                 if (!failed)
                 {
                     ResultsVisible = Visibility.Visible;
-                    bool found = false;
-                    foreach (SavedPostedFeed savedFeed in SavedFeeds)
+
+                    SavedPostedFeed currentFeed = SavedFeeds.SingleOrDefault(t => t.FeedTitle == SiteName && SICategories == t.FeedCategory);
+                    SavedPostedFeed feedToSave = new SavedPostedFeed()
                     {
-                        if (savedFeed.FeedTitle == SiteName && SICategories == savedFeed.FeedCategory)
-                        {
-                            savedFeed.FeedLinks = InputedText;
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)
+                        FeedLinks = InputedText,
+                        FeedTitle = SiteName,
+                        FeedCategory = SICategories,
+                        FeedResult = OutputedLinks,
+                        FeedIsRssMashup = IsRssMashup,
+                        ForeColorIsLocalProject = System.Windows.Media.Brushes.Black,
+                        ProjectName = "(" + GloableProfData.PData.ProjectName + ")"
+                    };
+
+                    if(currentFeed!=null)
                     {
+                        removeThisFeed(currentFeed);   
                         Application.Current.Dispatcher.Invoke((Action)delegate
                         {
-                            SavedFeeds.Add(new SavedPostedFeed()
-                            {
-                                FeedLinks = InputedText,
-                                FeedTitle = SiteName,
-                                FeedCategory = SICategories,
-                                FeedResult = OutputedLinks,
-                                FeedIsRssMashup = IsRssMashup
-                            });
+                            SavedFeeds.Remove(currentFeed);
                         });
                     }
 
-                    saveAFeed();
+                    Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        SavedFeeds.Add(feedToSave);
+                    });
+                    saveTheFeed(feedToSave);
                 }
 
+                if(errors != "")
+                {
+                    Application.Current.Dispatcher.Invoke((Action)delegate
+                    {
+                        FlexibleMessageBox.Show(errors);
+                    });
+                }
+               
                 Organiser.Common.Classes.UsageTracker.AddTraceCookie("Rss Masher Results: " + OutputedLinks);
 
-                Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    Mouse.OverrideCursor = null;
-                });
+                EnableOkBtn = true;
             }).Start();
         }
 
@@ -471,28 +530,19 @@ namespace RssReader.Mvvm
             {
                 if (site == xmlsite)
                 {
-                    bool okClicked = false;
-                    Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        string message = "There Is already a site that you own with this title would you like to overwrite it?";
-                        if (isRemove)
-                            message = "Are you sure you want to remove this site from our servers?";
-                        if (MessageBox.Show(mParent, message, "Overwrite?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                            okClicked = true;
-                    });
-                    if (okClicked)
+                    string message1 = "There Is already a site that you own with this title would you like to overwrite it?";
+                    if (isRemove)
+                        message1 = "Are you sure you want to remove this site from our servers?";
+                    if (MessageBox.Show(message1, "Overwrite?", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         return isRemove;
                     }
                 }
             }
-            Application.Current.Dispatcher.Invoke((Action)delegate
-                    {
-                        string message = "A site with this title already exists choose another one.";
-                        if (isRemove)
-                            message = "Cannot remove this site you did not create it";
-                        MessageBox.Show(mParent, message);
-                    });
+            string message = "A site with this title already exists choose another one.";
+            if (isRemove)
+                message = "Cannot remove this site you did not create it";
+            MessageBox.Show(message);
             if (isRemove)
                 return false;
             return true;
@@ -555,35 +605,61 @@ namespace RssReader.Mvvm
                 case "Remove":
                     if (SiteExists(true))
                     {
-                        try
+                        Task.Factory.StartNew(() =>
                         {
-                            Mouse.OverrideCursor = Cursors.Wait;
-                            EnableOkBtn = false;
+                            try
+                            {
+                                EnableOkBtn = false;
+                                try
+                                {
+                                    Status = "Deleting " + Catigories[SICategories] + "/" + SiteName + ".xml";
+                                    FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://192.185.150.11/public_html/rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".xml");
+                                    request.Credentials = new NetworkCredential("bedbugsb", "[+=KJIp^T~nf");
+                                    request.Method = WebRequestMethods.Ftp.DeleteFile;
+                                    FtpWebResponse response = (FtpWebResponse)request.GetResponse();
+                                    response.Close();
+                                }
+                                catch { }
 
-                            FtpWebRequest request = (FtpWebRequest)WebRequest.Create("ftp://192.185.150.11/public_html/rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".xml");
-                            request.Credentials = new NetworkCredential("bedbugsb", "[+=KJIp^T~nf");
-                            request.Method = WebRequestMethods.Ftp.DeleteFile;
-                            FtpWebResponse response = (FtpWebResponse)request.GetResponse();
-                            response.Close();
+                                try
+                                {
+                                    Status = "Deleting " + Catigories[SICategories] + "/" + SiteName + ".html";
+                                    FtpWebRequest siterequest = (FtpWebRequest)WebRequest.Create("ftp://192.185.150.11/public_html/rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".html");
+                                    siterequest.Credentials = new NetworkCredential("bedbugsb", "[+=KJIp^T~nf");
+                                    siterequest.Method = WebRequestMethods.Ftp.DeleteFile;
+                                    FtpWebResponse siteResponse = (FtpWebResponse)siterequest.GetResponse();
+                                    siteResponse.Close();
+                                }
+                                catch { } 
 
-                            FtpWebRequest siterequest = (FtpWebRequest)WebRequest.Create("ftp://192.185.150.11/public_html/rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".html");
-                            siterequest.Credentials = new NetworkCredential("bedbugsb", "[+=KJIp^T~nf");
-                            siterequest.Method = WebRequestMethods.Ftp.DeleteFile;
-                            FtpWebResponse siteResponse = (FtpWebResponse)siterequest.GetResponse();
-                            siteResponse.Close();
+                                Status = "Cleaning up.";
+                                RemoveRssSiteLine("http://rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".xml");
+                                SavedPostedFeed removedFeed = SavedFeeds[SISavedFeeds];
+                                removeThisFeed(removedFeed);
 
-                            RemoveRssSiteLine("http://rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".xml");
-                            SavedFeeds.RemoveAt(SISavedFeeds);
-                            saveAFeed();
-                            SISavedFeeds = 0;
-                            
-                            EnableOkBtn = true;
-                            Mouse.OverrideCursor = null;
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show(mParent, "Error Deleteing Site: " + ex.Message);
-                        }
+                                Application.Current.Dispatcher.Invoke((Action)delegate
+                                {
+                                    SavedFeeds.Remove(removedFeed);
+                                });
+                                SISavedFeeds = -1;
+                                EnableOkBtn = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show("Error Deleteing Site: " + ex.Message);
+                            }
+                        });
+                    }
+                    else
+                    {
+                        RemoveRssSiteLine("http://rssey.com/" + Catigories[SICategories] + "/" + SiteName + ".xml");
+
+                        SavedPostedFeed removedFeed = SavedFeeds[SISavedFeeds];
+                        removeThisFeed(removedFeed);
+
+                        SavedFeeds.Remove(removedFeed);
+                        SISavedFeeds = -1;
+                        EnableOkBtn = true;
                     }
                     break;
 
@@ -592,11 +668,80 @@ namespace RssReader.Mvvm
             }
         }
 
+        private void removeThisFeed(SavedPostedFeed removedFeed)
+        {
+            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "SavedPostedRssByProject", removedFeed.ProjectName.Replace("(", "").Replace(")", ""));
+            if (!Directory.Exists(dirPath)) return;
+
+            string filePath = Path.Combine(dirPath, "Saved.txt");
+            if (!File.Exists(filePath)) return;
+
+            List<SavedPostedFeed> currentFeeds = new List<SavedPostedFeed>();
+
+            foreach (string rssPost in File.ReadAllText(filePath).Split(new string[] { POST_SPLITTER }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                if (string.IsNullOrEmpty(rssPost) || string.IsNullOrWhiteSpace(rssPost)) continue;
+
+                string[] lines = rssPost.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
+                SavedPostedFeed feedFromFile = new SavedPostedFeed()
+                {
+                    FeedLinks = lines[0],
+                    FeedTitle = lines[1],
+                    FeedCategory = Convert.ToInt32(lines[2]),
+                    FeedResult = lines[4],
+                    FeedIsRssMashup = Convert.ToBoolean(lines[3]),
+                    ProjectName = removedFeed.ProjectName,
+                };
+                if (feedFromFile.FeedTitle != removedFeed.FeedTitle &&
+                    feedFromFile.FeedCategory != removedFeed.FeedCategory)
+                currentFeeds.Add(feedFromFile);
+            }
+
+            File.Delete(filePath);
+            foreach (SavedPostedFeed feed in currentFeeds)
+            {
+                saveTheFeed(feed);
+            } 
+        }
+
+        private void saveTheFeed(SavedPostedFeed savedFeed)
+        {
+            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "SavedPostedRssByProject", savedFeed.ProjectName.Replace("(","").Replace(")",""));
+            if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
+
+            string filePath = Path.Combine(dirPath, "Saved.txt");
+
+            File.AppendAllText(filePath, savedFeed.FeedLinks + MyFilesDatabase.SPLITTER +
+                savedFeed.FeedTitle + MyFilesDatabase.SPLITTER +
+                savedFeed.FeedCategory + MyFilesDatabase.SPLITTER +
+                savedFeed.FeedIsRssMashup + MyFilesDatabase.SPLITTER +
+                savedFeed.FeedResult + POST_SPLITTER);
+        }
+
+        public void CheckNRefreshList()
+        {
+            if (SavedFeeds.Count <= 0)
+                getAllSavedFeeds();
+        }
+
         private void getAllSavedFeeds()
         {
-            string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "SavedPostedRssByProject", mPData.ProjectName, "Saved.txt");
-            if (!File.Exists(filePath)) return;
-            foreach (string rssPost in File.ReadAllText(filePath).Split(new string[] { POST_SPLITTER }, StringSplitOptions.None))
+            string savedPostsDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "SavedPostedRssByProject");
+            if (!Directory.Exists(savedPostsDir)) return;
+            SavedFeeds.Clear();
+
+            foreach (DirectoryInfo dir in new DirectoryInfo(savedPostsDir).GetDirectories())
+            {
+                string filePath = Path.Combine(dir.FullName, "Saved.txt");
+                if (!File.Exists(filePath)) continue;
+
+                addtoListFromSavedPath(filePath, dir.Name == GloableProfData.PData.ProjectName, dir.Name);
+            }
+        }
+
+        private void addtoListFromSavedPath(string filePath, bool isProject, string projectName)
+        {
+            foreach (string rssPost in File.ReadAllText(filePath).Split(new string[] { POST_SPLITTER }, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (string.IsNullOrEmpty(rssPost) || string.IsNullOrWhiteSpace(rssPost)) continue;
 
@@ -606,35 +751,30 @@ namespace RssReader.Mvvm
                 string category = lines[2];
                 string isMasher = lines[3];
                 string result = lines[4];
-                SavedFeeds.Add(new SavedPostedFeed() 
+                SavedFeeds.Add(new SavedPostedFeed()
                 {
                     FeedLinks = links,
                     FeedTitle = title,
                     FeedCategory = Convert.ToInt32(category),
                     FeedResult = result,
-                    FeedIsRssMashup = Convert.ToBoolean(isMasher)
+                    FeedIsRssMashup = Convert.ToBoolean(isMasher),
+                    ForeColorIsLocalProject = isProject ? System.Windows.Media.Brushes.Black : System.Windows.Media.Brushes.Blue,
+                    ProjectName = "("+projectName+")",
                 });
             }
         }
-
-        private void saveAFeed()
-        {
-            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "SavedPostedRssByProject", mPData.ProjectName);
-            if (!Directory.Exists(dirPath)) Directory.CreateDirectory(dirPath);
-
-            string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "SavedPostedRssByProject", mPData.ProjectName, "Saved.txt");
-            if (File.Exists(filePath)) File.Delete(filePath);
-
-            foreach (SavedPostedFeed savedFeed in SavedFeeds)
-            {
-                File.AppendAllText(filePath, savedFeed.FeedLinks + MyFilesDatabase.SPLITTER +
-                    savedFeed.FeedTitle + MyFilesDatabase.SPLITTER +
-                    savedFeed.FeedCategory + MyFilesDatabase.SPLITTER +
-                    savedFeed.FeedIsRssMashup + MyFilesDatabase.SPLITTER +
-                    savedFeed.FeedResult + POST_SPLITTER);
-            }
-        }
         #endregion
+
+        public void DisposeBrowser()
+        {
+            //WebBrowserHost.Child.Dispose();
+            //WebBrowserHost.Child = null;
+            //WebBrowserHost.Dispose();
+            //WebBrowser.DisposeBrowserComponents();
+            WebBrowser.Dispose();
+            //WebBrowserHost = null;
+            
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

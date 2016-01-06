@@ -8,116 +8,65 @@
              xmlns:localHelper="clr-namespace:WPF_WYSIWYG_HTML_Editor.Helpers"
              mc:Ignorable="d">
     <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-        <Style x:Key="EmptyCheckBoxFocusVisual">
-            <Setter Property="Control.Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Rectangle Margin="1" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="CheckRadioFocusVisual">
-            <Setter Property="Control.Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Rectangle Margin="14,0,0,0" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style  TargetType="{x:Type CheckBox}">
-            <Setter Property="FocusVisualStyle" Value="{StaticResource EmptyCheckBoxFocusVisual}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <Grid x:Name="grid" Height="20" Background="Transparent" Cursor="Hand">
-                            <Border Width="16" Height="16" Background="#eeeeee" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
-                            <Image x:Name="v" 
-                                       HorizontalAlignment="Left" 
-                                       VerticalAlignment="Bottom"
-                                       SnapsToDevicePixels="True" 
-                                       Visibility="Collapsed" 
-                                       Source="/WYSIWYG;component/Images/v.png" 
-                                       Stretch="Fill" Width="12" Height="12" Margin="3,0,0,3"/>
-                            <ContentPresenter Margin="25,0,0,0" VerticalAlignment="Bottom"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked"  Value="True">
-                                <Setter Property="Visibility" TargetName="v" Value="Visible"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Opacity" TargetName="grid" Value="0.4"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!--<DataTemplate x:Key="templateForTheContent" DataType="{x:Type local:SpinningVM}">
-            <TextBox AcceptsReturn="True" VerticalScrollBarVisibility="Auto" MaxHeight="415" TextWrapping="Wrap" Text="{Binding Content}" />
-        </DataTemplate>-->
-
-        <Style x:Key="EditableTabHeaderControl" TargetType="{x:Type localHelper:EditableTabHeaderControl}">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type localHelper:EditableTabHeaderControl}">
-                        <Grid Background="#eeeeee">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" MaxWidth="200" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBox x:Name="PART_TabHeader"  VerticalAlignment="Center"
+            <Style x:Key="EditableTabHeaderControl" TargetType="{x:Type localHelper:EditableTabHeaderControl}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type localHelper:EditableTabHeaderControl}">
+                            <Grid Background="#eeeeee">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" MaxWidth="200" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="PART_TabHeader"  VerticalAlignment="Center"
                                      Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, Mode=TwoWay}" Visibility="Collapsed"/>
-                            <TextBlock x:Name="PART_TextBlock" VerticalAlignment="Center" 
+                                <TextBlock x:Name="PART_TextBlock" VerticalAlignment="Center" 
                                        Text="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Content, Mode=TwoWay}"/>
-                            <CheckBox IsChecked="{Binding IsChecked}" Grid.Column="1" Margin="5,2,3,2" VerticalAlignment="Center" />
-                        </Grid>
-                        <ControlTemplate.Triggers>
+                                <CheckBox IsChecked="{Binding IsChecked}" Grid.Column="1" Margin="5,2,3,2" VerticalAlignment="Center" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
 
-                            <Trigger Property="IsInEditMode" Value="True">
-                                <Trigger.Setters>
-                                    <Setter TargetName="PART_TabHeader" Property="Visibility" Value="Visible"/>
-                                    <Setter TargetName="PART_TextBlock" Property="Visibility" Value="Collapsed"/>
-                                </Trigger.Setters>
-                            </Trigger>
+                                <Trigger Property="IsInEditMode" Value="True">
+                                    <Trigger.Setters>
+                                        <Setter TargetName="PART_TabHeader" Property="Visibility" Value="Visible"/>
+                                        <Setter TargetName="PART_TextBlock" Property="Visibility" Value="Collapsed"/>
+                                    </Trigger.Setters>
+                                </Trigger>
 
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="ItemContainerStyle" TargetType="TabItem">
-            <Setter Property="HeaderTemplate">
-                <Setter.Value>
-                    <DataTemplate DataType="{x:Type local:SpinningVM}">
-                        <localHelper:EditableTabHeaderControl Style="{StaticResource EditableTabHeaderControl}">
-                            <localHelper:EditableTabHeaderControl.Content>
-                                <!--<StackPanel>-->
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="ItemContainerStyle" TargetType="TabItem">
+                <Setter Property="HeaderTemplate">
+                    <Setter.Value>
+                        <DataTemplate DataType="{x:Type local:SpinningVM}">
+                            <localHelper:EditableTabHeaderControl Style="{StaticResource EditableTabHeaderControl}">
+                                <localHelper:EditableTabHeaderControl.Content>
+                                    <!--<StackPanel>-->
                                     <Binding Path="Title" Mode="TwoWay" UpdateSourceTrigger="PropertyChanged" />
                                     <!--<CheckBox IsChecked="{Binding IsChecked}" />-->
-                                <!--</StackPanel>-->
-                            </localHelper:EditableTabHeaderControl.Content>
-                        </localHelper:EditableTabHeaderControl>
-                    </DataTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <DataTemplate x:Key="ContentTemplate" DataType="{x:Type local:SpinningVM}">
-            <Grid>
-                <TextBox AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Text="{Binding Content, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
-            </Grid>
-        </DataTemplate>
-
-        <!--<DataTemplate x:Key="templateForTheHeader"  DataType="{x:Type local:SpinningVM}">
-            <StackPanel Orientation="Horizontal" Background="WhiteSmoke">
-                <TextBox Background="#eeeeee" Text="{Binding Title}" VerticalAlignment="Center" Margin="4" MaxWidth="200" />
-                <CheckBox IsChecked="{Binding IsChecked}" />
-            </StackPanel>
-        </DataTemplate>-->
-
+                                    <!--</StackPanel>-->
+                                </localHelper:EditableTabHeaderControl.Content>
+                            </localHelper:EditableTabHeaderControl>
+                        </DataTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <DataTemplate x:Key="ContentTemplate" DataType="{x:Type local:SpinningVM}">
+                <Grid>
+                    <TextBox AcceptsReturn="True" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" Text="{Binding Content, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </Grid>
+            </DataTemplate>
+            <Style TargetType="{x:Type RibbonButton}">
+                <Setter Property="Cursor" Value="Hand" />
+            </Style>
+        </ResourceDictionary>
     </UserControl.Resources>
         <Grid>
             <Grid.RowDefinitions>
@@ -129,71 +78,69 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Grid Name="grdFtpProjects" Grid.Column="1" Grid.RowSpan="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Expander Name="spander"
-                      Width="24"
-                      Expanded="spander_Expanded"
-                      Collapsed="spander_Collapsed"
-                      ExpandDirection="Right">
-                <Expander.Header>
-                    <TextBlock Text="PBN Vault" Foreground="Orange">
-                        <TextBlock.LayoutTransform>
-                            <RotateTransform Angle="90"/>
-                        </TextBlock.LayoutTransform>
-                    </TextBlock>
-                </Expander.Header>
-                <localXaml:PBNVaultUserControl x:Name="ftpProjectList" />
-            </Expander>
 
-            <Expander Name="spander2"
-                      Width="24"
-                      Expanded="spander2_Expanded"
-                      Collapsed="spander2_Collapsed"
-                      Grid.Column="1"
-                      ExpandDirection="Right">
-                <Expander.Header>
-                    <TextBlock Text="Money Vault" Foreground="Green">
-                        <TextBlock.LayoutTransform>
-                            <RotateTransform Angle="90"/>
-                        </TextBlock.LayoutTransform>
-                    </TextBlock>
-                </Expander.Header>
-                <localXaml:MoneyVaultUserControl x:Name="moneyVaultSpander" />
-            </Expander>
-            <!--<localXaml:FTPProjectsList x:Name="ftpProjectList" />-->
+        <Grid Name="grdFtpProjects" Grid.Column="1" Grid.RowSpan="2" Background="#f5f5f5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                    <Expander Name="spander"
+                              Width="24"
+                              Expanded="spander_Expanded"
+                              Collapsed="spander_Collapsed"
+                              ExpandDirection="Right">
+                        <Expander.Header>
+                            <TextBlock Text="PBN Vault" Foreground="#de5347">
+                                <TextBlock.LayoutTransform>
+                                    <RotateTransform Angle="90"/>
+                                </TextBlock.LayoutTransform>
+                            </TextBlock>
+                        </Expander.Header>
+                        <localXaml:PBNVaultUserControl x:Name="ftpProjectList" />
+                    </Expander>
+
+                    <Expander Name="spander2"
+                              Width="24"
+                              Expanded="spander2_Expanded"
+                              Collapsed="spander2_Collapsed"
+                              Grid.Column="1"
+                              ExpandDirection="Right">
+                        <Expander.Header>
+                            <TextBlock Text="Money Vault" Foreground="#1ca261">
+                                <TextBlock.LayoutTransform>
+                                    <RotateTransform Angle="90"/>
+                                </TextBlock.LayoutTransform>
+                            </TextBlock>
+                        </Expander.Header>
+                        <localXaml:MoneyVaultUserControl x:Name="moneyVaultSpander" />
+                    </Expander>
             </Grid>
-            <Ribbon Name="ribon" Foreground="#333333" Background="WhiteSmoke" Margin="0,-22,0,0" SelectionChanged="Ribbon_SelectionChanged">
-                <Ribbon.ApplicationMenu>
-                    <RibbonApplicationMenu Visibility="Collapsed" />
-                </Ribbon.ApplicationMenu>
 
-            <RibbonTab Header="Editor">
+        <Ribbon Name="ribon" Foreground="#333333" Background="WhiteSmoke" Margin="0,-22,0,0" SelectionChanged="Ribbon_SelectionChanged">
+            <Ribbon.ApplicationMenu>
+                <RibbonApplicationMenu Visibility="Collapsed" />
+            </Ribbon.ApplicationMenu>
+            
+            <RibbonTab Header="Editor" IsEnabled="{Binding EnableBtns}">
                 <RibbonGroup Header="Clear" Width="60" >
                     <RibbonButton x:Name="RibbonButtonNew" Label="" ToolTip="Clear"
                                       LargeImageSource="..\Images\new.png" 
                                       Click="RibbonButtonNew_Click"  />
-                    <!--<RibbonButton x:Name="RibbonButtonOpen" Label="" SmallImageSource="..\Images\open.png" Click="RibbonButtonOpen_Click" HorizontalAlignment="Left" Width="22"/>-->
-                    <!--<RibbonButton x:Name="RibbonButtonOpenweb" Label="" SmallImageSource="..\Images\link.png"  HorizontalAlignment="Left" Width="22" Click="RibbonButtonOpenweb_Click"/>-->
-                    <!--<RibbonButton x:Name="RibbonButtonSave" Label="" SmallImageSource="..\Images\save.png" Click="RibbonButtonSave_Click"/>-->
                 </RibbonGroup>
-                <RibbonGroup Header="Editor" Width="365">
+                <RibbonGroup Header="Editor" Width="395">
                     <StackPanel>
-                        <ComboBox x:Name="RibbonComboboxFormat" Background="#eeeeee" Width="160" Height="21"  Margin="0,0,0,4" HorizontalAlignment="Left" SelectionChanged="RibbonComboboxFormat_SelectionChanged" >
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Value}" />
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
                         <StackPanel Orientation="Horizontal">
-                            <ComboBox  x:Name="RibbonComboboxFonts" Width="160" Background="#eeeeee" Height="21" SelectionChanged="RibbonComboboxFonts_SelectionChanged"/>
-                            <ComboBox x:Name="RibbonComboboxFontHeight" Width="50" Margin="3,0,0,0" Height="21" Background="#eeeeee" SelectionChanged="RibbonComboboxFontHeight_SelectionChanged"/>
+                            <ComboBox x:Name="RibbonComboboxFormat" Width="160" Height="22" Margin="2" HorizontalAlignment="Left" SelectionChanged="RibbonComboboxFormat_SelectionChanged" >
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Value}" />
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <ComboBox  x:Name="RibbonComboboxFonts" Width="160" Height="22" Margin="2" SelectionChanged="RibbonComboboxFonts_SelectionChanged"/>
+                            <ComboBox x:Name="RibbonComboboxFontHeight" Margin="2" Width="50" Height="22" SelectionChanged="RibbonComboboxFontHeight_SelectionChanged"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
                             <RibbonButton x:Name="SettingsBold" SmallImageSource="..\Images\bold.png" Click="SettingsBold_Click"/>
                             <RibbonButton x:Name="SettingsItalic" SmallImageSource="..\Images\italic.png" Click="SettingsItalic_Click"/>
                             <RibbonButton x:Name="SettingsUnderLine" SmallImageSource="..\Images\UnderLine.png" Click="SettingsUnderLine_Click"/>
@@ -213,27 +160,20 @@
                         </StackPanel>
                     </StackPanel>
                 </RibbonGroup>
-                <RibbonGroup Header="Custom" Width="120">
+                <RibbonGroup Header="Custom" Width="100">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
-                            <RibbonButton x:Name="EditWeb1"  LargeImageSource="..\Images\Editor.png" Height="42" HorizontalAlignment="Left" Click="EditWeb_Click"/>
-                            <RibbonButton x:Name="ViewHTML"  LargeImageSource="..\Images\html.png" Height="42" HorizontalAlignment="Left" Click="ViewHTML_Click"/>
+                            <RibbonButton x:Name="EditWeb1"  LargeImageSource="..\Images\Editor.png" HorizontalAlignment="Left" Click="EditWeb_Click"/>
+                            <RibbonButton x:Name="ViewHTML"  LargeImageSource="..\Images\html.png" HorizontalAlignment="Left" Click="ViewHTML_Click"/>
                         </StackPanel>
                     </StackPanel>
                 </RibbonGroup>
                 <RibbonGroup Header="FR">
-                    <Button Cursor="Hand" ToolTip="Clear All Spun Tabs" IsEnabled="{Binding EnableBtns}" 
-                            Background="Transparent" BorderBrush="Transparent" Name="btnFindReplace" 
-                            Click="btnFindReplace_Click">
-                        <StackPanel>
-                            <Image Source="..\Images\findReplace.ico" Width="45" />
-                            <TextBlock Text="Find Replace" HorizontalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
+                    <RibbonButton  LargeImageSource="..\Images\refresh-icon.png"  Click="btnFindReplace_Click" x:Name="btnFindReplace" ToolTip="Find Replace" />
                 </RibbonGroup>
             </RibbonTab>
-                
-            <RibbonTab Header="Publish PBN">
+
+            <RibbonTab Header="Publish PBN" IsEnabled="{Binding EnableBtns}">
                 <RibbonGroup Header="Title">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal" Margin="5">
@@ -245,72 +185,65 @@
                 </RibbonGroup>
 
                 <RibbonGroup Header="Settings">
-                    <Button Cursor="Hand" IsEnabled="{Binding EnableBtns}" ToolTip="Platform Settings" Background="Transparent" BorderBrush="Transparent" Command="{Binding SettingsClicked}">
-                        <Image Source="..\Images\settings-icon.png" />
-                    </Button>
-                    <!--<StackPanel>
-                            <DockPanel>
-                                <TextBlock Text="Status: " VerticalAlignment="Center" Margin="3" />
-                                <ComboBox ItemsSource="{Binding StatusTypes}" SelectedIndex="{Binding SIPostStatus,Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
-                                    Background="#eeeeee" Margin="1,0,0,0" Height="23" MinWidth="60" />
-
-                                <DatePicker Height="26" MinWidth="210" Foreground="Black" Margin="5" SelectedDate="{Binding PublishDate, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                            </DockPanel>
-                            <DockPanel>
-                                <TextBlock Text="Profile:" Margin="3" VerticalAlignment="Center" />
-                                <ComboBox ItemsSource="{Binding Profiles}" SelectedIndex="{Binding SIProfile}" 
-                                          Margin="3" Height="23" Background="#eeeeee" MinWidth="150" />
-                            </DockPanel>
-                        </StackPanel>-->
+                    <RibbonButton IsEnabled="{Binding EnableBtns}" ToolTip="Platform Settings" Command="{Binding SettingsClicked}"
+                                  LargeImageSource="..\Images\settings-icon.png" />
                 </RibbonGroup>
 
                 <RibbonGroup Header="Publish">
-                    <StackPanel Orientation="Horizontal">
-                        <Button ToolTip="Publish from pbns selected in settings" Cursor="Hand" IsEnabled="{Binding EnableBtns}" Margin="2"
-                            Background="Transparent" BorderBrush="Transparent" Name="btnPublishFTP" Click="btnPublish_Click">
-                        <StackPanel Height="80">
-                            <Image Source="..\Images\publish-bw.png" Height="40" Stretch="Uniform" />
-                            <TextBlock Text="From Settings" />
-                        </StackPanel>
-                    </Button>
-                    <Button ToolTip="Publish from selected vaulted pbns" Cursor="Hand" IsEnabled="{Binding EnableBtns}"  Margin="2"
-                            Background="Transparent" BorderBrush="Transparent" Name="pbnPubfromVault" Click="pbnPubfromVault_Click">
-                        <StackPanel Height="80">
-                            <Image Source="..\Images\publish-o.png" Height="40" Stretch="Uniform" />
-                            <TextBlock Text="From Vault" />
-                        </StackPanel>
-                    </Button>
+                    <StackPanel Margin="0,0,5,0">
+                        <CheckBox Content="Publish Spun Articles" IsChecked="{Binding UseSpunArticlesChecked}">
+                            <CheckBox.Style>
+                                <Style TargetType="CheckBox" BasedOn="{ StaticResource {x:Type CheckBox}}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Tabs.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </CheckBox.Style>
+
+                        </CheckBox>
+                        <CheckBox Content="Auto Spin" IsChecked="{Binding AutoSpinChecked}" />
+                        <DockPanel Visibility="{Binding DPtimesToSPinVisible}">
+                            <TextBlock Text="Times To Spin: " VerticalAlignment="Center" />
+                            <TextBox Text="{Binding TimesToSpin}" Width="30"/>
+                        </DockPanel>
+                    </StackPanel>
+                    <StackPanel Margin="0,0,3,0">
+                        <RibbonButton ToolTip="Publish to pbns selected in settings" Height="50" Name="btnPublishFTP" Click="btnPublish_Click"
+                                      LargeImageSource="..\Images\publish-bw.png" />
+                        <TextBlock Text="From Settings" />
+                    </StackPanel>
+
+                    <StackPanel Margin="3,0,0,0">
+                        <RibbonButton ToolTip="Publish to pbns selected in vaults vaulted" Height="50" Name="pbnPubfromVault" Click="pbnPubfromVault_Click"
+                                          LargeImageSource="..\Images\publish-o.png" />
+                        <TextBlock Text="From Vault" />
                     </StackPanel>
                 </RibbonGroup>
 
                 <RibbonGroup Header="Spin">
                     <StackPanel Orientation="Horizontal">
                         <StackPanel>
-                            <RibbonButton x:Name="btnSpin" Cursor="Hand" IsEnabled="{Binding EnableBtns}" HorizontalAlignment="Center" Height="40" LargeImageSource="..\Images\spin.png" Click="btnSpin_Click" />
-                            <CheckBox Content="Publish Spun Articles" IsChecked="{Binding UseSpunArticlesChecked}" />
+                            <RibbonButton x:Name="btnSpin" ToolTipService.ShowDuration="15000" ToolTipService.InitialShowDelay="0"
+                                          ToolTip="Place your spun article still in spin syntax into the text editor. Everytime you click a new spun article tab will be added.(this will also spin the title so add a title)" 
+                                          HorizontalAlignment="Center" Height="50" LargeImageSource="..\Images\spin.png" Click="btnSpin_Click" />
+                            <TextBlock Text="Spin It" HorizontalAlignment="Center" />
                         </StackPanel>
-                        <StackPanel Margin="3">
-                            <CheckBox Content="Auto Spin" IsChecked="{Binding AutoSpinChecked}" Margin="5,5,5,8" />
-                            <DockPanel Margin="5" Visibility="{Binding DPtimesToSPinVisible}">
-                                <TextBlock Text="Times To Spin: " VerticalAlignment="Center" />
-                                <TextBox Text="{Binding TimesToSpin}" Width="30"/>
-                            </DockPanel>
-                        </StackPanel>
-                        <Button Cursor="Hand" ToolTip="Clear All Spun Tabs" IsEnabled="{Binding EnableBtns}" 
-                                    Background="Transparent" BorderBrush="Transparent" Name="btnClearAllTabs" Click="btnClearAllTabs_Click">
-                            <StackPanel>
-                                <Image Source="..\Images\clear.png" Width="45" />
-                                <TextBlock Text="Clear" HorizontalAlignment="Center" />
-                            </StackPanel>
-                        </Button>
 
-                        <Button Cursor="Hand" ToolTip="Clear All Spun Tabs" IsEnabled="{Binding EnableBtns}" 
-                                    Background="Transparent" BorderBrush="Transparent" Name="btnSpinWindow" Click="btnSpinWindow_Click">
-                            <StackPanel>
-                                <Image Source="..\Images\new_window-icon.png" Width="45" />
-                                <TextBlock Text="Spinner Window" HorizontalAlignment="Center" />
-                            </StackPanel>
-                        </Button>
+                        <StackPanel>
+                            <RibbonButton ToolTip="Clear All Spun Tabs" Height="50"  Name="btnClearAllTabs" Click="btnClearAllTabs_Click"
+                                      LargeImageSource="..\Images\clear.png" />
+                            <TextBlock Text="Clear" HorizontalAlignment="Center" />
+                        </StackPanel>
+
+                        <StackPanel>
+                            <RibbonButton ToolTip="Place your spun article still in spin syntax into this window. A new article will be spun into the editor from the window."
+                                          ToolTipService.ShowDuration="15000" ToolTipService.InitialShowDelay="0"
+                                          Height="50" Name="btnSpinWindow" Click="btnSpinWindow_Click"
+                                      LargeImageSource="..\Images\new_window-icon.png" />
+                            <TextBlock Text="Spinner Window" HorizontalAlignment="Center" />
+                        </StackPanel>
                     </StackPanel>
                 </RibbonGroup>
 
@@ -319,30 +252,14 @@
                     <ProgressBar IsIndeterminate="{Binding ProgressBarStart}" Width="{Binding ElementName=tbStatus, Path=ActualWidth}" Height="18" Margin="5" HorizontalAlignment="Center" />
                 </RibbonGroup>
             </RibbonTab>
-                
+        </Ribbon>
             
-                
-            
-            
-                <!--<RibbonTab Header="Publish FTP">
-
-                </RibbonTab>-->
-
-            </Ribbon>
-            <!--<StatusBar Grid.Row="2">
-                <StatusBarItem>
-                    <TextBlock x:Name="lblCursorPosition" Text="http://www.greencomponent.net"/>
-                </StatusBarItem>
-            </StatusBar>-->
-            <local:WPFWebBrowser Grid.Column="0" x:Name="webBrowserEditor"  Grid.Row="1" VerticalAlignment="Top" />
-            <local:HtmlEditor Grid.Column="0" x:Name="HtmlEditor1"  Grid.Row="1" Visibility="Hidden" VerticalAlignment="Top"/>
+        <local:WPFWebBrowser Grid.Column="0" x:Name="webBrowserEditor"  Grid.Row="1" VerticalAlignment="Top" />
+        <local:HtmlEditor Grid.Column="0" x:Name="HtmlEditor1"  Grid.Row="1" Visibility="Hidden" VerticalAlignment="Top"/>
         
-            <!--<Line Name="lineResizer" Stroke="Black" Fill="Black"  
-                  X1="{Binding ActualHeight,ElementName=trvTasks}" X2="50"
-                  Y1="{Binding MouseY}"  Y2="{Binding MouseY}" />-->
         <TabControl Name="tbContrl" ItemsSource="{Binding Tabs}" Visibility="{Binding TabsVisible}"
                     Grid.Column="0" Grid.Row="2" MinHeight="400" 
                     ItemContainerStyle="{StaticResource ItemContainerStyle}" 
                     ContentTemplate="{StaticResource ContentTemplate}" />
-        </Grid>
+      </Grid>
 </UserControl>

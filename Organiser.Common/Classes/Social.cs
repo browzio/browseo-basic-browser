@@ -7,6 +7,8 @@ namespace Organiser.Common.Classes
 {
     public class Social
     {
+        public const string FACEBOOK_GRAPH_LINK = "https://developers.facebook.com/tools/explorer/";
+
         public const string SOCIALTYPE_fb = "facebook";
         public const string SOCIALTYPE_gp = "google";
         public const string SOCIALTYPE_digg = "digg";

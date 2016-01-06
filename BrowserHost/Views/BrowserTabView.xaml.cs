@@ -1,6 +1,6 @@
 ﻿using BrowserHost;
-using BrowserHost.Models;
-using BrowserHost.Views;
+using BrowserHost.Models;  
+using DragDropListview;
 using Microsoft.Win32;
 using Organiser.Common;
 using Organiser.Common.Classes;
@@ -32,144 +32,76 @@ namespace WpfCefDynamBrowser.Views
     /// </summary>
     public partial class BrowserTabView : UserControl
     {
-        private List<string> sites;
         public BrowserTabView()
         {
-            InitializeComponent();
-            new System.Threading.Thread(() =>
-            {
-                sites = MyFilesDatabase.GetSites();
-            }).Start();
+            InitializeComponent(); 
 
-            //dragnDropTreeview.OnLaunchSite += dragnDropTreeview_OnLaunchSite;
             this.Loaded += BrowserTabView_Loaded;
+            this.SizeChanged += UserControl_SizeChanged;
         }
 
-        static bool initializedddvm = false;
         void BrowserTabView_Loaded(object sender, RoutedEventArgs e)
         {
-            if (!initializedddvm)
-            {
-                dragnDropListview.vm.ProjectName = BrowserInit.pData.ProjectName;
-                dragnDropListview.vm.mPData = BrowserInit.pData;
-                dragnDropListview.vm.FillList();
-                dragnDropListview.vm.FillImportsList();
-                dragnDropListview.vm.FillSessionListFromFile();
-                //dragnDropListview.vm.OnDoubleClickedSite += vm_OnDoubleClickedSite;
-                // dragnDropListview.vm.OnListChanged += vm_OnListChanged;
-                //dragnDropListview.vm.OnRemindersChanged += vm_OnRemindersChanged;
-                //dragnDropListview.vm.MigrateOldSites();//TODO: takeOut
+            DragDropMainViewModel.Instance.OnHasReminders += vm_OnHasReminders;
+            DragDropMainViewModel.Instance.GetRemindersCountAndNotify();
 
-                initializedddvm = true;
-            }
-            dragnDropListview.vm.OnHasReminders += vm_OnHasReminders;
-            dragnDropListview.vm.CheckReminders();
-
-            (DataContext as BrowserTabViewModel).OnRefreshBookmarksList += BrowserTabView_OnRefreshBookmarksList;
-            (DataContext as BrowserTabViewModel).OnRefreshReminders += BrowserTabView_OnRefreshReminders;
             (DataContext as BrowserTabViewModel).OnShouldChangePropertyAddress += BrowserTabView_OnShouldChangePropertyAddress;
-        }
-
-        void BrowserTabView_OnRefreshReminders()
-        {
-            dragnDropListview.vm.CheckReminders();
-        }
-
-        void vm_OnRemindersChanged()
-        {
-            (DataContext as BrowserTabViewModel).RaiseRemindersChanged();
         }
 
         void vm_OnHasReminders(int notificationCount)
         {
-            borderNotification.Visibility = Visibility.Visible;
-            tbNotificationCount.Text = "" + notificationCount;
-            if(notificationCount == 0)
+            if (notificationCount == 0)
+            {
                 borderNotification.Visibility = Visibility.Hidden;
-        }
-
-        void vm_OnListChanged()
-        {
-            (DataContext as BrowserTabViewModel).RaiseAddedBookmark();
-        }
-
-        void BrowserTabView_OnRefreshBookmarksList()
-        {
-            dragnDropListview.vm.RefreshList();
-        }
-
-        void vm_OnDoubleClickedSite(string site)
-        {
-            (DataContext as BrowserTabViewModel).NavigateToSelectedSite(site);
-        }
-
-        void dragnDropTreeview_OnLaunchSite(string site)
-        {
-            (DataContext as BrowserTabViewModel).NavigateToSelectedSite(site);
-        }
-
-        private void OnTextBoxGotKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
-        {
-            var textBox = (TextBox)sender;
-            textBox.SelectAll();
-        }
-
-        private void OnTextBoxGotMouseCapture(object sender, MouseEventArgs e)
-        {
-            var textBox = (TextBox)sender;
-            textBox.SelectAll();
+            }
+            else
+            {
+                borderNotification.Visibility = Visibility.Visible;
+                tbNotificationCount.Text = "" + notificationCount;
+            }
         }
 
         private void openFlyout_Click(object sender, RoutedEventArgs e)
         {
-            if (!flyOut.IsOpen)
-            {
-                host.Width = host.ActualWidth - flyOut.ActualWidth;
+            if (!flyOut.IsExpanded)
+            {  
                 host.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-                flyOut.IsOpen = true;
+                flyOut.IsExpanded = true;
+                flyOut.Visibility = Visibility.Visible;
+                host.Width = host.ActualWidth - 330;
             }
         }
 
-        private void flyOut_ClosingFinished(object sender, RoutedEventArgs e)
+        private void btnCloseFlyout_Click(object sender, RoutedEventArgs e)
         {
+            flyOut.IsExpanded = false;
+            flyOut.Visibility = Visibility.Collapsed;
             host.Width = browserGrd.ActualWidth;
         }
+
+        //private void flyOut_ClosingFinished(object sender, RoutedEventArgs e)
+        //{
+        //    host.Width = browserGrd.ActualWidth;
+        //}
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             host.Width = browserGrd.ActualWidth;
             host.Height = browserGrd.ActualHeight;
-            if (flyOut.IsOpen && flyOut.IsLoaded)
+            if (flyOut.IsExpanded)
             {
-                host.Width = browserGrd.ActualWidth - (flyOut.ActualWidth);
-            }
-        }
-
-        public override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-            KeyUp += OnKeyUp;
-        }
-
-        private void OnKeyUp(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
-            {
-              //  System.Windows.Forms.SendKeys.Send("{ENTER}");
-              //  InputSimulator.SimulateKeyPress(VirtualKeyCode.RETURN);
+                host.Width = browserGrd.ActualWidth - 330;
             }
         }
 
         private void cmbSites_PreviewKeyDown(KeyEventArgs e)
         {
+            if (e.Key == Key.Left || e.Key == Key.Right) return;
+
             if (e.Key == Key.Enter || e.Key == Key.Return)
             {
                 (DataContext as BrowserTabViewModel).NavigateToSelectedSite(cmbSites.textbox.Text);
                 Keyboard.ClearFocus();
-                //new System.Threading.Thread(() =>
-                //{
-                //    sites = MyFilesDatabase.GetSites();
-                //}).Start();
                 return;
             }
 
@@ -182,30 +114,37 @@ namespace WpfCefDynamBrowser.Views
             }
             else if (e.Key == Key.Up)
             {
-                if(cmbSites.SelectedIndex >=0 )
-                cmbSites.SelectedIndex -= 1;
+                if (cmbSites.SelectedIndex >= 0)
+                    cmbSites.SelectedIndex -= 1;
                 return;
             }
 
-            string curtext = cmbSites.Text;
+            string curtext = cmbSites.textbox.Text;
+            string fullCurText = curtext + e.Key.ToString().ToLower();
 
             cmbSites.Items.Clear();
 
             cmbSites.Items.Add(curtext);
 
-            foreach (string site in sites)
+            foreach (string site in MyFilesDatabase.CookieSites)
             {
                 if (cmbSites.Items.Count > 7) break;
-                if (site.Contains(curtext))
-                    cmbSites.Items.Add(site);
+                string toCheck = site.Replace("http://", "").Replace("https://", "").Replace("www.", "");
+                if (toCheck.Length < curtext.Length) continue;
+
+                try
+                {
+                    if (toCheck.IndexOf(fullCurText, 0, fullCurText.Length) == 0)
+                        cmbSites.Items.Add(site);
+                }
+                catch { }
             }
 
-            if (!cmbSites.IsDropDownOpen && sites.Count > 0 && cmbSites.Items.Count > 0)
+            if (!cmbSites.IsDropDownOpen && cmbSites.Items.Count > 0)
             {
                 cmbSites.IsDropDownOpen = true;
-                
+
             }
-           
 
             if (e.Key != Key.Enter && e.Key != Key.Left && e.Key != Key.Right) cmbSites.SelectedIndex = 0;
         }
@@ -220,71 +159,30 @@ namespace WpfCefDynamBrowser.Views
 
         private void SaveSite_Click(object sender, RoutedEventArgs e)
         {
-            if (dragnDropListview == null) return;
-            dragnDropListview.SaveSite(cmbSites.Text);
+            DragDropMainViewModel.Instance.OpenSaveSiteOptions(cmbSites.Text);
         }
 
         private void btnExportAllBookmarks_Click(object sender, RoutedEventArgs e)
         {
-            if (dragnDropListview == null) return;
-            dragnDropListview.EportSitesToTxt();
+            DragDropMainViewModel.Instance.EportSitesToTxt();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
-        {
-            if (contextMnuBtn == null) return;
-            (contextMnuBtn as Button).ContextMenu.IsOpen = false;
-        }
-
-        object contextMnuBtn;
-        private void Share_Click(object sender, RoutedEventArgs e)
-        {
-            contextMnuBtn = sender;
-            (sender as Button).ContextMenu.IsEnabled = true;
-            (sender as Button).ContextMenu.PlacementTarget = (sender as Button);
-            (sender as Button).ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
-            (sender as Button).ContextMenu.IsOpen = true;
+        { 
+            btnShare.ContextMenu.IsOpen = false;
         }
 
         private void btnImpotBookmarks_Click(object sender, RoutedEventArgs e)
         {
-            SelectBookmarkImportTypeWindow bookmarkTypeWindow = new SelectBookmarkImportTypeWindow();
-            bookmarkTypeWindow.browseoGloable.Visibility = Visibility.Collapsed;
-            bookmarkTypeWindow.ShowDialog();
-            if(!bookmarkTypeWindow.OkClicked)return;
-            if (bookmarkTypeWindow.browseoProj.IsChecked == true)
-            {
-                SelectProfileWindow spw = new SelectProfileWindow();
-                spw.Title = "Select Project";
-                spw.ShowDialog();
-                if (spw.OkClicked)
-                {
-                    dragnDropListview.vm.MergeBookMarksFromProjectPath(spw.SelectedProjectName);
-                }
-            }
-            else if(bookmarkTypeWindow.fcs.IsChecked == true || bookmarkTypeWindow.entBud.IsChecked == true || bookmarkTypeWindow.rankWyx.IsChecked == true)
-            {
-                OpenFileDialog ofd = new OpenFileDialog();
-                ofd.Multiselect = false;
-                ofd.ShowDialog();
-                string path = ofd.FileName;
-
-                string importType = DragDropListview.DragDropMainViewModel.IMPORT_TYPE_FCS;
-                if (bookmarkTypeWindow.entBud.IsChecked == true)
-                    importType = DragDropListview.DragDropMainViewModel.IMPORT_TYPE_EB;
-                else if(bookmarkTypeWindow.rankWyx.IsChecked == true)
-                    importType = DragDropListview.DragDropMainViewModel.IMPORT_TYPE_RANKWYZ;
-
-                dragnDropListview.vm.MergeFromImport(path, importType);
-            }
+            DragDropMainViewModel.Instance.OpenImportBookmarksOptions();
         }
 
         private void Reminders_Click(object sender, RoutedEventArgs e)
         {
-            dragnDropListview.vm.OpenReminders();
+            DragDropMainViewModel.Instance.OpenReminders();
         }
 
-        private void SaveSession_Click(object sender, RoutedEventArgs e)
+        private void BtnWithContextMenue_Click(object sender, RoutedEventArgs e)
         {
             try
             {
@@ -294,6 +192,29 @@ namespace WpfCefDynamBrowser.Views
                 (sender as Button).ContextMenu.IsOpen = true;
             }
             catch { }
+        }
+
+        private void cmBrowserSettings_Closed(object sender, RoutedEventArgs e)
+        {
+            BrowserTabViewModel theVM = (DataContext as BrowserTabViewModel);
+            if (theVM != null)
+            {
+                theVM.SettingsMenuClosed();
+            }
+        }
+
+        private void cmsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            cmBrowserSettings.IsOpen = false;
+        }
+
+        private void cmBrowserSettings_Opened(object sender, RoutedEventArgs e)
+        {
+            BrowserTabViewModel theVM = (DataContext as BrowserTabViewModel);
+            if (theVM != null)
+            {
+                theVM.SettingsMenuOpen();
+            }
         }
     }
 }

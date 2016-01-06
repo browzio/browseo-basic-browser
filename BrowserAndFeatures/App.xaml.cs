@@ -17,9 +17,16 @@ namespace BrowserAndFeatures
     [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
     public partial class App : Application
     {
+        public static bool browserinit = true;
         protected override void OnStartup(StartupEventArgs e)
         {
-            this.Shutdown();
+            browserinit = false;
+            FeatureCallage.SetPersonData();
+
+            //this.Shutdown();
+
+
+
             base.OnStartup(e);
         }
         //App()

@@ -53,8 +53,6 @@ namespace RssReader
             }
         }
 
-        private PersonData mProfile;
-
         Thread loadingThread;
         bool wasRefresh;
 
@@ -67,22 +65,13 @@ namespace RssReader
             DockPannelButtonsClick = new RelayCommand(OnDockPannelButtonsClick);
         }
 
-        public void SetProfileData(PersonData profile)
-        {
-            if (mProfile == null)
-            {
-                mProfile = profile;
-                RefreshRssFeed();
-            }
-        }
-
         private void OnDockPannelButtonsClick(object param)
         {
             switch ((string)param)
             {
                 case "OpenRssLinksWindow":
                     RssFeedsLinksMultiWindow rsslw = new RssFeedsLinksMultiWindow();
-                    List<string> rssFeeds = MyFilesDatabase.GetRssFeedLinks(mProfile, TabTitle);
+                    List<string> rssFeeds = MyFilesDatabase.GetRssFeedLinks(GloableProfData.PData, TabTitle);
                     if (rssFeeds != null)
                     {
                         foreach (string link in rssFeeds)
@@ -93,14 +82,14 @@ namespace RssReader
                     rsslw.ShowDialog();
                     if (rsslw.OKClicked)
                     {
-                        MyFilesDatabase.SaveRssFeedsSiteLinks(rsslw.tbInputedText.Text.Trim(), mProfile, TabTitle);
-                        RefreshRssFeed();
+                        MyFilesDatabase.SaveRssFeedsSiteLinks(rsslw.tbInputedText.Text.Trim(), GloableProfData.PData, TabTitle);
+                        RefreshRssFeed(false);
                     }
                     break;
 
                 case "Refresh":
                     wasRefresh = true;
-                    RefreshRssFeed();
+                    RefreshRssFeed(false);
                     break;
 
             //    case "Import":
@@ -138,8 +127,12 @@ namespace RssReader
             }
         }
 
-        public void RefreshRssFeed()
+        public void RefreshRssFeed(bool checkFoeExists)
         {
+            if (checkFoeExists)
+            {
+                if (AllRssFeedsResults.Count > 0) return;
+            }
             if (loadingThread != null && loadingThread.IsAlive && wasRefresh)
             {
                 loadingThread.Abort();
@@ -148,15 +141,13 @@ namespace RssReader
             try
             {
                 AllRssFeedsResults.Clear();
-                List<string> rssFeeds = MyFilesDatabase.GetRssFeedLinks(mProfile, TabTitle);
+                List<string> rssFeeds = MyFilesDatabase.GetRssFeedLinks(GloableProfData.PData, TabTitle);
                 if (rssFeeds == null) return;
                 foreach (string link in rssFeeds)
                 {
                     if (string.IsNullOrEmpty(link) || string.IsNullOrWhiteSpace(link)) continue;
                     AllRssFeedsResults.Add(new RssList() { RssLink = link.Trim(), ListResults = new BindingList<RssResult>() { RaiseListChangedEvents = false } });
                 }
-
-                Mouse.OverrideCursor = Cursors.Wait;
                 
                 loadingThread = new Thread(() =>
                 {
@@ -285,11 +276,6 @@ namespace RssReader
                         if (!isCloseing)
                         MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
                     }
-                    if (!isCloseing)
-                    Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, (Action)delegate
-                    {
-                        Mouse.OverrideCursor = null;
-                    });
                 });
                 loadingThread.Start();
             }
@@ -375,7 +361,7 @@ namespace RssReader
                     break;
 
                 case Social.SOCIALTYPE_wp:
-                    AddLinkDataWindow alw = new AddLinkDataWindow();
+                    SetNameAndDataWindow alw = new SetNameAndDataWindow();
                     alw.tblockInfo.Text = "Enter wordpress site (browzio.wordpress.com):";
                     alw.ShowDialog();
                     if (!alw.OkClicked) return;
@@ -411,8 +397,8 @@ namespace RssReader
             }
             if (toSave != "")
             {
-                MyFilesDatabase.SaveRssFeedsSiteLinks(toSave.Trim(), mProfile, TabTitle);
-                RefreshRssFeed();
+                MyFilesDatabase.SaveRssFeedsSiteLinks(toSave.Trim(), GloableProfData.PData, TabTitle);
+                RefreshRssFeed(false);
             }
         }
     }

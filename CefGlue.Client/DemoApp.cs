@@ -1,18 +1,11 @@
 ﻿namespace Xilium.CefGlue.Client
 {
-    using Organiser.Common;
-    using PData.FilesReader;
     using Organiser.Common.Classes;
     using SocialOrganizer.Models;
     using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Text;
+    using System.IO; 
     using System.Windows.Forms;
-    using Xilium.CefGlue;
-    using System.Threading;
-    using System.Drawing;
-    using System.Drawing.Imaging;
+    using CefGlue;
 
     internal sealed class DemoApp : CefApp
     {
@@ -20,26 +13,25 @@
         {
             _renderProcessHandler = new DemoCefRenderProcessHandler();
         }
-        private readonly DemoCefRenderProcessHandler _renderProcessHandler;
+        private readonly DemoCefRenderProcessHandler _renderProcessHandler; 
 
         protected override CefRenderProcessHandler GetRenderProcessHandler()
         {
             return _renderProcessHandler;
         }
-        
 
         protected override void OnBeforeCommandLineProcessing(string processType, CefCommandLine commandLine)
         {
 
             //commandLine.AppendArgument("--enable-npapi");
-           // CefRuntime.AddWebPluginDirectory(@"C:\Windows\System32\Macromed\Flash\");
+            // CefRuntime.AddWebPluginDirectory(@"C:\Windows\System32\Macromed\Flash\");
             //CefRuntime.AddWebPluginPath(@"C:\Windows\System32\Macromed\Flash\pepflashplayer64_18_0_0_209.dll");
             //CefRuntime.RefreshWebPlugins();
 
             //if (!System.IO.File.Exists("C:\\file.txt"))
-              //  commandLine.AppendSwitch("proxy-server", "23.94.20.30:80");
+            //  commandLine.AppendSwitch("proxy-server", "23.94.20.30:80");
             //else
-             //   commandLine.AppendSwitch("proxy-server", "192.171.233.149:80");
+            //   commandLine.AppendSwitch("proxy-server", "192.171.233.149:80");
 
             //System.IO.File.Create("C:\\file.txt");
 
@@ -54,13 +46,45 @@
             //commandLine.AppendSwitch("ENABLE_WEBRTC", "0");
             //commandLine.AppendSwitch("enable-media-stream", "0");
             //commandLine.AppendSwitch("multiple_routes_enabled", "0");
-            if (BrowserInit.pData != null && !string.IsNullOrEmpty(BrowserInit.pData.ProxyIP) && !string.IsNullOrWhiteSpace(BrowserInit.pData.ProxyIP))
+
+
+            //settings.CefCommandLineArgs.Add("renderer-process-limit", "1");
+            //settings.CefCommandLineArgs.Add("renderer-startup-dialog", "1");
+            //settings.CefCommandLineArgs.Add("enable-media-stream", "1"); //Enable WebRTC
+            //settings.CefCommandLineArgs.Add("no-proxy-server", "1"); //Don't use a proxy server, always make direct connections. Overrides any other proxy server flags that are passed.
+            //settings.CefCommandLineArgs.Add("debug-plugin-loading", "1"); //Dumps extra logging about plugin loading to the log file.
+            //settings.CefCommandLineArgs.Add("disable-plugins-discovery", "1"); //Disable discovering third-party plugins. Effectively loading only ones shipped with the browser plus third-party ones as specified by --extra-plugin-dir and --load-plugin switches
+            // commandLine.AppendSwitch("enable-npapi", "0"); //Enable NPAPI plugs which were disabled by default in Chromium 43 (NPAPI will be removed completely in Chromium 45)
+            //  commandLine.AppendSwitch("enable-system-flash", "0"); //Automatically discovered and load a system-wide installation of Pepper Flash.
+
+            //settings.CefCommandLineArgs.Add("ppapi-flash-path", @"C:\WINDOWS\SysWOW64\Macromed\Flash\pepflashplayer32_18_0_0_209.dll"); //Load a specific pepper flash version (Step 1 of 2)
+            //settings.CefCommandLineArgs.Add("ppapi-flash-version", "18.0.0.209"); //Load a specific pepper flash version (Step 2 of 2)
+
+            //NOTE: For OSR best performance you should run with GPU disabled:
+            // `--disable-gpu --disable-gpu-compositing --enable-begin-frame-scheduling`
+            // (you'll loose WebGL support but gain increased FPS and reduced CPU usage).
+            // http://magpcss.org/ceforum/viewtopic.php?f=6&t=13271#p27075
+            //commandLine.AppendSwitch("disable-gpu", "1");
+            //commandLine.AppendSwitch("disable-gpu-compositing", "1");
+            //commandLine.AppendSwitch("enable-begin-frame-scheduling", "1");
+            //commandLine.AppendSwitch("disable-gpu-vsync", "1");
+
+            //Disables the DirectWrite font rendering system on windows.
+            //Possibly useful when experiencing blury fonts.
+            //settings.CefCommandLineArgs.Add("disable-direct-write", "1");
+
+            // Set command line arguments to enable best performance when off screen rendering
+            //https://bitbucket.org/chromiumembedded/cef/commits/e3c1d8632eb43c1c2793d71639f3f5695696a5e8
+            //settings.SetOffScreenRenderingBestPerformanceArgs();
+
+            //commandLine.AppendArgument("--disable-web-security");
+            if (GloableProfData.PData != null && !string.IsNullOrEmpty(GloableProfData.PData.ProxyIP) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyIP))
             {
                 try
                 {
-                    commandLine.AppendSwitch("proxy-server", BrowserInit.pData.ProxyIP+":"+BrowserInit.pData.ProxyPort);
+                    commandLine.AppendSwitch("proxy-server", GloableProfData.PData.ProxyIP+":"+GloableProfData.PData.ProxyPort);
                 }
-                catch 
+                catch(Exception ex) 
                 {
                     MessageBox.Show("failed to set proxy");
                 }
@@ -74,6 +98,8 @@
             
         }
     }
+
+
 
     class MyPluginVisitor : CefWebPluginInfoVisitor
     {
@@ -91,6 +117,14 @@
         PersonData profile;
         bool isTumblr;
         int tumblrcounter;
+
+        public override bool OnBeforeNavigation(CefBrowser browser, CefFrame frame, CefRequest request, CefNavigationType navigation_type, bool isRedirect)
+        {
+            //System.Collections.Specialized.NameValueCollection headers = request.GetHeaderMap();
+            //headers.Add("DNT:", "1");
+            //request.SetHeaderMap(headers);
+            return base.OnBeforeNavigation(browser, frame, request, navigation_type, isRedirect);
+        }
 
         public static CefV8Value val;
 

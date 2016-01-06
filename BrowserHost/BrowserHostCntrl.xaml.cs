@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,13 +27,11 @@ namespace BrowserHost
     /// </summary>
     public partial class BrowserHostCntrl : UserControl
     {
-        private const string DefaultUrlForAddedTabs = "https://www.google.com";
+       // private const string DefaultUrlForAddedTabs = "https://www.google.com/";
 
         public ObservableCollection<BrowserTabViewModel> BrowserTabs { get; set; }
-        public event Action<string> OnCurateToPBN = delegate { };
-
-        ulong availmem;
-        int timesToCheck = 0;
+        public event Action<string, string> OnCurateToPBN = delegate { };
+        public event Action<string> OnAddedToGoViral = delegate { };//link
 
         public BrowserHostCntrl()
         {
@@ -44,29 +43,6 @@ namespace BrowserHost
 
             CommandBindings.Add(new CommandBinding(ApplicationCommands.New, OpenNewTab));
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, CloseTab));
-
-            Microsoft.VisualBasic.Devices.ComputerInfo ci = new Microsoft.VisualBasic.Devices.ComputerInfo();
-            availmem = ci.AvailablePhysicalMemory;
-            availmem = availmem / (1024 * 1024);
-        }
-
-
-        private childItem FindVisualChild<childItem>(DependencyObject obj)
-    where childItem : DependencyObject
-        {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(obj); i++)
-            {
-                DependencyObject child = VisualTreeHelper.GetChild(obj, i);
-                if (child != null && child is childItem)
-                    return (childItem)child;
-                else
-                {
-                    childItem childOfChild = FindVisualChild<childItem>(child);
-                    if (childOfChild != null)
-                        return childOfChild;
-                }
-            }
-            return null;
         }
 
         private void CloseTab(object sender, ExecutedRoutedEventArgs e)
@@ -95,95 +71,83 @@ namespace BrowserHost
             }
             catch { }
         }
-        System.Threading.Thread ramCheckerThread;
+        
         private void OpenNewTab(object sender, ExecutedRoutedEventArgs e)
         {
-            if (timesToCheck++ >= 5)
-            {
-                if (ramCheckerThread == null || !ramCheckerThread.IsAlive)
-                {
-                    ramCheckerThread = new System.Threading.Thread(() =>
-                    {
-                        double total = 0;
-                        bool showedMSgBox = false;
-                        foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcessesByName("BrowserAndFeatures"))
-                        {
-                            var counter = new System.Diagnostics.PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
-                            total += counter.RawValue / (1024 * 1024);
-                            if ((availmem - total) < 350)
-                            {
-                                if (!showedMSgBox)
-                               Application.Current.Dispatcher.Invoke((Action)delegate
-                                {
-                                    MessageBox.Show(
-                                        "You have only " + (availmem - total) + "mb of ram space left please close down other applications" +
-                                        " to free up ram before continuing. Or refrain from openning more tabs, keep in mind" +
-                                        " you will risk your computer and Browseo's performance.");
-                                });
-                                showedMSgBox = true;
-                            }
-                        }
-                    });
-                    ramCheckerThread.Start();
-                }
-                timesToCheck = 0;
-            }
-
-            CreateNewTab();
-
-            //if (TabControl.Items.Count == 1)
-            //{
-            //    ItemContainerGenerator icg = TabControl.ItemContainerGenerator;
-            //    UIElement tabItem = icg.ContainerFromItem(TabControl.Items[0]) as UIElement;
-            //    (tabItem as TabItem).Margin = new Thickness(-12, 0, 0, 0);
-
-            //    //Type t = (FindResource("addButtonStyle") as Style).TargetType;
-            //    //(t.BaseType as Button).Margin = new Thickness(0); 
-            //   // (t as Button).Margin = new Thickness(0, 0, 0, 0);
-            //}
+            MyFilesDatabase.CheckRamUsage();
+                                            
+            CreateNewTab(MyFilesDatabase.GetDefultHomePage());
 
             TabControl.SelectedIndex = TabControl.Items.Count - 1;
         }
 
-        private void CreateNewTab(string url = DefaultUrlForAddedTabs)
+        private void CreateNewTab(string url)
         {
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 BrowserTabViewModel btvm = new BrowserTabViewModel(url);
-                btvm.OnCreateNewTab += btvm_OnCreateNewTab;
-                btvm.OnAddedBookmark += btvm_OnAddedBookmark;
-                btvm.OnRemindersChanged += btvm_OnRemindersChanged;
-                btvm.OnCurateToPBN += Btvm_OnCurateToPBN;
-                btvm.OnClickedSaveSession += Btvm_OnClickedSaveSession;
-                btvm.OnClickedDeleteSession += Btvm_OnClickedDeleteSession;
-                btvm.OnClickedSaveSessionToBookmarks += Btvm_OnClickedSaveSessionToBookmarks;
+                setBTVMEvents(btvm);
                 btvm.Title = url;
                 if (BrowserTabs.Count > 0)
                     btvm.TabMargin = new Thickness(-20, 0, 0, 0);
                 else
                     btvm.TabMargin = new Thickness(-3, 0, 0, 0);
                 BrowserTabs.Add(btvm);
-
-                //ScrollViewer scrollview = FindVisualChild<ScrollViewer>(TabControl);
-                //if (scrollview != null)
-                //{
-                //    scrollview.ScrollToBottom();
-
-                //    Button openTabBtn = FindVisualChild<Button>(TabControl);
-                //    if (openTabBtn != null)
-                //    {
-                //        if (scrollview.ExtentHeight == 33)
-                //        {
-                //            openTabBtn.Margin = new Thickness(-13, 13, 0, 0);
-                //        }
-                //        if (scrollview.ContentVerticalOffset == 14)
-                //        {
-                //            openTabBtn.Margin = new Thickness(-13, -5, 0, 0);
-                //        }
-                //    }
-                //}
-                    //scrollview.ScrollToVerticalOffset(9.5);
             });
+        }
+
+        private void setBTVMEvents(BrowserTabViewModel btvm)
+        {
+            btvm.OnCreateNewTab += btvm_OnCreateNewTab;
+            btvm.OnCurateToPBN += Btvm_OnCurateToPBN;
+            btvm.OnAddedToGoViral += Btvm_OnAddedToGoViral;
+            btvm.OnClickedSaveSession += Btvm_OnClickedSaveSession;
+            btvm.OnClickedDeleteSession += Btvm_OnClickedDeleteSession;
+            btvm.OnClickedSaveSessionToBookmarks += Btvm_OnClickedSaveSessionToBookmarks;
+            btvm.OnRefreshTabSettings += Btvm_OnRefreshTabSettings;
+            btvm.OnRefreshSessionSettings += Btvm_OnRefreshSessionSettings;
+        }
+
+        #region btvm events
+
+        private void Btvm_OnRefreshTabSettings(BrowserTabViewModel tab)
+        {
+            BrowserTabs.Remove(tab);
+
+            BrowserTabViewModel btvm = new BrowserTabViewModel(tab.AddressEditable, false);
+            btvm.Title = tab.AddressEditable; 
+            if (BrowserTabs.Count > 0)
+                btvm.TabMargin = new Thickness(-20, 0, 0, 0);
+            else
+                btvm.TabMargin = new Thickness(-3, 0, 0, 0);
+            setBTVMEvents(btvm);
+            //for settings
+            btvm.JavaEnabled = tab.JavaEnabled;
+            btvm.JavascriptEnabled = tab.JavascriptEnabled;
+            btvm.FlashEnabled = tab.FlashEnabled;
+            btvm.SetBrowser(tab.AddressEditable);
+                              
+            BrowserTabs.Add(btvm);
+            TabControl.SelectedItem = btvm;
+        }
+
+
+
+        private void Btvm_OnRefreshSessionSettings()
+        {
+            foreach (BrowserTabViewModel btvm in BrowserTabs)
+            {
+                btvm.WebBrowser.Dispose();
+            }
+
+            List<BrowserTabViewModel> tmpList = new List<BrowserTabViewModel>(BrowserTabs);
+            BrowserTabs.Clear();
+            foreach (BrowserTabViewModel btvm in tmpList)
+            {
+                CreateNewTab(btvm.AddressEditable);
+            }
+
+            tmpList.Clear();
         }
 
         private void Btvm_OnClickedSaveSessionToBookmarks()
@@ -200,7 +164,7 @@ namespace BrowserHost
 
         private void Btvm_OnClickedDeleteSession()
         {
-            MyFilesDatabase.DeleteSession(BrowserInit.pData.ProjectName);
+            MyFilesDatabase.DeleteSession(GloableProfData.PData.ProjectName);
         }
 
         private void Btvm_OnClickedSaveSession()
@@ -212,47 +176,29 @@ namespace BrowserHost
                 links.Add(btvm.AddressEditable);
             }
 
-            MyFilesDatabase.SaveSession(BrowserInit.pData.ProjectName, links);
+            MyFilesDatabase.SaveSession(GloableProfData.PData.ProjectName, links);
         }
 
-        private void Btvm_OnCurateToPBN(string content)
-        {
-            OnCurateToPBN(content);
-        }
-
-        void btvm_OnRemindersChanged()
-        {
-            foreach (BrowserTabViewModel btvm in BrowserTabs)
-            {
-                btvm.RaiseRefreshRemindersList();
-            }
-        }
-
-        void btvm_OnAddedBookmark()
-        {
-            foreach (BrowserTabViewModel btvm in BrowserTabs)
-            {
-                btvm.RaiseRefreshBookmarksList();
-            }
-        }
-
-        void btvm_OnCreateNewTab(string webSite, bool shownewTab)
+        void btvm_OnCreateNewTab(string webSite)
         {
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
                 CreateNewTab(webSite);
-
-              int oldindex = TabControl.SelectedIndex;
-              TabControl.SelectedIndex = TabControl.Items.Count - 1;
-
-              //if (!shownewTab)
-              //{
-                 // System.Threading.Thread.Sleep(2500);
-                  //TabControl.SelectedIndex = oldindex;
-              //}
-
+                int oldindex = TabControl.SelectedIndex;
+                TabControl.SelectedIndex = TabControl.Items.Count - 1;
             });
         }
+
+        private void Btvm_OnCurateToPBN(string content, string link)
+        {
+            OnCurateToPBN(content, link);
+        }
+
+        private void Btvm_OnAddedToGoViral(string link)
+        {
+            OnAddedToGoViral(link);
+        }
+        #endregion
 
         public void CloseAllTabs()
         {
@@ -322,17 +268,18 @@ namespace BrowserHost
                 scrollviewer.LineRight();
             e.Handled = true;
         }
-       
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
-        {
-            DragDropMainViewModel.Instance.OnDoubleClickedSite += Instance_OnDoubleClickedSite;
-            DragDropMainViewModel.Instance.OnSelsectedLauncAll += Instance_OnSelsectedLauncAll;
-            string[] sites = MyFilesDatabase.GetSavedSesstion(BrowserInit.pData.ProjectName);
-            Instance_OnSelsectedLauncAll(sites);
-            if (sites.Length > 0)
-                TabControl.SelectedIndex = -1;
 
-            this.Loaded -= UserControl_Loaded;
+        public void CheckAndSetOpenTabs()
+        {
+            Task.Factory.StartNew(() =>
+            {
+                DragDropMainViewModel.Instance.OnDoubleClickedSite += Instance_OnDoubleClickedSite;
+                DragDropMainViewModel.Instance.OnSelsectedLauncAll += Instance_OnSelsectedLauncAll;
+                string[] sites = MyFilesDatabase.GetSavedSesstion(GloableProfData.PData.ProjectName);
+                Instance_OnSelsectedLauncAll(sites);
+                if (sites.Length > 0)
+                    TabControl.SelectedIndex = -1;
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         private void Instance_OnSelsectedLauncAll(string[] sites)

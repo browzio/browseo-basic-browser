@@ -63,16 +63,11 @@
     <Reference Include="InputSimulator, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>bin\x86\Debug\InputSimulator.dll</HintPath>
+      <Private>False</Private>
     </Reference>
-    <Reference Include="MahApps.Metro">
-      <HintPath>bin\Debug\MahApps.Metro.dll</HintPath>
-    </Reference>
-    <Reference Include="MahApps.Metro.Resources">
-      <HintPath>bin\Debug\MahApps.Metro.Resources.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -88,18 +83,10 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\EditableComboBox.cs" />
     <Compile Include="Controls\MyComboBox.cs" />
     <Compile Include="Models\WebPageImg.cs" />
-    <Compile Include="Models\SavedSite.cs" />
-    <Compile Include="Mvvm\DelegateCommand.cs" />
-    <Compile Include="Mvvm\DelegateCommandT.cs" />
-    <Compile Include="Mvvm\DisposableResource.cs" />
-    <Compile Include="Mvvm\PropertyChangedExtensionMethods.cs" />
-    <Compile Include="Mvvm\RelayCommand.cs" />
-    <Compile Include="Mvvm\ViewModelBase.cs" />
-    <Compile Include="PersonDataFileReader.cs" />
     <Compile Include="ViewModels\BrowserTabViewModel.cs" />
+    <Compile Include="ViewModels\PinterestImagePickerVM.cs" />
     <Compile Include="Views\BrowserTabView.xaml.cs">
       <DependentUpon>BrowserTabView.xaml</DependentUpon>
     </Compile>
@@ -121,10 +108,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Styles\ScrollBarStyle.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\BrowserTabView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -166,66 +149,33 @@
     <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
       <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
       <Name>CefGlue.WindowsForms-old</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj">
       <Project>{9080d62a-6fe7-41d2-9a77-f3d7f6c33418}</Project>
       <Name>CefGlue-old</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">
       <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>
       <Name>CefGlue.Client</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\DragDropListview\DragDropListview.csproj">
       <Project>{f2c9dcf4-9c94-4389-9532-e9e7d0412c01}</Project>
       <Name>DragDropListview</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\GongSolutions.Wpf.DragDrop\GongSolutions.Wpf.DragDrop.csproj">
       <Project>{0c6674cc-6d49-414a-9b41-d4e175028ffb}</Project>
       <Name>GongSolutions.Wpf.DragDrop</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
       <Name>Organiser.Common</Name>
+      <Private>False</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\refresh.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\add.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\facebook.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\save.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\user.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\reminder.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\fcs icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\browseo %281%29.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\v.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\enterprise buddy.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\enterprise buddy.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\icon-global.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\save-as-xl.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

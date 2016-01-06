@@ -10,10 +10,10 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/RssReader;component/Styles/ScrollBarStyle.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
-          
+
             <Style x:Key="CloseButtonStyle" TargetType="{x:Type Button}" >
                 <Setter Property="Template">
                     <Setter.Value>

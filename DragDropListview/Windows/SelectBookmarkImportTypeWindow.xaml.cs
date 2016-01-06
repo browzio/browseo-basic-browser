@@ -12,7 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace BrowserHost.Views
+namespace DragDropListview.Windows
 {
     /// <summary>
     /// Interaction logic for SelectBookmarkImportTypeWindow.xaml
@@ -43,11 +43,13 @@ namespace BrowserHost.Views
             fcs.Checked -= browseoProj_Checked_1;
             entBud.Checked -= browseoProj_Checked_1;
             rankWyx.Checked -= browseoProj_Checked_1;
+            browseoFolder.Checked -= browseoProj_Checked_1;
 
-            browseoProj.IsChecked = browseoGloable.IsChecked = fcs.IsChecked = entBud.IsChecked = rankWyx.IsChecked = false;
+            browseoProj.IsChecked = browseoFolder.IsChecked = browseoGloable.IsChecked = fcs.IsChecked = entBud.IsChecked = rankWyx.IsChecked = false;
 
             (sender as CheckBox).IsChecked = true;
 
+            browseoFolder.Checked += browseoProj_Checked_1;
             browseoProj.Checked += browseoProj_Checked_1;
             browseoGloable.Checked += browseoProj_Checked_1;
             fcs.Checked += browseoProj_Checked_1;

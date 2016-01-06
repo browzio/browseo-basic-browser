@@ -77,7 +77,6 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="Models\Reminder.cs" />
     <Compile Include="Windows\EditBookmarkWindow.xaml.cs">
       <DependentUpon>EditBookmarkWindow.xaml</DependentUpon>
@@ -158,10 +157,12 @@
     <ProjectReference Include="..\GongSolutions.Wpf.DragDrop\GongSolutions.Wpf.DragDrop.csproj">
       <Project>{0C6674CC-6D49-414A-9B41-D4E175028FFB}</Project>
       <Name>GongSolutions.Wpf.DragDrop</Name>
+      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
       <Name>Organiser.Common</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -175,32 +176,6 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\closed_folder.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Images\new_document.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\browseo %281%29.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\rankwyz-icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\icon-global.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\fcs icon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\enterprise buddy.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\rankwyz-icon-check.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -8,18 +8,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" >
     <UserControl.Resources>
-        <ResourceDictionary>
-            <converter:booleanToVisible x:Key="boolToVis" />
-            <!--<ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml"  />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
-            </ResourceDictionary.MergedDictionaries>-->
-        </ResourceDictionary>
+        <converter:booleanToVisible x:Key="boolToVis" />
     </UserControl.Resources>
 
     <Grid>
@@ -57,9 +46,9 @@
                     <MenuItem Header="Add Folder..." Command="{Binding LVFolderCMenuClick}" CommandParameter="AddFolder" />
                     <MenuItem Header="Add Site..." Command="{Binding LVFolderCMenuClick}" CommandParameter="AddSite" />
                     <MenuItem Header="Delete" Command="{Binding LVFolderCMenuClick}" CommandParameter="Delete" />
-                    <Separator />
+                    <Separator Margin="-30,0,0,0" />
                     <MenuItem Header="Open All In Browser" Command="{Binding LVFolderCMenuClick}" CommandParameter="LaunchToBrowser" />
-                    <Separator />
+                    <Separator Margin="-30,0,0,0" />
                     <MenuItem Header="Set Reminder" Command="{Binding LVFolderCMenuClick}" CommandParameter="Reminder" />
                 </ContextMenu>
             </ListBox.ContextMenu>
@@ -88,9 +77,9 @@
                     <MenuItem Header="Edit..." Command="{Binding LVSiteCMenuClick}" CommandParameter="Edit" />
                     <MenuItem Header="Add Site..." Command="{Binding LVSiteCMenuClick}" CommandParameter="AddSite" />
                     <MenuItem Header="Delete" Command="{Binding LVSiteCMenuClick}" CommandParameter="Delete" />
-                    <Separator />
+                    <Separator Margin="-30,0,0,0" />
                     <MenuItem Header="C\P OnTop" Command="{Binding LVSiteCMenuClick}" CommandParameter="CPWindow" />
-                    <Separator />
+                    <Separator Margin="-30,0,0,0" />
                     <MenuItem Header="Set Reminder" Command="{Binding LVSiteCMenuClick}" CommandParameter="Reminder" />
                 </ContextMenu>
             </ListBox.ContextMenu>

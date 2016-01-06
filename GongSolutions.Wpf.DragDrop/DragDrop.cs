@@ -194,8 +194,13 @@ namespace GongSolutions.Wpf.DragDrop
 
         static bool HitTestScrollBar(object sender, MouseButtonEventArgs e)
         {
-            HitTestResult hit = VisualTreeHelper.HitTest((Visual)sender, e.GetPosition((IInputElement)sender));
-            return hit.VisualHit.GetVisualAncestor<System.Windows.Controls.Primitives.ScrollBar>() != null;
+            try
+            {
+                HitTestResult hit = VisualTreeHelper.HitTest((Visual)sender, e.GetPosition((IInputElement)sender));
+                return hit.VisualHit.GetVisualAncestor<System.Windows.Controls.Primitives.ScrollBar>() != null;
+            }
+            catch { }
+            return false;
         }
 
         static void Scroll(DependencyObject o, DragEventArgs e)

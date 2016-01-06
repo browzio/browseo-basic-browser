@@ -19,16 +19,6 @@ namespace Organiser.Common.Windows
     /// </summary>
     public partial class CreateProjectWindow : Window
     {
-        public static bool CanSeeProxys = false;
-
-        public bool isSave;
-        public bool isNew;
-
-        private bool isMulty;
-        private string oldPath;
-
-        string dir;
-
         public bool IsReadOnly;
 
         public CreateProjectWindow()
@@ -36,25 +26,9 @@ namespace Organiser.Common.Windows
             InitializeComponent();
         }
 
-        public void init(string dir, string txt, string txttitle, bool isMultyProfile, bool Projectprofile, string dirToProfilePath)
-        {
-            this.dir = dir;
-            tbbutton.Text = txt;
-            isMulty = isMultyProfile;
-            if (Projectprofile) isMulty = false;
-            this.Title = txttitle;
-            oldPath = dirToProfilePath;
-            // oldPath = System.IO.Path.Combine(FilesDatabases.GetBaseDir(), "Projects", (DataContext as PersonData).ProjectName, (DataContext as PersonData).ProfileName == null ? "" : (DataContext as PersonData).ProfileName);
-        }
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();            
-        }
-
-        private void btnDelete_Click(object sender, RoutedEventArgs e)
-        {
-           
         }
 
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

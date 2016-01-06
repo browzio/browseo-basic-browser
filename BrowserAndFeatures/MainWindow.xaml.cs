@@ -33,8 +33,7 @@ namespace BrowserAndFeatures
 
         void MainWindow_Closed(object sender, EventArgs e)
         {
-            bnf.close();
-            Xilium.CefGlue.Client.BrowserInit.Shutdown();
+            bnf.CloseAll();
         }
     }
 }

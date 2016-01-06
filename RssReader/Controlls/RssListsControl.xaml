@@ -12,7 +12,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/RssReader;component/Styles/ScrollBarStyle.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <helpers:booleanToVisible x:Key="boolToVis" />
         <helpers:ArithmaticConverter x:Key="arithConverter" />

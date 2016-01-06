@@ -1,102 +1,14 @@
 ﻿<Window x:Class="WPF_WYSIWYG_HTML_Editor.XAML.SelectPlatformWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Select Platform/s" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Width="250" SizeToContent="Height" Icon="/WYSIWYG;component/Images/browseo (1).ico">
+        Title="Select Platform/s" WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Width="250" ResizeMode="NoResize" SizeToContent="Height"
+        Icon="/WYSIWYG;component/Images/settings-icon.png">
     <Window.Resources>
-
-        <!-- Flat Button Style -->
-        <Color x:Key="DefaultColor" A="255" R="240" G ="240" B="240"/>
-        <Color x:Key="HighlightColor" A="255" R="229" G ="229" B="229"/>
-        <Color x:Key="PressedColor" A="255" R="215" G ="215" B="215"/>
-
-        <SolidColorBrush x:Key="DefaultBrush" Color="{StaticResource DefaultColor}" />
-        <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}" />
-        <SolidColorBrush x:Key="BtnPressedBrush" Color="#FF8B8B8B" />
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="{StaticResource DefaultBrush}" />
-            <Setter Property="BorderThickness" Value="0.6" />
-            <Setter Property="BorderBrush" Value="DarkGray" />
-            <Setter Property="Height" Value="22" />
-            <Setter Property="Margin" Value="3" />
-            <Setter Property="ClipToBounds" Value="True" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}"
-                                CornerRadius="0">
-                            <ContentControl Content="{TemplateBinding Content}" HorizontalAlignment="Center" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource HighlightBrush}" />
-                    <Setter Property="Border.Background" Value="Transparent" />
-                    <Setter Property="Border.BorderThickness" Value="1" />
-                    <Setter Property="Border.BorderBrush" Value="{StaticResource BtnPressedBrush}" />
-                    <Setter Property="Border.Effect">
-                        <Setter.Value>
-                            <DropShadowEffect ShadowDepth="0" BlurRadius="1.5" />
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="BorderBrush" Value="Black" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <!-- End Flat Button Style -->
-        
-        <Style x:Key="EmptyCheckBoxFocusVisual">
-            <Setter Property="Control.Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Rectangle Margin="1" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="CheckRadioFocusVisual">
-            <Setter Property="Control.Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Rectangle Margin="14,0,0,0" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style  TargetType="{x:Type CheckBox}">
-            <Setter Property="FocusVisualStyle" Value="{StaticResource EmptyCheckBoxFocusVisual}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <Grid x:Name="grid" Height="20" Background="Transparent" Cursor="Hand">
-                            <Border Width="16" Height="16" Background="#eeeeee" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
-                            <Image x:Name="v" 
-                                       HorizontalAlignment="Left" 
-                                       VerticalAlignment="Bottom"
-                                       SnapsToDevicePixels="True" 
-                                       Visibility="Collapsed" 
-                                       Source="/WYSIWYG;component/Images/v.png" 
-                                       Stretch="Fill" Width="12" Height="12" Margin="3,0,0,3"/>
-                            <ContentPresenter Margin="25,0,0,0" VerticalAlignment="Bottom"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked"  Value="True">
-                                <Setter Property="Visibility" TargetName="v" Value="Visible"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Opacity" TargetName="grid" Value="0.4"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Window.Resources>
     <Grid Background="WhiteSmoke">
         <Grid.RowDefinitions>
@@ -112,18 +24,14 @@
                     <TextBlock Text="Wordpress" VerticalAlignment="Center" Margin="3,0,0,0" />
                 </StackPanel>
             </CheckBox>
-            <Grid Name="cmbWP" Visibility="Collapsed">
-            <ComboBox ItemsSource="{Binding CmbBoxWPList}" Background="#eeeeee" Margin="3" Cursor="Hand" Name="boxWP">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="3">
+            <Grid Name="cmbWP" Visibility="Collapsed" Margin="3" >
+                <ComboBox ItemsSource="{Binding CmbBoxWPList}" Name="boxWP" Height="26" >
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
                             <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding ProfileName}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-                <!--<TextBlock Text="Select wordpress profiles" 
-                           HorizontalAlignment="Center" VerticalAlignment="Center" />-->
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </Grid>
         </StackPanel>
 
@@ -135,21 +43,17 @@
                     <TextBlock Text="Drupal" VerticalAlignment="Center" Margin="3,0,0,0" />
                 </StackPanel>
             </CheckBox>
-            <Grid Visibility="Collapsed" Name="cmbDrupal">
-            <ComboBox ItemsSource="{Binding CmbBoxDrupalList}" Background="#eeeeee" Margin="3" Cursor="Hand" Name="Boxdruple">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Margin="3">
+            <Grid Visibility="Collapsed" Margin="3" Name="cmbDrupal">
+                <ComboBox ItemsSource="{Binding CmbBoxDrupalList}" Name="Boxdruple" Height="26">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
                             <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding ProfileName}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
-                <!--<TextBlock Text="Select Drupal profiles" 
-                           HorizontalAlignment="Center" VerticalAlignment="Center" />-->
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
             </Grid>
         </StackPanel>
         
-        <Button Content="OK" Grid.Row="2" Cursor="Hand" Click="Button_Click" />
+        <Button Content="OK" Grid.Row="2" Click="Button_Click" Style="{StaticResource FlatbtnStyle}" />
     </Grid>
 </Window>

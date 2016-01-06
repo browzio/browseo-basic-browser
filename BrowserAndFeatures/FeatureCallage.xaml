@@ -6,85 +6,44 @@
              xmlns:browser="clr-namespace:BrowserHost;assembly=BrowserHost"
              xmlns:prospector="clr-namespace:Prospector.Controls;assembly=Prospector"
              xmlns:rssReaders="clr-namespace:RssReader.Controlls;assembly=RssReader"
+             xmlns:goVival="clr-namespace:GoViral.Controls;assembly=GoViral"
              xmlns:commonControlls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
              xmlns:wisi="clr-namespace:WPF_WYSIWYG_HTML_Editor.XAML;assembly=WYSIWYG"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="600">
-    
+             d:DesignHeight="600" d:DesignWidth="850">
     <UserControl.Resources>
-        <Style TargetType="{x:Type TabItem}" x:Key="gmailTabStyle">
-            <Setter Property="VerticalAlignment" Value="Bottom"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type TabItem}">
-                        <Grid Cursor="Hand">
-                            <Border Name="Border" 
-                                    Height="23" Width="90"
-                                    Background="#9196a1" Margin="15,0,0,5">
-                                <ContentPresenter x:Name="TitleContent" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" TextElement.Foreground="White"/>
-                            </Border>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="Border" Property="Background">
-                                    <Setter.Value>
-                                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                            <GradientStop Color="#FF376ED4" Offset="0"/>
-                                            <GradientStop Color="#FF588DF0" Offset="0.332"/>
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                            <!--<Trigger Property="IsMouseOver"  Value="True">
-                                <Setter TargetName="Border" Property="Background" Value="#FFc1c4cb" />
-                            </Trigger>-->
-                            
-                            <!--<MultiTrigger>
-                                <MultiTrigger.Conditions>
-                                    <Condition Property="IsSelected" Value="True" />
-                                    <Condition Property="IsMouseOver" Value="True" />
-                                </MultiTrigger.Conditions>
-                                <MultiTrigger.Setters>
-                                    <Setter TargetName="Border" Property="Background">
-                                        <Setter.Value>
-                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                <GradientStop Color="#FF376ED4" Offset="0"/>
-                                                <GradientStop Color="#FF7aa6f6" Offset="0.332"/>
-                                            </LinearGradientBrush>
-                                        </Setter.Value>
-                                    </Setter>
-                                </MultiTrigger.Setters>
-                            </MultiTrigger>--> 
-                        </ControlTemplate.Triggers>
-                        
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
         <commonControlls:NonReloadingTabControl Name="tbControl" BorderThickness="0" Padding="0" SelectionChanged="tbControl_SelectionChanged" Background="Transparent">
-            <TabItem Header="Browser"  Style="{StaticResource gmailTabStyle}">
+            <TabItem Header="Browser"  Style="{StaticResource gmailTabStyle90}">
                 <browser:BrowserHostCntrl Name="browser" />
             </TabItem>
-            <TabItem Header="Prospector" Style="{StaticResource gmailTabStyle}" Name="tabProspector">
+            <TabItem Header="Prospector" Style="{StaticResource gmailTabStyle90}" Name="tabProspector">
                 <prospector:ProspectorTabs Name="prospector" />
                 <!--<nichCntrol:NichResearchControl />-->
             </TabItem>
-            <TabItem Header="RSS"  Style="{StaticResource gmailTabStyle}" Name="tabrssControl"> 
+            <TabItem Header="RSS"  Style="{StaticResource gmailTabStyle90}" Name="tabrssControl"> 
                 <rssReaders:RssTabbedControl Name="rssControl" />
             </TabItem>
-            <TabItem Header="PBN Poster"  Style="{StaticResource gmailTabStyle}" Name="tabrsswisi">
+            <TabItem Header="PBN Poster"  Style="{StaticResource gmailTabStyle90}" Name="tabrsswisi">
                 <wisi:WysiwigControl Name="wisi" />
                 <!--<wisi:WysiwigControl />-->
                 <!--<wisi:WysiwigControl Name="wysiwig" />-->
             </TabItem>
-            <TabItem Header="Feed Masher" Name="feed" PreviewMouseDown="feed_PreviewMouseDown"  Style="{StaticResource gmailTabStyle}">
+            <TabItem Header="Feed Masher" Name="feed" Style="{StaticResource gmailTabStyle90}">
+                <rssReaders:LinksToRssUserControl Name="ucFeedMasher" />
             </TabItem>
-            <TabItem Header="Indexer" Name="indexer" PreviewMouseDown="indexer_PreviewMouseDown"  Style="{StaticResource gmailTabStyle}">
+            <TabItem Header="Go Viral" Name="tabGoViral" Style="{StaticResource gmailTabStyle90}">
+                <goVival:ProjectsWithBrowser Name="ucGoViral"  />
             </TabItem>
-            <TabItem Header="YouTube URL'r" Name="youtuber" PreviewMouseDown="youtuber_PreviewMouseDown"  Style="{StaticResource gmailTabStyle}">
+            <TabItem Header="Indexer" Name="indexer" Style="{StaticResource gmailTabStyle90}">
+            </TabItem>
+            <TabItem Header="YouTube URL'r" Name="youtuber" Style="{StaticResource gmailTabStyle90}">
             </TabItem>
             <!--<TabItem Name="tmContent" Header="Tasks Management" Height="23" VerticalAlignment="Center" BorderThickness="0" Padding="0">
             </TabItem>-->

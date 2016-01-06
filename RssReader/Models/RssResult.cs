@@ -1,4 +1,5 @@
-﻿using RssReader.Helpers;
+﻿using Organiser.Common.Classes;
+using RssReader.Helpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

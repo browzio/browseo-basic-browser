@@ -11,52 +11,21 @@
         <ResourceDictionary>
             <converter:booleanToVisible x:Key="boolToVis" />
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+                <!--<ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.AnimatedSingleRowTabControl.xaml"  />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/FlatButton.xaml" />-->
             </ResourceDictionary.MergedDictionaries>
-
-        
-
         </ResourceDictionary>
     </UserControl.Resources>
+    
     <Grid Background="White">
         <Grid.Resources>
             <SolidColorBrush x:Key="groupBg" Color="#f5f5f5"/>
-            <Style TargetType="Button" x:Key="ButtonStyle">
-                <Setter Property="Height" Value="23" />
-                <Setter Property="Margin" Value="0" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border 
-                                Background="#a1a5ad" Cursor="Hand"
-                                Padding="{TemplateBinding Padding}" MinWidth="95"
-                                CornerRadius="0" x:Name="Border">
-                                <ContentControl Content="{TemplateBinding Content}"
-                                                HorizontalAlignment="Center" Margin="7,0"
-                                                VerticalAlignment="Center" TextElement.Foreground="White"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="Border" Property="Background">
-                                        <Setter.Value>
-                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                <GradientStop Color="#FF376ED4" Offset="0"/>
-                                                <GradientStop Color="#FF588DF0" Offset="0.332"/>
-                                            </LinearGradientBrush>
-                                        </Setter.Value>
-                                    </Setter>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
         </Grid.Resources>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -105,7 +74,7 @@
                 
                 <StackPanel Orientation="Horizontal" Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}">
                     <TextBlock Text="Specific Sites:" TextWrapping="Wrap" Width="59" VerticalAlignment="Top" />
-                    <Image Source="/Prospector;component/Images/info.png" Margin="-48,6,0,0" VerticalAlignment="Center" ToolTipService.ShowDuration="15000" 
+                    <Image Source="pack://application:,,,/Organiser.Common;component/Image/info.png" Margin="-46,10,0,0" VerticalAlignment="Center" ToolTipService.ShowDuration="15000" 
                            ToolTip="Enter the top level domain (TLD),&#x0a; for example instead of www.yahoo.com enter yahoo.com" />
                     <StackPanel>
                         <TextBox Text="{Binding SpecificSites}" TextWrapping="Wrap" Width="400"  Margin="1" />
@@ -121,8 +90,7 @@
                 </StackPanel>
 
                 <Button Command="{Binding SaveFootprint}" Content="Save Footprint"
-                        Visibility="{Binding Path= Visible_savebtn,Converter={StaticResource boolToVis}}"
-                    Style="{StaticResource ButtonStyle}" HorizontalAlignment="Left" Margin="5"/>
+                        Visibility="{Binding Path= Visible_savebtn,Converter={StaticResource boolToVis}}" HorizontalAlignment="Left" Margin="0,5,5,0"/>
             </StackPanel>
 
             <StackPanel Margin="7" Grid.Column="1" VerticalAlignment="Top" Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}">
@@ -133,7 +101,7 @@
                 
                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
                     <TextBlock Text="Performance Score" Margin="4,2,2,2" />
-                    <Image Source="/Prospector;component/Images/info.png" Margin="2" VerticalAlignment="Center" ToolTipService.ShowDuration="15000" 
+                    <Image Source="pack://application:,,,/Organiser.Common;component/Image/info.png" Margin="2" VerticalAlignment="Center" ToolTipService.ShowDuration="15000" 
                            ToolTip="The score ranges between 0-10,&#x0a; where 0 means that the post didn't do well at all,&#x0a; i.e rarely or was never shared,&#x0a; to 10 which means that the post was on fire,&#x0a; shared thousands of times over on either Twitter,&#x0a; Facebook and other social networks." />
                 </StackPanel>
                 <ComboBox ItemsSource="{Binding PerformanceScores}" 
@@ -295,7 +263,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.Resources>
-                    <Style TargetType="Button" >
+                    <Style TargetType="Button">
                         <Setter Property="Height" Value="25" />
                         <Setter Property="Margin" Value="0" />
                         <Setter Property="Template">
@@ -354,26 +322,18 @@
         </Grid>
 
         <StackPanel IsEnabled="{Binding IsNotSerching}" Orientation="Horizontal" Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"  Margin="5,10">
-            <Button Command="{Binding StartSearch}"  Style="{StaticResource ButtonStyle}"
-                    Content="Search"/>
+            <Button Command="{Binding StartSearch}" Content="Search" Width="95"/>
 
-            <Button Command="{Binding Clear}" Content="Clear"
-                    Style="{StaticResource ButtonStyle}" Margin="10,0"/>
+            <Button Command="{Binding Clear}" Content="Clear" Margin="10,0" Width="95"/>
 
+            <Button Command="{Binding Export}" Content="Export Results" Width="95"/>
 
+            <Button Command="{Binding SetMoz}" Content="Set Moz Keys" Margin="10,0" Width="95"/>
 
-            <Button Command="{Binding Export}" Content="Export Results"
-                    Style="{StaticResource ButtonStyle}"/>
-
-            <Button Command="{Binding SetMoz}" Content="Set Moz Keys"
-                    Style="{StaticResource ButtonStyle}" Margin="10,0"/>
-
-            <Button Command="{Binding SetProxy}" Content="Set Proxy"
-                    Style="{StaticResource ButtonStyle}" Margin="0"/>
-
+            <Button Command="{Binding SetProxy}" Content="Set Proxy" Margin="0" Width="95"/>
         </StackPanel>
 
-        <localControls:GoogleSearchResults Grid.RowSpan="3" Grid.Column="2"  Margin="10,5,10,10" />
+        <localControls:GoogleSearchResults Grid.RowSpan="3" Grid.Column="2"  Margin="10,5,10,10"/>
 
     </Grid>
 </UserControl>

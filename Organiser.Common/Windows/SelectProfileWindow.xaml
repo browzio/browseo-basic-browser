@@ -1,0 +1,27 @@
+﻿<Window x:Class="Organiser.Common.SelectProfileWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Select Profile" SizeToContent="Height" Width="250" 
+        WindowStartupLocation="CenterScreen" Loaded="Window_Loaded" Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <StackPanel>
+        <ComboBox ItemsSource="{Binding ProfilesList}" 
+                      Margin="5" 
+                      Name="cmProfiles"
+                        x:FieldModifier="public" />
+            <Button Margin="5"
+                    Style="{StaticResource FlatbtnStyle}"
+                    Click="Button_Click">
+                <TextBlock HorizontalAlignment="Center" Text="OK" Name="tbbutton" />
+            </Button>
+        </StackPanel>
+    </Grid>
+        
+</Window>

@@ -6,111 +6,11 @@
              mc:Ignorable="d" 
              d:DesignHeight="550" d:DesignWidth="500">
     <UserControl.Resources>
-        <Style x:Key="EmptyCheckBoxFocusVisual">
-            <Setter Property="Control.Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Rectangle Margin="1" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="CheckRadioFocusVisual">
-            <Setter Property="Control.Template">
-                <Setter.Value>
-                    <ControlTemplate>
-                        <Rectangle Margin="14,0,0,0" SnapsToDevicePixels="true" Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" StrokeThickness="1" StrokeDashArray="1 2"/>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style  TargetType="{x:Type CheckBox}">
-            <Setter Property="FocusVisualStyle" Value="{StaticResource EmptyCheckBoxFocusVisual}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                        <Grid x:Name="grid" Height="20" Background="Transparent" Cursor="Hand">
-                            <Border Width="16" Height="16" Background="#eeeeee" VerticalAlignment="Bottom" HorizontalAlignment="Left"/>
-                            <Image x:Name="v" 
-                                       HorizontalAlignment="Left" 
-                                       VerticalAlignment="Bottom"
-                                       SnapsToDevicePixels="True" 
-                                       Visibility="Collapsed" 
-                                       Source="/Indexer;component/Images/v.png" 
-                                       Stretch="Fill" Width="12" Height="12" Margin="3,0,0,3"/>
-                            <ContentPresenter Margin="25,0,0,0" VerticalAlignment="Bottom"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsChecked"  Value="True">
-                                <Setter Property="Visibility" TargetName="v" Value="Visible"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="false">
-                                <Setter Property="Opacity" TargetName="grid" Value="0.4"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <!-- Flat Button Style -->
-        <Color x:Key="DefaultColor" A="255" R="240" G ="240" B="240"/>
-        <Color x:Key="HighlightColor" A="255" R="229" G ="229" B="229"/>
-        <Color x:Key="PressedColor" A="255" R="215" G ="215" B="215"/>
-
-        <SolidColorBrush x:Key="DefaultBrush" Color="{StaticResource DefaultColor}" />
-        <SolidColorBrush x:Key="HighlightBrush" Color="{StaticResource HighlightColor}" />
-        <SolidColorBrush x:Key="PressedBrush" Color="#FF8B8B8B" />
-
-        <Style TargetType="Border" x:Key="innerShaddowBorder">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush" Value="Black" />
-            <Setter Property="Margin" Value="-2" />
-            <Setter Property="Border.Effect">
-                <Setter.Value>
-                    <DropShadowEffect ShadowDepth="0" BlurRadius="10" />
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <Style TargetType="Button" x:Key="FlatButtonStyle">
-            <Setter Property="Background" Value="{StaticResource DefaultBrush}" />
-            <Setter Property="BorderThickness" Value="0.6" />
-            <Setter Property="BorderBrush" Value="DarkGray" />
-            <Setter Property="Height" Value="22" />
-            <Setter Property="Margin" Value="3" />
-            <Setter Property="ClipToBounds" Value="True" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border BorderThickness="{TemplateBinding BorderThickness}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}"
-                                CornerRadius="0">
-                            <ContentControl Content="{TemplateBinding Content}" />
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="{StaticResource HighlightBrush}" />
-                    <Setter Property="Border.Background" Value="Transparent" />
-                    <Setter Property="Border.BorderThickness" Value="1" />
-                    <Setter Property="Border.BorderBrush" Value="{StaticResource PressedBrush}" />
-                    <Setter Property="Border.Effect">
-                        <Setter.Value>
-                            <DropShadowEffect ShadowDepth="0" BlurRadius="1.5" />
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-                <Trigger Property="IsPressed" Value="True">
-                    <Setter Property="BorderBrush" Value="Black" />
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-        <!-- End Flat Button Style -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <Grid Background="WhiteSmoke">
         <Grid.ColumnDefinitions>
@@ -163,7 +63,7 @@
             </DockPanel>
         </StackPanel>
 
-        <Button Command="{Binding BtnOkClicked}" IsEnabled="{Binding BtnOkEnabled}"  Style="{StaticResource FlatButtonStyle}"  Grid.Row="2" Cursor="Hand">
+        <Button Command="{Binding BtnOkClicked}" IsEnabled="{Binding BtnOkEnabled}" Grid.Row="2" Cursor="Hand" Style="{StaticResource FlatbtnStyle}">
             <TextBlock Text="Index It" HorizontalAlignment="Center" />
         </Button>
 

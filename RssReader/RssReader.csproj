@@ -57,10 +57,14 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controlls\CirclePBarControl.xaml.cs">
       <DependentUpon>CirclePBarControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controlls\LinksToRssUserControl.xaml.cs">
+      <DependentUpon>LinksToRssUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controlls\RssControl.xaml.cs">
       <DependentUpon>RssControl.xaml</DependentUpon>
@@ -68,6 +72,7 @@
     <Compile Include="Controlls\RssTabbedControl.xaml.cs">
       <DependentUpon>RssTabbedControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converter\FalseToVisConverter.cs" />
     <Compile Include="Helpers\ArithmaticConverter.cs" />
     <Compile Include="Helpers\booleanToVisible.cs" />
     <Compile Include="Models\AvailableTabsAndLinks.cs" />
@@ -76,10 +81,11 @@
     <Compile Include="Windows\LinksToRssWindow.xaml.cs">
       <DependentUpon>LinksToRssWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\RssFeedsLinksMultiWindow.xaml.cs">
-      <DependentUpon>RssFeedsLinksMultiWindow.xaml</DependentUpon>
-    </Compile>
     <Page Include="Controlls\CirclePBarControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controlls\LinksToRssUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -105,7 +111,6 @@
     <Compile Include="Controlls\RssListsControl.xaml.cs">
       <DependentUpon>RssListsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -115,15 +120,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Styles\ScrollBarStyle.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Windows\LinksToRssWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Windows\RssFeedsLinksMultiWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -158,28 +155,25 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
+      <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
+      <Name>CefGlue.WindowsForms-old</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj">
+      <Project>{9080d62a-6fe7-41d2-9a77-f3d7f6c33418}</Project>
+      <Name>CefGlue-old</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">
+      <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>
+      <Name>CefGlue.Client</Name>
+      <Private>False</Private>
+    </ProjectReference>
     <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
       <Name>Organiser.Common</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\close.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\refresh.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\rss.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\import.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\browseo %281%29.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\v.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

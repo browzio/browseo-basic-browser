@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loclcontrol="clr-namespace:Indexer.Controls"
         WindowStartupLocation="CenterScreen"
-        Title="One Link On A Line keep http://" Height="350" Width="525" Icon="Images/browseo (1).ico">
+        Title="One Link On A Line keep http://" Height="350" Width="525" Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico">
     <Grid>
         <loclcontrol:IndexerMainUserControl />
     </Grid>

@@ -55,8 +55,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>
-    </ApplicationIcon>
+    <ApplicationIcon>browseo %281%29.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -146,6 +145,10 @@
       <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>
       <Name>CefGlue.Client</Name>
     </ProjectReference>
+    <ProjectReference Include="..\CrawlerHostViews\CrawlerHostViews.csproj">
+      <Project>{b624c5bb-83f8-48f0-956b-aad1f0554fe3}</Project>
+      <Name>CrawlerHostViews</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DragDropListview\DragDropListview.csproj">
       <Project>{f2c9dcf4-9c94-4389-9532-e9e7d0412c01}</Project>
       <Name>DragDropListview</Name>
@@ -157,6 +160,10 @@
     <ProjectReference Include="..\GongSolutions.Wpf.DragDrop\GongSolutions.Wpf.DragDrop.csproj">
       <Project>{0c6674cc-6d49-414a-9b41-d4e175028ffb}</Project>
       <Name>GongSolutions.Wpf.DragDrop</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GoViral\GoViral.csproj">
+      <Project>{0d0b3748-c24c-464a-b051-b06c983831ef}</Project>
+      <Name>GoViral</Name>
     </ProjectReference>
     <ProjectReference Include="..\Indexer\Indexer.csproj">
       <Project>{0b51ac08-7106-431f-8359-0f86e9f48dca}</Project>
@@ -186,26 +193,17 @@
       <Project>{13a55ae8-28ab-4ddb-9bc3-babfd7d64fea}</Project>
       <Name>WYSIWYG</Name>
     </ProjectReference>
+    <ProjectReference Include="..\WPFPieChart\WPFPieChartTwo.csproj">
+      <Project>{59210896-68d1-4a34-91cc-8d015eca7061}</Project>
+      <Name>WPFPieChartTwo</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Youtuber\Youtuber.csproj">
       <Project>{9ee91744-7d3f-4f68-8b98-395759ab4eb0}</Project>
       <Name>Youtuber</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\closed_folder.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\new_document.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="browseo %281%29.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="favicon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

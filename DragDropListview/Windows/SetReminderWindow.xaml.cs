@@ -27,6 +27,12 @@ namespace DragDropListview.Windows
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            DateTime dt;
+            if (!DateTime.TryParse(dtReminder.Text, out dt))
+            {
+                MessageBox.Show("Date for reminder was not set.");
+                return;
+            }
             OkClicked = true;
 
             this.Close();

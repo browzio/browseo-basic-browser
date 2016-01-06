@@ -424,7 +424,7 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
             });
         }
 
-        public void injectHtml(string content)
+        public void injectHtml(string content,string link)
         {
             System.Threading.Tasks.Task.Factory.StartNew(() =>
             {
@@ -439,7 +439,10 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
                             return;
                         }
                     }
-                    string thecontent = "<BLOCKQUOTE>" + content + "</BLOCKQUOTE>";
+                    string thecontent = "<BLOCKQUOTE>" + content + "<br />";
+                    if (!string.IsNullOrEmpty(link) && !string.IsNullOrWhiteSpace(link))
+                        thecontent += "<A href=\"" + link + " \" > " + link + " </a>";
+                    thecontent += "</BLOCKQUOTE>";
                     webBrowserEditor.doc.body.innerHTML += thecontent;
                 }
                 catch { }

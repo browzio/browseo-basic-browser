@@ -69,7 +69,35 @@ namespace RssReader.Models
             }
         }
 
-        
+        private System.Windows.Media.Brush forColor;
+        public System.Windows.Media.Brush ForeColorIsLocalProject
+        {
+            get { return forColor; }
+            set
+            {
+                forColor = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("ForeColorIsLocalProject"));
+                }
+            }
+        }
+
+        public string ProjectName { get; set; }
+
+        public SavedPostedFeed GetNewClone()
+        {
+            return new SavedPostedFeed()
+            {
+                FeedLinks = this.FeedLinks,
+                FeedTitle = this.FeedTitle,
+                FeedCategory = this.FeedCategory,
+                FeedResult = this.FeedResult,
+                FeedIsRssMashup = this.FeedIsRssMashup,
+                ForeColorIsLocalProject = this.ForeColorIsLocalProject,
+                ProjectName = this.ProjectName,
+            };
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

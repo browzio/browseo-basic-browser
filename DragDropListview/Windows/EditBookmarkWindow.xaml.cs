@@ -25,9 +25,7 @@ namespace DragDropListview.Windows
 
         public EditBookmarkWindow()
         {
-            InitializeComponent();
-            this.Icon = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\browseo (1).ico"));
-
+            InitializeComponent(); 
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)

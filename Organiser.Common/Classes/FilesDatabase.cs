@@ -1,9 +1,11 @@
-﻿using PData.FilesReader;
+﻿using Microsoft.Win32;
+using PData.FilesReader;
 using ProjectsList.Models;
 using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Windows;
 
@@ -13,64 +15,20 @@ namespace Organiser.Common.Classes
     {
         public const string SPLITTER = "{[:]}";
 
+        public static bool CanSeeProxys = false;
+
+        public static bool JavaEnabled = true;
+        public static bool JavascriptEnabled = true;
+        public static bool FlashEnabled = true;
+        public static bool SetSysDateEnabled = false;
+
+        static System.Threading.Thread ramCheckerThread;
+        static ulong availmem = 0;
+        static int timesToCheck = 0;
+
         public static string GetBaseDir()
         {
             return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\RAWSocialOrganizer";
-        }
-
-        public static List<ProjectData> GetProjects()
-        {
-            List<ProjectData> projects = new List<ProjectData>();
-            string path = Path.Combine(GetBaseDir(), "Projects");
-            if (Directory.Exists(path))
-            {
-                DirectoryInfo dirInfo = new DirectoryInfo(path);
-                foreach (DirectoryInfo dir in dirInfo.GetDirectories())
-                {
-                    string sitesFilePath = Path.Combine(dir.FullName, "ProjectData.ini");
-                    IniFile ini = new IniFile(sitesFilePath);
-                    PersonData profile = new PersonData();
-                    try
-                    {
-                        profile.ProjectName = ini.IniReadValue("Data", "ProjectName");
-                        profile.ProfileName = ini.IniReadValue("Data", "ProfileName");
-                        profile.FirstName = ini.IniReadValue("Data", "FirstName");
-                        profile.LastName = ini.IniReadValue("Data", "LastName");
-                        profile.Email = ini.IniReadValue("Data", "Email");
-                        profile.Password = ini.IniReadValue("Data", "Password");
-                        profile.Username = ini.IniReadValue("Data", "Username");
-                        profile.ProxyIP = ini.IniReadValue("Data", "ProxyIP");
-                        profile.ProxyPort = ini.IniReadValue("Data", "ProxyPort");
-                        profile.ProxyUsername = ini.IniReadValue("Data", "ProxyUsername");
-                        profile.ProxyPassword = ini.IniReadValue("Data", "ProxyPassword");
-                        profile.PhoneNumber = ini.IniReadValue("Data", "PhoneNumber");
-                        profile.Street = ini.IniReadValue("Data", "Street");
-                        profile.City = ini.IniReadValue("Data", "City");
-                        profile.State = ini.IniReadValue("Data", "State");
-                        profile.Zip = ini.IniReadValue("Data", "Zip");
-                        profile.Country = ini.IniReadValue("Data", "Country");
-                        profile.Notes = ini.IniReadValue("Data", "Notes");
-                        profile.CmbSelectedIndexSex = Convert.ToInt32(ini.IniReadValue("Data", "Sex"));
-                        profile.CmbSelectedIndexDay = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayDay"));
-                        profile.CmbSelectedIndexMonth = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayMonth"));
-                        try
-                        {
-                            profile.BirthdayYear = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayYear"));
-                        }
-                        catch { }
-                    }
-                    catch { }
-                    ProjectData proj = new ProjectData()
-                    {
-                        ProjectName = dir.Name,
-                        ProjDir = dir.FullName,
-                        PersonData = profile
-                    };
-                    projects.Add(proj);
-                }
-                return projects;
-            }
-            return projects;
         }
 
         public static List<KeyValuePair<string, string>> GetSubProjectsFolders(string path, string projname)
@@ -155,107 +113,90 @@ namespace Organiser.Common.Classes
             }
         }
 
-        public static void CreatProject(PersonData pdata)
+        public static string FindProjectDirByName(string projectName, string profileName)
         {
-            try
+            string path = Path.Combine(GetBaseDir(), "Projects");
+            string dir = RecursiveProjectFindByName(new DirectoryInfo(path), projectName, profileName);
+
+            
+            return dir;
+        }
+
+        private static string RecursiveProjectFindByName(DirectoryInfo directoryInfo, string projectName, string profileName)
+        {
+            if (directoryInfo != null)
             {
-                string path = Path.Combine(GetBaseDir(), "Projects\\" + pdata.ProjectName);
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
+                FileInfo[] files = directoryInfo.GetFiles();
+                if (files != null)
+                {
+                    foreach (FileInfo fi in files)
+                    {
+                        if (fi.Name == "ProjectData.ini" || fi.Name == "UserData.ini")
+                        {
+                            IniFile ini = new IniFile(fi.FullName);
+                            string ProjectName = ini.IniReadValue("Data", "ProjectName");
+                            string ProfileName = ini.IniReadValue("Data", "ProfileName");
 
-                IniFile fileWrighter = new IniFile(Path.Combine(path, "ProjectData.ini"));
-                fileWrighter.IniWriteValue("Data", "ProjectName", pdata.ProjectName);
-                fileWrighter.IniWriteValue("Data", "ProfileName", pdata.ProfileName);
-                fileWrighter.IniWriteValue("Data", "FirstName", pdata.FirstName);
-                fileWrighter.IniWriteValue("Data", "LastName", pdata.LastName);
-                fileWrighter.IniWriteValue("Data", "Email", pdata.Email);
-                fileWrighter.IniWriteValue("Data", "Password", pdata.Password);
-                fileWrighter.IniWriteValue("Data", "Username", pdata.Username);
-                fileWrighter.IniWriteValue("Data", "ProxyIP", pdata.ProxyIP);
-                fileWrighter.IniWriteValue("Data", "ProxyPort", pdata.ProxyPort);
-                fileWrighter.IniWriteValue("Data", "ProxyUsername", pdata.ProxyUsername);
-                fileWrighter.IniWriteValue("Data", "ProxyPassword", pdata.ProxyPassword);
-                fileWrighter.IniWriteValue("Data", "PhoneNumber", pdata.PhoneNumber);
-                fileWrighter.IniWriteValue("Data", "Sex", "" + pdata.CmbSelectedIndexSex);
-                fileWrighter.IniWriteValue("Data", "BirthdayDay", "" + pdata.CmbSelectedIndexDay);
-                fileWrighter.IniWriteValue("Data", "BirthdayMonth", "" + pdata.CmbSelectedIndexMonth);
-                fileWrighter.IniWriteValue("Data", "BirthdayYear", "" + pdata.BirthdayYear);
-                fileWrighter.IniWriteValue("Data", "Street", "" + pdata.Street);
-                fileWrighter.IniWriteValue("Data", "City", "" + pdata.City);
-                fileWrighter.IniWriteValue("Data", "State", "" + pdata.State);
-                fileWrighter.IniWriteValue("Data", "Zip", "" + pdata.Zip);
-                fileWrighter.IniWriteValue("Data", "Country", "" + pdata.Country);
-                fileWrighter.IniWriteValue("Data", "Notes", "" + pdata.Notes);
+                            if (ProjectName.Trim().ToLower() == projectName.Trim().ToLower())
+                            {
+                                if (ProfileName.Trim().ToLower() == profileName.Trim().ToLower())
+                                {
+                                    return fi.Directory.FullName;
+                                }
+                                else
+                                {
+                                    if (fi.Name == "ProjectData.ini")
+                                    {
+                                        DirectoryInfo[] Pdirs = directoryInfo.GetDirectories();
+                                        if (Pdirs != null)
+                                        {
+                                            foreach (var dir in Pdirs)
+                                            {
+                                                FileInfo[] Pfiles = dir.GetFiles();
+                                                if (Pfiles != null)
+                                                {
+                                                    foreach (FileInfo pfi in files)
+                                                    {
+                                                        if (pfi.Name == "UserData.ini")
+                                                        {
+                                                            string Name = ini.IniReadValue("Data", "ProjectName");
+                                                            string ProName = ini.IniReadValue("Data", "ProfileName");
+                                                            if (Name.Trim().ToLower() == Name.Trim().ToLower())
+                                                            {
+                                                                if (ProName.Trim().ToLower() == ProName.Trim().ToLower())
+                                                                {
+                                                                    return pfi.Directory.FullName;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                return fi.Directory.FullName;
+                            }
+                        }
+                    }
+                }
+
+
+                DirectoryInfo[] dirs = directoryInfo.GetDirectories();
+                if (dirs != null)
+                {
+                    foreach (DirectoryInfo item in dirs)
+                    {
+                        string dir = RecursiveProjectFindByName(item, projectName, profileName);
+
+                        if (dir != "")
+                            return dir;
+                    }
+                }
             }
-            catch { MessageBox.Show("Project not saved."); }
-        }
 
-        public static void DeleteSession(string projectName)
-        {
-            string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
-            if (Directory.Exists(directory))
-            {
-                Directory.Delete(directory, true);
-            }
-        }
-
-        public static void SaveSession(string projectName, List<string> links)
-        {
-            string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
-            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
-
-            string filePath = Path.Combine(directory, "sites.txt");
-            File.WriteAllLines(filePath, links.ToArray());
-        }
-
-        public static string[] GetSavedSesstion(string projectName)
-        {
-            string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
-            if (!Directory.Exists(directory)) return new string[] { };
-
-            string filePath = Path.Combine(directory, "sites.txt");
-            if (!File.Exists(filePath)) return new string[] { };
-
-            return File.ReadAllLines(filePath);
-        }
-
-        public static void CreatSubProjectUser(PersonData pdata)
-        {
-            try
-            {
-                string path = Path.Combine(GetBaseDir(), "Projects\\" + pdata.ProjectName);
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
-
-                string userPath = Path.Combine(GetBaseDir(), "Projects\\" + pdata.ProjectName + "\\" + pdata.ProfileName);
-                if (!Directory.Exists(userPath))
-                    Directory.CreateDirectory(userPath);
-
-                IniFile fileWrighter = new IniFile(Path.Combine(userPath, "UserData.ini"));
-                fileWrighter.IniWriteValue("Data", "ProjectName", pdata.ProjectName);
-                fileWrighter.IniWriteValue("Data", "ProfileName", pdata.ProfileName);
-                fileWrighter.IniWriteValue("Data", "FirstName", pdata.FirstName);
-                fileWrighter.IniWriteValue("Data", "LastName", pdata.LastName);
-                fileWrighter.IniWriteValue("Data", "Email", pdata.Email);
-                fileWrighter.IniWriteValue("Data", "Password", pdata.Password);
-                fileWrighter.IniWriteValue("Data", "Username", pdata.Username);
-                fileWrighter.IniWriteValue("Data", "ProxyIP", pdata.ProxyIP);
-                fileWrighter.IniWriteValue("Data", "ProxyPort", pdata.ProxyPort);
-                fileWrighter.IniWriteValue("Data", "ProxyUsername", pdata.ProxyUsername);
-                fileWrighter.IniWriteValue("Data", "ProxyPassword", pdata.ProxyPassword);
-                fileWrighter.IniWriteValue("Data", "PhoneNumber", pdata.PhoneNumber);
-                fileWrighter.IniWriteValue("Data", "Sex", "" + pdata.CmbSelectedIndexSex);
-                fileWrighter.IniWriteValue("Data", "BirthdayDay", "" + pdata.CmbSelectedIndexDay);
-                fileWrighter.IniWriteValue("Data", "BirthdayMonth", "" + pdata.CmbSelectedIndexMonth);
-                fileWrighter.IniWriteValue("Data", "BirthdayYear", "" + pdata.BirthdayYear);
-                fileWrighter.IniWriteValue("Data", "Street", "" + pdata.Street);
-                fileWrighter.IniWriteValue("Data", "City", "" + pdata.City);
-                fileWrighter.IniWriteValue("Data", "State", "" + pdata.State);
-                fileWrighter.IniWriteValue("Data", "Zip", "" + pdata.Zip);
-                fileWrighter.IniWriteValue("Data", "Country", "" + pdata.Country);
-                fileWrighter.IniWriteValue("Data", "Notes", "" + pdata.Notes);
-            }
-            catch { MessageBox.Show("Project not saved."); }
+            return "";
         }
 
         public static bool HasMultipleProfiles(string path)
@@ -318,190 +259,6 @@ namespace Organiser.Common.Classes
             return profile;
         }
 
-        public static List<string> GetProjectSites(ProjectData project)
-        {
-            List<string> currentList = currentList = new List<string>();
-            string path = Path.Combine(project.ProjDir, "sites.txt");
-
-            if (!File.Exists(path)) return currentList;
-
-            foreach (string site in File.ReadAllLines(path))
-            {
-                string[] lineArr = site.Split(new string[] { "{:|:}" }, StringSplitOptions.None);
-                currentList.Add(lineArr[1]);
-            }
-            return currentList;
-        }
-
-        public static void WrighProjectSitesData(ProjectData project)
-        {
-            if (project.Sites == null) return;
-
-            //if (project.Sites.Count <= 1)
-            //    foreach (string site in GetSubProjects(project))
-            //        project.Sites.Add(site);
-
-            FileStream fs = new FileStream(Path.Combine(project.ProjDir, "sites.txt"), FileMode.Create);
-            using (StreamWriter sw = new StreamWriter(fs))
-            {
-                foreach (string site in project.Sites)
-                {
-                    sw.WriteLine("Site {:|:}" + site);
-                }
-            }
-            fs.Close();
-        }
-
-        public static void DeleteProject(ProjectData proj)
-        {
-            try
-            {
-                if (Directory.Exists(proj.ProjDir))
-                    Directory.Delete(proj.ProjDir, true);
-            }
-            catch { }
-        }
-
-        public static void FlipCache(string oldProjectName, string newProjectName, bool flip)
-        {
-            string windowsPath = @"Microsoft\Windows\Temporary Internet Files";
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version >= new Version(6, 2, 9200, 0))
-                windowsPath = @"Microsoft\Windows\INetCache";
-
-            string cachePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), windowsPath);
-
-            if (Directory.Exists(cachePath))
-            {
-                if (flip)
-                {
-                    string destDir = Path.Combine(GetBaseDir(), "Caches\\" + oldProjectName);
-                    if (!Directory.Exists(destDir))
-                        Directory.CreateDirectory(destDir);
-
-                    DirectoryCopy(cachePath, destDir, true);
-                }
-
-                //DynamicBrowser.IECache.ClearCache();
-                foreach (string file in Directory.GetFiles(cachePath))
-                {
-                    try
-                    {
-                        File.Delete(file);
-                    }
-                    catch { }
-                }
-
-                string newDir = Path.Combine(GetBaseDir(), "Caches\\" + newProjectName);
-                if (!Directory.Exists(newDir))
-                    return;
-                else
-                    DirectoryCopy(newDir, cachePath, true);
-            }
-            else
-            {
-                // DynamicBrowser.IECache.ClearCache();
-            }
-        }
-
-        public static void WrightCache(string projname)
-        {
-            string windowsPath = @"Microsoft\Windows\Temporary Internet Files";
-            if (Environment.OSVersion.Platform == PlatformID.Win32NT && Environment.OSVersion.Version >= new Version(6, 2, 9200, 0))
-                windowsPath = @"Microsoft\Windows\INetCache";
-
-            string cachePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), windowsPath);
-
-            if (Directory.Exists(cachePath))
-            {
-                string destDir = Path.Combine(GetBaseDir(), "Caches\\" + projname);
-                if (!Directory.Exists(projname))
-                    Directory.CreateDirectory(projname);
-
-                DirectoryCopy(cachePath, destDir, true);
-            }
-        }
-
-        private static void DirectoryCopy(string sourceDirName, string destDirName, bool copySubDirs)
-        {
-            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
-            DirectoryInfo[] dirs = dir.GetDirectories();
-
-            // If the source directory does not exist, throw an exception.
-            if (!dir.Exists)
-            {
-                throw new DirectoryNotFoundException(
-                    "Source directory does not exist or could not be found: "
-                    + sourceDirName);
-            }
-
-            // If the destination directory does not exist, create it.
-            if (!Directory.Exists(destDirName))
-            {
-                Directory.CreateDirectory(destDirName);
-            }
-
-
-            // Get the file contents of the directory to copy.
-            FileInfo[] files = dir.GetFiles();
-
-            foreach (FileInfo file in files)
-            {
-                // Create the path to the new copy of the file.
-                string temppath = Path.Combine(destDirName, file.Name);
-
-                // Copy the file.
-                try
-                {
-                    file.CopyTo(temppath, true);
-                }
-                catch { }
-            }
-
-            // If copySubDirs is true, copy the subdirectories.
-            if (copySubDirs)
-            {
-
-                foreach (DirectoryInfo subdir in dirs)
-                {
-                    // Create the subdirectory.
-                    string temppath = Path.Combine(destDirName, subdir.Name);
-
-                    // Copy the subdirectories.
-                    DirectoryCopy(subdir.FullName, temppath, copySubDirs);
-                }
-            }
-        }
-
-        public static void CreateBrowserPersonData(PersonData pdata)
-        {
-            string path = Path.Combine(GetBaseDir(), "Temp");
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-
-            IniFile fileWrighter = new IniFile(Path.Combine(path, "BrowserConfig.ini"));
-            fileWrighter.IniWriteValue("Data", "ProjectName", pdata.ProjectName);
-            fileWrighter.IniWriteValue("Data", "FirstName", pdata.FirstName);
-            fileWrighter.IniWriteValue("Data", "LastName", pdata.LastName);
-            fileWrighter.IniWriteValue("Data", "Email", pdata.Email);
-            fileWrighter.IniWriteValue("Data", "Password", pdata.Password);
-            fileWrighter.IniWriteValue("Data", "Username", pdata.Username);
-            fileWrighter.IniWriteValue("Data", "ProxyIP", pdata.ProxyIP);
-            fileWrighter.IniWriteValue("Data", "ProxyPort", pdata.ProxyPort);
-            fileWrighter.IniWriteValue("Data", "ProxyUsername", pdata.ProxyUsername);
-            fileWrighter.IniWriteValue("Data", "ProxyPassword", pdata.ProxyPassword);
-            fileWrighter.IniWriteValue("Data", "PhoneNumber", pdata.PhoneNumber);
-            fileWrighter.IniWriteValue("Data", "Sex", "" + pdata.CmbSelectedIndexSex);
-            fileWrighter.IniWriteValue("Data", "BirthdayDay", "" + pdata.CmbSelectedIndexDay);
-            fileWrighter.IniWriteValue("Data", "BirthdayMonth", "" + pdata.CmbSelectedIndexMonth);
-            fileWrighter.IniWriteValue("Data", "BirthdayYear", "" + pdata.BirthdayYear);
-            fileWrighter.IniWriteValue("Data", "Street", "" + pdata.Street);
-            fileWrighter.IniWriteValue("Data", "City", "" + pdata.City);
-            fileWrighter.IniWriteValue("Data", "State", "" + pdata.State);
-            fileWrighter.IniWriteValue("Data", "Zip", "" + pdata.Zip);
-            fileWrighter.IniWriteValue("Data", "Country", "" + pdata.Country);
-            fileWrighter.IniWriteValue("Data", "Notes", "" + pdata.Notes);
-        }
-
         public static PersonData SetProfileFromini(string path)
         {
             PersonData profile = new PersonData();
@@ -541,25 +298,59 @@ namespace Organiser.Common.Classes
             return profile;
         }
 
-        #region cookie data
-        public static List<string> GetSites()
+        #region sessions
+        public static void DeleteSession(string projectName)
         {
-            List<string> sites = new List<string>();
-
-            string filePath = Path.Combine(GetBaseDir(), "VisitedSites\\SitesLog.txt");
-            if (File.Exists(filePath))
+            string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
+            if (Directory.Exists(directory))
             {
-                try
-                {
-                    foreach (var item in File.ReadAllLines(filePath))
-                    {
-                        sites.Add(item);
-                    }
-                }
-                catch { }
+                Directory.Delete(directory, true);
             }
+        }
 
-            return sites;
+        public static void SaveSession(string projectName, List<string> links)
+        {
+            string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
+            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
+
+            string filePath = Path.Combine(directory, "sites.txt");
+            File.WriteAllLines(filePath, links.ToArray());
+        }
+
+        public static string[] GetSavedSesstion(string projectName)
+        {
+            string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
+            if (!Directory.Exists(directory)) return new string[] { };
+
+            string filePath = Path.Combine(directory, "sites.txt");
+            if (!File.Exists(filePath)) return new string[] { };
+
+            return File.ReadAllLines(filePath);
+        }
+        #endregion
+
+        #region cookie data
+        public static List<string> CookieSites = new List<string>();//sites saved for quick reference 
+
+        public static void GetSites()
+        {
+            new System.Threading.Thread(() =>
+            {
+                CookieSites.Clear();
+
+                string filePath = Path.Combine(GetBaseDir(), "VisitedSites\\SitesLog.txt");
+                if (File.Exists(filePath))
+                {
+                    try
+                    {
+                        foreach (var item in File.ReadAllLines(filePath))
+                        {
+                            CookieSites.Add(item);
+                        }
+                    }
+                    catch { }
+                }
+            }).Start();
         }
 
         public static void AppendToSavedSites(string site)
@@ -574,7 +365,7 @@ namespace Organiser.Common.Classes
 
                     string filePath = Path.Combine(GetBaseDir(), "VisitedSites\\SitesLog.txt");
                     bool found = false;
-                    foreach (var item in GetSites())
+                    foreach (var item in CookieSites)
                     {
                         if (item == site)
                         {
@@ -583,7 +374,10 @@ namespace Organiser.Common.Classes
                         }
                     }
                     if (!found)
+                    {
                         File.AppendAllText(filePath, site + Environment.NewLine);
+                        CookieSites.Add(site);
+                    }
                 }
                 catch { }
             }).Start();
@@ -707,15 +501,6 @@ namespace Organiser.Common.Classes
             }
         }
 
-        public static void SaveBookmarkedSession(string projectName, string name, string[] sites)
-        {
-            string directory = Path.Combine(GetBaseDir(), "BookmarkSessions", projectName, name);
-            if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
-
-            string file = Path.Combine(directory, "sites.txt");
-            File.WriteAllLines(file, sites);
-        }
-
         public static void SaveBookmarkedSession(string projectName, string name, string[] sites, string[] names, string[] dateTimeStamp)
         {
             string directory = Path.Combine(GetBaseDir(), "BookmarkSessions", projectName, name);
@@ -808,6 +593,119 @@ namespace Organiser.Common.Classes
         }
 
         #endregion
+
+        public static void DownloadImage(string url)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "Png files (*.png)|*.png|JPeg files (*.jpg)|*.jpg|All files (*.*)|*.*";
+            sfd.FilterIndex = 0;
+            sfd.RestoreDirectory = true;
+            if (sfd.ShowDialog() != true) return;
+            try
+            {
+                using (WebClient webClient = new WebClient())
+                {
+                    webClient.Proxy = GetRequestsProxy();
+
+                    byte[] data = webClient.DownloadData(url);
+
+                    using (MemoryStream mem = new MemoryStream(data))
+                    {
+                        using (var yourImage = System.Drawing.Image.FromStream(mem))
+                        {
+                            yourImage.Save(sfd.FileName);
+                        }
+                    }
+                }
+
+                try
+                {
+                    FileInfo fileInfo = new FileInfo(sfd.FileName);
+                    System.Diagnostics.Process.Start(fileInfo.DirectoryName);
+                }
+                catch { }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to save image. " + ex.Message);
+            }
+        }
+
+        public static IWebProxy GetRequestsProxy()
+        {
+            WebProxy proxy = null;
+            try
+            {
+                if (!string.IsNullOrEmpty(GloableProfData.PData.ProxyIP) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyIP) &&
+                    !string.IsNullOrEmpty(GloableProfData.PData.ProxyPort) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyPort))
+                {
+                    proxy = new WebProxy(GloableProfData.PData.ProxyIP, Convert.ToInt32(GloableProfData.PData.ProxyPort));
+
+                    if (!string.IsNullOrEmpty(GloableProfData.PData.ProxyUsername) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyUsername) &&
+                        !string.IsNullOrEmpty(GloableProfData.PData.ProxyPassword) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyPassword))
+                    {
+                        proxy.Credentials = new NetworkCredential(GloableProfData.PData.ProxyUsername, GloableProfData.PData.ProxyPassword);
+                    }
+                }
+            }
+            catch { }
+            return proxy;
+        }
+
+        public static void CheckRamUsage()
+        {
+            if (availmem == 0)
+            {
+                Microsoft.VisualBasic.Devices.ComputerInfo ci = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                availmem = ci.AvailablePhysicalMemory;
+                availmem = availmem / (1024 * 1024);
+            }
+
+            if (timesToCheck++ >= 5)
+            {
+                if (ramCheckerThread == null || !ramCheckerThread.IsAlive)
+                {
+                    ramCheckerThread = new System.Threading.Thread(() =>
+                    {
+                        double total = 0;
+                        bool showedMSgBox = false;
+                        foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcessesByName("BrowserAndFeatures"))
+                        {
+                            var counter = new System.Diagnostics.PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
+                            total += counter.RawValue / (1024 * 1024);
+                            if ((availmem - total) < 350)
+                            {
+                                if (!showedMSgBox)
+                                    Application.Current.Dispatcher.Invoke((Action)delegate
+                                    {
+                                        MessageBox.Show(
+                                            "You have only " + (availmem - total) + "mb of ram space left please close down other applications" +
+                                            " to free up ram before continuing. Or refrain from openning more tabs, keep in mind" +
+                                            " you will risk your computer and Browseo's performance.");
+                                    });
+                                showedMSgBox = true;
+                            }
+                        }
+                    });
+                    ramCheckerThread.Start();
+                }
+                timesToCheck = 0;
+            }
+        }
+
+        public static string GetDefultHomePage()
+        {
+            string dirpathToHomePage = Path.Combine(GetBaseDir(), "DefaultHomePage");
+            if (Directory.Exists(dirpathToHomePage))
+            {
+                string filePathForHomePage = Path.Combine(GetBaseDir(), "DefaultHomePage", "homePage.txt");
+                if (File.Exists(filePathForHomePage))
+                {
+                    return File.ReadAllText(filePathForHomePage);
+                }
+            }
+            return "";
+        }
 
         public static string EncodeTo64(string toEncode)
         {

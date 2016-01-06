@@ -34,10 +34,9 @@ namespace Prospector
                 string mozDir = System.IO.Path.Combine(MyFilesDatabase.GetBaseDir(), "Prospector", "Proxy");
                 if (!System.IO.Directory.Exists(mozDir)) System.IO.Directory.CreateDirectory(mozDir);
 
-                string filePath = System.IO.Path.Combine(mozDir, "proxy.txt");
-                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
+                string filePath = System.IO.Path.Combine(mozDir, "proxy.txt");     
 
-                System.IO.File.AppendAllText(filePath, tbInputedText.Text);
+                System.IO.File.WriteAllText(filePath, tbInputedText.Text);
 
                 OKClicked = true;
             }

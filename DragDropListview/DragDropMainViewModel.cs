@@ -12,15 +12,15 @@ using Organiser.Common.Classes;
 using System.IO;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using System.Windows.Input;
-using DragDropListview.Helpers;
+using System.Windows.Input;   
 using DragDropListview.Windows;
 using System.Threading;
 using Organiser.Common.Windows;
 using DragDropListview.Models;
 using System.Windows.Media;
-using SocialOrganizer.Models;
-using BrowserHost.Views;
+using System.Threading.Tasks;
+using Organiser.Common;
+using Microsoft.Win32;
 
 namespace DragDropListview
 {
@@ -31,26 +31,23 @@ namespace DragDropListview
         Session
     }
 
-   public class DragDropMainViewModel : IDropTarget, INotifyPropertyChanged
+    public class DragDropMainViewModel : IDropTarget, INotifyPropertyChanged
     {
         public const string IMPORT_TYPE_FCS = "fcs";
         public const string IMPORT_TYPE_EB = "eb";
         public const string IMPORT_TYPE_RANKWYZ = "rankWYZ";
         public const string IMPORT_TYPE_GLOBAL = "global";
 
-       public const string GLOABLEFOLDERNAME = "GloableBookMarks_G_";
+        public const string GLOABLEFOLDERNAME = "GloableBookMarks_G_";
 
-        public event Action<int> OnHasReminders = delegate { };//int, amount of reminders
-        //public event Action OnRemindersChanged = delegate { };
+        public event Action<int> OnHasReminders = delegate { };//int, amount of reminders     
         public event Action<string> OnDoubleClickedSite = delegate { };//string, site to open
-        public event Action<string[]> OnSelsectedLauncAll = delegate { };//string, site to open
-        //public event Action OnListChanged = delegate { };
+        public event Action<string[]> OnSelsectedLauncAll = delegate { };//string, site to open          
 
 
         public List<Reminder> Reminders { get; set; }
         public ObservableCollection<Reminder> RemindersByDate { get; set; }
         public ObservableCollection<Reminder> ReminderDates { get; set; }
-
 
         private ICommand lVFCMenuClick;
         public ICommand LVFolderCMenuClick
@@ -72,8 +69,6 @@ namespace DragDropListview
             get { return selectFolderSelect_Click; }
             set { selectFolderSelect_Click = value; }
         }
-
-        public string ProjectName { get; set; }
 
         private bool visible_Sites;
         public bool Visible_Sites
@@ -124,9 +119,7 @@ namespace DragDropListview
                     PropertyChanged(this, new PropertyChangedEventArgs("SISitesSide"));
                 }
             }
-        }
-
-        public PersonData mPData { get; set; }
+        }                 
 
         private double lbFoldersWidth;
         public double LbFoldersWidth
@@ -134,7 +127,7 @@ namespace DragDropListview
             get { return lbFoldersWidth; }
             set
             {
-                lbFoldersWidth = value; 
+                lbFoldersWidth = value;
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("LbFoldersWidth"));
@@ -147,7 +140,7 @@ namespace DragDropListview
         //Thread saveThread;
         object mlock = new object();
         private Thread CPThread;
-        
+
         private ObservableCollection<FolderVM> folders;
         public ObservableCollection<FolderVM> FoldersAndSitesList
         {
@@ -161,10 +154,21 @@ namespace DragDropListview
             get
             {
                 if (instance == null)
-                    instance = new DragDropMainViewModel();
+                {
+                    instance = new DragDropMainViewModel();    
+                           
+                    Task.Factory.StartNew(() =>
+                    {
+                        instance.FillList();
+                        instance.FillImportsList();
+                        instance.FillSessionListFromFile();
+                        instance.CheckReminders();
+                    }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+                }
                 return instance;
             }
         }
+
         private DragDropMainViewModel()
         {
             FoldersAndSitesList = new ObservableCollection<FolderVM>();
@@ -179,7 +183,6 @@ namespace DragDropListview
 
             LbFoldersWidth = 300;
         }
-
 
         private void SiteMenueItemCLick(object param)
         {
@@ -222,13 +225,13 @@ namespace DragDropListview
                             FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].Password = ebm.Password.Text;
                         }
                         FoldersAndSitesList[SIFoldersSide].Sites[SISitesSide].BitmapImg = new BitmapImage
-                            (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                            (new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
                     }
                     break;
 
                 case "CPWindow":
                     wascp = true;
-                    
+
                     CPThread = new Thread(() =>
                     {
                         EditBookmarkWindow ebmffff = new EditBookmarkWindow();
@@ -248,9 +251,7 @@ namespace DragDropListview
                         }
                         ebmffff.Topmost = true;
                         ebmffff.ResizeMode = ResizeMode.CanResize;
-                        ebmffff.Show();
-
-                        System.Windows.Threading.Dispatcher.Run();
+                        ebmffff.ShowDialog();
                     });
 
                     CPThread.SetApartmentState(ApartmentState.STA);
@@ -285,7 +286,7 @@ namespace DragDropListview
 
                         bmark.DateTimeStamp = DateTime.Now.ToString();
                         bmark.BitmapImg = new BitmapImage
-                        (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                        (new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
                         FoldersAndSitesList[SIFoldersSide].Sites.Add(bmark);
                     }
                     break;
@@ -327,6 +328,89 @@ namespace DragDropListview
             }
         }
 
+        public void ImportFromMulyLinks()
+        {
+            Thread uiImportThread = new Thread(() =>
+            {
+                EditBookmarkWindow ebm = new EditBookmarkWindow();
+                ebm.spUrl.Visibility = Visibility.Collapsed;
+                ebm.SetValues("", "", FoldersAndSitesList, 0);
+                ebm.ShowDialog();
+
+                if (ebm.SaveClicked)
+                {
+                    int tagIndex = Convert.ToInt32((ebm.cmbFolders.SelectedItem as ComboBoxItem).Tag);
+                    string folderNewName = ebm.tbName.Text;
+                    bool noName = false;
+                    if (tagIndex == -1 && (string.IsNullOrEmpty(folderNewName) || string.IsNullOrWhiteSpace(folderNewName)))
+                    {
+                        if (MessageBox.Show("Select a name for a new folder or a folder from the dropdown list before you improt these links. if you continue it will import them as base links without a folder. Continue? ",
+                            "Continue?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                        {
+                            noName = true;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    RssFeedsLinksMultiWindow muliwindow = new RssFeedsLinksMultiWindow();
+                    muliwindow.ShowDialog();
+
+                    if (muliwindow.OKClicked)
+                    {
+
+                        string[] links = muliwindow.tbInputedText.Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+
+                        foreach (string link in links)
+                        {
+                            if (noName)
+                            {
+                                SaveSite(link, link, -1, DateTime.Now.ToString(), false);
+                                continue;
+                            }
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                if (string.IsNullOrEmpty(folderNewName) || string.IsNullOrWhiteSpace(folderNewName))
+                                {
+                                    SaveSite(link, link, tagIndex, DateTime.Now.ToString(), false);
+                                }
+                                else
+                                {
+                                    FolderVM bookmarkFolder = new FolderVM();
+                                    bookmarkFolder.Name = folderNewName;
+                                    bookmarkFolder.IsFolder = true;
+                                    bookmarkFolder.TypeOfFolder = FolderTypes.Regular;
+                                    bookmarkFolder.DateTimeStamp = DateTime.Now.ToString();
+                                    bookmarkFolder.BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/closed_folder.png"));
+                                    bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
+
+                                    FoldersAndSitesList.Add(bookmarkFolder);
+                                    tagIndex = FoldersAndSitesList.Count - 1;
+                                    folderNewName = "";
+                                    SaveSite(link, link, tagIndex, DateTime.Now.ToString(), false);
+                                }
+                            });
+                        }
+
+                        if (noName)
+                        {
+                            Application.Current.Dispatcher.Invoke((Action)delegate
+                            {
+                                FillList(false);
+                            });
+                        }
+                        saveAll();
+
+                    }
+                }
+            });
+
+            uiImportThread.SetApartmentState(ApartmentState.STA);
+            uiImportThread.Start();
+        }
+
         private void FolderMenueItemCLick(object param)
         {
             string clickType = param as string;
@@ -354,31 +438,31 @@ namespace DragDropListview
                         {
                             if (FoldersAndSitesList[SIFoldersSide].TypeOfFolder == FolderTypes.Import)
                             {
-                                if(FoldersAndSitesList[SIFoldersSide].ImportType == IMPORT_TYPE_GLOBAL)
+                                if (FoldersAndSitesList[SIFoldersSide].ImportType == IMPORT_TYPE_GLOBAL)
                                     FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
-                                (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\icon-global.png"));
+                                (new Uri("pack://application:,,,/Organiser.Common;component/Image/icon-global.png"));
                                 else
-                                FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
-                                (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
+                                    FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
+                                    (new Uri("pack://application:,,,/Organiser.Common;component/Image/closed_folder.png"));
                             }
                             else
                             {
                                 if (FoldersAndSitesList[SIFoldersSide].ImportType == IMPORT_TYPE_FCS)
                                 {
                                     FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
-                                (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png"));
+                                (new Uri("pack://application:,,,/Organiser.Common;component/Image/fcs icon.png"));
                                 }
 
                                 if (FoldersAndSitesList[SIFoldersSide].ImportType == IMPORT_TYPE_EB)
                                 {
                                     FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
-                                (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\enterprise buddy.ico"));
+                                (new Uri("pack://application:,,,/Organiser.Common;component/Image/enterprise buddy.ico"));
                                 }
                             }
                         }
                         else
                             FoldersAndSitesList[SIFoldersSide].BitmapImg = new BitmapImage
-                            (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                            (new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
                     }
                     break;
 
@@ -404,30 +488,38 @@ namespace DragDropListview
                     if (bookmarkTypeWindow.browseoProj.IsChecked == true)
                     {
                         bookmarkFolder_S.BitmapImg = new BitmapImage
-                        (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
+                        (new Uri("pack://application:,,,/Organiser.Common;component/Image/closed_folder.png"));
                     }
                     else if (bookmarkTypeWindow.fcs.IsChecked == true)
                     {
                         bookmarkFolder_S.TypeOfFolder = FolderTypes.Import;
                         bookmarkFolder_S.ImportType = IMPORT_TYPE_FCS;
                         bookmarkFolder_S.BitmapImg = new BitmapImage
-                            (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png"));
+                            (new Uri("pack://application:,,,/Organiser.Common;component/Image/fcs icon.png"));
                     }
                     else if (bookmarkTypeWindow.entBud.IsChecked == true)
                     {
                         bookmarkFolder_S.TypeOfFolder = FolderTypes.Import;
                         bookmarkFolder_S.ImportType = IMPORT_TYPE_EB;
                         bookmarkFolder_S.BitmapImg = new BitmapImage
-                            (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\enterprise buddy.ico"));
+                            (new Uri("pack://application:,,,/Organiser.Common;component/Image/enterprise buddy.ico"));
                     }
-                    else if(bookmarkTypeWindow.browseoGloable.IsChecked == true)
+                    else if (bookmarkTypeWindow.rankWyx.IsChecked == true)
+                    {
+                        bookmarkFolder_S.TypeOfFolder = FolderTypes.Import;
+                        bookmarkFolder_S.ImportType = IMPORT_TYPE_RANKWYZ;
+                        bookmarkFolder_S.BitmapImg = new BitmapImage
+                            (new Uri("pack://application:,,,/Organiser.Common;component/Image/rankwyz-icon-check.png"));
+                    }
+                    else if (bookmarkTypeWindow.browseoGloable.IsChecked == true)
                     {
                         //IMPORT_TYPE_GLOBAL
                         bookmarkFolder_S.ImportType = IMPORT_TYPE_GLOBAL;
                         bookmarkFolder_S.BitmapImg = new BitmapImage
-                            (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\icon-global.png"));
+                            (new Uri("pack://application:,,,/Organiser.Common;component/Image/icon-global.png"));
                     }
 
+                    folderType = bookmarkFolder_S.TypeOfFolder;
                     FoldersAndSitesList.Add(bookmarkFolder_S);
                     break;
 
@@ -443,13 +535,13 @@ namespace DragDropListview
                         bookmarkFolder.Link = ebmff.tbURL.Text;
                         bookmarkFolder.DateTimeStamp = DateTime.Now.ToString();
                         bookmarkFolder.BitmapImg = new BitmapImage
-                        (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                        (new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
                         FoldersAndSitesList.Add(bookmarkFolder);
                     }
                     break;
 
                 case "Delete":
-                    if (FoldersAndSitesList.Count == 0 || SIFoldersSide < 0 || SIFoldersSide > FoldersAndSitesList.Count-1) return;
+                    if (FoldersAndSitesList.Count == 0 || SIFoldersSide < 0 || SIFoldersSide > FoldersAndSitesList.Count - 1) return;
                     if (MessageBox.Show("Are you sure you would like to delete " + FoldersAndSitesList[SIFoldersSide].Name + "?", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         LastSelectedIndex = 0;
@@ -494,14 +586,28 @@ namespace DragDropListview
             }
         }
 
+        public void OpenSaveSiteOptions(string site)
+        {
+            EditBookmarkWindow ebm = new EditBookmarkWindow();
+            ebm.SetValues(site, site, FoldersAndSitesList, LastSelectedIndex);
+            ebm.ShowDialog();
 
-        internal void SaveSite(string url, string name, object indexTag, string saveTimeStamp)
+            if (ebm.SaveClicked)
+            {
+                LastSelectedIndex = ebm.LastSelectedIndex;
+                SaveSite(ebm.tbURL.Text, ebm.tbName.Text, (ebm.cmbFolders.SelectedItem as ComboBoxItem).Tag, DateTime.Now.ToString());
+            }
+        }
+
+        internal void SaveSite(string url, string name, object indexTag, string saveTimeStamp, bool saveAllThem = true)
         {
             int tagIndex = Convert.ToInt32(indexTag);
+            FolderTypes folderType = FolderTypes.Regular;
             if (tagIndex == -1)
             {
-                MyFilesDatabase.SaveSiteBookmark(url, name, ProjectName, saveTimeStamp);
-                FillList(false);
+                MyFilesDatabase.SaveSiteBookmark(url, name, GloableProfData.PData.ProjectName, saveTimeStamp);
+                if(saveAllThem)
+                    FillList(false);
             }
             else
             {
@@ -509,10 +615,27 @@ namespace DragDropListview
                 bmark.Link = url;
                 bmark.Name = name;
                 bmark.DateTimeStamp = saveTimeStamp;
-                bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                bmark.BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
                 FoldersAndSitesList[tagIndex].Sites.Add(bmark);
+                folderType = FoldersAndSitesList[tagIndex].TypeOfFolder;
             }
-            saveAll();
+            if (saveAllThem)
+            {
+                switch (folderType)
+                {
+                    case FolderTypes.Regular:
+                        saveAll();
+                        break;
+                    case FolderTypes.Import:
+                        saveAllImportedSites();
+                        break;
+                    case FolderTypes.Session:
+                        SaveSessionBookmarksToFile();
+                        break;
+                    default:
+                        break;
+                }        
+            }
         }
 
         void IDropTarget.DragOver(DropInfo dropInfo)
@@ -556,7 +679,7 @@ namespace DragDropListview
                                 Link = site.Link,
                                 Name = site.Name,
                                 DateTimeStamp = site.DateTimeStamp,
-                                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png")),
+                                BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png")),
                                 IsFolder = false
                             });
                         else
@@ -574,7 +697,7 @@ namespace DragDropListview
                         bmark.Link = site.Link;
                         bmark.Name = site.Name;
                         bmark.DateTimeStamp = site.DateTimeStamp;
-                        bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                        bmark.BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
                         bool ExistsinList = false;
                         if (folder.Sites.Count == 1)
                         {
@@ -610,7 +733,7 @@ namespace DragDropListview
 
         public void FillList(bool setIndex0 = true, string projName = "")
         {
-            string fromProj = ProjectName;
+            string fromProj = GloableProfData.PData.ProjectName;
             if (projName == "")
             {
                 FoldersAndSitesList.RemoveAllThese(item => item.TypeOfFolder != FolderTypes.Import);
@@ -639,7 +762,7 @@ namespace DragDropListview
             //     {
             try
             {
-                MyFilesDatabase.DeleteBookmarks(ProjectName);
+                MyFilesDatabase.DeleteBookmarks(GloableProfData.PData.ProjectName);
                 MyFilesDatabase.DeleteBookmarks(GLOABLEFOLDERNAME);
                 foreach (FolderVM folderListItem in FoldersAndSitesList)
                 {
@@ -651,12 +774,12 @@ namespace DragDropListview
                         {
                             foreach (Bookmark bmark in folderListItem.Sites)
                             {
-                                MyFilesDatabase.AppendBookmarkByFolderAnProjName(ProjectName, folderListItem.Name, bmark.Link, bmark.Name, bmark.DateTimeStamp);
+                                MyFilesDatabase.AppendBookmarkByFolderAnProjName(GloableProfData.PData.ProjectName, folderListItem.Name, bmark.Link, bmark.Name, bmark.DateTimeStamp);
                             }
                         }
                         else
                         {
-                            MyFilesDatabase.AppendBookmarkByFolderAnProjNameNoSites(ProjectName, folderListItem.Name);
+                            MyFilesDatabase.AppendBookmarkByFolderAnProjNameNoSites(GloableProfData.PData.ProjectName, folderListItem.Name);
                         }
                     }
                     else if (folderListItem.IsFolder && folderListItem.ImportType == IMPORT_TYPE_GLOBAL)
@@ -675,7 +798,7 @@ namespace DragDropListview
                     }
                     else if (!folderListItem.IsFolder && folderListItem.ImportType != IMPORT_TYPE_GLOBAL)
                     {
-                        MyFilesDatabase.SaveSiteBookmark(folderListItem.Link, folderListItem.Name, ProjectName, folderListItem.DateTimeStamp);
+                        MyFilesDatabase.SaveSiteBookmark(folderListItem.Link, folderListItem.Name, GloableProfData.PData.ProjectName, folderListItem.DateTimeStamp);
                     }
                 }
 
@@ -688,11 +811,6 @@ namespace DragDropListview
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public void MigrateOldSites()
-        {
-            MyFilesDatabase.MigrateOldBookmarks(ProjectName);
-        }
 
         internal void DoubleClickedFolderSide()
         {
@@ -735,7 +853,7 @@ namespace DragDropListview
             }
         }
 
-        internal void EportSitesToTxt()
+        public void EportSitesToTxt()
         {
             try
             {
@@ -815,9 +933,13 @@ namespace DragDropListview
         public void RefreshList()
         {
             //if (saveThread != null && saveThread.IsAlive) saveThread.Join();
-            FoldersAndSitesList.Clear();
-            ReFillList(ProjectName);
-            FillSessionListFromFile();
+            Task.Factory.StartNew(() =>
+            {
+                FoldersAndSitesList.Clear();
+                ReFillList(GloableProfData.PData.ProjectName);
+                FillImportsList();
+                FillSessionListFromFile();
+            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());   
         }
 
         private void ReFillList(string ProjectName)
@@ -831,7 +953,7 @@ namespace DragDropListview
                 bookmarkFolder.IsFolder = true;
                 bookmarkFolder.TypeOfFolder = FolderTypes.Regular;
                 bookmarkFolder.DateTimeStamp = folder.Value;
-                bookmarkFolder.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\closed_folder.png"));
+                bookmarkFolder.BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/closed_folder.png"));
                 bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
                 foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByPath(dirInfo.FullName, ProjectName))
                 {
@@ -843,7 +965,7 @@ namespace DragDropListview
                             Link = siteNname[0],
                             Name = siteNname[1],
                             BitmapImg = new BitmapImage
-                       (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"))
+                       (new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"))
                         };
                        if (siteNname.Length == 3)
                            bmark.DateTimeStamp = siteNname[2];
@@ -868,7 +990,7 @@ namespace DragDropListview
                     if (siteNname.Length == 3)
                         bookmarkFolder.DateTimeStamp = siteNname[2];
                     bookmarkFolder.BitmapImg = new BitmapImage
-                       (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                       (new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
                     FoldersAndSitesList.Add(bookmarkFolder);
                 }
                 catch { }
@@ -884,7 +1006,7 @@ namespace DragDropListview
                 bookmarkFolder.ImportType = IMPORT_TYPE_GLOBAL;
                 bookmarkFolder.DateTimeStamp = folder.Value;
                 bookmarkFolder.TypeOfFolder = FolderTypes.Regular;
-                bookmarkFolder.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\icon-global.png"));
+                bookmarkFolder.BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/icon-global.png"));
                 bookmarkFolder.Sites = new ObservableCollection<Bookmark>();
                 foreach (string siteLine in MyFilesDatabase.GetBookmarkedSitesByPath(dirInfo.FullName, GLOABLEFOLDERNAME))
                 {
@@ -896,7 +1018,7 @@ namespace DragDropListview
                             Link = siteNname[0],
                             Name = siteNname[1],
                             BitmapImg = new BitmapImage
-                        (new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"))
+                        (new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"))
                         };
                         if (siteNname.Length == 3)
                             bmark.DateTimeStamp = siteNname[2];
@@ -907,6 +1029,43 @@ namespace DragDropListview
 
                 FoldersAndSitesList.Add(bookmarkFolder);
             } 
+        }
+
+        public void OpenImportBookmarksOptions()
+        {
+            SelectBookmarkImportTypeWindow bookmarkTypeWindow = new SelectBookmarkImportTypeWindow();
+            bookmarkTypeWindow.browseoGloable.Visibility = Visibility.Collapsed;
+            bookmarkTypeWindow.ShowDialog();
+            if (!bookmarkTypeWindow.OkClicked) return;
+            if (bookmarkTypeWindow.browseoProj.IsChecked == true)
+            {
+                SelectProfileWindow spw = new SelectProfileWindow();
+                spw.Title = "Select Project";
+                spw.ShowDialog();
+                if (spw.OkClicked)
+                {
+                    MergeBookMarksFromProjectPath(spw.SelectedProjectName);
+                }
+            }
+            else if (bookmarkTypeWindow.browseoFolder.IsChecked == true)
+            {
+                ImportFromMulyLinks();
+            }
+            else if (bookmarkTypeWindow.fcs.IsChecked == true || bookmarkTypeWindow.entBud.IsChecked == true || bookmarkTypeWindow.rankWyx.IsChecked == true)
+            {
+                OpenFileDialog ofd = new OpenFileDialog();
+                ofd.Multiselect = false;
+                ofd.ShowDialog();
+                string path = ofd.FileName;
+
+                string importType = DragDropMainViewModel.IMPORT_TYPE_FCS;
+                if (bookmarkTypeWindow.entBud.IsChecked == true)
+                    importType = DragDropMainViewModel.IMPORT_TYPE_EB;
+                else if (bookmarkTypeWindow.rankWyx.IsChecked == true)
+                    importType = DragDropMainViewModel.IMPORT_TYPE_RANKWYZ;
+
+                MergeFromImport(path, importType);
+            }
         }
 
         #region reminders
@@ -930,7 +1089,7 @@ namespace DragDropListview
                 return;
             }
 
-            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", ProjectName);
+            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", GloableProfData.PData.ProjectName);
             if (!Directory.Exists(dirPath))
                 Directory.CreateDirectory(dirPath);
 
@@ -940,7 +1099,7 @@ namespace DragDropListview
             nameOfItem = nameOfItem.Replace("/", "_");
             nameOfItem = nameOfItem.Replace(":", "-");
 
-            string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", ProjectName, nameOfItem + ".txt");
+            string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", GloableProfData.PData.ProjectName, nameOfItem + ".txt");
             try
             {
                 File.AppendAllText(filePath, inputedText + SPLITTER + dateTimeForReminder + SPLITTER + "false" + REMINDER_SPLITTER);
@@ -959,7 +1118,7 @@ namespace DragDropListview
         public void CheckReminders()
         {
             Reminders.Clear();
-            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", ProjectName);
+            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", GloableProfData.PData.ProjectName);
             if (Directory.Exists(dirPath))
             {
                 foreach (string filePath in Directory.GetFiles(dirPath))
@@ -1020,23 +1179,30 @@ namespace DragDropListview
                 {
                     Reminders.Add(rem);
                 }
-                int unresolvedCount = 0;
-                foreach (Reminder rem in Reminders)
+
+                GetRemindersCountAndNotify();
+            }
+            
+        }
+
+        public void GetRemindersCountAndNotify()
+        {
+            int unresolvedCount = 0;
+            foreach (Reminder rem in Reminders)
+            {
+                if (rem.ResolvedText == "false")
                 {
-                    if (rem.ResolvedText == "false")
+                    unresolvedCount++;
+                    DateTime dt;
+                    DateTime.TryParse(rem.ReminderDate, out dt);
+                    if (dt < DateTime.Today)
                     {
-                        unresolvedCount++;
-                        DateTime dt;
-                        DateTime.TryParse(rem.ReminderDate,out dt);
-                        if(dt < DateTime.Today)
-                        {
-                            rem.ForeColorComplete = Brushes.Red;
-                        }
+                        rem.ForeColorComplete = Brushes.Red;
                     }
                 }
-                if (unresolvedCount > 0)
-                    OnHasReminders(unresolvedCount);
             }
+            if (unresolvedCount > 0)
+                OnHasReminders(unresolvedCount);
         }
 
         public void OpenReminders()
@@ -1147,7 +1313,7 @@ namespace DragDropListview
 
         private void SaveAllByReminders()
         {
-            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", ProjectName);
+            string dirPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", GloableProfData.PData.ProjectName);
             if (Directory.Exists(dirPath))
                 Directory.Delete(dirPath, true);
 
@@ -1159,7 +1325,7 @@ namespace DragDropListview
                 nameOfItem = nameOfItem.Replace("/", "_");
                 nameOfItem = nameOfItem.Replace(":", "-");
 
-                string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", ProjectName, nameOfItem + ".txt");
+                string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Reminders", "BookmarkReminders", GloableProfData.PData.ProjectName, nameOfItem + ".txt");
                 File.AppendAllText(filePath, rem.ReminderText + SPLITTER + rem.ReminderDate + SPLITTER + rem.ResolvedText + REMINDER_SPLITTER);
             }
 
@@ -1219,7 +1385,7 @@ namespace DragDropListview
             EditBookmarkWindow ebm = new EditBookmarkWindow();
             ebm.spUrl.Visibility = ebm.spFolder.Visibility = ebm.spName.Visibility = Visibility.Collapsed;
             ebm.spCmbName.Visibility = Visibility.Visible;
-            string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName, type);
+            string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", GloableProfData.PData.ProjectName, type);
             if (Directory.Exists(dirForCustomImport))
             {
                 DirectoryInfo dInfo = new DirectoryInfo(dirForCustomImport);
@@ -1253,7 +1419,7 @@ namespace DragDropListview
                             fcsVm = new FolderVM()
                             {
                                 Name = folderName,
-                                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png")),
+                                BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/fcs icon.png")),
                                 IsFolder = true,
                                 TypeOfFolder = FolderTypes.Import,
                                 ImportType = IMPORT_TYPE_FCS
@@ -1290,7 +1456,7 @@ namespace DragDropListview
                                         bmark.IsImported = true;
                                         bmark.ImportType = type;
                                         bmark.DateTimeStamp = DateTime.Now.ToString();
-                                        bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                                        bmark.BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
 
                                         fcsVm.Sites.Add(bmark);
                                     //});
@@ -1325,7 +1491,7 @@ namespace DragDropListview
                             ebVm = new FolderVM()
                             {
                                 Name = folderName,
-                                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\enterprise buddy.ico")),
+                                BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/enterprise buddy.ico")),
                                 IsFolder = true,
                                 TypeOfFolder = FolderTypes.Import,
                                 ImportType = IMPORT_TYPE_EB
@@ -1358,7 +1524,7 @@ namespace DragDropListview
                                     bmark.IsImported = true;
                                     bmark.ImportType = type;
                                     bmark.DateTimeStamp = DateTime.Now.ToString();
-                                    bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                                    bmark.BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
 
                                     ebVm.Sites.Add(bmark);
                                 }
@@ -1391,7 +1557,7 @@ namespace DragDropListview
                         ebVmRank = new FolderVM()
                         {
                             Name = folderName,
-                            BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\rankwyz-icon-check.png")),
+                            BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/rankwyz-icon-check.png")),
                             IsFolder = true,
                             TypeOfFolder = FolderTypes.Import,
                             ImportType = IMPORT_TYPE_RANKWYZ
@@ -1424,7 +1590,7 @@ namespace DragDropListview
                             bmark.IsImported = true;
                             bmark.ImportType = type;
                             bmark.DateTimeStamp = DateTime.Now.ToString();
-                            bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                            bmark.BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
 
                             ebVmRank.Sites.Add(bmark);
                         }
@@ -1444,15 +1610,15 @@ namespace DragDropListview
 
         private void saveAllImportedSites()
         {
-            string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName);
+            string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", GloableProfData.PData.ProjectName);
             if (Directory.Exists(dirForCustomImport)) DeleteDirectory(dirForCustomImport);
 
             foreach (FolderVM folderListItem in FoldersAndSitesList)
             {
                 if (folderListItem.TypeOfFolder != FolderTypes.Import) continue;
-                string dirpath = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName, folderListItem.ImportType, folderListItem.Name);
+                string dirpath = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", GloableProfData.PData.ProjectName, folderListItem.ImportType, folderListItem.Name);
                 if (!Directory.Exists(dirpath)) Directory.CreateDirectory(dirpath);
-                string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName, folderListItem.ImportType, folderListItem.Name, "SavedImports.txt");
+                string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", GloableProfData.PData.ProjectName, folderListItem.ImportType, folderListItem.Name, "SavedImports.txt");
 
                 if (File.Exists(filePath)) File.Delete(filePath);
 
@@ -1490,7 +1656,7 @@ namespace DragDropListview
 
         public void FillImportsList()
         {
-            string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName);
+            string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", GloableProfData.PData.ProjectName);
             if (!Directory.Exists(dirForCustomImport)) return;
 
             DirectoryInfo dInfo = new DirectoryInfo(dirForCustomImport);
@@ -1506,7 +1672,7 @@ namespace DragDropListview
                             fcsVm = new FolderVM()
                             {
                                 Name = dInfoWithFiles.Name,
-                                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png")),
+                                BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/fcs icon.png")),
                                 IsFolder = true,
                                 TypeOfFolder = FolderTypes.Import,
                                 ImportType = IMPORT_TYPE_FCS
@@ -1518,7 +1684,7 @@ namespace DragDropListview
                             fcsVm = new FolderVM()
                             {
                                 Name = dInfoWithFiles.Name,
-                                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\enterprise buddy.ico")),
+                                BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/enterprise buddy.ico")),
                                 IsFolder = true,
                                 TypeOfFolder = FolderTypes.Import,
                                 ImportType = IMPORT_TYPE_EB
@@ -1530,7 +1696,7 @@ namespace DragDropListview
                             fcsVm = new FolderVM()
                             {
                                 Name = dInfoWithFiles.Name,
-                                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\rankwyz-icon-check.png")),
+                                BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/rankwyz-icon-check.png")),
                                 IsFolder = true,
                                 TypeOfFolder = FolderTypes.Import,
                                 ImportType = IMPORT_TYPE_RANKWYZ
@@ -1554,7 +1720,7 @@ namespace DragDropListview
                                 bmark.IsImported = true;
                                 bmark.DateTimeStamp = dt;
                                 bmark.ImportType = item.Name;
-                                bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+                                bmark.BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
                                 fcsVm.Sites.Add(bmark);
                             }
                             FoldersAndSitesList.Add(fcsVm);
@@ -1569,7 +1735,7 @@ namespace DragDropListview
             //        FolderVM fcsVm = new FolderVM()
             //        {
             //            Name = "FCS Network",
-            //            BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\fcs icon.png")),
+            //            BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/fcs icon.png")),
             //            IsFolder = true,
             //            IsImported = true,
             //            ImportType = IMPORT_TYPE_FCS
@@ -1591,7 +1757,7 @@ namespace DragDropListview
             //            bmark.Password = PASSWORD;
             //            bmark.IsImported = true;
             //            bmark.DateTimeStamp = dt;
-            //            bmark.BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png"));
+            //            bmark.BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png"));
             //            fcsVm.Sites.Add(bmark);
             //        }
             //        FoldersAndSitesList.Add(fcsVm);
@@ -1609,7 +1775,7 @@ namespace DragDropListview
         {
             try
             {
-                string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", mPData.ProjectName);
+                string dirForCustomImport = Path.Combine(MyFilesDatabase.GetBaseDir(), "CustomImports", GloableProfData.PData.ProjectName);
                 if (!Directory.Exists(dirForCustomImport)) return;
 
                 string filePath = Path.Combine(dirForCustomImport, FoldersAndSitesList[SIFoldersSide].ImportType, FoldersAndSitesList[SIFoldersSide].Name);
@@ -1623,29 +1789,30 @@ namespace DragDropListview
         #region sessions
         public void SaveSession(List<string> links)
         {
-            SetANameWindow setNameWindow = new SetANameWindow();
+            SetNameAndDataWindow setNameWindow = new SetNameAndDataWindow();
+            setNameWindow.tblockInfo.Text = "Create a name for the folder.";
             setNameWindow.ShowDialog();
             if (!setNameWindow.OkClicked) return;
-            if(FoldersAndSitesList.Any(t => t.Name == setNameWindow.tbName.Text))
+            if(FoldersAndSitesList.Any(t => t.Name == setNameWindow.tbInputText.Text))
             {
                 MessageBox.Show("Choose another name for the session this one already exists in your bookmarks collection.");
                 return;
             }
             FolderVM folder = new FolderVM()
             {
-                Name = setNameWindow.tbName.Text,
+                Name = setNameWindow.tbInputText.Text,
                 DateTimeStamp = DateTime.Now.ToString(),
                 TypeOfFolder = FolderTypes.Session,
                 Sites = new ObservableCollection<Bookmark>(),
                 IsFolder = true,
-                BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\restore.png")),
+                BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/restore.png")),
             };
             FoldersAndSitesList.Add(folder);
             foreach (string link in links)
             {
                 folder.Sites.Add(new Bookmark()
                 {
-                    BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png")),
+                    BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png")),
                     DateTimeStamp = DateTime.Now.ToString(),
                     Link = link,
                     Name = link
@@ -1661,14 +1828,14 @@ namespace DragDropListview
             {
                 foreach (FolderVM folder in FoldersAndSitesList.Where(f=>f.TypeOfFolder == FolderTypes.Session))
                 {
-                    MyFilesDatabase.SaveBookmarkedSession(mPData.ProjectName, folder.Name, folder.Sites.Select(t => t.Link).ToArray(),folder.Sites.Select(t => t.Name).ToArray(),folder.Sites.Select(t=>t.DateTimeStamp).ToArray());
+                    MyFilesDatabase.SaveBookmarkedSession(GloableProfData.PData.ProjectName, folder.Name, folder.Sites.Select(t => t.Link).ToArray(),folder.Sites.Select(t => t.Name).ToArray(),folder.Sites.Select(t=>t.DateTimeStamp).ToArray());
                 }
             });
         }
 
         public void FillSessionListFromFile()
         {
-            string directory = Path.Combine(MyFilesDatabase.GetBaseDir(), "BookmarkSessions", mPData.ProjectName);
+            string directory = Path.Combine(MyFilesDatabase.GetBaseDir(), "BookmarkSessions", GloableProfData.PData.ProjectName);
             if (!Directory.Exists(directory)) return;
 
             DirectoryInfo diInfo = new DirectoryInfo(directory);
@@ -1681,17 +1848,18 @@ namespace DragDropListview
                     TypeOfFolder = FolderTypes.Session,
                     Sites = new ObservableCollection<Bookmark>(),
                     IsFolder = true,
-                    BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\restore.png")),
+                    BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/restore.png")),
                 };
                 FoldersAndSitesList.Add(folder);
 
                 string file = Path.Combine(dir.FullName, "sites.txt");
+                if(File.Exists(file))
                 foreach (string link in File.ReadAllLines(file))
                 {
                     string[] linkSplit = link.Split(new string[] { MyFilesDatabase.SPLITTER},StringSplitOptions.RemoveEmptyEntries);
                     folder.Sites.Add(new Bookmark()
                     {
-                        BitmapImg = new BitmapImage(new Uri(System.AppDomain.CurrentDomain.BaseDirectory + "\\Images\\new_document.png")),
+                        BitmapImg = new BitmapImage(new Uri("pack://application:,,,/Organiser.Common;component/Image/new_document.png")),
                         Link = linkSplit[0],
                         Name = linkSplit[1],
                         DateTimeStamp = linkSplit[2],

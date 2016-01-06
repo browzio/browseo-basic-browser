@@ -1,4 +1,5 @@
-﻿using Prospector.Models;
+﻿using Organiser.Common.Classes;
+using Prospector.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Prospector.Helpers
         IList<string> PresentableKeywords { get; set; }
         int MaxPagesToCheck { get; set; }
 
-        string searchUrl = "http://www.google.co.il/search?q=";
+        string searchUrl = "https://www.google.co.il/search?q=";
         const string pageNumber = "&start=";
         const string googleSearchSplit = "class=\"r\"";
         const string searchEngine = "Google";

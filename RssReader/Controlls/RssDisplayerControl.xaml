@@ -11,232 +11,9 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/RssReader;component/Styles/ScrollBarStyle.xaml"></ResourceDictionary>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <helpers:booleanToVisible x:Key="boolToVis" />
-
-            <Style x:Name="linkStyle" TargetType="{x:Type Button}" x:Key="linkStyle">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type Button}">
-                            <Border Height="25" Background="Transparent" x:Name="Border">
-                                <ContentPresenter x:Name="text" Margin="0,0" VerticalAlignment="Center" TextElement.Foreground="#558aed"/>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter TargetName="text" Property="TextElement.FontWeight" Value="Bold"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-            <DataTemplate x:Key="MetroListBoxItemTemplate">
-                <Border BorderThickness="0" BorderBrush="#dfdfdf"  Margin="0,0,0,15" Background="White">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Image Source="{Binding ImageLink}"
-                               Margin="0,3,0,0" 
-                               Width="160"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               MaxHeight="100" Grid.Row="1"
-                               Visibility="{Binding ImageLinkVisible}"
-                               Stretch="UniformToFill"/>
-                        <Grid Grid.Column="1" Margin="15,0,0,0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                       
-                      
-                            <TextBlock Text="{Binding Title, Mode=OneWay}"
-                                                   Margin="0,0,0,0" VerticalAlignment="Center" 
-                                                   HorizontalAlignment="Left"
-                                                   TextTrimming="CharacterEllipsis"
-                                                   Foreground="#558aed" FontWeight="Bold" FontSize="14"/>
-
-                            <TextBlock Text="{Binding Link, Mode=OneWay}"
-                                                   Margin="0,5" 
-                                                   TextWrapping="Wrap"
-                                                   Grid.Row="1" HorizontalAlignment="Left"
-                                                   Foreground="Gray" />
-
-                        <TextBlock Text="{Binding Date, Mode=OneWay}"
-                                                  Margin="0" 
-                                                  HorizontalAlignment="Left"
-                                                   Grid.Row="2"
-                                                   TextWrapping="Wrap"
-                                                   Foreground="#a1a1a2" />
-                        <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" MaxHeight="600"    Grid.Row="4">-->
-                        <TextBlock Text="{Binding Description, Mode=OneWay}"
-                                       TextWrapping="Wrap"
-                                       Foreground="#5a5a5a" Margin="0,5"
-                                       Grid.Row="3"/>
-                        <!--</ScrollViewer>-->
-                       
-
-                        <Button HorizontalAlignment="Left"
-                                Margin="0"
-                                Click="Button_Click"
-                                ContextMenuService.IsEnabled="False"
-                                Content="Share"
-                                Grid.Row="4" 
-                                Style="{StaticResource linkStyle}">
-
-                            <Button.ContextMenu>
-                                <ContextMenu Width="260">
-                                    <StackPanel Orientation="Horizontal" Margin="-27,0,0,0" Background="WhiteSmoke">
-                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="facebook"
-                                                                Click="Button_Click_1">
-                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png" 
-                                                                   ToolTip="facebook"
-                                                                   Width="18" Height="18" />
-                                        </Button>
-
-                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="google"
-                                                                Click="Button_Click_1">
-                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/googleplus-icon.png" 
-                                                                   Width="18" Height="18"
-                                                                   ToolTip="google+" />
-                                        </Button>
-
-                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="digg"
-                                                                Click="Button_Click_1">
-                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/digg-icon.png" 
-                                                                   Width="18" Height="18"
-                                                                   ToolTip="digg" />
-                                        </Button>
-
-                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="pintrest"
-                                                                Click="Button_Click_1">
-                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/Pinterest-icon.png" 
-                                                                   Width="18" Height="18"
-                                                                   ToolTip="pintrest" />
-                                        </Button>
-
-                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="reddit"
-                                                                Click="Button_Click_1">
-                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/reddit-icon.png" 
-                                                                   Width="18" Height="18"
-                                                                   ToolTip="reddit" />
-                                        </Button>
-
-                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="stumbleupon"
-                                                                Click="Button_Click_1">
-                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png" 
-                                                                   Width="18" Height="18"
-                                                                   ToolTip="stumbleupon" />
-                                        </Button>
-
-                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="tumblr"
-                                                                Click="Button_Click_1">
-                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/tumblr-icon.png" 
-                                                                   Width="18" Height="18"
-                                                                   ToolTip="tumblr" />
-                                        </Button>
-
-                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="twitter"
-                                                                Click="Button_Click_1">
-                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/twitter-icon.png" 
-                                                                   Width="18" Height="18"
-                                                                   ToolTip="twitter" />
-                                        </Button>
-
-                                        <Button Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="wordpress"
-                                                                Click="Button_Click_1">
-                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/wordpress-icon.png" 
-                                                                   Width="18" Height="18"
-                                                                   ToolTip="wordpress" />
-                                        </Button>
-                                    </StackPanel>
-                                </ContextMenu>
-                            </Button.ContextMenu>
-                        </Button>
-                        </Grid>
-                      
-                    </Grid>
-                </Border>
-               
-             </DataTemplate>
-            <Style x:Key="MetroListBoxItemStyle" TargetType="{x:Type ListBoxItem}">
-                <Setter Property="SnapsToDevicePixels" Value="True"/>
-                <Setter Property="Padding" Value="1"/>
-                <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ItemsControl}}}"/>
-                <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource FindAncestor, AncestorLevel=1, AncestorType={x:Type ItemsControl}}}"/>
-                <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="BorderBrush" Value="Transparent"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="FocusVisualStyle">
-                    <Setter.Value>
-                        <Style>
-                            <Setter Property="Control.Template">
-                                <Setter.Value>
-                                    <ControlTemplate>
-                                        <Rectangle Margin="2" 
-                                                   SnapsToDevicePixels="True" 
-                                                   Stroke="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" 
-                                                   StrokeThickness="1" 
-                                                   StrokeDashArray="1 2"/>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </Setter.Value>
-                </Setter>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                            <Border x:Name="Bd" 
-                                    BorderBrush="Transparent" 
-                                    BorderThickness="0"  
-                                    Background="{TemplateBinding Background}" 
-                                    Padding="{TemplateBinding Padding}" 
-                                    SnapsToDevicePixels="True">
-                                <Grid>
-                                    <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" 
-                                                  Content="{TemplateBinding Content}" 
-                                                  ContentStringFormat="{TemplateBinding ContentStringFormat}" 
-                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
-                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
-                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                                    <Rectangle Height="1.5" x:Name="frame" VerticalAlignment="Bottom" StrokeDashArray="1 2" Stroke="#FFB2B2B2" StrokeThickness="2"/>
-                                </Grid>
-                               
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsMouseOver" Value="True"/>
-                                        <Condition Property="IsSelected" Value="True"/>
-                                    </MultiTrigger.Conditions>
-                                    <Setter Property="Background" TargetName="Bd" Value="Transparent" />
-                                    <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
-                                 </MultiTrigger>
-                              
-                                <MultiTrigger>
-                                    <MultiTrigger.Conditions>
-                                        <Condition Property="IsSelected" Value="True"/>
-                                    </MultiTrigger.Conditions>
-                                    <Setter Property="Background" TargetName="Bd" Value="Transparent" />
-                                    <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
-                                </MultiTrigger>
-                                <Trigger Property="IsEnabled" Value="False">
-                                    <Setter Property="TextElement.Foreground" TargetName="Bd" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-
         </ResourceDictionary>
     </UserControl.Resources>
     
@@ -263,10 +40,144 @@
                       BorderThickness="0"
                       ScrollViewer.VerticalScrollBarVisibility="Hidden"
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                      PreviewMouseWheel="lv_PreviewMouseWheel"
-                      ItemTemplate="{DynamicResource MetroListBoxItemTemplate}" 
+                      PreviewMouseWheel="lv_PreviewMouseWheel" 
                       ItemContainerStyle="{DynamicResource MetroListBoxItemStyle}"
                       SelectedIndex="{Binding SIListResults, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderThickness="0" BorderBrush="#dfdfdf"  Margin="0,0,0,15" Background="White">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Image Source="{Binding ImageLink}"
+                               Margin="0,3,0,0" 
+                               Width="160"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               MaxHeight="100" Grid.Row="1"
+                               Visibility="{Binding ImageLinkVisible}"
+                               Stretch="UniformToFill"/>
+                                <Grid Grid.Column="1" Margin="15,0,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+
+                                    <TextBlock Text="{Binding Title, Mode=OneWay}"
+                                                   Margin="0,0,0,0" VerticalAlignment="Center" 
+                                                   HorizontalAlignment="Left"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Foreground="#558aed" FontWeight="Bold" FontSize="14"/>
+
+                                    <TextBlock Text="{Binding Link, Mode=OneWay}"
+                                                   Margin="0,5" 
+                                                   TextWrapping="Wrap"
+                                                   Grid.Row="1" HorizontalAlignment="Left"
+                                                   Foreground="Gray" />
+
+                                    <TextBlock Text="{Binding Date, Mode=OneWay}"
+                                                  Margin="0" 
+                                                  HorizontalAlignment="Left"
+                                                   Grid.Row="2"
+                                                   TextWrapping="Wrap"
+                                                   Foreground="#a1a1a2" />
+                                    <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" MaxHeight="600"    Grid.Row="4">-->
+                                    <TextBlock Text="{Binding Description, Mode=OneWay}"
+                                       TextWrapping="Wrap"
+                                       Foreground="#5a5a5a" Margin="0,5"
+                                       Grid.Row="3"/>
+                                    <!--</ScrollViewer>-->
+
+
+                                    <Button HorizontalAlignment="Left"
+                                Margin="0"
+                                Click="Button_Click"
+                                ContextMenuService.IsEnabled="False"
+                                Content="Share"
+                                Grid.Row="4" 
+                                Style="{StaticResource linkStyle}">
+                                        <Button.ContextMenu>
+                                            <ContextMenu>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="facebook"
+                                                                Click="Button_Click_1">
+                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png" 
+                                                                   ToolTip="facebook"
+                                                                   Width="18" Height="18" />
+                                                    </Button>
+
+                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="google"
+                                                                Click="Button_Click_1">
+                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/googleplus-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="google+" />
+                                                    </Button>
+
+                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="digg"
+                                                                Click="Button_Click_1">
+                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/digg-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="digg" />
+                                                    </Button>
+
+                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="pintrest"
+                                                                Click="Button_Click_1">
+                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/Pinterest-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="pintrest" />
+                                                    </Button>
+
+                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="reddit"
+                                                                Click="Button_Click_1">
+                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/reddit-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="reddit" />
+                                                    </Button>
+
+                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="stumbleupon"
+                                                                Click="Button_Click_1">
+                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="stumbleupon" />
+                                                    </Button>
+
+                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="tumblr"
+                                                                Click="Button_Click_1">
+                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/tumblr-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="tumblr" />
+                                                    </Button>
+
+                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="twitter"
+                                                                Click="Button_Click_1">
+                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/twitter-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="twitter" />
+                                                    </Button>
+
+                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="wordpress"
+                                                                Click="Button_Click_1">
+                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/wordpress-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="wordpress" />
+                                                    </Button>
+                                                </StackPanel>
+                                            </ContextMenu>
+                                        </Button.ContextMenu>
+                                    </Button>
+                                </Grid>
+
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
                 <ListBox.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="View In Browser">
