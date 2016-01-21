@@ -90,8 +90,10 @@
     <Compile Include="Classes\TrackedThread.cs" />
     <Compile Include="Classes\UsageTracker.cs" />
     <Compile Include="Classes\ViewModelBase.cs" />
+    <Compile Include="Controlls\ExpanderDoubleClickExpand.cs" />
     <Compile Include="Controlls\MyListView.cs" />
     <Compile Include="Converters\ElementSizeMathConverter.cs" />
+    <Compile Include="Converters\MaxCharCountConv.cs" />
     <Compile Include="Converters\OpisiteVisibilityConverter.cs" />
     <Compile Include="Windows\SetNameAndDataWindow.xaml.cs">
       <DependentUpon>SetNameAndDataWindow.xaml</DependentUpon>

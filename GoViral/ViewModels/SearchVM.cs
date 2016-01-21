@@ -9,6 +9,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -154,7 +155,7 @@ namespace GoViral.ViewModels
 
                     string savetoFilePath = Path.Combine(saveToDir, "FBSerchInfo");
 
-                    File.WriteAllText(savetoFilePath, SearchResultsWithKwList.SearchResultsList.XmlSerializeToString());
+                    File.WriteAllText(savetoFilePath, ObjectCopier.CleanInvalidXmlChars(SearchResultsWithKwList.SearchResultsList.XmlSerializeToString()));
                 }
                 catch(Exception ex)
                 {
@@ -177,7 +178,8 @@ namespace GoViral.ViewModels
                     string savetoFilePath = Path.Combine(saveToDir, "FBSerchInfo");
                     if (!File.Exists(savetoFilePath)) return;
 
-                    ObservableCollection<SearchResult> savedContent = File.ReadAllText(savetoFilePath).XmlDeserializeFromString<ObservableCollection<SearchResult>>();
+                    string savedXml = File.ReadAllText(savetoFilePath);
+                    ObservableCollection<SearchResult> savedContent = savedXml.XmlDeserializeFromString<ObservableCollection<SearchResult>>();
                     foreach (var item in savedContent)
                     {
                         SearchResultsWithKwList.SearchResultsList.Add(item);
@@ -226,7 +228,7 @@ namespace GoViral.ViewModels
             {
                 VisibleProgress = Visibility.Visible;
                 Status = "Initializing crawler...";
-                if (string.IsNullOrEmpty(SearchText) || string.IsNullOrWhiteSpace(SearchText) || !initCrawler())
+                if (string.IsNullOrEmpty(SearchText) || string.IsNullOrWhiteSpace(SearchText) || !anyOptionsChecked() || !initCrawler())
                 {
                     visibleProgress = Visibility.Collapsed;
                     return;
@@ -244,6 +246,11 @@ namespace GoViral.ViewModels
 
                 mCrawlerHost.IninAdin();
             }
+        }
+
+        private bool anyOptionsChecked()
+        {
+            return IsCheckedPage || IsCheckedGroup || IsCheckedEvent || IsCheckedPlace || IsCheckedUser;
         }
 
         private bool initCrawler()

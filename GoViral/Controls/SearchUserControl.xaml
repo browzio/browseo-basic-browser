@@ -6,6 +6,7 @@
              xmlns:local="clr-namespace:GoViral.Controls"
              xmlns:gloabConverters="clr-namespace:Organiser.Common.Converters;assembly=Organiser.Common"
              xmlns:gloabhelpers="clr-namespace:Organiser.Common.Classes;assembly=Organiser.Common"
+             xmlns:gloabControls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
              xmlns:converter="clr-namespace:GoViral.Converters"
              mc:Ignorable="d"
              Name="uc"
@@ -17,98 +18,114 @@
             </ResourceDictionary.MergedDictionaries>
             <converter:LinkToImageConverter x:Key="linktoimgcov" />
             <gloabConverters:ElementSizeMathConverter x:Key="mathConv" />
+            <gloabConverters:MaxCharCountConv x:Key="maxCharsConv" />
         </ResourceDictionary>
     </UserControl.Resources>
     
     <Grid Background="WhiteSmoke">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <Grid Margin="3,0,3,0" Visibility="{Binding VisibleProgress}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+        <Expander ExpandDirection="Up" IsExpanded="True" Grid.ColumnSpan="2">
+            <Expander.Header>
+                <TextBlock Text="Search Options" HorizontalAlignment="Left" Foreground="#1ba261" />
+            </Expander.Header>
+            <Grid Background="WhiteSmoke">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Button Content="Cancel Crawl" Command="{Binding OnClickCommand}" CommandParameter="CANCEL" Margin="3,0,3,0" Grid.RowSpan="2" />
                 
-                <ProgressBar IsIndeterminate="True" Height="7" Grid.Column="1" />
-                <TextBlock Text="{Binding Status}" Foreground="#dd4f43" Grid.Row="1" Grid.Column="1" />
-            </Grid>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-            <Button Content="Save" Command="{Binding OnClickCommand}" CommandParameter="SAVE" Grid.Column="1" Margin="3,0,3,0" />
-        </Grid>
+                    <Grid Margin="3,0,3,0" Visibility="{Binding VisibleProgress}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Button Content="Cancel Crawl" Command="{Binding OnClickCommand}" CommandParameter="CANCEL" Margin="3,0,3,0" Grid.RowSpan="2" />
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <GroupBox Header="Search Options" Margin="5,0,5,5" Grid.ColumnSpan="3">
-                <StackPanel Orientation="Horizontal" Margin="5">
-                    <StackPanel.Resources>
-                        <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
-                            <Setter Property="Margin" Value="6,0,0,0" />
-                            <Setter Property="Width" Value="65" />
-                            <Setter Property="VerticalAlignment" Value="Center" />
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type CheckBox}">
-                                        <Grid x:Name="grid" Height="20" Background="Transparent" Cursor="Hand">
-                                            <Border Width="16" Height="16" BorderBrush="LightGray" BorderThickness="1" Background="#eeeeee" VerticalAlignment="Center" HorizontalAlignment="Left"/>
-                                            <Image x:Name="v" 
+                        <ProgressBar IsIndeterminate="True" Height="7" Grid.Column="1" />
+                        <TextBlock Text="{Binding Status}" Foreground="#dd4f43" Grid.Row="1" Grid.Column="1" />
+                    </Grid>
+
+                    <Button Content="Save" Command="{Binding OnClickCommand}" CommandParameter="SAVE" Grid.Column="1" Margin="3,0,3,0" />
+                </Grid>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <GroupBox Header="Search Options" Margin="5,0,5,5" Grid.ColumnSpan="3">
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <StackPanel.Resources>
+                                <Style TargetType="CheckBox" BasedOn="{StaticResource {x:Type CheckBox}}">
+                                    <Setter Property="Margin" Value="6,0,0,0" />
+                                    <Setter Property="Width" Value="65" />
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type CheckBox}">
+                                                <Grid x:Name="grid" Height="20" Background="Transparent" Cursor="Hand">
+                                                    <Border Width="16" Height="16" BorderBrush="LightGray" BorderThickness="1" Background="#eeeeee" VerticalAlignment="Center" HorizontalAlignment="Left"/>
+                                                    <Image x:Name="v" 
                                                    HorizontalAlignment="Left" 
                                                    VerticalAlignment="Center"
                                                    SnapsToDevicePixels="True" 
                                                    Visibility="Collapsed" 
                                                    Source="pack://application:,,,/Organiser.Common;component/Image/v.png" 
                                                    Stretch="Fill" Width="12" Height="12" Margin="3,0,0,3"/>
-                                            <ContentPresenter Margin="20,0,0,4" VerticalAlignment="Center"/>
-                                        </Grid>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsChecked"  Value="True">
-                                                <Setter Property="Visibility" TargetName="v" Value="Visible"/>
-                                            </Trigger>
-                                            <Trigger Property="IsEnabled" Value="false">
-                                                <Setter Property="Opacity" TargetName="grid" Value="0.4"/>
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </StackPanel.Resources>
-                    <CheckBox Content="Pages" IsChecked="{Binding IsCheckedPage}" />
-                    <CheckBox Content="Groups" IsChecked="{Binding IsCheckedGroup}" />
-                    <CheckBox Content="Events" IsChecked="{Binding IsCheckedEvent}" />
-                    <CheckBox Content="Places" IsChecked="{Binding IsCheckedPlace}" />
-                    <CheckBox Content="People" IsChecked="{Binding IsCheckedUser}" />
-                </StackPanel>
-            </GroupBox>
-            
-            <TextBox Text="{Binding SearchText}"  Grid.Row="1" Margin="3" />
-            <Button Content="Multi" Command="{Binding OnClickCommand}" CommandParameter="MULTI" Grid.Column="1" Grid.Row="1" Margin="3" />
-            <Button Content="Search" Command="{Binding OnClickCommand}" CommandParameter="SEARCH" Grid.Column="2" Grid.Row="1" Margin="3" />
-        </Grid>
+                                                    <ContentPresenter Margin="20,0,0,4" VerticalAlignment="Center"/>
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsChecked"  Value="True">
+                                                        <Setter Property="Visibility" TargetName="v" Value="Visible"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsEnabled" Value="false">
+                                                        <Setter Property="Opacity" TargetName="grid" Value="0.4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </StackPanel.Resources>
+                            <CheckBox Content="Pages" IsChecked="{Binding IsCheckedPage}" />
+                            <CheckBox Content="Groups" IsChecked="{Binding IsCheckedGroup}" />
+                            <CheckBox Content="Events" IsChecked="{Binding IsCheckedEvent}" />
+                            <CheckBox Content="Places" IsChecked="{Binding IsCheckedPlace}" />
+                            <CheckBox Content="People" IsChecked="{Binding IsCheckedUser}" />
+                        </StackPanel>
+                    </GroupBox>
 
-        <ScrollViewer CanContentScroll="False"  Grid.Row="2" Name="svLists">
+                    <TextBox Text="{Binding SearchText}"  Grid.Row="1" Margin="3" />
+                    <Button Content="Multi" Command="{Binding OnClickCommand}" CommandParameter="MULTI" Grid.Column="1" Grid.Row="1" Margin="3" />
+                    <Button Content="Search" Command="{Binding OnClickCommand}" CommandParameter="SEARCH" Grid.Column="2" Grid.Row="1" Margin="3" />
+                </Grid>
+            </Grid>
+        </Expander>
+
+        <ScrollViewer Grid.Row="1" Name="svLists">
             <Grid>
                 <Grid.Resources>
                     <Style TargetType="ListView">
@@ -134,16 +151,16 @@
                     <Border Height="30" Background="#9196a1">
                         <TextBlock Text="Pages" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left" />
                     </Border>
-                    <ListView Width="{Binding ElementName=uc,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
+                    <ListView ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
+                              Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
                               MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}" 
-                              ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
-                              Name="lvData"
+                              Name="lvDataPages"
                               BorderThickness="0,0,0,0"
-                              PreviewMouseWheel="ListView_PreviewMouseWheel"
-                              PreviewMouseDown="lvData_PreviewMouseDown"
-                              MouseLeave="lvData_MouseLeave"
                               Background="Transparent"
-                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.CanContentScroll="False">
+                              PreviewMouseWheel="LVOuterData_PreviewMouseWheel"
+                              MouseLeave="LVOuterData_MouseLeave"
+                              ScrollViewer.ScrollChanged="LVOuterData_ScrollChanged"
+                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"  ScrollViewer.CanContentScroll="False">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
                                 <Setter Property="Visibility" Value="Visible" />
@@ -155,10 +172,14 @@
                             </Style>
                         </ListView.ItemContainerStyle>
                         <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <Expander ExpandDirection="Down" IsExpanded="False" Name="expander">
+                            <DataTemplate x:Name="dtPages">
+                                <gloabControls:ExpanderDoubleClickExpand ExpandDirection="Down" IsExpanded="False" Name="exPages"
+                                                                         VerticalAlignment="Top"
+                                                                         Expanded="Expander_Expanded" 
+                                                                         Collapsed="Expander_Collapsed"
+                                                                         PreviewMouseDown="Expander_PreviewMouseDown">
                                     <Expander.Header>
-                                        <Grid Width="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
+                                        <Grid Width="{Binding ElementName=lvDataPages,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition />
                                                 <ColumnDefinition />
@@ -169,10 +190,11 @@
                                         </Grid>
                                     </Expander.Header>
                                     <ListView ItemsSource="{Binding PagesResult.data}"
-                                              BorderThickness="0,0,0,0"
-                                              Width="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
+                                              Width="{Binding ElementName=lvDataPages,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
+                                              Height="{Binding ElementName=lvDataPages,Path=ActualHeight, Converter={StaticResource mathConv}, ConverterParameter=M-M28}" 
                                               ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
-                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                              BorderThickness="0,0,0,0"
+                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                                         <ListView.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="3">
@@ -181,25 +203,27 @@
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
                                                     
-                                                    <Image Source="{Binding picture.data.url,IsAsync=True, Converter={StaticResource linktoimgcov}}"
-                                                   Stretch="None" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
+                                                    <Image Source="{Binding picture.data.url,IsAsync=False, Converter={StaticResource linktoimgcov}}"
+                                                           Width="100" Height="100" Stretch="Fill"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
 
                                                     <StackPanel Grid.Column="1">
                                                         <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" />
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="category:" Width="85" />
-                                                            <TextBlock Text="{Binding category}" TextWrapping="Wrap" MaxHeight="150" 
-                                                                       MaxWidth="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M240}" />
+                                                            <TextBlock Text="{Binding category, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
+                                                                       Width="290" TextWrapping="Wrap" MaxHeight="150" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="about:" Width="85" />
-                                                            <TextBlock Text="{Binding about}" TextWrapping="Wrap" MaxHeight="150" 
-                                                                       MaxWidth="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M240}" />
+                                                            <TextBlock Text="{Binding about, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
+                                                                       Width="{Binding ElementName=lvDataPages,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="description:" Width="85" />
-                                                            <TextBlock Text="{Binding description}" TextWrapping="Wrap" MaxHeight="150"
-                                                                       MaxWidth="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M240}" />
+                                                            <TextBlock Text="{Binding description, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
+                                                                       Width="{Binding ElementName=lvDataPages,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="founded:" Width="85" />
@@ -223,7 +247,7 @@
                                             </ContextMenu>
                                         </ListView.ContextMenu>
                                     </ListView>
-                                </Expander>
+                                </gloabControls:ExpanderDoubleClickExpand>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
@@ -239,14 +263,15 @@
                         <TextBlock Text="Groups" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left" />
                     </Border>
                     <ListView ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
-                              Width="{Binding ElementName=uc,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
+                              Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
                               MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}"
+                              Name="lvDataGroups"
                               BorderThickness="0,0,0,0" 
-                              PreviewMouseWheel="ListView_PreviewMouseWheel"
-                              PreviewMouseDown="lvData_PreviewMouseDown"
-                              MouseLeave="lvData_MouseLeave"
                               Background="Transparent"
-                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.CanContentScroll="False">
+                              PreviewMouseWheel="LVOuterData_PreviewMouseWheel"
+                              MouseLeave="LVOuterData_MouseLeave"
+                              ScrollViewer.ScrollChanged="LVOuterData_ScrollChanged"
+                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"  ScrollViewer.CanContentScroll="False">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
                                 <Setter Property="Visibility" Value="Visible" />
@@ -259,9 +284,13 @@
                         </ListView.ItemContainerStyle>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Expander ExpandDirection="Down" IsExpanded="False">
+                                <gloabControls:ExpanderDoubleClickExpand ExpandDirection="Down" IsExpanded="False" Name="exGroups" 
+                                                                         VerticalAlignment="Top"
+                                                                         Expanded="Expander_Expanded" 
+                                                                         Collapsed="Expander_Collapsed"
+                                                                         PreviewMouseDown="Expander_PreviewMouseDown">
                                     <Expander.Header>
-                                        <Grid Width="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
+                                        <Grid Width="{Binding ElementName=lvDataGroups,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition />
                                                 <ColumnDefinition />
@@ -272,10 +301,11 @@
                                         </Grid>
                                     </Expander.Header>
                                     <ListView ItemsSource="{Binding GroupsResult.data}"
+                                              Width="{Binding ElementName=lvDataGroups,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
+                                              Height="{Binding ElementName=lvDataPages,Path=ActualHeight, Converter={StaticResource mathConv}, ConverterParameter=M-M28}"
+                                              ItemContainerStyle="{StaticResource MetroListBoxItemStyle}" 
                                               BorderThickness="0,0,0,0"
-                                              Width="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
-                                              ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
-                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                                         <ListView.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="3">
@@ -295,8 +325,9 @@
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="description:" Width="85" />
-                                                            <TextBlock Text="{Binding description}" TextWrapping="Wrap" MaxHeight="150"
-                                                                       MaxWidth="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M240}" />
+                                                            <TextBlock Text="{Binding description, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
+                                                                       Width="{Binding ElementName=lvDataGroups,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="members:" Width="85" />
@@ -312,7 +343,7 @@
                                             </ContextMenu>
                                         </ListView.ContextMenu>
                                     </ListView>
-                                </Expander>
+                                </gloabControls:ExpanderDoubleClickExpand>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
@@ -327,15 +358,16 @@
                     <Border Height="30" Background="#9196a1">
                         <TextBlock Text="Events" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left" />
                     </Border>
-                    <ListView Width="{Binding ElementName=uc,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
+                    <ListView Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
                               MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}"
                               ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
+                              Name="lvDataEvents"
                               BorderThickness="0,0,0,0"
-                              PreviewMouseWheel="ListView_PreviewMouseWheel"
-                              PreviewMouseDown="lvData_PreviewMouseDown"
-                              MouseLeave="lvData_MouseLeave"
                               Background="Transparent"
-                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.CanContentScroll="False">
+                              PreviewMouseWheel="LVOuterData_PreviewMouseWheel"
+                              MouseLeave="LVOuterData_MouseLeave"
+                              ScrollViewer.ScrollChanged="LVOuterData_ScrollChanged"
+                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"  ScrollViewer.CanContentScroll="False">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
                                 <Setter Property="Visibility" Value="Visible" />
@@ -348,9 +380,12 @@
                         </ListView.ItemContainerStyle>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Expander ExpandDirection="Down" IsExpanded="False">
+                                <gloabControls:ExpanderDoubleClickExpand ExpandDirection="Down" IsExpanded="False" Name="exEvents" 
+                                                                         Expanded="Expander_Expanded" 
+                                                                         Collapsed="Expander_Collapsed"
+                                                                         PreviewMouseDown="Expander_PreviewMouseDown">
                                     <Expander.Header>
-                                        <Grid Width="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
+                                        <Grid Width="{Binding ElementName=lvDataEvents,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition />
                                                 <ColumnDefinition />
@@ -361,10 +396,11 @@
                                         </Grid>
                                     </Expander.Header>
                                     <ListView ItemsSource="{Binding EventsResult.data}"
-                                              BorderThickness="0,0,0,0"
-                                              Width="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
+                                              Width="{Binding ElementName=lvDataEvents,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
+                                              Height="{Binding ElementName=lvDataEvents,Path=ActualHeight, Converter={StaticResource mathConv}, ConverterParameter=M-M25}"
                                               ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
-                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                              BorderThickness="0,0,0,0"
+                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                                         <ListView.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="3">
@@ -380,8 +416,9 @@
                                                         <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" />
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="description:" Width="85" />
-                                                            <TextBlock Text="{Binding description}" TextWrapping="Wrap" MaxHeight="150"
-                                                                       MaxWidth="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M240}" />
+                                                            <TextBlock Text="{Binding description, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
+                                                                       Width="{Binding ElementName=lvDataEvents,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="start time:" Width="85" />
@@ -421,7 +458,7 @@
                                             </ContextMenu>
                                         </ListView.ContextMenu>
                                     </ListView>
-                                </Expander>
+                                </gloabControls:ExpanderDoubleClickExpand>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
@@ -437,14 +474,15 @@
                         <TextBlock Text="Places" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left" />
                     </Border>
                     <ListView ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
-                              Width="{Binding ElementName=uc,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
+                              Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
                               MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}"
+                              Name="lvDataPlaces"
                               BorderThickness="0,0,0,0" 
-                              PreviewMouseWheel="ListView_PreviewMouseWheel"
-                              PreviewMouseDown="lvData_PreviewMouseDown"
-                              MouseLeave="lvData_MouseLeave"
                               Background="Transparent"
-                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.CanContentScroll="False">
+                              PreviewMouseWheel="LVOuterData_PreviewMouseWheel"
+                              MouseLeave="LVOuterData_MouseLeave"
+                              ScrollViewer.ScrollChanged="LVOuterData_ScrollChanged"
+                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"  ScrollViewer.CanContentScroll="False">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
                                 <Setter Property="Visibility" Value="Visible" />
@@ -457,9 +495,12 @@
                         </ListView.ItemContainerStyle>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Expander ExpandDirection="Down" IsExpanded="False">
+                                <gloabControls:ExpanderDoubleClickExpand ExpandDirection="Down" IsExpanded="False" Name="exPlaces" 
+                                                                         Expanded="Expander_Expanded" 
+                                                                         Collapsed="Expander_Collapsed"
+                                                                         PreviewMouseDown="Expander_PreviewMouseDown">
                                     <Expander.Header>
-                                        <Grid Width="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
+                                        <Grid Width="{Binding ElementName=lvDataPlaces,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition />
                                                 <ColumnDefinition />
@@ -470,10 +511,11 @@
                                         </Grid>
                                     </Expander.Header>
                                     <ListView ItemsSource="{Binding PlacesResult.data}"
-                                              BorderThickness="0,0,0,0" 
-                                              Width="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
+                                              Width="{Binding ElementName=lvDataPlaces,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
+                                              Height="{Binding ElementName=lvDataPlaces,Path=ActualHeight, Converter={StaticResource mathConv}, ConverterParameter=M-M25}"
                                               ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
-                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                              BorderThickness="0,0,0,0" 
+                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                                         <ListView.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="3">
@@ -489,16 +531,20 @@
                                                         <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" />
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="category:" Width="85" />
-                                                            <TextBlock Text="{Binding category}" />
+                                                            <TextBlock Text="{Binding category, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
+                                                                       Width="290" TextWrapping="Wrap" MaxHeight="150" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="about:" Width="85" />
-                                                            <TextBlock Text="{Binding about}" TextWrapping="Wrap" MaxHeight="150"
-                                                                       MaxWidth="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M240}" />
+                                                            <TextBlock Text="{Binding about, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
+                                                                       Width="{Binding ElementName=lvDataPlaces,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="description:" Width="85" />
-                                                            <TextBlock Text="{Binding description}" />
+                                                            <TextBlock Text="{Binding description, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
+                                                                       Width="{Binding ElementName=lvDataPlaces,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="founded:" Width="85" />
@@ -558,7 +604,7 @@
                                             </ContextMenu>
                                         </ListView.ContextMenu>
                                     </ListView>
-                                </Expander>
+                                </gloabControls:ExpanderDoubleClickExpand>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
@@ -574,14 +620,15 @@
                         <TextBlock Text="People" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left" />
                     </Border>
                     <ListView ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
-                              Width="{Binding ElementName=uc,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
+                              Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
                               MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}"
+                              Name="lvDataPeople"
                               BorderThickness="0,0,0,0" 
-                              PreviewMouseWheel="ListView_PreviewMouseWheel"
-                              PreviewMouseDown="lvData_PreviewMouseDown"
-                              MouseLeave="lvData_MouseLeave"
                               Background="Transparent"
-                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.CanContentScroll="False">
+                              PreviewMouseWheel="LVOuterData_PreviewMouseWheel"
+                              MouseLeave="LVOuterData_MouseLeave"
+                              ScrollViewer.ScrollChanged="LVOuterData_ScrollChanged"
+                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"  ScrollViewer.CanContentScroll="False">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="{x:Type ListViewItem}">
                                 <Setter Property="Visibility" Value="Visible" />
@@ -594,9 +641,12 @@
                         </ListView.ItemContainerStyle>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <Expander ExpandDirection="Down" IsExpanded="False">
+                                <gloabControls:ExpanderDoubleClickExpand ExpandDirection="Down" IsExpanded="False" Name="exPeople" 
+                                                                         Expanded="Expander_Expanded" 
+                                                                         Collapsed="Expander_Collapsed"
+                                                                         PreviewMouseDown="Expander_PreviewMouseDown">
                                     <Expander.Header>
-                                        <Grid Width="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
+                                        <Grid Width="{Binding ElementName=lvDataPeople,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition />
                                                 <ColumnDefinition />
@@ -607,10 +657,11 @@
                                         </Grid>
                                     </Expander.Header>
                                     <ListView ItemsSource="{Binding PersonsResult.data}"
-                                              BorderThickness="0,0,0,0" 
-                                              Width="{Binding ElementName=lvData,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
+                                              Width="{Binding ElementName=lvDataPeople,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
+                                              Height="{Binding ElementName=lvDataPeople,Path=ActualHeight, Converter={StaticResource mathConv}, ConverterParameter=M-M25}"
                                               ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
-                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                              BorderThickness="0,0,0,0" 
+                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden">
                                         <ListView.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="3">
@@ -638,7 +689,7 @@
                                             </ContextMenu>
                                         </ListView.ContextMenu>
                                     </ListView>
-                                </Expander>
+                                </gloabControls:ExpanderDoubleClickExpand>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
@@ -646,5 +697,20 @@
 
             </Grid>
         </ScrollViewer>
+
+        <Expander ExpandDirection="Right" Grid.Column="1" Grid.Row="1" IsExpanded="False">
+            <Expander.Header>
+                <TextBlock Text="Selected Search Content" Foreground="#de5347">
+                    <TextBlock.LayoutTransform>
+                        <RotateTransform Angle="90"/>
+                    </TextBlock.LayoutTransform>
+                </TextBlock>
+            </Expander.Header>
+            <ListView Name="lvPreview" Width="500" BorderThickness="0"  ScrollViewer.CanContentScroll="True" Background="WhiteSmoke"
+                      ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                      PreviewMouseWheel="lvPreview_PreviewMouseWheel"
+                      ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
+                      Height="{Binding ElementName=svLists,Path=ActualHeight, Converter={StaticResource mathConv}, ConverterParameter=M-M25}" />
+        </Expander>
     </Grid>
 </UserControl>

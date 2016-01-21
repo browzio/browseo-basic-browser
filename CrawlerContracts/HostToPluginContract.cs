@@ -113,7 +113,7 @@ namespace Contract
             var info = new ProcessStartInfo
             {
                 Arguments = mName + " " + quotedAssemblyPath,
-                CreateNoWindow = false,
+                CreateNoWindow = true,
                 UseShellExecute = false,
                 FileName = processName
             };

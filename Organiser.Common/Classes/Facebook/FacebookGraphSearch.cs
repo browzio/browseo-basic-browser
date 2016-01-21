@@ -216,35 +216,38 @@ namespace Organiser.Common.Classes.Facebook
         {
             data = new ObservableCollection<PagesResultData>();
         }
+    }
 
-        public class PagesResultData
-        {
-            public string about { get; set; }
-            public string name { get; set; }
-            public string description { get; set; }
-            public string id { get; set; }
-            public string link { get; set; }
-            public string founded { get; set; }
-            public string can_post { get; set; }
-            public string category { get; set; }
-            public int talking_about_count { get; set; }
-            public int likes { get; set; }
-            public Picture picture { get; set; }
-            public Paging paging { get; set; }
-        }
+    [Serializable]
+    public class PagesResultData
+    {
+        public string about { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public string id { get; set; }
+        public string link { get; set; }
+        public string founded { get; set; }
+        public string can_post { get; set; }
+        public string category { get; set; }
+        public int talking_about_count { get; set; }
+        public int likes { get; set; }
+        public Picture picture { get; set; }
+        public Paging paging { get; set; }
     }
 
     [Serializable]
     public class Picture
     {
         public PicData data { get; set; }
-
-        public class PicData
-        {
-            public string url { get; set; } 
-        }
     }
 
+    [Serializable]
+    public class PicData
+    {
+        public string url { get; set; }
+    }
+
+    [Serializable]
     public class Paging
     {
         public string next { get; set; }

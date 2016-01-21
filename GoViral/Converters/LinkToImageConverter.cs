@@ -17,6 +17,7 @@ namespace GoViral.Converters
             if (value == null) return null;
             string link = System.Convert.ToString(value);
             link = link.Replace("&amp;", "&");
+            link = link.Replace("amp;", "");
             BitmapImage img = new BitmapImage(new Uri(link), new System.Net.Cache.HttpRequestCachePolicy(System.Net.Cache.HttpRequestCacheLevel.NoCacheNoStore));
             img.CacheOption = BitmapCacheOption.None;
             ImageSource image = img;
