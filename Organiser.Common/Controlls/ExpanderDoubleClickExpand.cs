@@ -46,17 +46,13 @@ namespace Organiser.Common.Controlls
 
         private void ExpanderHeader_MouseDoubleClick(Object sender, MouseButtonEventArgs e)
         {
-            base.SetValue(IsMouseDoubleClickedPropertyKey, !IsMouseDoubleClicked);
-            if (IsMouseDoubleClicked)
-            {
-                //base.OnExpanded();
-                IsExpanded = true;
-            }
-            else
-            {
-                //base.OnCollapsed();
-                IsExpanded = false;
-            }
+            SetExpandedValue(!IsMouseDoubleClicked);
+        }
+
+        public void SetExpandedValue(bool expanded)
+        {
+            base.SetValue(IsMouseDoubleClickedPropertyKey, expanded);
+            IsExpanded = expanded;
         }
     }
 }

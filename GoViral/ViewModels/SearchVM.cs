@@ -14,6 +14,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace GoViral.ViewModels
 {
@@ -71,7 +73,24 @@ namespace GoViral.ViewModels
         {
             get { return isCheckedUser; }
             set { isCheckedUser = value; RaisePropertyChanged("IsCheckedUser"); }
-        }  
+        }
+
+        //IsCheckedPhotos
+        private bool isCheckedPhotos;
+        public bool IsCheckedPhotos
+        {
+            get { return isCheckedPhotos; }
+            set { isCheckedPhotos = value; RaisePropertyChanged("IsCheckedPhotos"); }
+        }
+
+        //IsCheckedVideos
+        private bool isCheckedVideos;
+        public bool IsCheckedVideos
+        {
+            get { return isCheckedVideos; }
+            set { isCheckedVideos = value; RaisePropertyChanged("IsCheckedVideos"); }
+        }
+
 
         private string searchText;  
         public string SearchText
@@ -116,6 +135,8 @@ namespace GoViral.ViewModels
            // BindingOperations.EnableCollectionSynchronization(SearchResultsList.GroupsResult.data, mListLock);
         }
 
+        #region from view via command or method
+
         private void OnAnyCommandFromView(object obj)
         {
             string param = obj as string;
@@ -141,6 +162,117 @@ namespace GoViral.ViewModels
                     break;
             }
         }
+
+        internal void OrderResultsOfListBy(string sortby, IEnumerable itemsSource, bool orderByDescending)
+        {
+            //SearchResult selectedResult = selectedSearchResultinKWList as SearchResult;
+            //if (selectedResult == null) return;
+
+            switch (sortby)
+            {
+                //pages and places
+                case "miOrderLikes":
+                case "miOrderTalkingAbout":
+                case "miOrderComments":
+                case "miOrderViews":
+                    if (itemsSource is ObservableCollection<PlacesResultData>) //places
+                    {
+                        ObservableCollection<PlacesResultData> itemsToSortPlaces = itemsSource as ObservableCollection<PlacesResultData>;
+                        List<PlacesResultData> sortedPlaces = orderByDescending ? itemsToSortPlaces.OrderByDescending(i => sortby == "miOrderLikes" ? i.likes : i.talking_about_count).ToList() : 
+                                                                                  itemsToSortPlaces.OrderBy(i => sortby == "miOrderLikes" ? i.likes : i.talking_about_count).ToList();
+                        itemsToSortPlaces.Clear();
+                        foreach (var item in sortedPlaces)
+                        {
+                            itemsToSortPlaces.Add(item);
+                        }
+                    }
+                    else if (itemsSource is ObservableCollection<PagesResultData>)
+                    {
+                        ObservableCollection<PagesResultData> itemsToSortPages = itemsSource as ObservableCollection<PagesResultData>;
+                        List<PagesResultData> sortedPages = orderByDescending ? itemsToSortPages.OrderByDescending(i => sortby == "miOrderLikes" ? i.likes : i.talking_about_count).ToList() :
+                                                                                itemsToSortPages.OrderBy(i => sortby == "miOrderLikes" ? i.likes : i.talking_about_count).ToList(); 
+                        itemsToSortPages.Clear();
+                        foreach (var item in sortedPages)
+                        {
+                            itemsToSortPages.Add(item);
+                        }
+                    }
+                    else if (itemsSource is ObservableCollection<MediaResultData>)
+                    {
+                        ObservableCollection<MediaResultData> itemsToSortPages = itemsSource as ObservableCollection<MediaResultData>;
+                        List<MediaResultData> sortedMedia = orderByDescending ? itemsToSortPages.OrderByDescending(i=> sortby == "miOrderLikes" ? i.like_count : sortby == "miOrderComments" ? i.comment_count : i.view_count).ToList():
+                                                                                itemsToSortPages.OrderBy(i => sortby == "miOrderLikes" ? i.like_count : sortby == "miOrderComments" ? i.comment_count : i.view_count).ToList();
+                        itemsToSortPages.Clear();
+                        foreach (var item in sortedMedia)
+                        {
+                            itemsToSortPages.Add(item);
+                        }
+                    }
+                    break;
+
+                //groups
+                case "miOrderMembers":
+                case "miOrderPrivacy":
+                case "miOrderPrivacyOpen":
+                case "miOrderPrivacyClosed":
+                    if (itemsSource is ObservableCollection<GroupsResultData>)
+                    {
+                        ObservableCollection<GroupsResultData> itemsToSortGroups = itemsSource as ObservableCollection<GroupsResultData>;
+                        List<GroupsResultData> sorted;
+                        if (sortby == "miOrderMembers")
+                        {
+                            sorted = orderByDescending ? itemsToSortGroups.OrderByDescending(i => i.members == null || i.members.summary == null ? 0 : i.members.summary.total_count).ToList():
+                                                         itemsToSortGroups.OrderBy(i => i.members == null || i.members.summary == null ? 0 : i.members.summary.total_count).ToList();
+                        }
+                        else
+                        {
+                            sorted = orderByDescending ? itemsToSortGroups.OrderByDescending(i => sortby == "miOrderPrivacy" ? i.privacy :
+                                                                                                  sortby == "miOrderPrivacyOpen" ?  "OPEN" : "CLOSED").ToList() :
+                                                         itemsToSortGroups.OrderBy(i => sortby == "miOrderPrivacy" ? i.privacy :
+                                                                                                  sortby == "miOrderPrivacyOpen" ? "OPEN" : "CLOSED").ToList();
+                        }
+                        itemsToSortGroups.Clear();
+
+                        foreach (var item in sorted)
+                        {
+                            itemsToSortGroups.Add(item);
+                        }
+                    }
+                    break;
+
+                //events
+                case "miOrderInterested":
+                case "miOrderGoing":
+                case "miOrderInvited":
+                case "miOrderOrderMaybe":
+                    if (itemsSource is ObservableCollection<EventsResultData>)
+                    {
+                        ObservableCollection<EventsResultData> itemsToSortEvents = itemsSource as ObservableCollection<EventsResultData>;
+                        List<EventsResultData> sorted = orderByDescending ? itemsToSortEvents.OrderByDescending(i => sortby == "miOrderInterested" ? i.interested == null || i.interested.summary == null ? 0 : i.interested.summary.count :
+                                                                                                                i.invited == null || i.invited.summary == null ? 0 :
+                                                                                                                sortby == "miOrderGoing" ? i.invited.summary.attending_count :
+                                                                                                                sortby == "miOrderInvited" ? i.invited.summary.count :
+                                                                                                                i.invited.summary.maybe_count).ToList() :
+                                                                            itemsToSortEvents.OrderByDescending(i => sortby == "miOrderInterested" ? i.interested == null || i.interested.summary == null ? 0 : i.interested.summary.count :
+                                                                                                                i.invited == null || i.invited.summary == null ? 0 :
+                                                                                                                sortby == "miOrderGoing" ? i.invited.summary.attending_count :
+                                                                                                                sortby == "miOrderInvited" ? i.invited.summary.count :
+                                                                                                                i.invited.summary.maybe_count).ToList();
+                        itemsToSortEvents.Clear();
+
+                        foreach (var item in sorted)
+                        {
+                            itemsToSortEvents.Add(item);
+                        }
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        #endregion
 
         private void save()
         {
@@ -242,6 +374,8 @@ namespace GoViral.ViewModels
                     if (IsCheckedEvent) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Events, url = kw.Trim() });
                     if (IsCheckedPlace) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Places, url = kw.Trim() });
                     if (IsCheckedUser) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Users, url = kw.Trim() });
+                    if (IsCheckedPhotos) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Photos, url = kw.Trim() });
+                    if(IsCheckedVideos) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Videos, url = kw.Trim() });
                 }
 
                 mCrawlerHost.IninAdin();
@@ -250,7 +384,7 @@ namespace GoViral.ViewModels
 
         private bool anyOptionsChecked()
         {
-            return IsCheckedPage || IsCheckedGroup || IsCheckedEvent || IsCheckedPlace || IsCheckedUser;
+            return IsCheckedPage || IsCheckedGroup || IsCheckedEvent || IsCheckedPlace || IsCheckedUser || IsCheckedPhotos || IsCheckedVideos;
         }
 
         private bool initCrawler()
@@ -306,6 +440,20 @@ namespace GoViral.ViewModels
             }
         }
 
+        internal void DownloadImageFromUrl(string picUrl)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                VisibleProgress = Visibility.Visible;
+
+                picUrl = picUrl.Replace("&amp;","&");
+                picUrl = picUrl.Replace("amp;","");
+                MyFilesDatabase.DownloadImage(picUrl);
+
+                VisibleProgress = Visibility.Collapsed;
+            });
+        }
+
         private void MCrawlerHost_OnReportFatalError(string userMessage, string fullExceptionText)
         {       
             cancelCrawl(false);
@@ -327,27 +475,7 @@ namespace GoViral.ViewModels
             {
                 if (json == "N/A")
                 {
-                    string inPage = " in ";
-                    switch (searchState.state)
-                    {    
-                        case CrawlerStates.GraphSearch_Pages:
-                            inPage += "Pages";
-                            break;
-                        case CrawlerStates.GraphSearch_Groups:
-                            inPage += "Groups";
-                            break;
-                        case CrawlerStates.GraphSearch_Events:
-                            inPage += "Events";
-                            break;
-                        case CrawlerStates.GraphSearch_Places:
-                            inPage += "Places";
-                            break;
-                        case CrawlerStates.GraphSearch_Users:
-                            inPage += "Users";
-                            break;
-                        default:
-                            break;
-                    }
+                    string inPage = " in " + searchState.state.GetDescription();
                     errors += "Failed To Search For " + searchState.url + inPage + Environment.NewLine;
                 }
                 else
@@ -398,6 +526,24 @@ namespace GoViral.ViewModels
                             {
                                 if (resultWithKw.PagesResult.data.Any(d => d.name == result.name)) continue;
                                 resultWithKw.PersonsResult.data.Add(result);
+                            }
+                            break;
+
+                        case CrawlerStates.GraphSearch_Photos:
+                            MediaResult photoResult = json.XmlDeserializeFromString<MediaResult>();
+                            foreach(var result in photoResult.data)
+                            {
+                                if (resultWithKw.MediaResult.data.Any(d => d.id == result.id)) continue;
+                                resultWithKw.MediaResult.data.Add(result);
+                            }
+                            break;
+
+                        case CrawlerStates.GraphSearch_Videos:
+                            MediaResult videoResult = json.XmlDeserializeFromString<MediaResult>();
+                            foreach (var result in videoResult.data)
+                            {
+                                if (resultWithKw.MediaResultVideos.data.Any(d => d.id == result.id)) continue;
+                                resultWithKw.MediaResultVideos.data.Add(result);
                             }
                             break;
 

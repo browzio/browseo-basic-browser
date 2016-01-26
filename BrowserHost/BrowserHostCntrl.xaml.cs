@@ -31,7 +31,7 @@ namespace BrowserHost
 
         public ObservableCollection<BrowserTabViewModel> BrowserTabs { get; set; }
         public event Action<string, string> OnCurateToPBN = delegate { };
-        public event Action<string,List<string>> OnAddedToGoViral = delegate { };//link
+        public event Action<string,string,List<string>> OnAddedToGoViral = delegate { };//link,type,multi
         public event Action OnRefreshedSessionSettings = delegate { };
 
         public BrowserHostCntrl()
@@ -196,9 +196,9 @@ namespace BrowserHost
             OnCurateToPBN(content, link);
         }
 
-        private void Btvm_OnAddedToGoViral(string link, List<string> multilinks)
+        private void Btvm_OnAddedToGoViral(string link,string type, List<string> multilinks)
         {
-            OnAddedToGoViral(link, multilinks);
+            OnAddedToGoViral(link,type, multilinks);
         }
         #endregion
 

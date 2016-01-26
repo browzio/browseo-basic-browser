@@ -14,7 +14,6 @@ using System.Threading.Tasks;
 
 namespace GoViral.Helpers
 {
-
     public class CrawlerPreInitState
     {
         public CrawlerStates state = CrawlerStates.FbGraphCrawl;
@@ -106,7 +105,7 @@ namespace GoViral.Helpers
             if (PreInitStates != null && PreInitStates.Count > 0 && Initialized == 2)
             {
                 if (PreInitStates.Count == 0) return;
-                OnReportProgress("START: " + PreInitStates[0].url);
+                OnReportProgress("START: " + PreInitStates[0].url.Replace("https://www.facebook.com/","") + " " + PreInitStates[0].state.GetDescription());
                 HostToPluginContract.SetCrawlerState(Convert.ToInt32(PreInitStates[0].state));
                 HostToPluginContract.NavigateToUrl(PreInitStates[0].url);
             }

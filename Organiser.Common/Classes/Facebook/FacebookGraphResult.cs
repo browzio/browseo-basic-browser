@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Organiser.Common.Classes.Facebook;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,14 +16,106 @@ namespace Organiser.Common.Classes
         public string id { get; set; }
         public string link { get; set; }
         public string founded { get; set; }
-        public bool can_post { get; set; }
+        public string can_post { get; set; }
         public string category { get; set; }
-        public int likes { get; set; }
+        public long likes { get; set; }
         public int talking_about_count { get; set; }
+
+        public string privacy { get; set; }
+        public string updated_time { get; set; }
+
+        public string start_time { get; set; }
+        public string timezone { get; set; }
+
+        public string is_community_page { get; set; }
+        public string is_permanently_closed { get; set; }
+        public string is_published { get; set; }
+        public string is_unclaimed { get; set; }
+        public string is_verified { get; set; }
+        public string website { get; set; }
+
+        public string description { get; set; }
+
+        public string permalink_url { get; set; }
+        public string picture { get; set; }
+        public double length { get; set; }
+        public string embed_html { get; set; }
+        public string source { get; set; }
+        public long views { get; set; }
+        public string name { get; set; }
+
 
         public Videos videos { get; set; }
         public Photos photos { get; set; }
-        public Posts posts { get; set; } 
+        public Albums albums { get; set; }
+        public Posts posts { get; set; }
+        public Feed feed { get; set; }
+
+        public Members members { get; set; }
+        public Interested interested { get; set; }
+        public Invited invited { get; set; }
+
+        public Comments comments { get; set; }
+        public Album album { get; set; }
+        public Images[] images { get; set; }
+        //public Likes likes { get; set; }
+
+
+        public Paging paging { get; set; }
+    }
+
+    [Serializable]
+    public class FacebookGraphDataForMedia
+    {
+        public string about { get; set; }
+        public string id { get; set; }
+        public string link { get; set; }
+        public string founded { get; set; }
+        public string can_post { get; set; }
+        public string category { get; set; }
+        public int talking_about_count { get; set; }
+
+        public string privacy { get; set; }
+        public string updated_time { get; set; }
+
+        public string start_time { get; set; }
+        public string timezone { get; set; }
+
+        public string is_community_page { get; set; }
+        public string is_permanently_closed { get; set; }
+        public string is_published { get; set; }
+        public string is_unclaimed { get; set; }
+        public string is_verified { get; set; }
+        public string website { get; set; }
+
+        public string description { get; set; }
+
+        public string permalink_url { get; set; }
+        public string picture { get; set; }
+        public double length { get; set; }
+        public string embed_html { get; set; }
+        public string source { get; set; }
+        public long views { get; set; }
+        public string name { get; set; }
+
+
+        public Videos videos { get; set; }
+        public Photos photos { get; set; }
+        public Albums albums { get; set; }
+        public Posts posts { get; set; }
+        public Feed feed { get; set; }
+
+        public Members members { get; set; }
+        public Interested interested { get; set; }
+        public Invited invited { get; set; }
+
+        public Comments comments { get; set; }
+        public Album album { get; set; }
+        public Images[] images { get; set; }
+        public Likes likes { get; set; }
+
+
+        public Paging paging { get; set; }
     }
 
     public class Videos
@@ -48,8 +141,9 @@ namespace Organiser.Common.Classes
             public string updated_time { get; set; }
             public string description { get; set; }
             public bool embeddable { get; set; }
+            public long views { get; set; }
             public Likes likes { get; set; }
-            public SharedPosts sharedposts { get; set; }
+           //public SharedPosts sharedposts { get; set; }
             public Comments comments { get; set; }
         }
     }
@@ -86,6 +180,20 @@ namespace Organiser.Common.Classes
         public Photos photos { get; set; }
     }
 
+    public class Albums
+    {
+        private ObservableCollection<AlbumsData> mydata;
+        public ObservableCollection<AlbumsData> data
+        {
+            get { return mydata; }
+            set { mydata = value; }
+        }
+    }
+    public class AlbumsData
+    {
+        public Photos photos { get; set; }
+    }
+
     public class Posts
     {
         private ObservableCollection<FacebookGraphPostResult> mydata;
@@ -96,36 +204,56 @@ namespace Organiser.Common.Classes
             set { mydata = value; }
         }
     }
-
     public class FacebookGraphPostResult
     {   
-        [JsonProperty("caption")]
         public string caption { get; set; }
-
-        [JsonProperty("description")]
         public string description { get; set; }
-
-        [JsonProperty("icon")]
         public string icon { get; set; }
-
-        [JsonProperty("link")]
         public string link { get; set; }
-
-        [JsonProperty("message")]
         public string message { get; set; }
-
-        [JsonProperty("updated_time")]
         public string updated_time { get; set; }
-
-        [JsonProperty("id")]
         public string id { get; set; }
-
         public string full_picture { get; set; }
         public string picture { get; set; }
 
         public Shares shares { get; set; }
-
         public Likes likes { get; set; }
+        public Comments comments { get; set; }
+    }
+
+    public class Feed
+    {
+        private ObservableCollection<FeedData> mydata;
+        public ObservableCollection<FeedData> data
+        {
+            get { return mydata; }
+            set { mydata = value; }
+        }
+
+        public Paging paging { get; set; }
+    }
+    public class FeedData
+    {
+        public string caption { get; set; }
+        public string created_time { get; set; }
+        public string description { get; set; }
+        public string full_picture { get; set; }
+        public string id { get; set; }
+        public bool is_expired { get; set; }
+        public bool is_hidden { get; set; }
+        public bool is_published { get; set; }
+        public string link { get; set; }
+        public string message { get; set; }
+        public string name { get; set; }
+        public string object_id { get; set; }
+        public string picture { get; set; }
+        public string story { get; set; }
+        public string type { get; set; }
+        public string updated_time { get; set; }
+
+        public Shares shares { get; set; }
+        public Likes likes { get; set; }
+        public Comments comments { get; set; }
     }
 
     public class SharedPosts
@@ -170,13 +298,14 @@ namespace Organiser.Common.Classes
         public class Coment
         {
             public string id { get; set; }
+            public string created_time { get; set; }
+            public string message { get; set; }
         }
     }
 
     public class Shares
     {
-        [JsonProperty("count")]
-        public int count { get; set; }
+        public long count { get; set; }
     }
 
     public class Likes
@@ -198,7 +327,6 @@ namespace Organiser.Common.Classes
             public string id { get; set; }
         }
     }
-
     public class LikesData
     {
         public Likes likes { get; set; }
@@ -211,11 +339,17 @@ namespace Organiser.Common.Classes
 
     public class Summary
     {
-        public int total_count { get; set; }
+        public long total_count { get; set; }
         public string order { get; set; }
         public bool can_like { get; set; }
         public bool can_comment { get; set; }
         public bool has_liked { get; set; }
+    }
+
+    public class Album
+    {
+        public string created_time { get; set; }
+        public string name { get; set; }
     }
 
     public class FBUploadSessionReply

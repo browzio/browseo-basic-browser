@@ -89,12 +89,12 @@
                                                 <Grid x:Name="grid" Height="20" Background="Transparent" Cursor="Hand">
                                                     <Border Width="16" Height="16" BorderBrush="LightGray" BorderThickness="1" Background="#eeeeee" VerticalAlignment="Center" HorizontalAlignment="Left"/>
                                                     <Image x:Name="v" 
-                                                   HorizontalAlignment="Left" 
-                                                   VerticalAlignment="Center"
-                                                   SnapsToDevicePixels="True" 
-                                                   Visibility="Collapsed" 
-                                                   Source="pack://application:,,,/Organiser.Common;component/Image/v.png" 
-                                                   Stretch="Fill" Width="12" Height="12" Margin="3,0,0,3"/>
+                                                           HorizontalAlignment="Left" 
+                                                           VerticalAlignment="Center"
+                                                           SnapsToDevicePixels="True" 
+                                                           Visibility="Collapsed" 
+                                                           Source="pack://application:,,,/Organiser.Common;component/Image/v.png" 
+                                                           Stretch="Fill" Width="12" Height="12" Margin="3,0,0,3"/>
                                                     <ContentPresenter Margin="20,0,0,4" VerticalAlignment="Center"/>
                                                 </Grid>
                                                 <ControlTemplate.Triggers>
@@ -114,6 +114,8 @@
                             <CheckBox Content="Groups" IsChecked="{Binding IsCheckedGroup}" />
                             <CheckBox Content="Events" IsChecked="{Binding IsCheckedEvent}" />
                             <CheckBox Content="Places" IsChecked="{Binding IsCheckedPlace}" />
+                            <CheckBox Content="Photos" IsChecked="{Binding IsCheckedPhotos}" />
+                            <CheckBox Content="Videos" IsChecked="{Binding IsCheckedVideos}" />
                             <CheckBox Content="People" IsChecked="{Binding IsCheckedUser}" />
                         </StackPanel>
                     </GroupBox>
@@ -140,6 +142,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid Name="grdPages" Margin="15" Grid.Column="0">
@@ -152,6 +155,7 @@
                         <TextBlock Text="Pages" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left" />
                     </Border>
                     <ListView ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
+                              SelectedIndex="{Binding SearchResultsWithKwList.SISearchResultList}"
                               Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
                               MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}" 
                               Name="lvDataPages"
@@ -207,23 +211,23 @@
                                                            Width="100" Height="100" Stretch="Fill"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
 
                                                     <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" />
+                                                        <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" PreviewMouseDown="TextBlock_PreviewMouseDown" />
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="category:" Width="85" />
                                                             <TextBlock Text="{Binding category, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
-                                                                       Width="290" TextWrapping="Wrap" MaxHeight="150" />
+                                                                       Width="290" TextWrapping="Wrap" MaxHeight="250" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="about:" Width="85" />
                                                             <TextBlock Text="{Binding about, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
                                                                        Width="{Binding ElementName=lvDataPages,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
-                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="250" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="description:" Width="85" />
-                                                            <TextBlock Text="{Binding description, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
+                                                            <TextBlock Text="{Binding description, ConverterParameter=100, Converter={StaticResource maxCharsConv}}" 
                                                                        Width="{Binding ElementName=lvDataPages,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
-                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="250" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="founded:" Width="85" />
@@ -244,9 +248,24 @@
                                         <ListView.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Collapse" Name="miCollpse" Click="miCollpse_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Order By Likes" Name="miOrderLikes" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Order By Talking About" Name="miOrderTalkingAbout" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Dominate" Name="miDominate" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All" Name="miDominateAll" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All (selectively)" Name="miDominateBy" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Remove" Name="miRemove" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Remove Multiple (selectively)" Name="miRemoveSelective" Click="CMMIinner_Click" />
                                             </ContextMenu>
                                         </ListView.ContextMenu>
                                     </ListView>
+                                    <Expander.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Delete" Name="exMIdelete" Click="exMIdelete_Click" />
+                                        </ContextMenu>
+                                    </Expander.ContextMenu>
                                 </gloabControls:ExpanderDoubleClickExpand>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -263,6 +282,7 @@
                         <TextBlock Text="Groups" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left" />
                     </Border>
                     <ListView ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
+                              SelectedIndex="{Binding SearchResultsWithKwList.SISearchResultList}"
                               Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
                               MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}"
                               Name="lvDataGroups"
@@ -313,12 +333,12 @@
                                                         <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
-                                                    
-                                                    <Image Source="{Binding picture.data.url,IsAsync=True, Converter={StaticResource linktoimgcov}}"
-                                                   Stretch="None" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
+
+                                                    <Image Source="{Binding picture.data.url,IsAsync=False, Converter={StaticResource linktoimgcov}}"
+                                                           Width="100" Height="100" Stretch="Fill"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
 
                                                     <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" />
+                                                        <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" PreviewMouseDown="TextBlock_PreviewMouseDown" />
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="privacy:" Width="85" />
                                                             <TextBlock Text="{Binding privacy}" />
@@ -327,7 +347,7 @@
                                                             <TextBlock Text="description:" Width="85" />
                                                             <TextBlock Text="{Binding description, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
                                                                        Width="{Binding ElementName=lvDataGroups,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
-                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="250" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="members:" Width="85" />
@@ -340,9 +360,24 @@
                                         <ListView.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Collapse" Name="miCollpse" Click="miCollpse_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Order By Members" Name="miOrderMembers" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Order By Privacy About" Name="miOrderPrivacy" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Dominate" Name="miDominate" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All" Name="miDominateAll" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All (selectively)" Name="miDominateBy" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Remove" Name="miRemove" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Remove Multiple (selectively)" Name="miRemoveSelective" Click="CMMIinner_Click" />
                                             </ContextMenu>
                                         </ListView.ContextMenu>
                                     </ListView>
+                                    <Expander.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Delete" Name="exMIdelete" Click="exMIdelete_Click" />
+                                        </ContextMenu>
+                                    </Expander.ContextMenu>
                                 </gloabControls:ExpanderDoubleClickExpand>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -361,6 +396,7 @@
                     <ListView Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
                               MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}"
                               ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
+                              SelectedIndex="{Binding SearchResultsWithKwList.SISearchResultList}"
                               Name="lvDataEvents"
                               BorderThickness="0,0,0,0"
                               Background="Transparent"
@@ -408,17 +444,17 @@
                                                         <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
-                                                    
-                                                    <Image Source="{Binding picture.data.url,IsAsync=True, Converter={StaticResource linktoimgcov}}"
-                                                   Stretch="None" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
+
+                                                    <Image Source="{Binding picture.data.url,IsAsync=False, Converter={StaticResource linktoimgcov}}"
+                                                           Width="100" Height="100" Stretch="Fill"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
 
                                                     <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" />
+                                                        <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" PreviewMouseDown="TextBlock_PreviewMouseDown" />
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="description:" Width="85" />
                                                             <TextBlock Text="{Binding description, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
                                                                        Width="{Binding ElementName=lvDataEvents,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
-                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="250" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="start time:" Width="85" />
@@ -455,9 +491,26 @@
                                         <ListView.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Collapse" Name="miCollpse" Click="miCollpse_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Order By Interested" Name="miOrderInterested" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Order By Going" Name="miOrderGoing" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Order By Invited" Name="miOrderInvited" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Order By Maybe" Name="miOrderOrderMaybe" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Dominate" Name="miDominate" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All" Name="miDominateAll" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All (selectively)" Name="miDominateBy" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Remove" Name="miRemove" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Remove Multiple (selectively)" Name="miRemoveSelective" Click="CMMIinner_Click" />
                                             </ContextMenu>
                                         </ListView.ContextMenu>
                                     </ListView>
+                                    <Expander.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Delete" Name="exMIdelete" Click="exMIdelete_Click" />
+                                        </ContextMenu>
+                                    </Expander.ContextMenu>
                                 </gloabControls:ExpanderDoubleClickExpand>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -474,6 +527,7 @@
                         <TextBlock Text="Places" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left" />
                     </Border>
                     <ListView ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
+                              SelectedIndex="{Binding SearchResultsWithKwList.SISearchResultList}"
                               Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
                               MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}"
                               Name="lvDataPlaces"
@@ -523,63 +577,63 @@
                                                         <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
-                                                    
-                                                    <Image Source="{Binding picture.data.url,IsAsync=True, Converter={StaticResource linktoimgcov}}"
-                                                   Stretch="None" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
+
+                                                    <Image Source="{Binding picture.data.url,IsAsync=False, Converter={StaticResource linktoimgcov}}"
+                                                           Width="100" Height="100" Stretch="Fill"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
 
                                                     <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" />
+                                                        <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" PreviewMouseDown="TextBlock_PreviewMouseDown" />
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="category:" Width="85" />
+                                                            <TextBlock Text="category:" Width="120" />
                                                             <TextBlock Text="{Binding category, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
-                                                                       Width="290" TextWrapping="Wrap" MaxHeight="150" />
+                                                                       Width="290" TextWrapping="Wrap" MaxHeight="250" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="about:" Width="85" />
+                                                            <TextBlock Text="about:" Width="120" />
                                                             <TextBlock Text="{Binding about, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
                                                                        Width="{Binding ElementName=lvDataPlaces,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
-                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="250" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="description:" Width="85" />
+                                                            <TextBlock Text="description:" Width="120" />
                                                             <TextBlock Text="{Binding description, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
                                                                        Width="{Binding ElementName=lvDataPlaces,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M280}"
-                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="150" />
+                                                                       MinWidth="250" TextWrapping="Wrap" MaxHeight="250" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="founded:" Width="85" />
+                                                            <TextBlock Text="founded:" Width="120" />
                                                             <TextBlock Text="{Binding founded}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="can post:" Width="85" />
+                                                            <TextBlock Text="can post:" Width="120" />
                                                             <TextBlock Text="{Binding can_post}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="community page:" Width="85" />
+                                                            <TextBlock Text="community page:" Width="120" />
                                                             <TextBlock Text="{Binding is_community_page}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="permanently closed:" Width="85" />
+                                                            <TextBlock Text="permanently closed:" Width="120" />
                                                             <TextBlock Text="{Binding is_permanently_closed}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="published:" Width="85" />
+                                                            <TextBlock Text="published:" Width="120" />
                                                             <TextBlock Text="{Binding is_published}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="unclaimed:" Width="85" />
+                                                            <TextBlock Text="unclaimed:" Width="120" />
                                                             <TextBlock Text="{Binding is_unclaimed}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="verified:" Width="85" />
+                                                            <TextBlock Text="verified:" Width="120" />
                                                             <TextBlock Text="{Binding is_verified}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="website:" Width="85" />
+                                                            <TextBlock Text="website:" Width="120" />
                                                             <TextBlock Text="{Binding website}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="country:" Width="85" />
+                                                            <TextBlock Text="country:" Width="120" />
                                                             <TextBlock Text="{Binding country}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
@@ -587,11 +641,11 @@
                                                             <TextBlock Text="{Binding city}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="talking about:" Width="85" />
+                                                            <TextBlock Text="talking about:" Width="120" />
                                                             <TextBlock Text="{Binding talking_about_count}" />
                                                         </StackPanel>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <TextBlock Text="likes:" Width="85" />
+                                                            <TextBlock Text="likes:" Width="120" />
                                                             <TextBlock Text="{Binding likes}" />
                                                         </StackPanel>
                                                     </StackPanel>
@@ -601,16 +655,319 @@
                                         <ListView.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Collapse" Name="miCollpse" Click="miCollpse_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Order By Likes" Name="miOrderLikes" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Order By Talking About" Name="miOrderTalkingAbout" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Dominate" Name="miDominate" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All" Name="miDominateAll" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All (selectively)" Name="miDominateBy" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Remove" Name="miRemove" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Remove Multiple (selectively)" Name="miRemoveSelective" Click="CMMIinner_Click" />
                                             </ContextMenu>
                                         </ListView.ContextMenu>
                                     </ListView>
+                                    <Expander.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Delete" Name="exMIdelete" Click="exMIdelete_Click" />
+                                        </ContextMenu>
+                                    </Expander.ContextMenu>
                                 </gloabControls:ExpanderDoubleClickExpand>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
                 </Grid>
 
-                <Grid Name="grdPeople" Margin="15" Grid.Column="0" Grid.Row="2">
+                <Grid Name="grdPhotos" Margin="15" Grid.Column="0" Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Height="30" Background="#9196a1">
+                        <TextBlock Text="Photos" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left" />
+                    </Border>
+                    <ListView ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
+                              SelectedIndex="{Binding SearchResultsWithKwList.SISearchResultList}"
+                              Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
+                              MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}"
+                              Name="lvDataPhotos"
+                              BorderThickness="0,0,0,0" 
+                              Background="Transparent"
+                              PreviewMouseWheel="LVOuterData_PreviewMouseWheel"
+                              MouseLeave="LVOuterData_MouseLeave"
+                              ScrollViewer.ScrollChanged="LVOuterData_ScrollChanged"
+                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"  ScrollViewer.CanContentScroll="False">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListViewItem}">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MediaResult.data.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <gloabControls:ExpanderDoubleClickExpand ExpandDirection="Down" IsExpanded="False" Name="exPhotos" 
+                                                                         Expanded="Expander_Expanded" 
+                                                                         Collapsed="Expander_Collapsed"
+                                                                         PreviewMouseDown="Expander_PreviewMouseDown">
+                                    <Expander.Header>
+                                        <Grid Width="{Binding ElementName=lvDataPeople,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="{Binding Keyword}" HorizontalAlignment="Left" Foreground="#4c8cf5" />
+                                            <TextBlock Text="{Binding MediaResult.data.Count}" HorizontalAlignment="Right" Grid.Column="1" Foreground="#4c8cf5" />
+                                        </Grid>
+                                    </Expander.Header>
+                                    <ListView ItemsSource="{Binding MediaResult.data}"
+                                              Width="{Binding ElementName=lvDataPhotos,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
+                                              Height="{Binding ElementName=lvDataPhotos,Path=ActualHeight, Converter={StaticResource mathConv}, ConverterParameter=M-M25}"
+                                              ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
+                                              BorderThickness="0,0,0,0" 
+                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="3">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Image Source="{Binding link,IsAsync=False, Converter={StaticResource linktoimgcov}}"
+                                                           Width="100" Height="100" Stretch="Fill"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
+
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="{Binding id}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" PreviewMouseDown="TextBlock_PreviewMouseDown" />
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="about:" Width="85" />
+                                                            <TextBlock Text="{Binding about, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
+                                                                       Width="290" TextWrapping="Wrap" MaxHeight="250" />
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <StackPanel.Style>
+                                                                <Style TargetType="StackPanel">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding comment_count}" Value="0">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </StackPanel.Style>
+                                                            <TextBlock Text="comments:" Width="85" />
+                                                            <TextBlock Text="{Binding comment_count}" />
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <StackPanel.Style>
+                                                                <Style TargetType="StackPanel">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding view_count}" Value="0">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </StackPanel.Style>
+                                                            <TextBlock Text="views:" Width="85" />
+                                                            <TextBlock Text="{Binding view_count}" />
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <StackPanel.Style>
+                                                                <Style TargetType="StackPanel">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding like_count}" Value="0">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </StackPanel.Style>
+                                                            <TextBlock Text="likes:" Width="85" />
+                                                            <TextBlock Text="{Binding like_count}" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                        <ListView.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Collapse" Name="miCollpse" Click="miCollpse_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Order By Likes" Name="miOrderLikes" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Order By Comments" Name="miOrderComments" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Order By Views" Name="miOrderViews" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Dominate" Name="miDominate" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All" Name="miDominateAll" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All (selectively)" Name="miDominateBy" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Download" Name="miDownload" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Remove" Name="miRemove" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Remove Multiple (selectively)" Name="miRemoveSelective" Click="CMMIinner_Click" />
+                                            </ContextMenu>
+                                        </ListView.ContextMenu>
+                                    </ListView>
+                                    <Expander.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Delete" Name="exMIdelete" Click="exMIdelete_Click" />
+                                        </ContextMenu>
+                                    </Expander.ContextMenu>
+                                </gloabControls:ExpanderDoubleClickExpand>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+
+                <Grid Name="grdVideos" Margin="15" Grid.Column="1" Grid.Row="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Height="30" Background="#9196a1">
+                        <TextBlock Text="Videos" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left" />
+                    </Border>
+                    <ListView ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
+                              SelectedIndex="{Binding SearchResultsWithKwList.SISearchResultList}"
+                              Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
+                              MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}"
+                              Name="lvDataVideos"
+                              BorderThickness="0,0,0,0" 
+                              Background="Transparent"
+                              PreviewMouseWheel="LVOuterData_PreviewMouseWheel"
+                              MouseLeave="LVOuterData_MouseLeave"
+                              ScrollViewer.ScrollChanged="LVOuterData_ScrollChanged"
+                              ScrollViewer.HorizontalScrollBarVisibility="Hidden" ScrollViewer.VerticalScrollBarVisibility="Hidden"  ScrollViewer.CanContentScroll="False">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="{x:Type ListViewItem}">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding MediaResultVideos.data.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <gloabControls:ExpanderDoubleClickExpand ExpandDirection="Down" IsExpanded="False" Name="exVideos" 
+                                                                         Expanded="Expander_Expanded" 
+                                                                         Collapsed="Expander_Collapsed"
+                                                                         PreviewMouseDown="Expander_PreviewMouseDown">
+                                    <Expander.Header>
+                                        <Grid Width="{Binding ElementName=lvDataVideos,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M65}">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+
+                                            <TextBlock Text="{Binding Keyword}" HorizontalAlignment="Left" Foreground="#4c8cf5" />
+                                            <TextBlock Text="{Binding MediaResultVideos.data.Count}" HorizontalAlignment="Right" Grid.Column="1" Foreground="#4c8cf5" />
+                                        </Grid>
+                                    </Expander.Header>
+                                    <ListView ItemsSource="{Binding MediaResultVideos.data}"
+                                              Width="{Binding ElementName=lvDataVideos,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M70}"
+                                              Height="{Binding ElementName=lvDataVideos,Path=ActualHeight, Converter={StaticResource mathConv}, ConverterParameter=M-M25}"
+                                              ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
+                                              BorderThickness="0,0,0,0" 
+                                              ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="3">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <Image Source="{Binding link,IsAsync=False, Converter={StaticResource linktoimgcov}}"
+                                                           Width="100" Height="100" Stretch="Fill"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
+
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="{Binding id}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" PreviewMouseDown="TextBlock_PreviewMouseDown" />
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <TextBlock Text="about:" Width="85" />
+                                                            <TextBlock Text="{Binding about, ConverterParameter=100, Converter={StaticResource maxCharsConv}}"
+                                                                       Width="290" TextWrapping="Wrap" MaxHeight="250" />
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <StackPanel.Style>
+                                                                <Style TargetType="StackPanel">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding comment_count}" Value="0">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </StackPanel.Style>
+                                                            <TextBlock Text="comments:" Width="85" />
+                                                            <TextBlock Text="{Binding comment_count}" />
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <StackPanel.Style>
+                                                                <Style TargetType="StackPanel">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding view_count}" Value="0">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </StackPanel.Style>
+                                                            <TextBlock Text="views:" Width="85" />
+                                                            <TextBlock Text="{Binding view_count}" />
+                                                        </StackPanel>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <StackPanel.Style>
+                                                                <Style TargetType="StackPanel">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding like_count}" Value="0">
+                                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </StackPanel.Style>
+                                                            <TextBlock Text="likes:" Width="85" />
+                                                            <TextBlock Text="{Binding like_count}" />
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                        <ListView.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Collapse" Name="miCollpse" Click="miCollpse_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Order By Likes" Name="miOrderLikes" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Order By Comments" Name="miOrderComments" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Order By Views" Name="miOrderViews" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Dominate" Name="miDominate" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All" Name="miDominateAll" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All (selectively)" Name="miDominateBy" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Download" Name="miDownload" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Remove" Name="miRemove" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Remove Multiple (selectively)" Name="miRemoveSelective" Click="CMMIinner_Click" />
+                                            </ContextMenu>
+                                        </ListView.ContextMenu>
+                                    </ListView>
+                                    <Expander.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Delete" Name="exMIdelete" Click="exMIdelete_Click" />
+                                        </ContextMenu>
+                                    </Expander.ContextMenu>
+                                </gloabControls:ExpanderDoubleClickExpand>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+
+                <Grid Name="grdPeople" Margin="15" Grid.Column="0" Grid.Row="3">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
@@ -620,6 +977,7 @@
                         <TextBlock Text="People" Foreground="White" VerticalAlignment="Center" Margin="15,0,0,0" HorizontalAlignment="Left" />
                     </Border>
                     <ListView ItemsSource="{Binding SearchResultsWithKwList.SearchResultsList}"
+                              SelectedIndex="{Binding SearchResultsWithKwList.SISearchResultList}"
                               Width="{Binding ElementName=svLists,Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M/M2M-M40}"
                               MaxHeight="{Binding ElementName=svLists,Path=ActualHeight,Converter={StaticResource mathConv}, ConverterParameter=M-M50}"
                               Name="lvDataPeople"
@@ -669,12 +1027,12 @@
                                                         <ColumnDefinition Width="Auto" />
                                                         <ColumnDefinition Width="*" />
                                                     </Grid.ColumnDefinitions>
-                                                    
-                                                    <Image Source="{Binding picture.data.url,IsAsync=True, Converter={StaticResource linktoimgcov}}"
-                                                   Stretch="None" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
+
+                                                    <Image Source="{Binding picture.data.url,IsAsync=False, Converter={StaticResource linktoimgcov}}"
+                                                           Width="100" Height="100" Stretch="Fill"  VerticalAlignment="Top" HorizontalAlignment="Left" Margin="0,0,5,0" />
 
                                                     <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" />
+                                                        <TextBlock Text="{Binding name}" FontWeight="Bold" Style="{StaticResource tbLinkStyle}" PreviewMouseDown="TextBlock_PreviewMouseDown" />
                                                         <StackPanel Orientation="Horizontal">
                                                             <TextBlock Text="privacy:" Width="85" />
                                                             <TextBlock Text="{Binding privacy}" />
@@ -686,9 +1044,19 @@
                                         <ListView.ContextMenu>
                                             <ContextMenu>
                                                 <MenuItem Header="Collapse" Name="miCollpse" Click="miCollpse_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Dominate" Name="miDominate" Click="CMMIinner_Click" />
+                                                <MenuItem Header="Dominate All" Name="miDominateAll" Click="CMMIinner_Click" />
+                                                <Separator Margin="-30,0,0,0" />
+                                                <MenuItem Header="Remove" Name="miRemove" Click="CMMIinner_Click" />
                                             </ContextMenu>
                                         </ListView.ContextMenu>
                                     </ListView>
+                                    <Expander.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Delete" Name="exMIdelete" Click="exMIdelete_Click" />
+                                        </ContextMenu>
+                                    </Expander.ContextMenu>
                                 </gloabControls:ExpanderDoubleClickExpand>
                             </DataTemplate>
                         </ListView.ItemTemplate>
@@ -709,8 +1077,16 @@
             <ListView Name="lvPreview" Width="500" BorderThickness="0"  ScrollViewer.CanContentScroll="True" Background="WhiteSmoke"
                       ScrollViewer.HorizontalScrollBarVisibility="Hidden"
                       PreviewMouseWheel="lvPreview_PreviewMouseWheel"
+                      Language="en-GB"
                       ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
-                      Height="{Binding ElementName=svLists,Path=ActualHeight, Converter={StaticResource mathConv}, ConverterParameter=M-M25}" />
+                      Height="{Binding ElementName=svLists,Path=ActualHeight, Converter={StaticResource mathConv}, ConverterParameter=M-M25}">
+                <ListView.Resources>
+                    <Style TargetType="{x:Type TextBlock}">
+                        <Setter Property="TextWrapping" Value="Wrap" />
+                        <Setter Property="MaxWidth" Value="220" />
+                    </Style>
+                </ListView.Resources>
+            </ListView>
         </Expander>
     </Grid>
 </UserControl>

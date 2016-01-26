@@ -8,6 +8,13 @@ namespace Organiser.Common.Classes
     public class Social
     {
         public const string FACEBOOK_GRAPH_LINK = "https://developers.facebook.com/tools/explorer/";
+        public const string FACEBOOK_PAGES_DEFAULT_URL = "https://www.facebook.com/pages/";
+        public const string FACEBOOK_GROUPS_DEFAULT_URL = "https://www.facebook.com/groups/";
+        public const string FACEBOOK_EVENTS_DEFAULT_URL = "https://www.facebook.com/events/";
+        public const string FACEBOOK_PLACES_DEFAULT_URL = "https://www.facebook.com/places/";
+        public const string FACEBOOK_USERS_DEFAULT_URL = "https://www.facebook.com/people/";
+        public const string FACEBOOK_PHOTOS_DEFAULT_URL = "https://www.facebook.com/photos/";
+        public const string FACEBOOK_VIDEOS_DEFAULT_URL = "https://www.facebook.com/videos/";
 
         public const string SOCIALTYPE_fb = "facebook";
         public const string SOCIALTYPE_gp = "google";

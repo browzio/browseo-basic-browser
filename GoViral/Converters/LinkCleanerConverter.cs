@@ -6,30 +6,25 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace Organiser.Common.Converters
+namespace GoViral.Converters
 {
-    public class MaxCharCountConv : IValueConverter
+    public class LinkCleanerConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string text = value as string;
-            if (text != null)
+            string link = value as string;
+            if(link != null)
             {
-                int maxLen = System.Convert.ToInt32(parameter);
-                if (System.Convert.ToString(culture) == "en-GB") maxLen = 700;
-
-                if (text.Length > maxLen)
-                    text = text.Substring(0, maxLen);
-
-                return text;
+                link = link.Replace("&amp;", "&");
+                link = link.Replace("amp;", "");
+                return link;
             }
-
             return value;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            return value;
+            throw new NotImplementedException();
         }
     }
 }

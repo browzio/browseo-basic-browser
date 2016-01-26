@@ -171,7 +171,7 @@ namespace GoViral.ViewModels
         }
 
         #region command raised methods
-        private void On_CTMenuClick(object param)
+        public void On_CTMenuClick(object param)
         {
             if (Folders.Count == 0) return;
             string commandParam = param as string;
@@ -217,26 +217,87 @@ namespace GoViral.ViewModels
 
                 case "ORDER_PostsByLikes":
                 case "ORDER_PostsByShares":
+                case "ORDER_PostsByComments":
                     if (SelectedFolder != null && SelectedFolder.SelectedPageFBGraphData != null)
                     {
-                        if (SelectedFolder.SelectedPageFBGraphData.posts == null || SelectedFolder.SelectedPageFBGraphData.posts.data == null) return;
-
-                        List<FacebookGraphPostResult> pdOrderd = SelectedFolder.SelectedPageFBGraphData.posts.data.OrderByDescending(l => commandParam == "ORDER_PostsByLikes" ?
-                                                                                                                           (l.likes == null ? 0 : l.likes.summary == null ? 0 : l.likes.summary.total_count) :
-                                                                                                                           (l.shares == null ? 0 : l.shares.count)).ToList();
-                        SelectedFolder.SelectedPageFBGraphData.posts.data.Clear();
-                        foreach (FacebookGraphPostResult pResult in pdOrderd)
+                        if (SelectedFolder.SelectedPageFBGraphData.posts != null && SelectedFolder.SelectedPageFBGraphData.posts.data != null)
                         {
-                            SelectedFolder.SelectedPageFBGraphData.posts.data.Add(pResult);
+                            List<FacebookGraphPostResult> pdOrderd = SelectedFolder.SelectedPageFBGraphData.posts.data.OrderByDescending(l =>
+                            commandParam == "ORDER_PostsByLikes" ?
+                            l.likes == null ? 0 : l.likes.summary == null ? 0 : l.likes.summary.total_count :
+                            commandParam == "ORDER_PostsByComments" ?
+                            l.comments == null ? 0 : l.comments.summary == null ? 0 : l.comments.summary.total_count :
+                            l.shares == null ? 0 : l.shares.count).ToList();
+
+                            SelectedFolder.SelectedPageFBGraphData.posts.data.Clear();
+                            foreach (FacebookGraphPostResult pResult in pdOrderd)
+                            {
+                                SelectedFolder.SelectedPageFBGraphData.posts.data.Add(pResult);
+                            }
+                        }
+
+                        if (SelectedFolder.SelectedPageFBGraphData.feed != null && SelectedFolder.SelectedPageFBGraphData.feed.data != null)
+                        {
+                            List<FeedData> pdOrderd = SelectedFolder.SelectedPageFBGraphData.feed.data.OrderByDescending(l =>
+                                commandParam == "ORDER_PostsByLikes" ?
+                                l.likes == null ? 0 : l.likes.summary == null ? 0 : l.likes.summary.total_count :
+                                commandParam == "ORDER_PostsByComments" ?
+                                l.comments == null ? 0 : l.comments.summary == null ? 0 : l.comments.summary.total_count:
+                                l.shares == null ? 0 : l.shares.count).ToList();
+
+                            SelectedFolder.SelectedPageFBGraphData.feed.data.Clear();
+                            foreach (FeedData fResult in pdOrderd)
+                            {
+                                SelectedFolder.SelectedPageFBGraphData.feed.data.Add(fResult);
+                            }
                         }
 
                         RaisePropertyChanged("SelectedFolder");
                     }
                     break;
 
-                //case "ORDER_Likes":
-                //    orderFolderByLikes(Folders[SIFolders]);
-                //    break;
+                case "ORDERPICS_LIKES":
+                case "ORDERPICS_COMMENTS":
+                    if (SelectedFolder != null && SelectedFolder.SelectedPageFBGraphData != null)
+                    {
+                        if (SelectedFolder.SelectedPageFBGraphData.photos != null && SelectedFolder.SelectedPageFBGraphData.photos.data != null && SelectedFolder.SelectedPageFBGraphData.photos.data.Count > 0)
+                        {
+                            List<Photos.Photo> orderdPhotos = SelectedFolder.SelectedPageFBGraphData.photos.data.OrderByDescending(d => 
+                            commandParam == "ORDERPICS_LIKES" ? 
+                            d.likes == null? 0 : d.likes.summary == null ? 0 : d.likes.summary.total_count :
+                            d.comments == null? 0 : d.comments.summary == null? 0 : d.comments.summary.total_count).ToList();
+
+                            SelectedFolder.SelectedPageFBGraphData.photos.data.Clear();
+                            foreach (var d in orderdPhotos)
+                            {
+                                SelectedFolder.SelectedPageFBGraphData.photos.data.Add(d);
+                            }
+                        }
+                    }
+                        break;
+
+                case "ORDERVIDS_LIKES":
+                case "OORDERVIDS_COMMENTS":
+                case "OORDERVIDS_VIEWS":
+                    if (SelectedFolder != null && SelectedFolder.SelectedPageFBGraphData != null)
+                    {
+                        if (SelectedFolder.SelectedPageFBGraphData.videos != null && SelectedFolder.SelectedPageFBGraphData.videos.data != null && SelectedFolder.SelectedPageFBGraphData.videos.data.Count > 0)
+                        {
+                            List<Videos.Video> orderdVids = SelectedFolder.SelectedPageFBGraphData.videos.data.OrderByDescending(d =>
+                            commandParam == "ORDERVIDS_LIKES" ?
+                            d.likes == null ? 0 : d.likes.summary == null ? 0 : d.likes.summary.total_count :
+                            commandParam == "OORDERVIDS_COMMENTS" ?
+                            d.comments == null ? 0 : d.comments.summary == null ? 0 : d.comments.summary.total_count :
+                            d.views).ToList();
+
+                            SelectedFolder.SelectedPageFBGraphData.videos.data.Clear();
+                            foreach (var d in orderdVids)
+                            {
+                                SelectedFolder.SelectedPageFBGraphData.videos.data.Add(d);
+                            }
+                        }
+                    }
+                    break;
 
                 default:
                     break;
@@ -252,11 +313,37 @@ namespace GoViral.ViewModels
                     break;
 
                 case "MULTILINKS":
-                    OpenMultyLinks(null);
+                    OpenMultyLinks(null, showWindow: true);
                     break;
 
                 case "SAVE":
-                    Task.Factory.StartNew(()=> { SaveList(); });
+                    Task.Factory.StartNew(SaveList);
+                    break;
+
+
+                case "DEDUPE":
+                    List<string> links = new List<string>();
+                    List<ListOption> listsToRemove = new List<ListOption>();
+
+                    foreach (Folder f in Folders)
+                    {
+                        listsToRemove.Clear();
+                        foreach (ListOption lo in f.SavedLinksList)
+                        {
+                            if (links.Contains(lo.Url))
+                            {
+                                listsToRemove.Add(lo);
+                            }
+                            else
+                            {
+                                links.Add(lo.Url);
+                            }
+                        }
+                        foreach (ListOption lo in listsToRemove)
+                        {
+                            f.SavedLinksList.Remove(lo);
+                        }
+                    }
                     break;
 
                 case "REFRESHTOKEN":
@@ -269,7 +356,7 @@ namespace GoViral.ViewModels
         }
         #endregion
 
-        private void OpenMultyLinks(List<string> links)
+        private void OpenMultyLinks(List<string> links, bool showWindow)
         {
             if (displayYouNeedToAddFolderMessage()) return;
 
@@ -284,37 +371,58 @@ namespace GoViral.ViewModels
             fcw.dpUrl.Visibility = Visibility.Collapsed;
             if (fcw.ShowDialog() == false) return;
 
-            RssFeedsLinksMultiWindow linksWindow = new RssFeedsLinksMultiWindow();
-            if (links != null)
+            if (showWindow)
+            {
+                RssFeedsLinksMultiWindow linksWindow = new RssFeedsLinksMultiWindow();
+                if (links != null)
+                {
+                    foreach (string link in links)
+                    {
+                        linksWindow.tbInputedText.Text += link + Environment.NewLine;
+                    }
+                }
+                linksWindow.ShowDialog();
+                if (linksWindow.OKClicked)
+                {
+                    string[] splitLinks = linksWindow.tbInputedText.Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string link in splitLinks)
+                    {
+                        string pageName = getPageNameFromUrl(link);
+                        addNewLoToFolder(Folders[SIFolders], pageName, link, null);
+                    }
+                }
+            }
+            else
             {
                 foreach (string link in links)
                 {
-                    linksWindow.tbInputedText.Text += link + Environment.NewLine;
-                }
-            }
-            linksWindow.ShowDialog();
-            if (linksWindow.OKClicked)
-            {
-                string[] splitLinks = linksWindow.tbInputedText.Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-                foreach (string link in splitLinks)
-                {
-                    string pageName = link;
-                    if (pageName.Contains("https://www.facebook.com/"))
-                    {
-                        pageName = link.Split(new string[] { @"https://www.facebook.com/" }, StringSplitOptions.None)[1];
-                        if (link.Contains("pages/"))
-                            pageName = pageName.Split(new string[] { @"pages/" }, StringSplitOptions.None)[1];
-
-                        pageName = pageName.Replace("//", "/");
-                        pageName = pageName.Replace("/", "");
-                    }
-
-                    if (string.IsNullOrEmpty(pageName) || string.IsNullOrWhiteSpace(pageName) ||
-                        string.IsNullOrEmpty(pageName) || string.IsNullOrWhiteSpace(pageName))
-                        continue;
+                    string pageName = getPageNameFromUrl(link);
                     addNewLoToFolder(Folders[SIFolders], pageName, link, null);
                 }
             }
+        }
+
+        private string getPageNameFromUrl(string link)
+        {
+            string pageName = link;
+
+            if (pageName.Contains("https://www.facebook.com/"))
+            {
+                pageName = link.Split(new string[] { @"https://www.facebook.com/" }, StringSplitOptions.None)[1];
+                if (link.Contains("pages/"))
+                    pageName = pageName.Split(new string[] { @"pages/" }, StringSplitOptions.None)[1];
+                else if (link.Contains("groups/"))
+                    pageName = pageName.Split(new string[] { @"groups/" }, StringSplitOptions.None)[1];
+                else if (link.Contains("events/"))
+                    pageName = pageName.Split(new string[] { @"events/" }, StringSplitOptions.None)[1];
+                else if (link.Contains("places/"))
+                    pageName = pageName.Split(new string[] { @"places/" }, StringSplitOptions.None)[1];
+
+                pageName = pageName.Replace("//", "/");
+                pageName = pageName.Replace("/", "");
+            }
+
+            return pageName;
         }
 
         internal void BeginImageDownload(string full_picture)
@@ -356,7 +464,7 @@ namespace GoViral.ViewModels
             }).Start(); 
         }
 
-        public void BeginAllPhotosScrape(Folder folder, ListOption option)
+        public void BeginAllPhotosScrape(Folder folder, ListOption option, bool useGraph)
         {
             new Thread(() =>
             {
@@ -364,12 +472,12 @@ namespace GoViral.ViewModels
                 {
                     return;
                 }
-                addLinkForCrawlerAddInn(option.Url, folder, option, null, CrawlerStates.LoadAllPhotos);
+                addLinkForCrawlerAddInn(option.Url, folder, option, null, useGraph ? CrawlerStates.LoadAllPhotos : CrawlerStates.LoadAllPhotos_Crawl);
                 mCrawlerHost.IninAdin();
             }).Start();
         }
 
-        internal void BeginAllVideosScrape(Folder folder, ListOption option)
+        internal void BeginAllVideosScrape(Folder folder, ListOption option, bool useGraph)
         {
             new Thread(() =>
             {
@@ -377,7 +485,7 @@ namespace GoViral.ViewModels
                 {
                     return;
                 }
-                addLinkForCrawlerAddInn(option.Url, folder, option, null, CrawlerStates.LoadAllVideos);
+                addLinkForCrawlerAddInn(option.Url, folder, option, null, useGraph? CrawlerStates.LoadAllVideos : CrawlerStates.LoadAllVideos_Crawl);
                 mCrawlerHost.IninAdin();
             }).Start();
         }
@@ -475,15 +583,22 @@ namespace GoViral.ViewModels
                                 preinintState.option.FBGraphData = fbgData;
                                 break;
                             case CrawlerStates.LoadAllPhotos:
-                                if (preinintState.option != null && preinintState.option.FBGraphData != null && preinintState.option.FBGraphData.photos != null)
+                            case CrawlerStates.LoadAllPhotos_Crawl:
+                                if (preinintState.option != null && preinintState.option.FBGraphData != null)
                                 {
+                                    if (preinintState.option.FBGraphData.photos == null)
+                                    {
+                                        preinintState.option.FBGraphData.photos = new Photos();
+                                    }
                                     if (preinintState.option.FBGraphData.photos.data == null)
                                     {
                                         preinintState.option.FBGraphData.photos.data = new ObservableCollection<Photos.Photo>();
                                     }
 
                                     List<PhotosGraphData> allcrawledPhotos = serializedXMLResult.XmlDeserializeFromString<List<PhotosGraphData>>();
-                                    if (allcrawledPhotos.Count > 1)
+                                    int numToBeGreaterThen = 0;
+                                    if (preinintState.state == CrawlerStates.LoadAllPhotos) numToBeGreaterThen = 1;
+                                    if (allcrawledPhotos.Count >= numToBeGreaterThen)
                                     {
                                         preinintState.option.FBGraphData.photos.data.Clear();
                                         foreach (PhotosGraphData pd in allcrawledPhotos)
@@ -501,17 +616,24 @@ namespace GoViral.ViewModels
                                 }
                                 break;
                             case CrawlerStates.LoadAllVideos:
-                                if (preinintState.option != null && preinintState.option.FBGraphData != null && preinintState.option.FBGraphData.videos != null)
+                            case CrawlerStates.LoadAllVideos_Crawl:
+                                if (preinintState.option != null && preinintState.option.FBGraphData != null)
                                 {
-                                    if (preinintState.option.FBGraphData.photos.data == null)
+                                    if(preinintState.option.FBGraphData.videos == null)
+                                    {
+                                        preinintState.option.FBGraphData.videos = new Videos();
+                                    }
+                                    if (preinintState.option.FBGraphData.videos.data == null)
                                     {
                                         preinintState.option.FBGraphData.videos.data = new ObservableCollection<Videos.Video>();
                                     }
 
                                     List<VideosGraphData> allcrawledVideos = serializedXMLResult.XmlDeserializeFromString<List<VideosGraphData>>();
-                                    if (allcrawledVideos.Count > 1)
+                                    int numToBeGreaterThenVidt = 0;
+                                    if (preinintState.state == CrawlerStates.LoadAllVideos) numToBeGreaterThenVidt = 1;
+                                    if (allcrawledVideos.Count > numToBeGreaterThenVidt)
                                     {
-                                        preinintState.option.FBGraphData.photos.data.Clear();
+                                        preinintState.option.FBGraphData.videos.data.Clear();
                                         foreach (VideosGraphData vd in allcrawledVideos)
                                         {
                                             if (vd.videos == null) continue;
@@ -697,7 +819,12 @@ namespace GoViral.ViewModels
             });
         }
 
-        public async void AsyncAddLinkToList(string link, List<string> multi)
+        /// <summary>
+        /// for sending links to be stored
+        /// </summary>
+        /// <param name="link">link to store if null will use multi</param>
+        /// <param name="multi">to activate this as a multy add cannot be null if link is null</param>
+        public async void AsyncAddLinkToList(string link, string type, List<string> multi, bool showLinksWindow)
         {
             if (!PopulateListTask.IsCompleted)
             {
@@ -705,14 +832,15 @@ namespace GoViral.ViewModels
             }
             if(link == null)
             {
-                OpenMultyLinks(multi);
+                OpenMultyLinks(multi, showLinksWindow);
                 return;
             }
 
+            if (link.Contains("/?ref=br_rs")) link = link.Replace("/?ref=br_rs", "");
             string name = "";
             try
             {
-                name = link.Split(new string[] { "/" }, StringSplitOptions.RemoveEmptyEntries)[2];
+                name = link.Substring(link.LastIndexOf("/") + 1);
             }
             catch { }
 
@@ -730,16 +858,15 @@ namespace GoViral.ViewModels
 
                 addNewLoToFolder(Folders[SIFolders], fcw.tbName.Text, fcw.tbUrl.Text, null);
 
-                Task.Factory.StartNew(() =>
-                {
-                    SaveList();
-                });
+                new Thread(SaveList).Start();
             }
 
         }
 
         private void addNewLoToFolder(Folder folder, string name, string url, FacebookGraphData facebookGraphData)
         {
+            if(url.Contains("/?ref=br_rs")) url = url.Replace("/?ref=br_rs", "");
+
             ListOption lo = new ListOption() { Name = name, Url = url };
             if(facebookGraphData != null)
             {
@@ -755,34 +882,33 @@ namespace GoViral.ViewModels
             {
                 MessageBox.Show("You need to create a folder before pushing links to it.");
                 addNewFolder();
-                return true;
             }
 
-            return false;
+            return Folders.Count == 0;
         }
 
         private void addNewFolder()
         {
-            Task.Factory.StartNew(() =>
-            {
-                SetNameAndDataWindow setFolderNAmeWindow = new SetNameAndDataWindow();
-                setFolderNAmeWindow.Title = "Create Name";
-                setFolderNAmeWindow.tblockInfo.Text = "Write in the name for the folder you want to create.";
-                setFolderNAmeWindow.ShowDialog();
-                if (setFolderNAmeWindow.OkClicked && !string.IsNullOrEmpty(setFolderNAmeWindow.tbInputText.Text) && !string.IsNullOrWhiteSpace(setFolderNAmeWindow.tbInputText.Text))
-                {
-                    if (Folders.Any(f => f.FolderTitle.ToLower().Trim() == setFolderNAmeWindow.tbInputText.Text.ToLower().Trim()))
-                    {
-                        MessageBox.Show(setFolderNAmeWindow.tbInputText.Text + " Already exists, use a different name.");
-                        return;
-                    }
 
-                    Folder folder = new Folder() { FolderTitle = setFolderNAmeWindow.tbInputText.Text };
-                    setFolderEvents(folder);
-                    Folders.Add(folder);
-                    SaveList();
+            SetNameAndDataWindow setFolderNAmeWindow = new SetNameAndDataWindow();
+            setFolderNAmeWindow.Title = "Create Name";
+            setFolderNAmeWindow.tblockInfo.Text = "Write in the name for the folder you want to create.";
+            setFolderNAmeWindow.ShowDialog();
+            if (setFolderNAmeWindow.OkClicked && !string.IsNullOrEmpty(setFolderNAmeWindow.tbInputText.Text) && !string.IsNullOrWhiteSpace(setFolderNAmeWindow.tbInputText.Text))
+            {
+                if (Folders.Any(f => f.FolderTitle.ToLower().Trim() == setFolderNAmeWindow.tbInputText.Text.ToLower().Trim()))
+                {
+                    MessageBox.Show(setFolderNAmeWindow.tbInputText.Text + " Already exists, use a different name.");
+                    addNewFolder();
+                    return;
                 }
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+
+                Folder folder = new Folder() { FolderTitle = setFolderNAmeWindow.tbInputText.Text };
+                setFolderEvents(folder);
+                Folders.Add(folder);
+
+                Task.Factory.StartNew(SaveList);
+            }
         }
 
         void Folder_OnSelectedEditOrRemove(Folder folder)

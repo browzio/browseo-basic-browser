@@ -1,0 +1,40 @@
+﻿<Window x:Class="GoViral.Windows.TopNsearchResultsToDominateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GoViral.Windows"
+        mc:Ignorable="d"
+        Title="Edit Options" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <StackPanel>
+        <RadioButton Content="Top Results" GroupName="rb" IsChecked="True" Margin="3" Name="rbTopResults" />
+        <RadioButton Content="Bottom Results" GroupName="rb" Margin="3" Name="rbBottom" />
+        <DockPanel Margin="3" Name="dpName">
+            <TextBlock Text="Max:" Width="40" VerticalAlignment="Center" />
+            <TextBox Name="tbMax" Margin="3" Width="40" HorizontalAlignment="Left" Text="0" />
+        </DockPanel>
+        <GroupBox Header="Filter" Width="250">
+            <StackPanel>
+                <CheckBox Name="miOrderLikes" Content="Likes" Visibility="Collapsed" />
+                <CheckBox Name="miOrderComments" Content="Comments" Visibility="Collapsed" />
+                <CheckBox Name="miOrderViews" Content="Views" Visibility="Collapsed" />
+                <CheckBox Name="miOrderTalkingAbout" Content="Talking About" Visibility="Collapsed"  />
+                <CheckBox Name="miOrderMembers" Content="Members" Visibility="Collapsed"  />
+                <CheckBox Name="miOrderPrivacyOpen" Content="Open Groups" Visibility="Collapsed"  />
+                <CheckBox Name="miOrderPrivacyClosed" Content="Closed Groups" Visibility="Collapsed"  />
+                <CheckBox Name="miOrderInterested" Content="Interested" Visibility="Collapsed"  />
+                <CheckBox Name="miOrderGoing" Content="Going" Visibility="Collapsed"  />
+                <CheckBox Name="miOrderInvited" Content="Invited" Visibility="Collapsed"  />
+                <CheckBox Name="miOrderOrderMaybe" Content="Maybe" Visibility="Collapsed"  />
+            </StackPanel>
+        </GroupBox>
+        <Button Content="OK" Style="{StaticResource FlatbtnStyle}" Click="Button_Click"  Margin="3,10,3,3" />
+    </StackPanel>
+</Window>

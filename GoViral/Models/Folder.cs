@@ -58,9 +58,10 @@ namespace GoViral.Models
                         SelectedPage.IsSelected = false;
                     }
                     SISavedLinks = -1;
-                    RaisePropertyChanged("SISavedLinks");
-                    RaisePropertyChanged("SelectedPageFBGraphData");
-                    RaisePropertyChanged("SelectedPageName");
+                    //RaisePropertyChanged("SISavedLinks");
+                    //RaisePropertyChanged("SelectedPageFBGraphData");
+                    //RaisePropertyChanged("SelectedPageName");
+                    //RaisePropertyChanged("SelectedPage");
                 }
             }
         }
@@ -86,10 +87,12 @@ namespace GoViral.Models
 
                 if (SelectedPage != null)
                     SelectedPage.IsSelected = true;
-                RaiseSiChanged(this); 
+                RaiseSiChanged(this);
+                RaisePropertyChanged("SISavedLinks");
                 RaisePropertyChanged("SelectedPageFBGraphData");
                 RaisePropertyChanged("SelectedPageName");
-                RaisePropertyChanged("SISavedLinks");
+                RaisePropertyChanged("SelectedPage");
+                if(SelectedPage != null) SelectedPage.RaisePropertyChanged("FBGraphData");
             }
         } 
 

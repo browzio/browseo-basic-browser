@@ -308,10 +308,10 @@ namespace BrowserAndFeatures
             browser.Loaded -= Browser_Loaded;
         }
 
-        private void Browser_OnAddedToGoViral(string link, List<string> multiLinks)
+        private void Browser_OnAddedToGoViral(string link,string type, List<string> multiLinks)
         {
             createGoViralVM();
-            goViralVM.AsyncAddLinkToList(link, multiLinks);
+            goViralVM.AsyncAddLinkToList(link, type, multiLinks, showLinksWindow: true);
         }
         #endregion
 

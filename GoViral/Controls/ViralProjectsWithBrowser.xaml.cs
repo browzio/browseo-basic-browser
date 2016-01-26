@@ -26,13 +26,6 @@ namespace GoViral.Controls
         public ProjectsWithBrowser()
         {
             InitializeComponent();
-            ucSyncedPosts.OnBrowserNavigateToUrl += UcSyncedPosts_OnBrowserNavigateToUrl;
-        }
-
-        private void UcSyncedPosts_OnBrowserNavigateToUrl(string url)
-        {
-            tbCntrl.SelectedIndex = 0;
-            (this.DataContext as GoViral.ViewModels.GoViralVM).WebBrowser.Navigate(url);
         }
 
         private void StackPanel_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -41,7 +34,7 @@ namespace GoViral.Controls
             {
                 try
                 {
-                    (this.DataContext as GoViral.ViewModels.GoViralVM).WebBrowser.Navigate(((sender as Grid).DataContext as GoViral.Models.ListOption).Url);
+                    NavigateToUrl(((sender as Grid).DataContext as GoViral.Models.ListOption).Url);
                 }
                 catch
                 {
@@ -63,23 +56,13 @@ namespace GoViral.Controls
                     vm.SIFolders = vm.Folders.IndexOf(nextFolder);
                     nextFolder.SISavedLinks = nextFolder.SavedLinksList.IndexOf(loToFind);    
                 }
-                //
-
-
-                //if(vm.SelectedFolder != null)
-                //{
-                //    vm.SIFolders = vm.Folders.IndexOf(vm.SelectedFolder);
-                //    vm.SelectedFolder.SISavedLinks = vm.SelectedFolder.SavedLinksList.IndexOf(loToFind);
-                //}
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
-
-        #region scrolling
-
+        
         private void lbFolders_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             Decorator border = VisualTreeHelper.GetChild((sender as ListView), 0) as Decorator;
@@ -88,222 +71,62 @@ namespace GoViral.Controls
             if (sv == null) return;
             sv.ScrollToVerticalOffset(sv.VerticalOffset - e.Delta);
         }
-        //private void lbFolders_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        //{
-        //    MyScrollViewer.ScrollToVerticalOffset(MyScrollViewer.VerticalOffset - e.Delta);
-        //}
 
-
-
-
-        private ScrollViewer mouseWithinChildScroll;
-        private void spSelectedFBData_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
+        private void NavigateToUrl(string url)
         {
-            if (mouseWithinChildScroll == null)
+            if (tbCntrl.SelectedIndex != 0) tbCntrl.SelectedIndex = 0;
+            if (url.Contains("/?ref=br_rs")) url = url.Replace("/?ref=br_rs", "");
+
+            string urltillId = url.Remove(url.LastIndexOf("/"));
+            string name = url.Substring(url.LastIndexOf("/") + 1);
+            if (url.Contains("-"))
             {
-                MyScrollViewerFBContent.ScrollToVerticalOffset(MyScrollViewerFBContent.VerticalOffset - e.Delta);
-            }    
-        } 
-
-        private void lvVideos_MouseEnter(object sender, MouseEventArgs e)
-        {
-            Decorator border = VisualTreeHelper.GetChild((sender as ListView), 0) as Decorator;
-            mouseWithinChildScroll = border.Child as ScrollViewer;
-        }
-
-        private void lvVideos_MouseLeave(object sender, MouseEventArgs e)
-        {
-            mouseWithinChildScroll = null;
-        }
-
-        private void lvVideos_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
-        {
-            if (mouseWithinChildScroll != null)
-            {
-                mouseWithinChildScroll.ScrollToHorizontalOffset(mouseWithinChildScroll.ContentHorizontalOffset - e.Delta);
-            }
-        }
-        #endregion     
-
-        private void fbPostImages_Click(object sender, RoutedEventArgs e)
-        {
-            string full_picture = Convert.ToString((sender as MenuItem).Tag);
-            if (string.IsNullOrEmpty(full_picture) || string.IsNullOrWhiteSpace(full_picture)) return;
-            full_picture = full_picture.Replace("&amp;", "&");
-            (this.DataContext as ViewModels.GoViralVM).BeginImageDownload(full_picture);
-        }
-
-        string linkTextForCopy = "";         
-        private void tbPostLink_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            
-            string url = Convert.ToString((sender as TextBlock).Text);
-            if (string.IsNullOrEmpty(url) || string.IsNullOrWhiteSpace(url)) return;
-            if (e.RightButton == MouseButtonState.Pressed)
-            {
-                linkTextForCopy = url;
-                return;
-            }
-            
-            (this.DataContext as GoViral.ViewModels.GoViralVM).WebBrowser.Navigate(url);
-        }
-
-        private void miCopyLink_Click(object sender, RoutedEventArgs e)
-        {
-            string url = Convert.ToString((sender as MenuItem).Tag);
-            string header = Convert.ToString((sender as MenuItem).Header);
-            if (string.IsNullOrEmpty(url) || string.IsNullOrWhiteSpace(url))
-            {
-                url = linkTextForCopy;
-                if (string.IsNullOrEmpty(url) || string.IsNullOrWhiteSpace(url))
-                    return;
-            }
-            if (header == "Copy")
-            {
-                MyFilesDatabase.SetClipboardText(url);
-            }
-            else if (header == "Sync")
-            {
-                string pageName = "";
-                if((this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder != null)
+                string id = url.Substring(url.LastIndexOf("-") + 1);
+                long tryparseResult = 0;
+                if (Int64.TryParse(id, out tryparseResult))
                 {
-                    if((this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder.SelectedPage != null)
-                    {
-                        pageName = (this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder.SelectedPage.Name;
-                    }
+                    url = "https://www.facebook.com/" + id;
                 }
-                ucSyncedPosts.ViewModel.AddUrlToSavedProjectList(pageName, url,null);
-            }
-        }
-
-        private void imgVideo_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-             if(e.ClickCount == 2)
-            {
-                try
+                else
                 {
-                    string link = Convert.ToString((sender as Image).Tag);
-                    if (!link.Contains("https://www.facebook.com"))
-                        link = "https://www.facebook.com" + link;
-                    (this.DataContext as GoViral.ViewModels.GoViralVM).WebBrowser.Navigate(link);
-                }
-                catch { }
-            }
-        }
-
-        private void miVids_Click(object sender, RoutedEventArgs e)
-        {
-            MenuItem mi = sender as MenuItem;
-            string tag = Convert.ToString(mi.Tag);
-            if (string.IsNullOrEmpty(tag) || string.IsNullOrWhiteSpace(tag)) return;
-
-            switch (mi.Name)
-            {
-                case "Copy":
-                    if (!tag.Contains("https://www.facebook.com"))
-                    {
-                        tag  = "https://www.facebook.com" + tag;
-                    }
-                    MyFilesDatabase.SetClipboardText(tag);
-                    break;
-
-                case "Download":
-                    try
-                    {
-                        string link = (mi.DataContext as Videos.Video).source.Replace("&amp;", "&");
-                        (this.DataContext as GoViral.ViewModels.GoViralVM).WebBrowser.Navigate(link);
-                    }
-                    catch { MessageBox.Show("No video download link found."); }
-                    break;
-
-                default:
-                    break;
-            }
-        }
-
-        private void miPhotosPhotoDownload(object sender, RoutedEventArgs e)
-        {
-            MenuItem mi = sender as MenuItem;
-            Images[] images = mi.Tag as Images[];
-            string link = "";
-
-            if (images != null)
-            {
-                int lastImageSize = 0;
-                foreach (Images img in images)
-                {
-                    if ((img.height + img.width) > lastImageSize)
-                    {
-                        link = img.source;
-                        lastImageSize = img.height + img.width;
-                    }
-                    
+                    url = "https://www.facebook.com/" + name;
                 }
             }
-            else
-            {
-                Photos.Photo pic = (mi.DataContext as Photos.Photo);
-                if(pic != null)
-                {
-                    link = pic.picture;
-                }
-            }
-
-            if (string.IsNullOrEmpty(link) || string.IsNullOrWhiteSpace(link))
-            {
-                MessageBox.Show("No image link found to download.");
-                return;
-            }
-
-            if(link.Contains("&amp;"))
-                link = link.Replace("&amp;", "&");
-            (this.DataContext as ViewModels.GoViralVM).BeginImageDownload(link);
+            (this.DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(url);
         }
 
-        private void tbLoadMorePhotos_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+
+        #region ucSelectedPageInfo
+        private void selectedPageInfoUC_AddUrlToPostsSync(string pageName, string url)
         {
-            Models.Folder folder = (sender as TextBlock).Tag as Models.Folder;
-            Models.ListOption option = folder.SelectedPage;
-            if (folder == null || option == null) return;
-            (this.DataContext as ViewModels.GoViralVM).BeginAllPhotosScrape(folder, option);
+            ucSyncedPosts.ViewModel.AddUrlToSavedProjectList(pageName, url, null);
         }
 
-        private void tbLoadMoreVideos_PreviewMouseUp(object sender, MouseButtonEventArgs e)
+        private void ucSelectedPageInfo_AddUrlForMulti(string text)
         {
-            Models.Folder folder = (sender as TextBlock).Tag as Models.Folder;
-            Models.ListOption option = folder.SelectedPage;
-            if (folder == null || option == null) return;
-            (this.DataContext as ViewModels.GoViralVM).BeginAllVideosScrape(folder, option);
-        }
-
-        List<KeyValuePair<string, string>> ToSendSyncLinks = new List<KeyValuePair<string, string>>();
-
-
-        Organiser.Common.Windows.RssFeedsLinksMultiWindow multiWindowForLinksAdd;
-
-        private void cbSync_Click(object sender, RoutedEventArgs e)
-        {
-            if(multiWindowForLinksAdd == null)
+            if (multiWindowForLinksAdd == null)
             {
                 multiWindowForLinksAdd = new Organiser.Common.Windows.RssFeedsLinksMultiWindow();
                 multiWindowForLinksAdd.Closed += MultiWindowForLinksAdd_Closed;
                 multiWindowForLinksAdd.Title = "Page Name , Url";
                 multiWindowForLinksAdd.Show();
             }
-            string link = Convert.ToString((sender as Button).Tag);
-            if (link == null) return;
 
-            string pageName = "";
-            if ((this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder != null)
-            {
-                if ((this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder.SelectedPage != null)
-                {
-                    pageName = (this.DataContext as GoViral.ViewModels.GoViralVM).SelectedFolder.SelectedPage.Name;
-                }
-            }
-
-            multiWindowForLinksAdd.tbInputedText.Text += pageName + " , " + link + Environment.NewLine;
+            multiWindowForLinksAdd.tbInputedText.Text += text;
         }
+
+        private void ucSelectedPageInfo_OnNavigateToUrl(string url)
+        {
+            NavigateToUrl(url);
+        }
+        #endregion
+
+
+        #region ucSyncedPosts
+        List<KeyValuePair<string, string>> ToSendSyncLinks = new List<KeyValuePair<string, string>>();
+
+
+        Organiser.Common.Windows.RssFeedsLinksMultiWindow multiWindowForLinksAdd;
 
         private void MultiWindowForLinksAdd_Closed(object sender, EventArgs e)
         {
@@ -313,6 +136,31 @@ namespace GoViral.Controls
                 multiWindowForLinksAdd = null;
             }
         }
+
+        private void UcSyncedPosts_OnBrowserNavigateToUrl(string url)
+        {
+            NavigateToUrl(url);
+        }
+        #endregion
+
+
+
+        #region ucSearch
+        private void ucSearch_OnOpenInBrowserRequested(string url)
+        {
+            NavigateToUrl(url);
+        }
+
+        private void ucSearch_OnStoreForDominationRequested(string link, List<string> multi)
+        {
+            (this.DataContext as ViewModels.GoViralVM).AsyncAddLinkToList(link,"", multi, showLinksWindow: false);
+        }
+
+        private void ucSearch_OnOpenInBrowserForDownloadRequested(string source)
+        {
+            (this.DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(source);
+        }
+        #endregion
     }
 }
 

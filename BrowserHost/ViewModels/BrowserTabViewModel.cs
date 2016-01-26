@@ -35,7 +35,7 @@ namespace WpfCefDynamBrowser.ViewModels
 
         public event Action<string> OnCreateNewTab = delegate { }; 
         public event Action<string,string> OnCurateToPBN = delegate { };//content,link
-        public event Action<string, List<string>> OnAddedToGoViral = delegate { };//link
+        public event Action<string,string, List<string>> OnAddedToGoViral = delegate { };//link,type
         public event Action OnClickedSaveSession = delegate { };
         public event Action OnClickedDeleteSession = delegate { };
         public event Action OnClickedSaveSessionToBookmarks = delegate { };
@@ -322,12 +322,35 @@ namespace WpfCefDynamBrowser.ViewModels
 
                 #region go viral
                 case 555:
-                    if (string.IsNullOrEmpty(HuverLink) && string.IsNullOrWhiteSpace(HuverLink))
+                    if ((string.IsNullOrEmpty(HuverLink) && string.IsNullOrWhiteSpace(HuverLink)) ||
+                        (string.IsNullOrEmpty(AddressEditable) && string.IsNullOrWhiteSpace(AddressEditable)))
                     {
                         MessageBox.Show("Cant complete action make sure the mouse pointer is hovering over the link you want.");
                         return;
                     }
-                    OnAddedToGoViral(HuverLink,null);
+                        WebBrowser.CBrowser.Browser.GetMainFrame().GetSource(new SourceVisitor(htmlSource =>
+                        {
+                            try
+                            {
+                                string splitter = getsplitter();
+                                ///events/174736672890597/?ref=br_rs&amp;action_history=null
+                                ///events/656447624373019/?ref=br_rs&action_history=null
+                                string linkToGet = HuverLink;
+                                linkToGet = linkToGet.Replace(Social.FACEBOOK_GROUPS_DEFAULT_URL, "/groups/");
+                                linkToGet = linkToGet.Replace(Social.FACEBOOK_EVENTS_DEFAULT_URL, "/events/");
+                                linkToGet = linkToGet.Replace("?ref=br_rs&action_history=null", "?ref=br_rs&amp;action_history=null");
+
+                                string link = getLinkFromUrlAndSource(linkToGet, htmlSource, splitter);
+                                Application.Current.Dispatcher.Invoke(delegate
+                                {
+                                    OnAddedToGoViral(link, "", null);
+                                });
+                            }
+                            catch(Exception ex)
+                            {
+                                MessageBox.Show("Couldnt pull data.");
+                            }
+                        }));
                     break;
 
                 case 444:
@@ -335,25 +358,22 @@ namespace WpfCefDynamBrowser.ViewModels
                     {
                         try
                         {
-                            List<string> links = htmlSource.Split(new string[] { "<div class=\"_gll\"><a href=\"" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                            string splitter = getsplitter();
+
+                            List<string> links = htmlSource.Split(new string[] { splitter }, StringSplitOptions.RemoveEmptyEntries).ToList();
                             links.RemoveAt(0);
 
                             List<string> linksToReturn = new List<string>();
                             foreach (string link in links)
                             {
-                                string properLink = link;
-
-                                if (properLink.Contains("?"))
-                                    properLink = properLink.Remove(link.IndexOf("?"));
-                                else
-                                    properLink = properLink.Remove(link.IndexOf("\""));
-
-                                linksToReturn.Add(properLink);
+                                string linkToGet = link.Remove(link.IndexOf("\""));
+                                string linkToAdd = getLinkFromUrlAndSource(linkToGet, htmlSource, splitter);
+                                linksToReturn.Add(linkToAdd);
                             }
 
                             Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                OnAddedToGoViral(null, linksToReturn);
+                                OnAddedToGoViral(null,"", linksToReturn);
                             });
                         }
                         catch
@@ -368,6 +388,61 @@ namespace WpfCefDynamBrowser.ViewModels
                 default:
                     break;
             }
+        }
+
+        private string getsplitter()
+        {
+            string splitter =  "<div class=\"_gll\"><a href=\"";
+            if (AddressEditable.Contains("/places/"))
+            {
+                splitter = "<a target=\"_blank\" href=\"";
+            }
+
+            return splitter;
+        }
+
+        private string getLinkFromUrlAndSource(string url, string htmlSource, string splitter)
+        {
+            string type = AddressEditable.Replace("https://www.facebook.com/search/", "");
+            type = type.Remove(type.IndexOf("/"));
+
+            string id = htmlSource.Substring(0, htmlSource.IndexOf(splitter + url));
+            id = id.Replace("&quot;", "");
+            id = id.Replace("quot;", "");
+            id = id.Substring(id.LastIndexOf("data-bt=\"{id:"));
+            id = id.Substring(id.IndexOf(":") + 1);
+            id = id.Remove(id.IndexOf(","));
+
+            string name = url;
+            if (name.Contains("/?ref=br_rs"))
+            {
+                bool gotName = false;
+                if (name.Contains("&amp;action_history=null"))
+                {
+                    try
+                    {
+                        name = htmlSource.Substring(htmlSource.IndexOf(splitter + url));
+                        name = name.Substring(0, name.IndexOf("</a>"));
+                        name = name.Substring(name.LastIndexOf(">") + 1);
+                        gotName = true;
+                    }
+                    catch { name = url; }
+                }
+                if (!gotName)
+                {
+                    name = name.Replace("/?ref=br_rs", "");
+                    name = name.Substring(name.LastIndexOf("/") + 1);
+                }
+            }
+            else
+            {
+                name = name.Replace("https://www.facebook.com/", "");
+                name = name.Replace("/", "");
+            }
+
+            string link = "https://www.facebook.com/" + type + "/" + name + "-" + id;
+            link = link.Replace("&amp;action_history=null", "");
+            return link;
         }
 
         private string getImageUrl(string url)

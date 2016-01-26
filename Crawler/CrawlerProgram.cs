@@ -8,6 +8,7 @@ using System;
 using System.AddIn;
 using System.AddIn.Pipeline;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -46,104 +47,22 @@ namespace Crawler
     // [AddIn("Crawler", Version = "1.0.0.0", Publisher = "Browseo", Description = "Ninja Crawler")]
     public class Crawler : MarshalByRefObject, IPlugin
     {
-        //public void start()
-        //{
-        //    // Load CEF. This checks for the correct CEF version.
-        //    CefRuntime.Load();
-
-        //    // Start the secondary CEF process.
-        //    var cefMainArgs = new CefMainArgs(new string[0]);
-        //    var cefApp = new DemoCefApp();
-
-        //    // This is where the code path divereges for child processes.
-        //    if (CefRuntime.ExecuteProcess(cefMainArgs, cefApp) != -1)
-        //    {
-        //        Console.Error.WriteLine("CefRuntime could not the secondary process.");
-        //    }
-
-        //    // Settings for all of CEF (e.g. process management and control).
-        //    var cefSettings = new CefSettings
-        //    {
-        //        SingleProcess = false,
-        //        MultiThreadedMessageLoop = true
-        //    };
-
-        //    // Start the browser process (a child process).
-        //    CefRuntime.Initialize(cefMainArgs, cefSettings, cefApp);
-
-        //    // Instruct CEF to not render to a window at all.
-        //    CefWindowInfo cefWindowInfo = CefWindowInfo.Create();
-        //    cefWindowInfo.SetAsWindowless(IntPtr.Zero,false);
-
-        //    // Settings for the browser window itself (e.g. should JavaScript be enabled?).
-        //    var cefBrowserSettings = new CefBrowserSettings();
-
-        //    // Initialize some the cust interactions with the browser process.
-        //    // The browser window will be 1280 x 720 (pixels).
-        //    var cefClient = new DemoCefClient(1280, 720);
-
-        //    // Start up the browser instance.
-        //    string url = "http://www.reddit.com/";
-        //    CefBrowserHost.CreateBrowser(cefWindowInfo, cefClient, cefBrowserSettings, url);
-
-        //    // Hang, to let the browser to do its work.
-        //    Console.WriteLine("Press a key at any time to end the program.");
-        //    Console.ReadKey();
-
-        //    // Clean up CEF.
-        //    CefRuntime.Shutdown();
-        //}
-
         public event Action OnReportInitialized = delegate { };
-        //event Action IPlugin.OnReportInitialized
-        //{
-        //    add
-        //    {
-        //        lock (mlock)
-        //        {
-        //            OnReportInitialized += value;
-        //        }
-        //    }
-
-        //    remove
-        //    {
-        //        lock (mlock)
-        //        {
-        //            OnReportInitialized -= value;
-        //        }
-        //    }
-        //}
         public event Action<string> OnReportSerializedResult = delegate { };
-        //event Action<string> IPlugin.OnReportSerializedResult
-        //{
-        //    add
-        //    {
-        //        lock (mlock)
-        //        {
-        //            OnReportSerializedResult += value;
-        //        }
-        //    }
-
-        //    remove
-        //    {
-        //        lock (mlock)
-        //        {
-        //            OnReportSerializedResult -= value;
-        //        }
-        //    }
-        //}
-
 
         private DemoCefClient cefClient;
         private CefBrowser browser;
 
         private CrawlerStates crawlerState;
+        private CrawlerStates pageType = CrawlerStates.PageType_Pages;//used within 
 
         private List<PhotosGraphData> allCrawledPhotos = new List<PhotosGraphData>();
         private List<VideosGraphData> allCrawledVideos = new List<VideosGraphData>();
+        private List<string> allMediaLinkToCrawl = new List<string>();
 
         private string AccessToken = "", preRegetTokenUrl = "", preRegetAccessToken = "";
         private object mlock = new object();
+        private object mPhotStatslock = new object();
 
         public Crawler()
         {
@@ -165,7 +84,6 @@ namespace Crawler
             //   assemblyLoader.LoadFrom(AppDomain.CurrentDomain.BaseDirectory.Replace(@"AddIns\CrawlerAddIn", "Browseo.WindowsForms.dll"));
             // assemblyLoader.LoadFrom(AppDomain.CurrentDomain.BaseDirectory.Replace(@"AddIns\CrawlerAddIn", "Organiser.Common.dll"));
         }
-
 
         public void SetCrawlerState(int state)
         {
@@ -267,19 +185,26 @@ namespace Crawler
 
         public void NavigateToUrl(string url)
         {
+            if (url.Contains("/?ref=br_rs")) url = url.Replace("/?ref=br_rs", "");
+            if (url.Contains("?ref=br_rs")) url = url.Replace("?ref=br_rs", "");
+
             string pageName = url;
+            string urltillId = url;
 
             switch (crawlerState)
             {
                 case CrawlerStates.FbGraphCrawl:
                 case CrawlerStates.LoadAllPhotos:
                 case CrawlerStates.LoadAllVideos:
+                case CrawlerStates.LoadAllPhotos_Crawl:
+                case CrawlerStates.LoadAllVideos_Crawl:
                     if (!url.Contains("https://www.facebook.com/"))
                     {
                         OnReportSerializedResult("N/A");
                         return;
                     }
-                    pageName = getPageNameFromUrl(url);
+                    pageName = getPageNameOrIdFromUrl(url);
+                    urltillId = url.Remove(url.LastIndexOf("/")+1);
                     preRegetAccessToken = AccessToken;
                     break;
                 default:
@@ -290,12 +215,65 @@ namespace Crawler
             switch (crawlerState)
             {
                 case CrawlerStates.FbGraphCrawl:
+                    //Debugger.Launch();
+                    //maybe to add = keywords,emails,new_like_count,description,sharedposts
+                    pageType = CrawlerStates.GraphSearch_Pages;
                     preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
-                                        @"about,description,keywords,id,link,emails,new_like_count,founded,can_post,category,talking_about_count,likes,
-                                        photos.limit(50){picture,id,link,updated_time,images,likes.limit(1).summary(true),comments.limit(1).summary(true)},
-                                        videos.limit(50){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,sharedposts,likes.limit(1).summary(true),comments.limit(1).summary(true)},
-                                        posts.limit(100){caption,description,picture,full_picture,shares,link,message,via,source,updated_time,likes.limit(1).summary(true)}
+                                        @"about,id,link,founded,can_post,category,talking_about_count,likes,
+                                        photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)},
+                                        videos.limit(30){permalink_url,picture,id,views,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
+                                        posts.limit(100){caption,description,picture,full_picture,shares,link,message,via,source,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)},
+                                        feed.limit(70){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
                                         &access_token=" + AccessToken;
+                    if (urltillId.Contains(Social.FACEBOOK_GROUPS_DEFAULT_URL))
+                    {
+                        pageType = CrawlerStates.PageType_Groups;
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
+                                        @"description,name,privacy,updated_time,
+                                        members.limit(0).summary(true),
+                                        feed.limit(100){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
+                                        &access_token=" + AccessToken;
+                    }
+                    else if (urltillId.Contains(Social.FACEBOOK_EVENTS_DEFAULT_URL))
+                    {
+                        pageType = CrawlerStates.PageType_Events;
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.3/" + pageName + "?fields="+
+                                          @"description,location,privacy,start_time,ticket_uri,timezone,updated_time,
+                                            interested.limit(0).summary(true),
+                                            invited.limit(0).summary(true),
+                                            feed.limit(100){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
+                                            &access_token=" + AccessToken;
+                    }
+                    else if (urltillId.Contains(Social.FACEBOOK_PLACES_DEFAULT_URL))
+                    {
+                        pageType = CrawlerStates.PageType_Places;
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
+                                        @"about,id,name,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,location,
+                                        photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)},
+                                        albums{photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)}},
+                                        videos.limit(30){permalink_url,picture,views,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
+                                        posts.limit(100){caption,description,picture,full_picture,shares,link,message,via,source,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)},
+                                        feed.limit(70){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
+                                        &access_token=" + AccessToken;
+                    }
+                    else if (urltillId.Contains(Social.FACEBOOK_PHOTOS_DEFAULT_URL))
+                    {
+                        pageType = CrawlerStates.PageType_Photos;
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + @"?fields=
+                                            created_time,link,name,source,updated_time,album,from,picture,images,likes.limit(0).summary(true),comments.limit(200).summary(true)&access_token=" + AccessToken;
+                    }
+                    else if (urltillId.Contains(Social.FACEBOOK_VIDEOS_DEFAULT_URL))
+                    {
+                        pageType = CrawlerStates.PageType_Videos;
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + @"?fields=
+                                            picture,id,views,embed_html,source,updated_time,description,created_time,likes.limit(0).summary(true),comments.limit(200).summary(true)&access_token=" + AccessToken;
+                    }
+                    else if (urltillId.Contains(Social.FACEBOOK_USERS_DEFAULT_URL))
+                    {
+                        pageType = CrawlerStates.PageType_Users;
+                        OnReportSerializedResult("N/A");
+                        return;
+                    }
 
                     browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                     break;
@@ -303,15 +281,41 @@ namespace Crawler
                 case CrawlerStates.LoadAllPhotos:
                     allCrawledPhotos.Clear();
                     preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName +
-                                       "?fields=photos.limit(50){picture,id,link,updated_time,images,likes.limit(1).summary(true),comments.limit(1).summary(true)}&access_token=" + AccessToken;
+                                       "?fields=photos.limit(50){picture,id,link,updated_time,images,likes.limit(0).summary(true),comments.limit(0).summary(true)}&access_token=" + AccessToken;
                     browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                    break;
+
+                case CrawlerStates.LoadAllPhotos_Crawl:
+                    allMediaLinkToCrawl.Clear();
+                    allCrawledPhotos.Clear();
+                    if (urltillId.Contains(Social.FACEBOOK_GROUPS_DEFAULT_URL))
+                    {
+                        browser.GetMainFrame().LoadUrl(Social.FACEBOOK_GROUPS_DEFAULT_URL + pageName + "/photos/");
+                    }
+                    else
+                    {
+                        OnReportSerializedResult("N/A");
+                    }
                     break;
 
                 case CrawlerStates.LoadAllVideos:
                     allCrawledVideos.Clear();
                     preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName +
-                                      "?fields=videos.limit(50){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,sharedposts,likes.limit(1).summary(true),comments.limit(1).summary(true)}&access_token=" + AccessToken;
+                                      "?fields=videos.limit(50){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)}&access_token=" + AccessToken;
                     browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                    break;
+
+                case CrawlerStates.LoadAllVideos_Crawl:
+                    allMediaLinkToCrawl.Clear();
+                    allCrawledVideos.Clear();
+                    if (urltillId.Contains(Social.FACEBOOK_GROUPS_DEFAULT_URL))
+                    {
+                        browser.GetMainFrame().LoadUrl(Social.FACEBOOK_GROUPS_DEFAULT_URL + pageName + "/photos/?filter=videos");
+                    }
+                    else
+                    {
+                        OnReportSerializedResult("N/A");
+                    }
                     break;
 
                 case CrawlerStates.GraphSearch_Pages:
@@ -322,14 +326,14 @@ namespace Crawler
                     break;
 
                 case CrawlerStates.GraphSearch_Groups:
-                    //search?q=bodybuilding&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy //to url = https://www.facebook.com/groups/787206314630616
+                    //search?q=bodybuilding&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy 
                     preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
                        "&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy&access_token=" + AccessToken; 
                     browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                     break;
 
                 case CrawlerStates.GraphSearch_Events:
-                    //v2.3 search?q=bodybuilding&type=event&limit=500&fields=description,id,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true) https://www.facebook.com/events/787206314630616
+                    //v2.3 search?q=bodybuilding&type=event&limit=500&fields=description,id,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true) 
                     preRegetTokenUrl = "https://graph.facebook.com/v2.3/search?q=" + pageName +
                        "&type=event&limit=500&fields=description,id,name,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true)&access_token=" + AccessToken; 
                     browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
@@ -349,50 +353,71 @@ namespace Crawler
                     browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                     break;
 
+                case CrawlerStates.GraphSearch_Photos:
+                    browser.GetMainFrame().LoadUrl("https://www.facebook.com/search/photos/?q=" + pageName);
+                    break;
+
+                case CrawlerStates.GraphSearch_Videos:
+                    allCrawledVideos.Clear();
+                    allMediaLinkToCrawl.Clear();
+                    browser.GetMainFrame().LoadUrl("https://www.facebook.com/search/videos/?q=" + pageName);
+                    break;
+
                 default:
                     break;
             }
         }
 
-        private string getPageNameFromUrl(string url)
+        private string getPageNameOrIdFromUrl(string url)
         {
             string pageName = url;
 
             try
             {
-                pageName = pageName.Split(new string[] { @"https://www.facebook.com/" }, StringSplitOptions.None)[1];
-
-                if (pageName.Contains("pages/"))
+                pageName = url.Substring(url.LastIndexOf("/") + 1);
+                if (url.Contains("-"))
                 {
-                    pageName = pageName.Split(new string[] { @"pages/" }, StringSplitOptions.None)[1];
-                }
-
-                pageName = pageName.Replace("//", "/");
-
-                if (pageName.Contains("/"))
-                {
-                    pageName = pageName.Remove(pageName.IndexOf("/"));
-                }
-
-                //edit for https://www.facebook.com/Body-building-motivation-457074090989432/
-                if (pageName.Contains("-"))
-                {
-                    string[] nameNums = pageName.Split('-');
+                    string id = url.Substring(url.LastIndexOf("-") + 1);
                     long tryparseResult = 0;
-                    int tryparseintResult = 0;
-                    string sToTry = nameNums[nameNums.Length - 1];
-                    if (!Int32.TryParse(sToTry, out tryparseintResult) && Int64.TryParse(sToTry, out tryparseResult))
+                    if (Int64.TryParse(id, out tryparseResult))
                     {
-                        nameNums[nameNums.Length - 1] = "";
-                        string newPageName = "";
-                        foreach (string s in nameNums)
-                        {
-                            newPageName += s + "-";
-                        }
-                        pageName = newPageName.Remove(newPageName.IndexOf("--"));
+                        pageName = id;
                     }
-
                 }
+
+                //pageName = pageName.Split(new string[] { @"https://www.facebook.com/" }, StringSplitOptions.None)[1];
+
+                //if (pageName.Contains("pages/"))
+                //{
+                //    pageName = pageName.Split(new string[] { @"pages/" }, StringSplitOptions.None)[1];
+                //}
+
+                //pageName = pageName.Replace("//", "/");
+
+                //if (pageName.Contains("/"))
+                //{
+                //    pageName = pageName.Remove(pageName.IndexOf("/"));
+                //}
+
+                ////edit for https://www.facebook.com/Body-building-motivation-457074090989432/
+                //if (pageName.Contains("-"))
+                //{
+                //    string[] nameNums = pageName.Split('-');
+                //    long tryparseResult = 0;
+                //    int tryparseintResult = 0;
+                //    string sToTry = nameNums[nameNums.Length - 1];
+                //    if (!Int32.TryParse(sToTry, out tryparseintResult) && Int64.TryParse(sToTry, out tryparseResult))
+                //    {
+                //        nameNums[nameNums.Length - 1] = "";
+                //        string newPageName = "";
+                //        foreach (string s in nameNums)
+                //        {
+                //            newPageName += s + "-";
+                //        }
+                //        pageName = newPageName.Remove(newPageName.IndexOf("--"));
+                //    }
+
+                //}
             }
             catch { }
 
@@ -423,10 +448,13 @@ namespace Crawler
                     return;
                 }
 
-                string json = source.Split(new string[] { @"<html><head></head><body>" }, StringSplitOptions.None)[1];
-                json = json.Split('>')[1];
-                json = json.Remove(json.IndexOf("</pre"));
-
+                string json = "";
+                if (source.Contains("<html><head></head><body>"))
+                {
+                    json = source.Split(new string[] { @"<html><head></head><body>" }, StringSplitOptions.None)[1];
+                    json = json.Split('>')[1];
+                    json = json.Remove(json.IndexOf("</pre"));
+                }
 
                 if (json.Contains("Error validating access token: Session has expired on"))
                 {
@@ -448,12 +476,27 @@ namespace Crawler
                         GetMoreVideos(json);
                         break;
 
+                    case CrawlerStates.LoadAllPhotos_Crawl:
+                        GetPhotosViaHtmlCrawl(source, json, url);
+                        break;
+                    case CrawlerStates.LoadAllVideos_Crawl:
+                        GetVideosViaHtmlCrawl(source, json, url);
+                        break;
+
                     case CrawlerStates.GraphSearch_Pages:
                     case CrawlerStates.GraphSearch_Groups: 
                     case CrawlerStates.GraphSearch_Events:   
                     case CrawlerStates.GraphSearch_Places: 
                     case CrawlerStates.GraphSearch_Users:
                         OnReportSerializedResult(json);
+                        break;
+
+                    case CrawlerStates.GraphSearch_Photos:
+                        GetPhotosFromSearchCrawl(source);
+                        break;
+
+                    case CrawlerStates.GraphSearch_Videos:
+                        GetVideosFromSearchCrawl(source, json, url);
                         break;
                     default:
                         break;
@@ -465,71 +508,247 @@ namespace Crawler
             }
         }
 
-        //private void GetSearchedPages(string json)
-        //{
-        //    //Debugger.Break();
-        //    try
-        //    {
-        //       // var jsonfile = JsonConvert.DeserializeObject<PagesResult>(json);
-        //        OnReportSerializedResult(json);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        OnReportSerializedResult("N/A");
-        //    }
-        //}
 
-        //private void GetSearchedGroups(string json)
-        //{
-        //    try
-        //    {
-        //        //var jsonfile = JsonConvert.DeserializeObject<GroupsResult>(json);
-        //        OnReportSerializedResult(json);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        OnReportSerializedResult("N/A");
-        //    }
-        //}
 
-        //private void GetSearchedEvents(string json)
-        //{
-        //    try
-        //    {
-        //        //var jsonfile = JsonConvert.DeserializeObject<EventsResult>(json);
-        //        OnReportSerializedResult(json);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        OnReportSerializedResult("N/A");
-        //    }
-        //}
 
-        //private void GetSearchedPlaces(string json)
-        //{
-        //    try
-        //    {
-        //        //var jsonfile = JsonConvert.DeserializeObject<PlacesResult>(json);
-        //        OnReportSerializedResult(json);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        OnReportSerializedResult("N/A");
-        //    }
-        //}
 
-        //private void GetSearchedUsers(string json)
-        //{
-        //    try
-        //    {
-        //        //var jsonfile = JsonConvert.DeserializeObject<PersonsResult>(json);
-        //        OnReportSerializedResult(json);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        OnReportSerializedResult("N/A");
-        //    }
-        //}
+        private void GetVideosFromSearchCrawl(string source, string json, string url)
+        {
+            try
+            {
+                //Debugger.Launch();
+                if (url.Contains("/search/videos/"))
+                {
+                    source = source.Replace("&quot;", "");
+                    source = source.Replace("quot;", "");
+
+                    //<div id="BrowseResultsContainer">
+                    string firstResponders = source.Substring(source.IndexOf("id=\"BrowseResultsContainer\">"));
+                    firstResponders = firstResponders.Substring(0, firstResponders.IndexOf("result_below_fold"));
+                    foreach (var d in getIdsFromVideoScrape(firstResponders))
+                    {
+                        if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
+                    }
+
+                    //result_below_fold
+                    string secondResponders = source.Substring(source.IndexOf("result_below_fold"));
+                    secondResponders = secondResponders.Remove(secondResponders.IndexOf("fbBrowseScrollingPagerContainer"));
+                    foreach (var d in getIdsFromVideoScrape(secondResponders))
+                    {
+                        if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
+                    }
+
+                    //fbBrowseScrollingPagerContainer
+                    List<string> afterScrolledData = source.Split(new string[] { "fbBrowseScrollingPagerContainer" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                    afterScrolledData.RemoveAt(0);
+                    foreach (var item in afterScrolledData)
+                    {
+                        foreach (var d in getIdsFromVideoScrape(item))
+                        {
+                            if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
+                        }
+                    }
+                }
+
+                if (allMediaLinkToCrawl.Count > 0)
+                {
+                    if (!url.Contains("/search/videos/"))
+                    {
+                        if (allCrawledPhotos.Count == 0)
+                        {
+                            VideosGraphData itemToReply = new VideosGraphData();
+                            itemToReply.videos = new Videos();
+                            itemToReply.videos.data = new ObservableCollection<Videos.Video>();
+                            allCrawledVideos.Add(itemToReply);
+                        }
+
+                        if (!json.Contains("Unsupported get request."))
+                        {
+                            Videos.Video photo = JsonConvert.DeserializeObject<Videos.Video>(json);
+                            allCrawledVideos[0].videos.data.Add(photo);
+                        }
+                    }
+
+
+                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + allMediaLinkToCrawl[0] +
+                        "?fields=permalink_url,picture,id,length,embed_html,source,updated_time,views,description,title,likes.limit(0).summary(true),comments.limit(0).summary(true)&access_token=" + AccessToken;
+                    allMediaLinkToCrawl.RemoveAt(0);
+                    browser.GetFocusedFrame().LoadUrl(preRegetTokenUrl);
+                }
+                else
+                {
+                    MediaResult resultToReply = new MediaResult();
+                    if (allCrawledVideos.Count > 0)
+                    {
+                        foreach (var d in allCrawledVideos[0].videos.data)
+                        {
+                            resultToReply.data.Add(new MediaResultData()
+                            {
+                                about = d.description,
+                                 comment_count = d.comments == null ? 0 : d.comments.summary == null ? 0 : d.comments.summary.total_count,
+                                  id = d.id,
+                                   like_count = d.likes == null ? 0 : d.likes.summary == null ? 0 : d.likes.summary.total_count,
+                                    link = d.picture,
+                                     source = d.source,
+                                      updated_time = d.updated_time,
+                                       view_count = d.views,
+                                        is_video = true
+                            });
+                        }
+                    }
+                    OnReportSerializedResult(resultToReply.XmlSerializeToString());
+                }
+
+            }
+            catch
+            {
+                OnReportSerializedResult("N/A");
+            }
+        }
+
+        private List<string> getIdsFromVideoScrape(string source)
+        {
+            List<string> thisIdList = new List<string>();
+            try
+            {
+                List<string> sourceAfterSplit = source.Split(new string[] { "data-bt=\"{id:" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                sourceAfterSplit.RemoveAt(0);
+                foreach (string line in sourceAfterSplit)
+                {
+                    string id = line.Remove(line.IndexOf(","));
+                    id = id.Trim();
+                    thisIdList.Add(id);
+                }
+            }
+            catch { }
+            return thisIdList;
+        }
+
+        private void GetPhotosFromSearchCrawl(string source)
+        {
+            try
+            {
+                MediaResult resultToReply = new MediaResult();
+
+                source = source.Replace("&quot;", "");
+                source = source.Replace("quot;", "");
+
+                //<div id="BrowseResultsContainer">
+                string firstResponders = source.Substring(source.IndexOf("id=\"BrowseResultsContainer\">"));
+                firstResponders = firstResponders.Substring(0, firstResponders.IndexOf("result_below_fold"));
+                foreach (var d in getDataFromEditedPhotoScrapeSource(firstResponders))
+                {
+                    resultToReply.data.Add(d);
+                }
+
+                //result_below_fold
+                string secondResponders = source.Substring(source.IndexOf("result_below_fold"));
+                secondResponders = secondResponders.Remove(secondResponders.IndexOf("fbBrowseScrollingPagerContainer"));
+                foreach (var d in getDataFromEditedPhotoScrapeSource(secondResponders))
+                {
+                    resultToReply.data.Add(d);
+                }
+
+                //fbBrowseScrollingPagerContainer
+                List<string> afterScrolledData = source.Split(new string[] { "fbBrowseScrollingPagerContainer" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                afterScrolledData.RemoveAt(0);
+                foreach (var item in afterScrolledData)
+                {
+                    foreach (var d in getDataFromEditedPhotoScrapeSource(item))
+                    {
+                        resultToReply.data.Add(d);
+                    }
+                }
+
+                OnReportSerializedResult(resultToReply.XmlSerializeToString());
+            }
+            catch
+            {
+                OnReportSerializedResult("N/A");
+            }
+        }
+
+        private List<MediaResultData> getDataFromEditedPhotoScrapeSource(string firstResponders)
+        {
+            List<MediaResultData> resultAfterCrawl = new List<MediaResultData>();
+
+            try
+            {
+                List<string> images = firstResponders.Split(new string[] { "img\" src=\"" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                images.RemoveAt(0);
+                foreach (string img in images)
+                {
+                    string link = img.Remove(img.IndexOf("\""));
+                    if (img.Contains("background-image: url("))
+                    {
+                        link = img.Substring(img.IndexOf("background-image: url("));
+                        link = link.Replace("background-image: url(", "");
+                        link = link.Remove(link.IndexOf(");"));
+                    }
+                    string id = link.Substring(0, link.IndexOf("?")).Split('_')[1];
+
+                    string about = img.Substring(img.IndexOf("alt=\"")).Replace("alt=\"", "");
+                    about = about.Remove(about.IndexOf("\""));
+
+                    long views_count = 0;
+                    long likes_count = 0;
+                    long comments_count = 0;
+                    if (img.Contains("<div class=\"_37_g\">"))
+                    {
+                        string views = img.Substring(img.IndexOf("<div class=\"_37_g\">"));
+                        views = views.Replace("<div class=\"_37_g\">", "");
+                        views = views.Substring(views.IndexOf("</div>"));
+                        views = views.Replace("</div>", "");
+                        views = views.Replace("Views", "");
+                        views = views.Replace(",", "");
+                        views = views.Remove(views.IndexOf("<"));
+                        views = views.Trim();
+                        Int64.TryParse(views,out views_count);
+                    }
+                    else
+                    {
+                        string[] likesThenComments = img.Split(new string[] { "<div class=\"_50f3\">" }, StringSplitOptions.RemoveEmptyEntries);
+                        if (likesThenComments.Length >= 3)
+                        {
+                            string likes = likesThenComments[1].Remove(likesThenComments[1].IndexOf("</div>"));
+                            Int64.TryParse(getCountstring(likes), out likes_count);
+
+                            string comments = likesThenComments[2].Remove(likesThenComments[2].IndexOf("</div>"));
+                            Int64.TryParse(getCountstring(comments), out comments_count);
+                        }
+                    }
+
+                    resultAfterCrawl.Add(new MediaResultData()
+                    {
+                        link = link,
+                        id = id,
+                        about = about,
+                        view_count = views_count,
+                        like_count = likes_count,
+                        comment_count = comments_count,
+                    });
+                }
+            }
+            catch { }
+
+            return resultAfterCrawl;
+        }
+
+        private string getCountstring(string data)
+        {
+            data = data.ToLower();
+            if (data.Contains("k")) data = data.Replace("k", "000");
+            if (data.Contains("m")) data = data.Replace("m", "000000");
+            if (data.Contains("."))
+            {
+                data.Replace(".", "");
+                data = data.Replace("000", "00");
+            }
+            return data = data.Trim();
+        }
+
+
+
 
         private void GetMoreVideos(string json)
         {
@@ -606,15 +825,199 @@ namespace Crawler
         private void GetAllPageStats(string source, string url)
         {
             try
-            { 
+            {
+                switch (pageType)
+                {
+                    case CrawlerStates.PageType_Videos:
+                    case CrawlerStates.PageType_Photos:
+                        var j = JsonConvert.DeserializeObject<FacebookGraphDataForMedia>(source);
+                        FacebookGraphData data = new FacebookGraphData()
+                        {
+                            about = j.about,
+                             album = j.album,
+                              albums = j.albums,
+                               can_post = j.can_post,
+                                category = j.category,
+                                 comments = j.comments,
+                                  description = j.description,
+                                   embed_html = j.embed_html,
+                                    feed = j.feed,
+                                     founded = j.founded,
+                                      id = j.id,
+                                       images = j.images,
+                                        interested = j.interested,
+                                         invited = j.invited,
+                                          is_community_page = j.is_community_page,
+                                           is_permanently_closed = j.is_permanently_closed,
+                                            is_published = j.is_published,
+                                             is_unclaimed = j.is_unclaimed,
+                                              is_verified = j.is_verified,
+                                               length = j.length,
+                                                likes = j.likes == null ? 0 : j.likes.summary == null ? 0: j.likes.summary.total_count,
+                                                 link = j.link,
+                                                  members = j.members,
+                                                   name = j.name,    
+                                                    paging = j.paging,
+                                                     permalink_url = j.permalink_url,
+                                                      photos = j.photos,
+                                                       picture = j.picture,
+                                                        posts = j.posts,
+                                                         privacy = j.privacy,
+                                                          source = j.source,
+                                                           start_time = j.start_time,
+                                                            talking_about_count = j.talking_about_count,
+                                                             timezone = j.timezone,
+                                                              updated_time = j.updated_time,
+                                                               videos = j.videos,
+                                                                views = j.views,
+                                                                 website = j.website,
+                        };
+                        OnReportSerializedResult(data.XmlSerializeToString());
+                        return;
+                    default:
+                        break;
+                }
                 var jsonfile = JsonConvert.DeserializeObject<FacebookGraphData>(source);
-                OnReportSerializedResult(jsonfile.XmlSerializeToString()); 
+                if(jsonfile.albums != null && jsonfile.albums.data != null && jsonfile.albums.data.Count > 0)
+                {
+                    foreach (var album in jsonfile.albums.data)
+                    {
+                        if (album == null || album.photos == null || album.photos.data.Count == 0) continue;
+                        if (jsonfile.photos == null) jsonfile.photos = new Photos();
+                        if (jsonfile.photos.data == null) jsonfile.photos.data = new ObservableCollection<Photos.Photo>();
+                        foreach (var p in album.photos.data)
+                        {
+                            jsonfile.photos.data.Add(p);
+                        }
+                    }
+                }
+                OnReportSerializedResult(jsonfile.XmlSerializeToString());
             }
             catch (Exception ex)
             {
                 OnReportSerializedResult("N/A");
             }
         }
+
+
+
+
+
+        private void GetPhotosViaHtmlCrawl(string source, string json, string url)
+        {
+            try
+            {
+                //Debugger.Launch();
+                //?fields=source,link,picture,comments.limit(0).summary(true),likes.limit(0).summary(true)
+                if (url.Contains("/photos/"))
+                {
+                    List<string> htmlSplit1 = source.Split(new string[] { "<a class=\"uiMediaThumb uiScrollableThumb uiMediaThumbLarge\" href=\"" }, StringSplitOptions.None).ToList();
+                    htmlSplit1.RemoveAt(0);
+                    foreach (string split in htmlSplit1)
+                    {
+                        string postId = split;
+                        postId = postId.Remove(postId.IndexOf("\""));
+                        postId = postId.Replace("&amp;", "&");
+                        postId = postId.Replace("amp;", "");
+                        postId = postId.Substring(postId.LastIndexOf("fbid="));
+                        postId = postId.Replace("fbid=", "");
+                        postId = postId.Remove(postId.IndexOf("&"));
+
+                        if (!allMediaLinkToCrawl.Contains(postId)) allMediaLinkToCrawl.Add(postId);
+                    }
+                }
+
+                if (allMediaLinkToCrawl.Count > 0)
+                {
+                    if (!url.Contains("/photos/"))
+                    {
+                        if (allCrawledPhotos.Count == 0)
+                        {
+                            PhotosGraphData itemToReply = new PhotosGraphData();
+                            itemToReply.photos = new Photos();
+                            itemToReply.photos.data = new System.Collections.ObjectModel.ObservableCollection<Photos.Photo>();
+                            allCrawledPhotos.Add(itemToReply);
+                        }
+
+                        Photos.Photo photo = JsonConvert.DeserializeObject<Photos.Photo>(json);
+                        allCrawledPhotos[0].photos.data.Add(photo);
+                    }
+
+
+                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + allMediaLinkToCrawl[0] + "?fields=link,picture,updated_time,images,comments.limit(0).summary(true),likes.limit(0).summary(true)&access_token=" + AccessToken;
+                    allMediaLinkToCrawl.RemoveAt(0);
+                    browser.GetFocusedFrame().LoadUrl(preRegetTokenUrl);
+                }
+                else
+                {
+                    OnReportSerializedResult(allCrawledPhotos.XmlSerializeToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                OnReportSerializedResult("N/A");
+            }
+        }
+
+        private void GetVideosViaHtmlCrawl(string source, string json, string url)
+        {
+            try
+            {
+               // Debugger.Launch();
+                //?fields=permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)
+                if (url.Contains("/photos/"))
+                {
+                    List<string> htmlSplit1 = source.Split(new string[] { "<a class=\"uiVideoLink uiScrollableThumb uiVideoLinkLarge\" href=\"" }, StringSplitOptions.None).ToList();
+                    htmlSplit1.RemoveAt(0);
+                    foreach (string split in htmlSplit1)
+                    {
+                        string postId = split;
+                        postId = postId.Substring(postId.IndexOf("name=\""));
+                        postId = postId.Replace("name=\"", "");
+                        postId = postId.Remove(postId.IndexOf("\""));
+                        postId = postId.Replace("&amp;", "&");
+                        postId = postId.Replace("amp;", "");
+
+                       if(!allMediaLinkToCrawl.Contains(postId)) allMediaLinkToCrawl.Add(postId);
+                    }
+                }
+
+                if (allMediaLinkToCrawl.Count > 0)
+                {
+                    if (!url.Contains("/photos/"))
+                    {
+                        if (allCrawledPhotos.Count == 0)
+                        {
+                            VideosGraphData itemToReply = new VideosGraphData();
+                            itemToReply.videos = new Videos();
+                            itemToReply.videos.data = new ObservableCollection<Videos.Video>();
+                            allCrawledVideos.Add(itemToReply);
+                        }
+
+                        Videos.Video photo = JsonConvert.DeserializeObject<Videos.Video>(json);
+                        allCrawledVideos[0].videos.data.Add(photo);
+                    }
+
+
+                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + allMediaLinkToCrawl[0] +
+                        "?fields=permalink_url,picture,id,length,embed_html,source,views,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)&access_token=" + AccessToken;
+                    allMediaLinkToCrawl.RemoveAt(0);
+                    browser.GetFocusedFrame().LoadUrl(preRegetTokenUrl);
+                }
+                else
+                {
+                    OnReportSerializedResult(allCrawledVideos.XmlSerializeToString());
+                }
+            }
+            catch (Exception ex)
+            {
+                OnReportSerializedResult("N/A");
+            }
+        }
+
+
+
+
 
         public void Shutdown()
         {
@@ -749,6 +1152,59 @@ namespace Crawler
 
     public class DemoRequestHandler : CefRequestHandler
     {
+        protected override bool OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request)
+        {
+            //if (request.Url.Contains("https://fbcdn-photos-b-a.akamaihd.net/"))
+            //{
+            //    try
+            //    {
+            //        foreach (var item in request.GetHeaderMap())
+            //        {
+
+            //        }
+            //        foreach (var item in request.GetHeaderMap().AllKeys)
+            //        {
+            //            foreach (var item1 in request.GetHeaderMap().GetValues(item))
+            //            {
+
+            //            }
+
+            //        }
+            //        foreach (var item in request.GetHeaderMap().Keys)
+            //        {
+
+            //        }
+            //    }
+            //    catch { }
+            //    Debugger.Break();
+            //}
+            //try
+            //{
+            //    foreach (var item in request.GetHeaderMap())
+            //    {
+
+            //    }
+            //    foreach (var item in request.GetHeaderMap().AllKeys)
+            //    {
+            //        foreach (var item1 in request.GetHeaderMap().GetValues(item))
+            //        {
+
+            //        }
+
+            //    }
+            //    foreach (var item in request.GetHeaderMap().Keys)
+            //    {
+
+            //    }
+
+            //    foreach (var pda in request.PostData.GetElements())
+            //    {
+
+            //    }
+            //}
+            //catch { }
+            return base.OnBeforeResourceLoad(browser, frame, request);
+        }
         protected override bool GetAuthCredentials(CefBrowser browser, CefFrame frame, bool isProxy, string host, int port, string realm, string scheme, CefAuthCallback callback)
         {
             if (isProxy)
@@ -777,47 +1233,84 @@ namespace Crawler
 
         protected override void OnLoadStart(CefBrowser browser, CefFrame frame)
         {
-            //IntPtr browserWindowHandle = browser.GetHost().GetWindowHandle();
-            //if (browserWindowHandle != IntPtr.Zero)
-            //    NativeMethods.SetWindowPos(browserWindowHandle, IntPtr.Zero, 0, 0, 1280, 720, SetWindowPosFlags.NoZOrder);
-
-            //browser.GetHost().SetFocus(true);
-            //frame.Browser.GetHost().SetFocus(true);
-            //SetForegroundWindow(browser.GetHost().GetWindowHandle());
-            //SetForegroundWindow(frame.Browser.GetHost().GetWindowHandle());
-
             // A single CefBrowser instance can handle multiple requests
             //   for a single URL if there are frames (i.e. <FRAME>, <IFRAME>).
+            if (frame.Url.Contains("generic.php/GroupPhotosetPagelet"))
+            {
+                getAllotOfPhotosRecursive(browser);
+            }
             if (frame.IsMain)
             {
                 Console.WriteLine("START: {0}", browser.GetMainFrame().Url);
             }
         }
-        //protected override void OnLoadingStateChange(CefBrowser browser, bool isLoading, bool canGoBack, bool canGoForward)
-        //{
-        //    if (!isLoading && browser.GetMainFrame() != null)
-        //    {
-        //        Console.WriteLine("END: {0}, {1}", browser.GetMainFrame().Url, isLoading);
-        //        SourceVisitor Visitor = new SourceVisitor(browser.GetMainFrame().Url,
-        //            (text, url) =>
-        //            {
-        //                OnGotSourceFromLoadEnd(text, url);
-        //            });
-        //        browser.GetMainFrame().GetSource(Visitor);
-        //    }
-        //}
         protected override void OnLoadEnd(CefBrowser browser, CefFrame frame, int httpStatusCode)
         {
             if (frame.IsMain)
             {
                 Console.WriteLine("END: {0}, {1}", browser.GetMainFrame().Url, httpStatusCode);
-                SourceVisitor Visitor = new SourceVisitor(browser.GetMainFrame().Url,
+                if (browser.GetMainFrame().Url.Contains("/photos/") || browser.GetMainFrame().Url.Contains("/search/videos/"))
+                {
+                    maxrecursive = 3;
+                    if (browser.GetMainFrame().Url.Contains("/search/photos/") || browser.GetMainFrame().Url.Contains("/search/videos/")) maxrecursive = 75;
+                    recursiveScrollCalls = 0;
+                    getAllotOfPhotosRecursive(browser);
+                }
+                else
+                {
+                    SourceVisitor Visitor = new SourceVisitor(browser.GetMainFrame().Url,
                     (text, url) =>
                     {
                         OnGotSourceFromLoadEnd(text, url);
                     });
-                browser.GetMainFrame().GetSource(Visitor);
+                    browser.GetMainFrame().GetSource(Visitor);
+                }
             }
+        }
+
+        static int recursiveScrollCalls = 0;
+        static int maxrecursive = 3;
+        private void getAllotOfPhotosRecursive(CefBrowser browser)
+        {
+            recursiveScrollCalls++;
+            browser.GetMainFrame().ExecuteJavaScript("window.scrollTo(0,document.body.scrollHeight);", browser.GetMainFrame().Url, 0);
+            Thread.Sleep(300);
+
+            SourceVisitor Visitor = new SourceVisitor(browser.GetMainFrame().Url,
+            (text, url) =>
+            {
+
+                if (browser.GetMainFrame().Url.Contains("/search/photos/") || browser.GetMainFrame().Url.Contains("/search/videos/"))
+                {
+                    if (recursiveScrollCalls >= maxrecursive)
+                    {
+                        OnGotSourceFromLoadEnd(text, url);
+                    }
+                    else
+                    {
+                        getAllotOfPhotosRecursive(browser);
+                    }
+                }
+                else
+                {
+                    if (text.Contains("iframe class=\"hidden_elem\""))
+                    {
+                        if (recursiveScrollCalls >= maxrecursive)
+                        {
+                            OnGotSourceFromLoadEnd(text, url);
+                        }
+                        else
+                        {
+                            getAllotOfPhotosRecursive(browser);
+                        }
+                    }
+                    else
+                    {
+                        OnGotSourceFromLoadEnd(text, url);
+                    }
+                }
+            });
+            browser.GetMainFrame().GetSource(Visitor);
         }
     }
 

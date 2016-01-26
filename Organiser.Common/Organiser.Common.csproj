@@ -49,6 +49,7 @@
     <Reference Include="System" />
     <Reference Include="System.AddIn" />
     <Reference Include="System.AddIn.Contract" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
@@ -93,6 +94,7 @@
     <Compile Include="Controlls\ExpanderDoubleClickExpand.cs" />
     <Compile Include="Controlls\MyListView.cs" />
     <Compile Include="Converters\ElementSizeMathConverter.cs" />
+    <Compile Include="Converters\EmptyTextToVisibilityConverter.cs" />
     <Compile Include="Converters\MaxCharCountConv.cs" />
     <Compile Include="Converters\OpisiteVisibilityConverter.cs" />
     <Compile Include="Windows\SetNameAndDataWindow.xaml.cs">

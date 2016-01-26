@@ -20,7 +20,10 @@ namespace GoViral.Models
         private string url;
         public string Url
         {
-            get { return url; }
+            get
+            {
+                return url.Replace("&amp;", "&").Replace("amp;", "");
+            }
             set { url = value; RaisePropertyChanged("Url"); }
         }
 

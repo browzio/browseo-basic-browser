@@ -68,14 +68,20 @@
     <Compile Include="Controls\SearchUserControl.xaml.cs">
       <DependentUpon>SearchUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\SelectedPageInfoUserControl.xaml.cs">
+      <DependentUpon>SelectedPageInfoUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\SharedPostsUserControl.xaml.cs">
       <DependentUpon>SharedPostsUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ViralProjectsWithBrowser.xaml.cs">
       <DependentUpon>ViralProjectsWithBrowser.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\LinkCleanerConverter.cs" />
     <Compile Include="Converters\LinkToImageConverter.cs" />
+    <Compile Include="Converters\PageTypeFromUrlToVisibleConverter.cs" />
     <Compile Include="Converters\PhotoLinkToImageConverter.cs" />
+    <Compile Include="Converters\PhotosVidsCountToTextConverter.cs" />
     <Compile Include="Converters\PostIdToUrlConverter.cs" />
     <Compile Include="Helpers\CrawlerHost.cs" />
     <Compile Include="Models\Folder.cs" />
@@ -102,6 +108,9 @@
     <Compile Include="Windows\ToFolderChooserWindow.xaml.cs">
       <DependentUpon>ToFolderChooserWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\TopNsearchResultsToDominateWindow.xaml.cs">
+      <DependentUpon>TopNsearchResultsToDominateWindow.xaml</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -122,6 +131,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\SelectedPageInfoUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\SharedPostsUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -131,6 +144,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\ToFolderChooserWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\TopNsearchResultsToDominateWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
