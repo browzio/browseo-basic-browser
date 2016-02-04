@@ -185,195 +185,202 @@ namespace Crawler
 
         public void NavigateToUrl(string url)
         {
-            if (url.Contains("/?ref=br_rs")) url = url.Replace("/?ref=br_rs", "");
-            if (url.Contains("?ref=br_rs")) url = url.Replace("?ref=br_rs", "");
+            try {
+                if (url.Contains("/?ref=br_rs")) url = url.Replace("/?ref=br_rs", "");
+                if (url.Contains("?ref=br_rs")) url = url.Replace("?ref=br_rs", "");
 
-            string pageName = url;
-            string urltillId = url;
+                string pageName = url;
+                string urltillId = url;
 
-            switch (crawlerState)
-            {
-                case CrawlerStates.FbGraphCrawl:
-                case CrawlerStates.LoadAllPhotos:
-                case CrawlerStates.LoadAllVideos:
-                case CrawlerStates.LoadAllPhotos_Crawl:
-                case CrawlerStates.LoadAllVideos_Crawl:
-                    if (!url.Contains("https://www.facebook.com/"))
-                    {
-                        OnReportSerializedResult("N/A");
-                        return;
-                    }
-                    pageName = getPageNameOrIdFromUrl(url);
-                    urltillId = url.Remove(url.LastIndexOf("/")+1);
-                    preRegetAccessToken = AccessToken;
-                    break;
-                default:
-                    break;
-            }
+                switch (crawlerState)
+                {
+                    case CrawlerStates.FbGraphCrawl:
+                    case CrawlerStates.LoadAllPhotos:
+                    case CrawlerStates.LoadAllVideos:
+                    case CrawlerStates.LoadAllPhotos_Crawl:
+                    case CrawlerStates.LoadAllVideos_Crawl:
+                        pageName = getPageNameOrIdFromUrl(url);
+                        if (string.IsNullOrEmpty(pageName) || string.IsNullOrWhiteSpace(pageName))
+                        {
+                            OnReportSerializedResult("N/A");
+                            return;
+                        }
+                        if (url.Contains("/")) urltillId = url.Remove(url.LastIndexOf("/") + 1);
+                        preRegetAccessToken = AccessToken;
+                        break;
+                    default:
+                        break;
+                }
 
 
-            switch (crawlerState)
-            {
-                case CrawlerStates.FbGraphCrawl:
-                    //Debugger.Launch();
-                    //maybe to add = keywords,emails,new_like_count,description,sharedposts
-                    pageType = CrawlerStates.GraphSearch_Pages;
-                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
-                                        @"about,id,link,founded,can_post,category,talking_about_count,likes,
+                switch (crawlerState)
+                {
+                    case CrawlerStates.FbGraphCrawl:
+                        //Debugger.Launch();
+                        //maybe to add = keywords,emails,new_like_count,description,sharedposts
+                        pageType = CrawlerStates.GraphSearch_Pages;
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
+                                            @"about,id,link,founded,can_post,category,talking_about_count,likes,
                                         photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)},
                                         videos.limit(30){permalink_url,picture,id,views,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
                                         posts.limit(100){caption,description,picture,full_picture,shares,link,message,via,source,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)},
                                         feed.limit(70){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
                                         &access_token=" + AccessToken;
-                    if (urltillId.Contains(Social.FACEBOOK_GROUPS_DEFAULT_URL))
-                    {
-                        pageType = CrawlerStates.PageType_Groups;
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
-                                        @"description,name,privacy,updated_time,
+                        if (urltillId.Contains(Social.FACEBOOK_GROUPS_DEFAULT_URL))
+                        {
+                            pageType = CrawlerStates.PageType_Groups;
+                            preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
+                                            @"description,name,privacy,updated_time,
                                         members.limit(0).summary(true),
                                         feed.limit(100){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
                                         &access_token=" + AccessToken;
-                    }
-                    else if (urltillId.Contains(Social.FACEBOOK_EVENTS_DEFAULT_URL))
-                    {
-                        pageType = CrawlerStates.PageType_Events;
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.3/" + pageName + "?fields="+
-                                          @"description,location,privacy,start_time,ticket_uri,timezone,updated_time,
+                        }
+                        else if (urltillId.Contains(Social.FACEBOOK_EVENTS_DEFAULT_URL))
+                        {
+                            pageType = CrawlerStates.PageType_Events;
+                            preRegetTokenUrl = "https://graph.facebook.com/v2.3/" + pageName + "?fields=" +
+                                              @"description,location,privacy,start_time,ticket_uri,timezone,updated_time,
                                             interested.limit(0).summary(true),
                                             invited.limit(0).summary(true),
                                             feed.limit(100){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
                                             &access_token=" + AccessToken;
-                    }
-                    else if (urltillId.Contains(Social.FACEBOOK_PLACES_DEFAULT_URL))
-                    {
-                        pageType = CrawlerStates.PageType_Places;
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
-                                        @"about,id,name,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,location,
+                        }
+                        else if (urltillId.Contains(Social.FACEBOOK_PLACES_DEFAULT_URL))
+                        {
+                            pageType = CrawlerStates.PageType_Places;
+                            preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
+                                            @"about,id,name,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,location,
                                         photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)},
                                         albums{photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)}},
                                         videos.limit(30){permalink_url,picture,views,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
                                         posts.limit(100){caption,description,picture,full_picture,shares,link,message,via,source,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)},
                                         feed.limit(70){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
                                         &access_token=" + AccessToken;
-                    }
-                    else if (urltillId.Contains(Social.FACEBOOK_PHOTOS_DEFAULT_URL))
-                    {
-                        pageType = CrawlerStates.PageType_Photos;
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + @"?fields=
+                        }
+                        else if (urltillId.Contains(Social.FACEBOOK_PHOTOS_DEFAULT_URL))
+                        {
+                            pageType = CrawlerStates.PageType_Photos;
+                            preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + @"?fields=
                                             created_time,link,name,source,updated_time,album,from,picture,images,likes.limit(0).summary(true),comments.limit(200).summary(true)&access_token=" + AccessToken;
-                    }
-                    else if (urltillId.Contains(Social.FACEBOOK_VIDEOS_DEFAULT_URL))
-                    {
-                        pageType = CrawlerStates.PageType_Videos;
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + @"?fields=
+                        }
+                        else if (urltillId.Contains(Social.FACEBOOK_VIDEOS_DEFAULT_URL))
+                        {
+                            pageType = CrawlerStates.PageType_Videos;
+                            preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + @"?fields=
                                             picture,id,views,embed_html,source,updated_time,description,created_time,likes.limit(0).summary(true),comments.limit(200).summary(true)&access_token=" + AccessToken;
-                    }
-                    else if (urltillId.Contains(Social.FACEBOOK_USERS_DEFAULT_URL))
-                    {
-                        pageType = CrawlerStates.PageType_Users;
-                        OnReportSerializedResult("N/A");
-                        return;
-                    }
+                        }
+                        else if (urltillId.Contains(Social.FACEBOOK_USERS_DEFAULT_URL))
+                        {
+                            pageType = CrawlerStates.PageType_Users;
+                            OnReportSerializedResult("N/A");
+                            return;
+                        }
 
-                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
-                    break;
+                        browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                        break;
 
-                case CrawlerStates.LoadAllPhotos:
-                    allCrawledPhotos.Clear();
-                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName +
-                                       "?fields=photos.limit(50){picture,id,link,updated_time,images,likes.limit(0).summary(true),comments.limit(0).summary(true)}&access_token=" + AccessToken;
-                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
-                    break;
+                    case CrawlerStates.LoadAllPhotos:
+                        allCrawledPhotos.Clear();
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName +
+                                           "?fields=photos.limit(50){picture,id,link,updated_time,images,likes.limit(0).summary(true),comments.limit(0).summary(true)}&access_token=" + AccessToken;
+                        browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                        break;
 
-                case CrawlerStates.LoadAllPhotos_Crawl:
-                    allMediaLinkToCrawl.Clear();
-                    allCrawledPhotos.Clear();
-                    if (urltillId.Contains(Social.FACEBOOK_GROUPS_DEFAULT_URL))
-                    {
-                        browser.GetMainFrame().LoadUrl(Social.FACEBOOK_GROUPS_DEFAULT_URL + pageName + "/photos/");
-                    }
-                    else
-                    {
-                        OnReportSerializedResult("N/A");
-                    }
-                    break;
+                    case CrawlerStates.LoadAllPhotos_Crawl:
+                        allMediaLinkToCrawl.Clear();
+                        allCrawledPhotos.Clear();
+                        if (urltillId.Contains(Social.FACEBOOK_GROUPS_DEFAULT_URL))
+                        {
+                            browser.GetMainFrame().LoadUrl(Social.FACEBOOK_GROUPS_DEFAULT_URL + pageName + "/photos/");
+                        }
+                        else
+                        {
+                            OnReportSerializedResult("N/A");
+                        }
+                        break;
 
-                case CrawlerStates.LoadAllVideos:
-                    allCrawledVideos.Clear();
-                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName +
-                                      "?fields=videos.limit(50){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)}&access_token=" + AccessToken;
-                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
-                    break;
+                    case CrawlerStates.LoadAllVideos:
+                        allCrawledVideos.Clear();
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName +
+                                          "?fields=videos.limit(50){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)}&access_token=" + AccessToken;
+                        browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                        break;
 
-                case CrawlerStates.LoadAllVideos_Crawl:
-                    allMediaLinkToCrawl.Clear();
-                    allCrawledVideos.Clear();
-                    if (urltillId.Contains(Social.FACEBOOK_GROUPS_DEFAULT_URL))
-                    {
-                        browser.GetMainFrame().LoadUrl(Social.FACEBOOK_GROUPS_DEFAULT_URL + pageName + "/photos/?filter=videos");
-                    }
-                    else
-                    {
-                        OnReportSerializedResult("N/A");
-                    }
-                    break;
+                    case CrawlerStates.LoadAllVideos_Crawl:
+                        allMediaLinkToCrawl.Clear();
+                        allCrawledVideos.Clear();
+                        if (urltillId.Contains(Social.FACEBOOK_GROUPS_DEFAULT_URL))
+                        {
+                            browser.GetMainFrame().LoadUrl(Social.FACEBOOK_GROUPS_DEFAULT_URL + pageName + "/photos/?filter=videos");
+                        }
+                        else
+                        {
+                            OnReportSerializedResult("N/A");
+                        }
+                        break;
 
-                case CrawlerStates.GraphSearch_Pages:
-                    //search?q=bodybuilding&type=page&limit=500&fields=about,description,id,link,founded,can_post,category,talking_about_count,likes,picture{url}
-                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
-                        "&type=page&limit=500&fields=about,description,id,link,name,founded,can_post,category,talking_about_count,likes,picture{url}&access_token=" + AccessToken; 
-                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
-                    break;
+                    case CrawlerStates.GraphSearch_Pages:
+                        //search?q=bodybuilding&type=page&limit=500&fields=about,description,id,link,founded,can_post,category,talking_about_count,likes,picture{url}
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                            "&type=page&limit=500&fields=about,description,id,link,name,founded,can_post,category,talking_about_count,likes,picture{url}&access_token=" + AccessToken;
+                        browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                        break;
 
-                case CrawlerStates.GraphSearch_Groups:
-                    //search?q=bodybuilding&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy 
-                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
-                       "&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy&access_token=" + AccessToken; 
-                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
-                    break;
+                    case CrawlerStates.GraphSearch_Groups:
+                        //search?q=bodybuilding&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy 
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                           "&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy&access_token=" + AccessToken;
+                        browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                        break;
 
-                case CrawlerStates.GraphSearch_Events:
-                    //v2.3 search?q=bodybuilding&type=event&limit=500&fields=description,id,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true) 
-                    preRegetTokenUrl = "https://graph.facebook.com/v2.3/search?q=" + pageName +
-                       "&type=event&limit=500&fields=description,id,name,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true)&access_token=" + AccessToken; 
-                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
-                    break;
+                    case CrawlerStates.GraphSearch_Events:
+                        //v2.3 search?q=bodybuilding&type=event&limit=500&fields=description,id,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true) 
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.3/search?q=" + pageName +
+                           "&type=event&limit=500&fields=description,id,name,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true)&access_token=" + AccessToken;
+                        browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                        break;
 
-                case CrawlerStates.GraphSearch_Places:
-                    //search?q=bodybuilding&type=place&limit=300&fields=about,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,picture{url},location
-                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
-                       "&type=place&limit=200&fields=about,id,name,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,picture{url},location&access_token=" + AccessToken;
-                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
-                    break;
+                    case CrawlerStates.GraphSearch_Places:
+                        //search?q=bodybuilding&type=place&limit=300&fields=about,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,picture{url},location
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                           "&type=place&limit=200&fields=about,id,name,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,picture{url},location&access_token=" + AccessToken;
+                        browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                        break;
 
-                case CrawlerStates.GraphSearch_Users:
-                    //search?q=bodybuilding&type=user&limit=500&fields=name,id,link,picture //other then that need to crawl
-                    preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
-                       "&type=user&limit=500&fields=name,id,link,picture&access_token=" + AccessToken;
-                    browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
-                    break;
+                    case CrawlerStates.GraphSearch_Users:
+                        //search?q=bodybuilding&type=user&limit=500&fields=name,id,link,picture //other then that need to crawl
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                           "&type=user&limit=500&fields=name,id,link,picture&access_token=" + AccessToken;
+                        browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                        break;
 
-                case CrawlerStates.GraphSearch_Photos:
-                    browser.GetMainFrame().LoadUrl("https://www.facebook.com/search/photos/?q=" + pageName);
-                    break;
+                    case CrawlerStates.GraphSearch_Photos:
+                        browser.GetMainFrame().LoadUrl("https://www.facebook.com/search/photos/?q=" + pageName);
+                        break;
 
-                case CrawlerStates.GraphSearch_Videos:
-                    allCrawledVideos.Clear();
-                    allMediaLinkToCrawl.Clear();
-                    browser.GetMainFrame().LoadUrl("https://www.facebook.com/search/videos/?q=" + pageName);
-                    break;
+                    case CrawlerStates.GraphSearch_Videos:
+                        allCrawledVideos.Clear();
+                        allMediaLinkToCrawl.Clear();
+                        browser.GetMainFrame().LoadUrl("https://www.facebook.com/search/videos/?q=" + pageName);
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
+            }
+            catch
+            {
+                OnReportSerializedResult("N/A");
             }
         }
 
         private string getPageNameOrIdFromUrl(string url)
         {
-            string pageName = url;
-
             try
             {
+                if (!url.Contains("https://www.facebook.com/")) return "";
+
+                string pageName = url;
                 pageName = url.Substring(url.LastIndexOf("/") + 1);
                 if (url.Contains("-"))
                 {
@@ -385,43 +392,12 @@ namespace Crawler
                     }
                 }
 
-                //pageName = pageName.Split(new string[] { @"https://www.facebook.com/" }, StringSplitOptions.None)[1];
-
-                //if (pageName.Contains("pages/"))
-                //{
-                //    pageName = pageName.Split(new string[] { @"pages/" }, StringSplitOptions.None)[1];
-                //}
-
-                //pageName = pageName.Replace("//", "/");
-
-                //if (pageName.Contains("/"))
-                //{
-                //    pageName = pageName.Remove(pageName.IndexOf("/"));
-                //}
-
-                ////edit for https://www.facebook.com/Body-building-motivation-457074090989432/
-                //if (pageName.Contains("-"))
-                //{
-                //    string[] nameNums = pageName.Split('-');
-                //    long tryparseResult = 0;
-                //    int tryparseintResult = 0;
-                //    string sToTry = nameNums[nameNums.Length - 1];
-                //    if (!Int32.TryParse(sToTry, out tryparseintResult) && Int64.TryParse(sToTry, out tryparseResult))
-                //    {
-                //        nameNums[nameNums.Length - 1] = "";
-                //        string newPageName = "";
-                //        foreach (string s in nameNums)
-                //        {
-                //            newPageName += s + "-";
-                //        }
-                //        pageName = newPageName.Remove(newPageName.IndexOf("--"));
-                //    }
-
-                //}
+                return pageName;
             }
-            catch { }
-
-            return pageName;
+            catch
+            {
+                return "";
+            }
         }
 
         private void LoadHandler_OnGotSourceFromLoadEnd(string source, string url)

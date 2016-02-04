@@ -245,11 +245,21 @@
                                        Visibility="Collapsed" 
                                        Source="/Organiser.Common;component/Image/v.png" 
                                        Stretch="Fill" Width="12" Height="12" Margin="3,0,0,3"/>
+                        <Image x:Name="circ" 
+                                       HorizontalAlignment="Left" 
+                                       VerticalAlignment="Center"
+                                       SnapsToDevicePixels="True" 
+                                       Visibility="Collapsed" 
+                                       Source="/Organiser.Common;component/Image/checkmark-green-dot.png" 
+                                       Stretch="Fill" Width="12" Height="12" Margin="2"/>
                         <ContentPresenter Margin="25,0,0,0" VerticalAlignment="Center"/>
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked"  Value="True">
                             <Setter Property="Visibility" TargetName="v" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked"  Value="{x:Null}">
+                            <Setter Property="Visibility" TargetName="circ" Value="Visible"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="false">
                             <Setter Property="Opacity" TargetName="grid" Value="0.4"/>

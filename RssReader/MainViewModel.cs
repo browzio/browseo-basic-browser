@@ -146,9 +146,9 @@ namespace RssReader
                 foreach (string link in rssFeeds)
                 {
                     if (string.IsNullOrEmpty(link) || string.IsNullOrWhiteSpace(link)) continue;
-                    AllRssFeedsResults.Add(new RssList() { RssLink = link.Trim(), ListResults = new BindingList<RssResult>() { RaiseListChangedEvents = false } });
+                    AllRssFeedsResults.Add(new RssList() { RssLink = link.Trim(), ListResults = new List<RssResult>() });
                 }
-                
+
                 loadingThread = new Thread(() =>
                 {
                     try
@@ -220,7 +220,7 @@ namespace RssReader
                                             {
                                                 string tempIimgLink = result.ImageLink;
                                                 result.ImageLink = "";
-                                                result.ImageLink = "https:" + tempIimgLink; 
+                                                result.ImageLink = "https:" + tempIimgLink;
                                             }
                                             result.OnClickedSendSocialLink += result_OnClickedSendSocialLink;
                                             tempResultsList.Add(result);
@@ -242,18 +242,18 @@ namespace RssReader
                             Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, (Action)delegate
                             {
 
-                            foreach (RssResult r in tempResultsList)
-                            {
-                                rssLink.ListResults.Add(r);
-                            }
+                                foreach (RssResult r in tempResultsList)
+                                {
+                                    rssLink.ListResults.Add(r);
+                                }
                                 //rssLink.ListResults.AddRange(tempResultsList);
                                 tempResultsList.Clear();
                                 // after all.. update the UI with following
-                               // rssLink.ListResults.RaiseListChangedEvents = true;
+                                // rssLink.ListResults.RaiseListChangedEvents = true;
                                 //rssLink.ListResults.ResetBindings(); // this forces update of entire list
                             });
 
-                               // rssLink.RaisListPropChanged();
+                            // rssLink.RaisListPropChanged();
                         }
 
                         if (failedLinks.Count > 0 && !isCloseing)
@@ -270,16 +270,16 @@ namespace RssReader
                                 "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                         }
                     }
-                    catch(Exception ex) 
+                    catch (Exception ex)
                     {
                         if (ex.Message != null && ex.Message.ToLower().Contains("thread was being aborted")) return;
                         if (!isCloseing)
-                        MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
+                            MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
                     }
                 });
                 loadingThread.Start();
             }
-            catch 
+            catch
             {
                 MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
             }

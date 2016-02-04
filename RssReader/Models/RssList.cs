@@ -96,7 +96,7 @@ namespace RssReader.Models
 
         //
 
-        public BindingList<RssResult> ListResults { get; set; }
+        public List<RssResult> ListResults { get; set; }
 
         public void RaisListPropChanged()
         {

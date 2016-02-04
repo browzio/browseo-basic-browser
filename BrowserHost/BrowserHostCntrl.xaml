@@ -9,11 +9,11 @@
              xmlns:viewModel="clr-namespace:WpfCefDynamBrowser.ViewModels"
              xmlns:view="clr-namespace:WpfCefDynamBrowser.Views"
              mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <!--<UserControl.InputBindings>
+             d:DesignHeight="300" d:DesignWidth="300" Focusable="True" Loaded="UserControl_Loaded">
+    <UserControl.InputBindings>
         <KeyBinding Key="T" Modifiers="Control" Command="New"/>
-        <KeyBinding Key="W" Modifiers="Control" Command="Close"/>
-    </UserControl.InputBindings>-->
+        <!--<KeyBinding Key="W" Modifiers="Control" Command="Close"/>-->
+    </UserControl.InputBindings>
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -188,14 +188,15 @@
     </UserControl.Resources>
     
     <Grid>
-        <commonControlls:NonReloadingTabControl   x:Name="TabControl"
-                                           SelectionChanged="TabControl_SelectionChanged"
-                                           Margin="0,0,0,0" 
-                                           ItemsSource="{Binding BrowserTabs, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
-                                           SelectedIndex="0">
+        <commonControlls:NonReloadingTabControl x:Name="TabControl"
+                                                SelectionChanged="TabControl_SelectionChanged"
+                                                Margin="0,0,0,0" 
+                                                ItemsSource="{Binding BrowserTabs, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                SelectedIndex="0">
             <TabControl.ContentTemplate>
                 <DataTemplate>
-                    <ContentControl Content="{Binding}" />
+                    <ContentControl Content="{Binding}">
+                    </ContentControl>
                 </DataTemplate>
             </TabControl.ContentTemplate>
         </commonControlls:NonReloadingTabControl>

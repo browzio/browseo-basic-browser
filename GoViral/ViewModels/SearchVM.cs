@@ -16,6 +16,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Collections;
 using System.Collections.Generic;
+using GoViral.Models.FilterResults;
 
 namespace GoViral.ViewModels
 {
@@ -106,7 +107,38 @@ namespace GoViral.ViewModels
         {
             get { return searchResultsList; }
             set { searchResultsList = value; }
-        }    
+        }
+
+
+        private ObservableCollection<FilterOption> filterOptionsList;
+        public ObservableCollection<FilterOption> FilterOptionsList
+        {
+            get { return filterOptionsList; }
+            set { filterOptionsList = value; }
+        }
+
+        private ObservableCollection<SearchResult> searchResultsForFilter;
+        public ObservableCollection<SearchResult> SearchResultsForFilter
+        {
+            get { return searchResultsForFilter; }
+            set { searchResultsForFilter = value; }
+        }
+
+        private bool threeStateFilterchecked;
+        public bool ThreeStateFilterchecked
+        {
+            get { return threeStateFilterchecked; }
+            set
+            {
+                threeStateFilterchecked = value;
+                foreach (var sr in SearchResultsForFilter)
+                {
+                    sr.IsChecked = (bool)threeStateFilterchecked;
+                }
+
+                RaisePropertyChanged("ThreeStateFilterchecked");
+            }
+        }
 
 
         private CrawlerHost mCrawlerHost;
@@ -123,6 +155,8 @@ namespace GoViral.ViewModels
             OnClickCommand = new RelayCommand(OnAnyCommandFromView);
 
             SearchResultsWithKwList = new SearchResultWithKeyWord();
+            FilterOptionsList = new ObservableCollection<FilterOption>();
+            SearchResultsForFilter = new ObservableCollection<SearchResult>();
 
             VisibleProgress = Visibility.Collapsed;
 
@@ -272,6 +306,97 @@ namespace GoViral.ViewModels
             }
         }
 
+        #region filter
+        internal void SetAvailableKeywordsList(IEnumerable itemsSource)
+        {
+            SearchResultsForFilter.Clear();
+            ThreeStateFilterchecked = false;
+
+            foreach (var item in SearchResultsWithKwList.SearchResultsList)
+            {
+                item.IsChecked = false;
+
+                if (SearchResultsWithKwList.SISearchResultList >= 0 && 
+                    item.Keyword == SearchResultsWithKwList.SearchResultsList[SearchResultsWithKwList.SISearchResultList].Keyword)
+                {
+                    item.IsChecked = true;
+                    ThreeStateFilterchecked = false;
+                }
+                if (itemsSource is ObservableCollection<PlacesResultData>)
+                {
+                    if (item.PlacesResult.data.Count > 0)
+                    {
+                        SearchResultsForFilter.Add(item);
+                    }
+                }
+                else if (itemsSource is ObservableCollection<PagesResultData>)
+                {
+                    if (item.PagesResult.data.Count > 0)
+                    {
+                        SearchResultsForFilter.Add(item);
+                    }
+                }
+                else if (itemsSource is ObservableCollection<MediaResultData>)
+                {
+                    if (item.MediaResult.data.Count > 0)
+                    {
+                        SearchResultsForFilter.Add(item);
+                    }
+                }
+                else if (itemsSource is ObservableCollection<GroupsResultData>)
+                {
+                    if (item.GroupsResult.data.Count > 0)
+                    {
+                        SearchResultsForFilter.Add(item);
+                    }
+                }
+                else if (itemsSource is ObservableCollection<EventsResultData>)
+                {
+                    if (item.EventsResult.data.Count > 0)
+                    {
+                        SearchResultsForFilter.Add(item);
+                    }
+                }
+            }
+        }
+
+        internal void AddFilterOption(OptionType type)
+        {
+            FilterOptionsList.Add(new FilterOption() { OptionState = type, Title = type.GetDescription() });
+        }
+
+        internal bool GetFilterOptionChecked(OptionType option)
+        {
+            return FilterOptionsList.Any(o => o.OptionState == option && o.IsChecked);
+        }
+
+        internal int GetOptionMinStart(OptionType option)
+        {
+            FilterOption o = FilterOptionsList.FirstOrDefault(p => p.OptionState == option);
+            return o == null ? 0 : o.StartingFrom;
+        }
+
+        internal int GetCheckedFilterCount()
+        {
+            return FilterOptionsList.Where(f => f.IsChecked).Count();
+        }
+        #endregion
+
+
+        internal void DownloadImageFromUrl(string picUrl)
+        {
+            Task.Factory.StartNew(() =>
+            {
+                VisibleProgress = Visibility.Visible;
+
+                picUrl = picUrl.Replace("&amp;", "&");
+                picUrl = picUrl.Replace("amp;", "");
+                MyFilesDatabase.DownloadImage(picUrl);
+
+                VisibleProgress = Visibility.Collapsed;
+            });
+        }
+
         #endregion
 
         private void save()
@@ -323,6 +448,7 @@ namespace GoViral.ViewModels
                 } 
             }
         }
+
 
         private void setKwByMulty()
         {
@@ -438,20 +564,6 @@ namespace GoViral.ViewModels
                 FlexibleMessageBox.Show(errors);
                 errors = "";
             }
-        }
-
-        internal void DownloadImageFromUrl(string picUrl)
-        {
-            Task.Factory.StartNew(() =>
-            {
-                VisibleProgress = Visibility.Visible;
-
-                picUrl = picUrl.Replace("&amp;","&");
-                picUrl = picUrl.Replace("amp;","");
-                MyFilesDatabase.DownloadImage(picUrl);
-
-                VisibleProgress = Visibility.Collapsed;
-            });
         }
 
         private void MCrawlerHost_OnReportFatalError(string userMessage, string fullExceptionText)

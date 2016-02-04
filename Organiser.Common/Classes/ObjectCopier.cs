@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
@@ -30,13 +31,43 @@ namespace Organiser.Common.Classes
             {
                 serializer.Serialize(writer, objectInstance);
             }
+            StringBuilder sbReplaced = sb.Replace("&", "&amp;");
 
-            return sb.ToString().Replace("&", "&amp;");
+            return sbReplaced.ToString();
+        }
+
+        public static List<string> XmlSerializeToStringChunks(this object objectInstance)
+        {
+            var serializer = new XmlSerializer(objectInstance.GetType());
+            var sb = new StringBuilder();
+
+            using (TextWriter writer = new StringWriter(sb))
+            {
+                serializer.Serialize(writer, objectInstance);
+            }
+
+            List<string> chunks = new List<string>();
+            string s = "";
+
+            for (int i = 0; i < sb.Length; i++)
+            {
+                s += sb[i];
+                if(s.Length >= 1000000)
+                {
+                    chunks.Add(s);
+                    s = "";
+                }
+            }
+
+            return chunks;
         }
 
         public static T XmlDeserializeFromString<T>(this string objectData)
         {
-            return (T)XmlDeserializeFromString(objectData.Replace("&", "&amp;"), typeof(T));
+            //StringBuilder sb = new StringBuilder();
+            //sb.Append(objectData);
+            //StringBuilder sbReplaced = sb.Replace("&", "&amp;");
+            return (T)XmlDeserializeFromString(objectData, typeof(T));
         }
 
         public static object XmlDeserializeFromString(this string objectData, Type type)

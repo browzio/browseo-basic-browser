@@ -18,6 +18,7 @@ namespace Organiser.Common.Classes
         public static bool JavaEnabled = true;
         public static bool JavascriptEnabled = true;
         public static bool FlashEnabled = true;
+        public static bool DoNotTrackEnabled = true; 
         public static bool SetSysDateEnabled = false;
 
         private static List<string> timeZoneList;
@@ -348,7 +349,8 @@ namespace Organiser.Common.Classes
                 "," + BrowserSettimgs.JavaEnabled +
                 "," + BrowserSettimgs.JavascriptEnabled +
                 "," + BrowserSettimgs.SetSysDateEnabled +
-                "," + BrowserSettimgs.SITimeZone);
+                "," + BrowserSettimgs.SITimeZone+
+                "," + BrowserSettimgs.DoNotTrackEnabled);
 
             string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
@@ -381,6 +383,10 @@ namespace Organiser.Common.Classes
                         BrowserSettimgs.JavascriptEnabled = Convert.ToBoolean(browserSettings[2]);
                         BrowserSettimgs.SetSysDateEnabled = Convert.ToBoolean(browserSettings[3]);
                         BrowserSettimgs.SITimeZone = Convert.ToInt32(browserSettings[4]);
+                        if(browserSettings.Length > 5)
+                        {
+                            BrowserSettimgs.DoNotTrackEnabled = Convert.ToBoolean(browserSettings[5]);
+                        }
                         if (BrowserSettimgs.SetSysDateEnabled)
                         {
                             TimeHelper.StartSetTimeAndZoneProcess(new DateAndTimeZone() { TimeZone = TimeZoneInfo.GetSystemTimeZones()[BrowserSettimgs.SITimeZone] });

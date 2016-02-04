@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GoViral.Windows"
         mc:Ignorable="d"
-        Title="Edit Options" SizeToContent="WidthAndHeight" WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="Edit Options" SizeToContent="Width" Height="450" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -13,28 +13,105 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <StackPanel>
-        <RadioButton Content="Top Results" GroupName="rb" IsChecked="True" Margin="3" Name="rbTopResults" />
-        <RadioButton Content="Bottom Results" GroupName="rb" Margin="3" Name="rbBottom" />
-        <DockPanel Margin="3" Name="dpName">
-            <TextBlock Text="Max:" Width="40" VerticalAlignment="Center" />
-            <TextBox Name="tbMax" Margin="3" Width="40" HorizontalAlignment="Left" Text="0" />
-        </DockPanel>
-        <GroupBox Header="Filter" Width="250">
-            <StackPanel>
-                <CheckBox Name="miOrderLikes" Content="Likes" Visibility="Collapsed" />
-                <CheckBox Name="miOrderComments" Content="Comments" Visibility="Collapsed" />
-                <CheckBox Name="miOrderViews" Content="Views" Visibility="Collapsed" />
-                <CheckBox Name="miOrderTalkingAbout" Content="Talking About" Visibility="Collapsed"  />
-                <CheckBox Name="miOrderMembers" Content="Members" Visibility="Collapsed"  />
-                <CheckBox Name="miOrderPrivacyOpen" Content="Open Groups" Visibility="Collapsed"  />
-                <CheckBox Name="miOrderPrivacyClosed" Content="Closed Groups" Visibility="Collapsed"  />
-                <CheckBox Name="miOrderInterested" Content="Interested" Visibility="Collapsed"  />
-                <CheckBox Name="miOrderGoing" Content="Going" Visibility="Collapsed"  />
-                <CheckBox Name="miOrderInvited" Content="Invited" Visibility="Collapsed"  />
-                <CheckBox Name="miOrderOrderMaybe" Content="Maybe" Visibility="Collapsed"  />
-            </StackPanel>
-        </GroupBox>
-        <Button Content="OK" Style="{StaticResource FlatbtnStyle}" Click="Button_Click"  Margin="3,10,3,3" />
-    </StackPanel>
+    <Grid Background="WhiteSmoke">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel>
+            <RadioButton Content="Top Results" GroupName="rb" IsChecked="True" Margin="3" Name="rbTopResults" />
+            <RadioButton Content="Bottom Results" GroupName="rb" Margin="3" Name="rbBottom" />
+        </StackPanel>
+        <Grid Grid.Row="1" Margin="3">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Border BorderThickness="0,0.5,0,0" Margin="1" BorderBrush="Black" />
+            <CheckBox Grid.Row="1" IsChecked="{Binding ThreeStateFilterchecked}" />
+            <ListView Grid.Row="2" 
+                      Background="WhiteSmoke"
+                      Name="lvAvailKws" 
+                      BorderThickness="0,0,0,0"
+                      ItemsSource="{Binding SearchResultsForFilter}">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding Keyword}" IsChecked="{Binding IsChecked}" />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+            <StackPanel Grid.Row="2" HorizontalAlignment="Left">
+            <DockPanel Margin="3" Name="dpName">
+                <TextBlock Text="Max:" Width="40" VerticalAlignment="Center" />
+                <TextBox Name="tbMax" Margin="3" Width="40" HorizontalAlignment="Left" Text="0" />
+            </DockPanel>
+
+            <GroupBox Header="Filter" Width="250" HorizontalAlignment="Left">
+                <ListView ItemsSource="{Binding FilterOptionsList}"
+                          Background="WhiteSmoke"
+                          BorderThickness="0,0,0,0">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <CheckBox Content="{Binding Title}" IsChecked="{Binding IsChecked}" />
+                                <DockPanel Visibility="{Binding ViSibleStartfomOptions}">
+                                    <!--<DockPanel.Style>
+                                        <Style TargetType="DockPanel">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsChecked}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding IsChecked}" Value="False">
+                                                    <Setter Property="Visibility" Value="Collapsed" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DockPanel.Style>-->
+                                    <TextBlock DockPanel.Dock="Left" Text="Starting From" Width="80" />
+                                    <TextBox DockPanel.Dock="Right" Text="{Binding StartingFrom}" />
+                                </DockPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </GroupBox>
+            <!--<GroupBox Header="Filter" Width="250">
+                StackPanel>
+                    <CheckBox Name="miOrderLikes" Content="Likes" Visibility="Collapsed" />
+                    <DockPanel>
+                        <DockPanel.Style>
+                            <Style TargetType="DockPanel">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=miOrderLikes, Path=IsChecked}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+
+                                    <DataTrigger Binding="{Binding ElementName=miOrderLikes, Path=IsChecked}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DockPanel.Style>
+                        <TextBlock Text="Starting From" Width="80" />
+                        <TextBox />
+                    </DockPanel>
+                    <CheckBox Name="miOrderComments" Content="Comments" Visibility="Collapsed" />
+                    <CheckBox Name="miOrderViews" Content="Views" Visibility="Collapsed" />
+                    <CheckBox Name="miOrderTalkingAbout" Content="Talking About" Visibility="Collapsed"  />
+                    <CheckBox Name="miOrderMembers" Content="Members" Visibility="Collapsed"  />
+                    <CheckBox Name="miOrderPrivacyOpen" Content="Open Groups" Visibility="Collapsed"  />
+                    <CheckBox Name="miOrderPrivacyClosed" Content="Closed Groups" Visibility="Collapsed"  />
+                    <CheckBox Name="miOrderInterested" Content="Interested" Visibility="Collapsed"  />
+                    <CheckBox Name="miOrderGoing" Content="Going" Visibility="Collapsed"  />
+                    <CheckBox Name="miOrderInvited" Content="Invited" Visibility="Collapsed"  />
+                    <CheckBox Name="miOrderOrderMaybe" Content="Maybe" Visibility="Collapsed"  />
+                </StackPanel>
+            </GroupBox>-->
+            <Button Content="OK" Style="{StaticResource FlatbtnStyle}" Click="Button_Click"  Margin="3,10,3,3" />
+        </StackPanel>
+    </Grid>
 </Window>

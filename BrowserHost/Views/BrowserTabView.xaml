@@ -76,7 +76,7 @@
                         ToolTip="Browser Settings" 
                         ContextMenuService.IsEnabled="False"
                         Click="BtnWithContextMenue_Click"
-                        Style="{DynamicResource browser_btn}">
+                        Style="{DynamicResource browser_btn}" Margin="5,0,0,3" VerticalAlignment="Bottom">
                         <Image Width="17" Height="17"
                                HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
@@ -106,16 +106,20 @@
                                 </ContextMenu.Resources>
                                 <MenuItem Header="Save Session" Command="{Binding SaveSession}" />
                                 <MenuItem Header="Delete Last Session" Command="{Binding DeleteSession}" />
-                                <MenuItem Header="Save Session To Bookmarks" Command="{Binding SaveSessionToBMs}" />
+
+                                <Separator Margin="-30,0,0,0" />
+                                
+                                <MenuItem Header="Save Open Tabs" ToolTip="Will save all open tabs to a bookmarks folder" Command="{Binding SaveSessionToBMs}" />
                                 
                                 <Separator Margin="-30,0,0,0" />
                                 
-                                <CheckBox Content="Flash Enabled" IsChecked="{Binding FlashEnabled, UpdateSourceTrigger=PropertyChanged}" />
-                                <CheckBox Content="Javascript Enabled" IsChecked="{Binding JavascriptEnabled, UpdateSourceTrigger=PropertyChanged}" />
-                                <CheckBox Content="Java Enabled" IsChecked="{Binding JavaEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                <CheckBox Content="Flash" IsChecked="{Binding FlashEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                <CheckBox Content="Javascript" IsChecked="{Binding JavascriptEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                <CheckBox Content="Java" IsChecked="{Binding JavaEnabled, UpdateSourceTrigger=PropertyChanged}" />
 
                                 <Separator Margin="-30,0,0,0" />
 
+                                <CheckBox Content="Allow Tracking (DNT)"  ToolTip="Can only be set with session settings" IsChecked="{Binding DoNotTrackEnabled, UpdateSourceTrigger=PropertyChanged}" />
                                 <CheckBox Content="Sync Time" ToolTip="Can only be set with session settings" IsChecked="{Binding SetSysDateEnabled, UpdateSourceTrigger=PropertyChanged}" />
                                 <Grid>
                                     <StackPanel Visibility="{Binding VisibleDtPbar}">

@@ -146,12 +146,13 @@ namespace WpfCefDynamBrowser.ViewModels
             IsLoading = true;
 
             SetSysDateEnabled = BrowserSettimgs.SetSysDateEnabled;
+            DoNotTrackEnabled = BrowserSettimgs.DoNotTrackEnabled;
 
             if (setTheBrowser)
             {
                 JavascriptEnabled = BrowserSettimgs.JavascriptEnabled;
                 JavaEnabled = BrowserSettimgs.JavaEnabled;
-                FlashEnabled = BrowserSettimgs.FlashEnabled;  
+                FlashEnabled = BrowserSettimgs.FlashEnabled;
                 SetBrowser(address);
             }
 
@@ -193,11 +194,15 @@ namespace WpfCefDynamBrowser.ViewModels
             WebBrowser.OnCreateNewTab += WebBrowser_OnCreateNewTab;   
             WebBrowser.OnBrowserContextMenuClicked += WebBrowser_OnBrowserContextMenuClicked;
         }
-
+        //class DemoClient : CefClient { }
         private void WebBrowser_OnBrowserContextMenuClicked(int contextMenueItemID)
         {
             switch (contextMenueItemID)
             {
+                case 333:
+                    //WebBrowser.CBrowser.Browser.GetHost().SendFocusEvent
+                   // WebBrowser.CBrowser.Browser.GetHost().ShowDevTools(CefWindowInfo.Create(), new DemoClient(), new CefBrowserSettings() { }, new CefPoint(110,110));
+                    break;
                 #region curate
                 case 666:
                     try
@@ -1193,6 +1198,18 @@ namespace WpfCefDynamBrowser.ViewModels
             }
         }
 
+        //DoNotTrackEnabled
+        private bool doNotTrackEnabled;
+        public bool DoNotTrackEnabled
+        {
+            get { return doNotTrackEnabled; }
+            set
+            {
+                doNotTrackEnabled = value;
+                RaisePropertyChanged("DoNotTrackEnabled");
+            }
+        }
+
         private bool setSysDateEnabled;
         public bool SetSysDateEnabled
         {
@@ -1245,7 +1262,7 @@ namespace WpfCefDynamBrowser.ViewModels
             }
         }
 
-        bool oldJavaCript, oldJava, oldFlash, oldSysDate;
+        bool oldJavaCript, oldJava, oldFlash, oldSysDate, oldDnt;
         int oldTZSI = 0;
 
         internal void SettingsMenuOpen()
@@ -1254,6 +1271,7 @@ namespace WpfCefDynamBrowser.ViewModels
             oldJava = JavaEnabled;
             oldFlash = FlashEnabled;
             oldSysDate = SetSysDateEnabled;
+            oldDnt = DoNotTrackEnabled;
             oldTZSI = SITimeZone;
         }
 
@@ -1263,6 +1281,7 @@ namespace WpfCefDynamBrowser.ViewModels
             JavaEnabled = oldJava;
             FlashEnabled = oldFlash;
             SetSysDateEnabled = oldSysDate;
+            DoNotTrackEnabled = oldDnt;
             SITimeZone = oldTZSI;
         }
 
@@ -1279,6 +1298,7 @@ namespace WpfCefDynamBrowser.ViewModels
                     BrowserSettimgs.JavascriptEnabled = JavascriptEnabled;
                     BrowserSettimgs.JavaEnabled = JavaEnabled;
                     BrowserSettimgs.FlashEnabled = FlashEnabled;
+                    BrowserSettimgs.DoNotTrackEnabled = DoNotTrackEnabled;
                     if (BrowserSettimgs.SetSysDateEnabled)
                     {
                         System.Threading.Tasks.Task.Factory.StartNew(() =>

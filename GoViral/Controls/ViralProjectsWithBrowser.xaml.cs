@@ -23,9 +23,13 @@ namespace GoViral.Controls
     /// </summary>
     public partial class ProjectsWithBrowser : UserControl
     {
+        ViewModels.GoViralVM ViewModel;
         public ProjectsWithBrowser()
         {
             InitializeComponent();
+
+            ViewModel = new ViewModels.GoViralVM();
+            DataContext = ViewModel;
         }
 
         private void StackPanel_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -47,13 +51,13 @@ namespace GoViral.Controls
         {
             try
             {
-                ViewModels.GoViralVM vm = this.DataContext as ViewModels.GoViralVM;
+                //ViewModels.GoViralVM vm = this.DataContext as ViewModels.GoViralVM;
                 Models.ListOption loToFind = ((sender as TextBox).DataContext as Models.ListOption);
                 if (loToFind == null) return;
-                Models.Folder nextFolder = vm.Folders.SingleOrDefault(f => f.SavedLinksList.SingleOrDefault(lo => lo == loToFind) != null);
+                Models.Folder nextFolder = ViewModel.Folders.SingleOrDefault(f => f.SavedLinksList.SingleOrDefault(lo => lo == loToFind) != null);
                 if(nextFolder != null)
                 {
-                    vm.SIFolders = vm.Folders.IndexOf(nextFolder);
+                    ViewModel.SIFolders = ViewModel.Folders.IndexOf(nextFolder);
                     nextFolder.SISavedLinks = nextFolder.SavedLinksList.IndexOf(loToFind);    
                 }
             }
@@ -92,7 +96,7 @@ namespace GoViral.Controls
                     url = "https://www.facebook.com/" + name;
                 }
             }
-            (this.DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(url);
+            ViewModel.WebBrowser.Navigate(url);
         }
 
 
@@ -153,12 +157,13 @@ namespace GoViral.Controls
 
         private void ucSearch_OnStoreForDominationRequested(string link, List<string> multi)
         {
-            (this.DataContext as ViewModels.GoViralVM).AsyncAddLinkToList(link,"", multi, showLinksWindow: false);
+            ViewModel.AsyncAddLinkToList(link,"", multi, showLinksWindow: false);
         }
 
         private void ucSearch_OnOpenInBrowserForDownloadRequested(string source)
         {
-            (this.DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(source);
+            ViewModel.WebBrowser.CBrowser.Browser.GetHost().StartDownload(source);
+            // (this.DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(source);
         }
         #endregion
     }

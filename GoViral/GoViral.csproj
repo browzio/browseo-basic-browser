@@ -84,6 +84,7 @@
     <Compile Include="Converters\PhotosVidsCountToTextConverter.cs" />
     <Compile Include="Converters\PostIdToUrlConverter.cs" />
     <Compile Include="Helpers\CrawlerHost.cs" />
+    <Compile Include="Models\FilterResults\FilterOption.cs" />
     <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\ListOption.cs" />
     <Compile Include="Models\Search\SearchResult.cs" />

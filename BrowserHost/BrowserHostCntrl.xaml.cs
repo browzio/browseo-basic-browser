@@ -75,18 +75,16 @@ namespace BrowserHost
         
         private void OpenNewTab(object sender, ExecutedRoutedEventArgs e)
         {
-            MyFilesDatabase.CheckRamUsage();
-                                            
-            CreateNewTab(MyFilesDatabase.GetDefultHomePage());
-
-            TabControl.SelectedIndex = TabControl.Items.Count - 1;
+            CreateNewTab("");
         }
 
         private void CreateNewTab(string url)
         {
+            MyFilesDatabase.CheckRamUsage();
+
             Application.Current.Dispatcher.Invoke((Action)delegate
             {
-                BrowserTabViewModel btvm = new BrowserTabViewModel(url);
+                BrowserTabViewModel btvm = new BrowserTabViewModel(url == "" ? MyFilesDatabase.GetDefultHomePage() : url);
                 setBTVMEvents(btvm);
                 btvm.Title = url;
                 if (BrowserTabs.Count > 0)
@@ -94,6 +92,8 @@ namespace BrowserHost
                 else
                     btvm.TabMargin = new Thickness(-3, 0, 0, 0);
                 BrowserTabs.Add(btvm);
+
+                TabControl.SelectedIndex = TabControl.Items.Count - 1;
             });
         }
 
@@ -131,8 +131,6 @@ namespace BrowserHost
             BrowserTabs.Add(btvm);
             TabControl.SelectedItem = btvm;
         }
-
-
 
         private void Btvm_OnRefreshSessionSettings()
         {
@@ -183,12 +181,7 @@ namespace BrowserHost
 
         void btvm_OnCreateNewTab(string webSite)
         {
-            Application.Current.Dispatcher.Invoke((Action)delegate
-            {
-                CreateNewTab(webSite);
-                int oldindex = TabControl.SelectedIndex;
-                TabControl.SelectedIndex = TabControl.Items.Count - 1;
-            });
+             CreateNewTab(webSite);
         }
 
         private void Btvm_OnCurateToPBN(string content, string link)
@@ -301,6 +294,11 @@ namespace BrowserHost
 
             BrowserTabs[TabControl.SelectedIndex].NavigateToSelectedSite(site);
            // btvm_OnCreateNewTab(site, true);
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.Focus();
         }
     }
 }

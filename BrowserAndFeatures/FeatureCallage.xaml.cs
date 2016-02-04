@@ -41,6 +41,7 @@ namespace BrowserAndFeatures
             if(App.browserinit)
                 BrowserInit.Init();
 
+           
             MyFilesDatabase.GetSites(); 
 
             (prospector.DataContext as FootPrintsOptionsVM).OnClickedSearch += FeatureCallage_OnClickedSearch;
@@ -218,13 +219,13 @@ namespace BrowserAndFeatures
                     previndex = tbControl.SelectedIndex;
                     crreateFeedMAsherContext(); 
                 }
-                else if (tbControl.SelectedIndex == 5)
-                {
-                    previndex = tbControl.SelectedIndex;
-                    { 
-                        createGoViralVM();
-                    } 
-                }
+                //else if (tbControl.SelectedIndex == 5)
+                //{
+                //    previndex = tbControl.SelectedIndex;
+                //    { 
+                //        createGoViralVM();
+                //    } 
+                //}
                 else
                 {
                     previndex = tbControl.SelectedIndex;
@@ -267,15 +268,6 @@ namespace BrowserAndFeatures
             }
         }
 
-        private void createGoViralVM()
-        {
-            if (goViralVM == null)
-            {
-                goViralVM = new GoViralVM();
-                ucGoViral.DataContext = goViralVM;   
-            }
-        }
-
         #region uc browser events
         private void Browser_OnRefreshedSessionSettings()
         {
@@ -310,7 +302,8 @@ namespace BrowserAndFeatures
 
         private void Browser_OnAddedToGoViral(string link,string type, List<string> multiLinks)
         {
-            createGoViralVM();
+            // createGoViralVM();
+            if (goViralVM == null) goViralVM = ucGoViral.DataContext as GoViralVM;
             goViralVM.AsyncAddLinkToList(link, type, multiLinks, showLinksWindow: true);
         }
         #endregion

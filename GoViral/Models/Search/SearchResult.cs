@@ -8,12 +8,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Xml.Serialization;
+using System.Collections;
 
 namespace GoViral.Models
 {
     [Serializable]
     [XmlType("GoViral.Models.SearchResult")]
-    public class SearchResult
+    public class SearchResult : ViewModelBase
     {
         //public ICommand OnClickCommandFromView { get; set; }
 
@@ -23,6 +24,14 @@ namespace GoViral.Models
             get { return kw; }
             set { kw = value; }
         }
+
+        private bool isChecked;
+        public bool IsChecked
+        {
+            get { return isChecked; }
+            set { isChecked = value; RaisePropertyChanged("IsChecked"); }
+        }
+
 
         public SearchResult()
         {
@@ -217,6 +226,62 @@ namespace GoViral.Models
             else if (dataContext is ObservableCollection<MediaResultData>)
             {
                 (dataContext as ObservableCollection<MediaResultData>).Clear();
+            }
+        }
+
+        internal IEnumerable GetCorrectItemsByList(IEnumerable dataContext)
+        {
+            if (dataContext is ObservableCollection<PersonsResultData>)
+            {
+                return PersonsResult.data;
+            }
+            else if (dataContext is ObservableCollection<PlacesResultData>)
+            {
+                return PlacesResult.data;
+            }
+            else if (dataContext is ObservableCollection<EventsResultData>)
+            {
+                return EventsResult.data;
+            }
+            else if (dataContext is ObservableCollection<GroupsResultData>)
+            {
+                return GroupsResult.data;
+            }
+            else if (dataContext is ObservableCollection<PagesResultData>)
+            {
+                return PagesResult.data;
+            }
+            else //if (dataContext is ObservableCollection<MediaResultData>)
+            {
+                return (dataContext as ObservableCollection<MediaResultData>).Any(d => d.is_video) ? MediaResultVideos.data : MediaResult.data;
+            }
+        }
+
+        internal int GetCorrectItemSizeByList(IEnumerable dataContext)
+        {
+            if (dataContext is ObservableCollection<PersonsResultData>)
+            {
+                return PersonsResult.data.Count;
+            }
+            else if (dataContext is ObservableCollection<PlacesResultData>)
+            {
+                return PlacesResult.data.Count;
+            }
+            else if (dataContext is ObservableCollection<EventsResultData>)
+            {
+                return EventsResult.data.Count;
+            }
+            else if (dataContext is ObservableCollection<GroupsResultData>)
+            {
+                return GroupsResult.data.Count;
+            }
+            else if (dataContext is ObservableCollection<PagesResultData>)
+            {
+                return PagesResult.data.Count;
+            }
+            else //if (dataContext is ObservableCollection<MediaResultData>)
+            {
+                return (dataContext as ObservableCollection<MediaResultData>).Any(d => d.is_video) ? MediaResultVideos.data.Count : MediaResult.data.Count;
             }
         }
     }

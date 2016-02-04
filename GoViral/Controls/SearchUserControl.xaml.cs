@@ -1,4 +1,5 @@
-﻿using GoViral.ViewModels;
+﻿using GoViral.Models.FilterResults;
+using GoViral.ViewModels;
 using GoViral.Windows;
 using Organiser.Common.Classes;
 using Organiser.Common.Classes.Facebook;
@@ -385,29 +386,6 @@ namespace GoViral.Controls
                     ViewModel.SearchResultsWithKwList.SearchResultsList[ViewModel.SearchResultsWithKwList.SISearchResultList].RemoveThisResultFromData(lv.SelectedItem);
                     break;
 
-                case "miRemoveSelective":
-                    TopNsearchResultsToDominateWindow filderForDeletionWindow = getSelectiveFilterWindw(lv, mi);
-                    filderForDeletionWindow.rbBottom.IsChecked = true;
-                    if (filderForDeletionWindow.ShowDialog() == true)
-                    {
-                        List<object> filterdItemsToDelete = getAllFilterdDataFromDataContext(lv.ItemsSource, lv.Items,
-                            filderForDeletionWindow.MaxNums, filderForDeletionWindow.rbTopResults.IsChecked,
-                            filderForDeletionWindow.miOrderLikes.IsChecked, filderForDeletionWindow.miOrderTalkingAbout.IsChecked,
-                            filderForDeletionWindow.miOrderMembers.IsChecked, filderForDeletionWindow.miOrderPrivacyOpen.IsChecked, filderForDeletionWindow.miOrderPrivacyClosed.IsChecked,
-                            filderForDeletionWindow.miOrderInterested.IsChecked, filderForDeletionWindow.miOrderGoing.IsChecked, filderForDeletionWindow.miOrderInvited.IsChecked, filderForDeletionWindow.miOrderOrderMaybe.IsChecked,
-                            filderForDeletionWindow.miOrderComments.IsChecked, filderForDeletionWindow.miOrderViews.IsChecked);
-
-                        if (filterdItemsToDelete.Count > 0)
-                        {
-                            foreach (object item in filterdItemsToDelete)
-                            {
-                                ViewModel.SearchResultsWithKwList.SearchResultsList[ViewModel.SearchResultsWithKwList.SISearchResultList].RemoveThisResultFromDataConditionally(item,
-                                     (bool)filderForDeletionWindow.miOrderPrivacyOpen.IsChecked, (bool)filderForDeletionWindow.miOrderPrivacyClosed.IsChecked);
-                            }
-                        }
-                    }
-                    break;
-
                 case "miDominate":
                     string link = getLinkFromDataContext(lv.SelectedItem, forDominator: true);
                     if (!string.IsNullOrEmpty(link) && !string.IsNullOrWhiteSpace(link))
@@ -433,25 +411,48 @@ namespace GoViral.Controls
                     }
                     break;
 
+                case "miRemoveSelective":
                 case "miDominateBy":
-                    TopNsearchResultsToDominateWindow filterForDominationWindow = getSelectiveFilterWindw(lv, mi);
-                    if (filterForDominationWindow.ShowDialog() == true)
-                    {
-                        List<object> filterdItemsForDominator = getAllFilterdDataFromDataContext(lv.ItemsSource, lv.Items,
-                            filterForDominationWindow.MaxNums, filterForDominationWindow.rbTopResults.IsChecked,
-                            filterForDominationWindow.miOrderLikes.IsChecked, filterForDominationWindow.miOrderTalkingAbout.IsChecked,
-                            filterForDominationWindow.miOrderMembers.IsChecked, filterForDominationWindow.miOrderPrivacyOpen.IsChecked, filterForDominationWindow.miOrderPrivacyClosed.IsChecked,
-                            filterForDominationWindow.miOrderInterested.IsChecked, filterForDominationWindow.miOrderGoing.IsChecked, filterForDominationWindow.miOrderInvited.IsChecked, filterForDominationWindow.miOrderOrderMaybe.IsChecked,
-                            filterForDominationWindow.miOrderComments.IsChecked, filterForDominationWindow.miOrderViews.IsChecked);
+                    TopNsearchResultsToDominateWindow filderForDeletionWindow = getSelectiveFilterWindw(lv, mi);
+                    if (mi.Name == "miRemoveSelective") filderForDeletionWindow.rbBottom.IsChecked = true;
+                    filderForDeletionWindow.DataContext = ViewModel;
 
-                        if (filterdItemsForDominator.Count > 0)
+                    if (filderForDeletionWindow.ShowDialog() == true)
+                    {
+                        Task.Factory.StartNew(() =>
                         {
-                            foreach (object item in filterdItemsForDominator)
+                            Mouse.OverrideCursor = Cursors.Wait;
+                            string textForMultyWindow = "";
+                            foreach (var kwList in ViewModel.SearchResultsForFilter.Where(r => r.IsChecked))
                             {
-                                string linkToAdd = getLinkFromDataContext(item, forDominator: true);
-                                if (!string.IsNullOrEmpty(linkToAdd) && !string.IsNullOrWhiteSpace(linkToAdd)) addLinkToMultiWindow(linkToAdd);
+                                List<object> filterdItemsToDelete = getAllFilterdDataFromDataContext(kwList.GetCorrectItemsByList(lv.ItemsSource), filderForDeletionWindow.MaxNums, (bool)filderForDeletionWindow.rbTopResults.IsChecked);
+
+                                if (filterdItemsToDelete.Count > 0)
+                                {
+                                    foreach (object item in filterdItemsToDelete)
+                                    {
+                                        if (mi.Name == "miRemoveSelective")
+                                        {
+                                            ViewModel.SearchResultsWithKwList.SearchResultsList[ViewModel.SearchResultsWithKwList.SISearchResultList].RemoveThisResultFromDataConditionally(item,
+                                                 getCheckedForFilter(OptionType.Privacy_OPEN), getCheckedForFilter(OptionType.Privacy_CLOSED));
+                                        }
+                                        else
+                                        {
+                                            string linkToAdd = getLinkFromDataContext(item, forDominator: true);
+                                            if (!string.IsNullOrEmpty(linkToAdd) && !string.IsNullOrWhiteSpace(linkToAdd)) textForMultyWindow = textForMultyWindow + linkToAdd + Environment.NewLine; 
+                                            //addLinkToMultiWindow(linkToAdd); //Application.Current.Dispatcher.Invoke(delegate { addLinkToMultiWindow(linkToAdd); });
+                                        }
+                                    }
+                                }
                             }
-                        }
+
+                            if (textForMultyWindow != "")
+                            {
+                                addLinkToMultiWindow(textForMultyWindow);
+                            }
+                            Mouse.OverrideCursor = null;
+
+                        }, System.Threading.CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
                     }
                     break;
 
@@ -481,7 +482,19 @@ namespace GoViral.Controls
         private TopNsearchResultsToDominateWindow getSelectiveFilterWindw(ListView lv,MenuItem mi)
         {
             TopNsearchResultsToDominateWindow tsrWindow = new TopNsearchResultsToDominateWindow();
-            tsrWindow.tbMax.Text = Convert.ToString(lv.Items.Count);
+            ViewModel.SetAvailableKeywordsList(lv.ItemsSource);
+            int max = 1;
+            foreach (var kwList in ViewModel.SearchResultsForFilter)
+            {
+                if (ViewModel.SearchResultsWithKwList.SISearchResultList >= 0 &&
+                    kwList.Keyword == ViewModel.SearchResultsWithKwList.SearchResultsList[ViewModel.SearchResultsWithKwList.SISearchResultList].Keyword)
+                {
+                    max = kwList.GetCorrectItemSizeByList(lv.ItemsSource);
+                    break;
+                }
+            }
+            tsrWindow.tbMax.Text = Convert.ToString(max);
+            ViewModel.FilterOptionsList.Clear();
             foreach (var item in (mi.Parent as ContextMenu).Items)
             {
                 if (item is MenuItem)
@@ -490,35 +503,35 @@ namespace GoViral.Controls
                     switch (miTcmbi.Name)
                     {
                         case "miOrderLikes":
-                            tsrWindow.miOrderLikes.Visibility = Visibility.Visible;
+                            ViewModel.AddFilterOption(OptionType.Likes);
                             break;
                         case "miOrderComments":
-                            tsrWindow.miOrderComments.Visibility = Visibility.Visible;
+                            ViewModel.AddFilterOption(OptionType.Comments);
                             break;
                         case "miOrderViews":
-                            tsrWindow.miOrderViews.Visibility = Visibility.Visible;
+                            ViewModel.AddFilterOption(OptionType.Views);
                             break;
                         case "miOrderTalkingAbout":
-                            tsrWindow.miOrderTalkingAbout.Visibility = Visibility.Visible;
+                            ViewModel.AddFilterOption(OptionType.TalkingAbout);
                             break;
                         case "miOrderMembers":
-                            tsrWindow.miOrderMembers.Visibility = Visibility.Visible;
+                            ViewModel.AddFilterOption(OptionType.Members);
                             break;
                         case "miOrderPrivacy":
-                            tsrWindow.miOrderPrivacyOpen.Visibility = Visibility.Visible;
-                            tsrWindow.miOrderPrivacyClosed.Visibility = Visibility.Visible;
+                            ViewModel.AddFilterOption(OptionType.Privacy_OPEN);
+                            ViewModel.AddFilterOption(OptionType.Privacy_CLOSED);
                             break;
                         case "miOrderInterested":
-                            tsrWindow.miOrderInterested.Visibility = Visibility.Visible;
+                            ViewModel.AddFilterOption(OptionType.Interested);
                             break;
                         case "miOrderGoing":
-                            tsrWindow.miOrderGoing.Visibility = Visibility.Visible;
+                            ViewModel.AddFilterOption(OptionType.Going);
                             break;
                         case "miOrderInvited":
-                            tsrWindow.miOrderInvited.Visibility = Visibility.Visible;
+                            ViewModel.AddFilterOption(OptionType.Invited);
                             break;
                         case "miOrderOrderMaybe":
-                            tsrWindow.miOrderOrderMaybe.Visibility = Visibility.Visible;
+                            ViewModel.AddFilterOption(OptionType.Maybe);
                             break;
 
                         default:
@@ -530,52 +543,29 @@ namespace GoViral.Controls
             return tsrWindow;
         }
 
-        private List<object> getAllFilterdDataFromDataContext(IEnumerable itemsSource, ItemCollection items,
-            int maxListSize, bool? rbTopResults,
-            bool? miOrderLikes, bool? miOrderTalkingAbout,
-            bool? miOrderMembers, bool? miOrderPrivacyOpen, bool? miOrderPrivacyClosed,
-            bool? miOrderInterested, bool? miOrderGoing, bool? miOrderInvited, bool? miOrderOrderMaybe, 
-            bool? miOrderComments, bool? miOrderViews)
+        private List<object> getAllFilterdDataFromDataContext(IEnumerable itemsSource, int maxListSize, bool rbTopResults)
         {
             List<object> multiItemsWithFilter = new List<object>();
-            int devideMaxBy = 0;
+            int devideMaxBy = ViewModel.GetCheckedFilterCount();
 
-            if (miOrderLikes == true) devideMaxBy++;
-            if (miOrderTalkingAbout == true) devideMaxBy++;
-
-            if (miOrderMembers == true) devideMaxBy++;
-            if (miOrderPrivacyOpen == true) devideMaxBy++;
-            if (miOrderPrivacyClosed == true) devideMaxBy++;
-
-            if (miOrderInterested == true) devideMaxBy++;
-            if (miOrderGoing == true) devideMaxBy++;
-            if (miOrderInvited == true) devideMaxBy++;
-            if (miOrderViews == true) devideMaxBy++;
-
-            if (miOrderComments == true) devideMaxBy++;
-            if (miOrderViews == true) devideMaxBy++;
-
-            if (devideMaxBy == 0) devideMaxBy = 1;
+            if (devideMaxBy <= 0) devideMaxBy = 1;
             int maxChunk = maxListSize / devideMaxBy;
 
-            if (miOrderLikes == true || miOrderTalkingAbout == true ||
-                miOrderMembers == true || miOrderPrivacyOpen == true || miOrderPrivacyClosed == true ||
-                miOrderInterested == true || miOrderGoing == true || miOrderInvited == true || miOrderOrderMaybe == true||
-                miOrderComments == true || miOrderViews == true)
+            if (ViewModel.FilterOptionsList.Any(f=>f.IsChecked))
             {
-                addAllFilterdItemsRecursive(itemsSource, items,
+                addAllFilterdItemsRecursive(itemsSource,
                     maxListSize, maxChunk, devideMaxBy, ref multiItemsWithFilter,
-                    (bool)rbTopResults,
-                    (bool)miOrderLikes, (bool)miOrderTalkingAbout,
-                    (bool)miOrderMembers, (bool)miOrderPrivacyOpen, (bool)miOrderPrivacyClosed,
-                    (bool)miOrderInterested, (bool)miOrderGoing, (bool)miOrderInvited, (bool)miOrderOrderMaybe,
-                    (bool)miOrderComments, (bool)miOrderViews);
+                    rbTopResults,
+                    getCheckedForFilter(OptionType.Likes), getCheckedForFilter(OptionType.TalkingAbout),
+                    getCheckedForFilter(OptionType.Members), getCheckedForFilter(OptionType.Privacy_OPEN), getCheckedForFilter(OptionType.Privacy_CLOSED),
+                    getCheckedForFilter(OptionType.Interested), getCheckedForFilter(OptionType.Going), getCheckedForFilter(OptionType.Invited), getCheckedForFilter(OptionType.Maybe),
+                    getCheckedForFilter(OptionType.Comments), getCheckedForFilter(OptionType.Views));
 
                 return multiItemsWithFilter;
             }
             else
             {
-                foreach (var item in items)
+                foreach (var item in itemsSource)
                 {
                     multiItemsWithFilter.Add(item);
                     if (multiItemsWithFilter.Count == maxListSize) break;
@@ -585,7 +575,17 @@ namespace GoViral.Controls
             }
         }
 
-        private void addAllFilterdItemsRecursive(IEnumerable itemsSource, ItemCollection items,
+        bool getCheckedForFilter(OptionType option)
+        {
+            return ViewModel.GetFilterOptionChecked(option);
+        }
+
+        int getMinStartForFilter(OptionType option)
+        {
+            return ViewModel.GetOptionMinStart(option); 
+        }
+
+        private void addAllFilterdItemsRecursive(IEnumerable itemsSource, 
             int maxListSize, int maxChunk, int devideMaxBy, ref List<object> multiItemsWithFilter,
             bool topResults,
             bool miOrderLikes, bool miOrderTalkingAbout,
@@ -593,16 +593,23 @@ namespace GoViral.Controls
             bool miOrderInterested, bool miOrderGoing, bool miOrderInvited, bool miOrderOrderMaybe,
             bool miOrderComments, bool miOrderViews)
         {
+            int minStartFrom = 0;
+            OptionType type = OptionType.Likes;
+
             #region pages or places  [miOrderLikes | miOrderTalkingAbout] 
             if (miOrderLikes)
             {
                 ViewModel.OrderResultsOfListBy("miOrderLikes", itemsSource, topResults);
                 miOrderLikes = false;
+                minStartFrom = ViewModel.GetOptionMinStart(OptionType.Likes);
+                type = OptionType.Likes;
             }
             else if (miOrderTalkingAbout)
             {
                 ViewModel.OrderResultsOfListBy("miOrderTalkingAbout", itemsSource, topResults);
                 miOrderTalkingAbout = false;
+                minStartFrom = ViewModel.GetOptionMinStart(OptionType.TalkingAbout);
+                type = OptionType.TalkingAbout;
             }
             #endregion
             #region media [miOrderComments | miOrderViews ]
@@ -610,11 +617,15 @@ namespace GoViral.Controls
             {
                 ViewModel.OrderResultsOfListBy("miOrderComments", itemsSource, topResults);
                 miOrderComments = false;
+                minStartFrom = ViewModel.GetOptionMinStart(OptionType.Comments);
+                type = OptionType.Comments;
             }
             else if (miOrderViews)
             {
                 ViewModel.OrderResultsOfListBy("miOrderViews", itemsSource, topResults);
                 miOrderViews = false;
+                minStartFrom = ViewModel.GetOptionMinStart(OptionType.Views);
+                type = OptionType.Views;
             }
             #endregion
             #region groups [miOrderMembers | miOrderPrivacyOpen | miOrderPrivacyClosed]
@@ -622,16 +633,22 @@ namespace GoViral.Controls
             {
                 ViewModel.OrderResultsOfListBy("miOrderMembers", itemsSource, topResults);
                 miOrderMembers = false;
+                minStartFrom = ViewModel.GetOptionMinStart(OptionType.Members);
+                type = OptionType.Members;
             }
             else if (miOrderPrivacyOpen)
             {
                 ViewModel.OrderResultsOfListBy("miOrderPrivacyOpen", itemsSource, topResults);
                 miOrderPrivacyOpen = false;
+                minStartFrom = ViewModel.GetOptionMinStart(OptionType.Privacy_OPEN);
+                type = OptionType.Privacy_OPEN;
             }
             else if (miOrderPrivacyClosed)
             {
                 ViewModel.OrderResultsOfListBy("miOrderPrivacyClosed", itemsSource, topResults);
                 miOrderPrivacyClosed = false;
+                minStartFrom = ViewModel.GetOptionMinStart(OptionType.Privacy_CLOSED);
+                type = OptionType.Privacy_CLOSED;
             }
             #endregion
             #region events [miOrderInterested | miOrderGoing | miOrderInvited | miOrderOrderMaybe]
@@ -639,28 +656,36 @@ namespace GoViral.Controls
             {
                 ViewModel.OrderResultsOfListBy("miOrderInterested", itemsSource, topResults);
                 miOrderInterested = false;
+                minStartFrom = ViewModel.GetOptionMinStart(OptionType.Interested);
+                type = OptionType.Interested;
             }
             else if (miOrderGoing)
             {
                 ViewModel.OrderResultsOfListBy("miOrderGoing", itemsSource, topResults);
                 miOrderGoing = false;
+                minStartFrom = ViewModel.GetOptionMinStart(OptionType.Going);
+                type = OptionType.Going;
             }
             else if (miOrderInvited)
             {
                 ViewModel.OrderResultsOfListBy("miOrderInvited", itemsSource, topResults);
                 miOrderInvited = false;
+                minStartFrom = ViewModel.GetOptionMinStart(OptionType.Invited);
+                type = OptionType.Invited;
             }
             else if (miOrderOrderMaybe)
             {
                 ViewModel.OrderResultsOfListBy("miOrderOrderMaybe", itemsSource, topResults);
                 miOrderOrderMaybe = false;
+                minStartFrom = ViewModel.GetOptionMinStart(OptionType.Maybe);
+                type = OptionType.Going;
             }
             #endregion
 
             List<object> multiLinksChunk = new List<object>();
-            foreach (var item in items)
+            foreach (var item in itemsSource)
             {
-                if (!multiLinksChunk.Contains(item)) multiLinksChunk.Add(item);
+                if (!multiLinksChunk.Contains(item) && canAddByMinAmount(item, minStartFrom, type)) multiLinksChunk.Add(item);
                 if (multiLinksChunk.Count == maxChunk) break;
             }
             multiItemsWithFilter.AddRange(multiLinksChunk);
@@ -668,7 +693,7 @@ namespace GoViral.Controls
             if (devideMaxBy > 1)
             {
                 devideMaxBy--;
-                addAllFilterdItemsRecursive(itemsSource, items,
+                addAllFilterdItemsRecursive(itemsSource, 
                     maxListSize, maxChunk, devideMaxBy, ref multiItemsWithFilter,
                     topResults,
                     miOrderLikes, miOrderTalkingAbout,
@@ -678,6 +703,89 @@ namespace GoViral.Controls
             }
         }
 
+        private bool canAddByMinAmount(object dataContext, int minStartFrom, OptionType type)
+        {
+            if (dataContext is PagesResultData)
+            {
+                PagesResultData data = (dataContext as PagesResultData);
+                switch (type)
+                {
+                    case OptionType.Likes:
+                        return data.likes >= minStartFrom;
+                    case OptionType.TalkingAbout:
+                        return data.talking_about_count >= minStartFrom;
+                    default:
+                        break;
+                }
+            }
+            else if (dataContext is GroupsResultData)
+            {
+                GroupsResultData data = (dataContext as GroupsResultData);
+                switch (type)
+                {
+                    case OptionType.Members:
+                        return data.members == null ? false : data.members.summary == null ? false : data.members.summary.total_count >= minStartFrom;
+                    case OptionType.Privacy_OPEN:
+                        return true;
+                    case OptionType.Privacy_CLOSED:
+                        return true;
+                }
+            }
+            else if (dataContext is EventsResultData)
+            {
+                EventsResultData data = (dataContext as EventsResultData);
+                switch (type)
+                {
+                    case OptionType.Interested:
+                        return data.interested == null ? false : data.interested.summary == null ? false : data.interested.summary.count >= minStartFrom;
+                    case OptionType.Going:
+                        return data.invited == null ? false : data.invited.summary == null ? false : data.invited.summary.attending_count >= minStartFrom;
+                    case OptionType.Invited:
+                        return data.invited == null ? false : data.invited.summary == null ? false : data.invited.summary.count >= minStartFrom;
+                    case OptionType.Maybe:
+                        return data.invited == null ? false : data.invited.summary == null ? false : data.invited.summary.maybe_count >= minStartFrom;
+                    default:
+                        break;
+                }
+            }
+            else if (dataContext is PlacesResultData)
+            {
+                PlacesResultData data = (dataContext as PlacesResultData);
+                switch (type)
+                {
+                    case OptionType.Likes:
+                        return data.likes >= minStartFrom;
+                    case OptionType.TalkingAbout:
+                        return data.talking_about_count >= minStartFrom;
+                    default:
+                        break;
+                }
+            }
+            else if (dataContext is MediaResultData)
+            {
+                MediaResultData data = (dataContext as MediaResultData);
+                switch (type)
+                {
+                    case OptionType.Likes:
+                        return data.like_count >= minStartFrom;
+                    case OptionType.Comments:
+                        return data.comment_count >= minStartFrom;
+                    case OptionType.Views:
+                        return data.view_count >= minStartFrom;
+                    default:
+                        break;
+                }
+                //return data.like_count > minStartFrom;
+            }
+            else if (dataContext is PersonsResultData)
+            {
+                PersonsResultData data = (dataContext as PersonsResultData);
+                return true;
+            }
+
+            return false;
+        }
+        
 
         private string getLinkFromDataContext(object dataContext, bool forDominator)
         {

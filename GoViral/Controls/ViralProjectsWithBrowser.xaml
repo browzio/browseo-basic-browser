@@ -149,12 +149,13 @@
                                                                         Padding="{TemplateBinding Padding}">
                                                                             <Grid>
                                                                                 <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" 
-                                                                                          Content="{TemplateBinding Content}" 
-                                                                                          ContentStringFormat="{TemplateBinding ContentStringFormat}" 
-                                                                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
-                                                                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
-                                                                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
-                                                                                <Rectangle Height="1.5" x:Name="frame" VerticalAlignment="Top" StrokeDashArray="1 2" Stroke="#FFB2B2B2" StrokeThickness="2"/>
+                                                                                                  Content="{TemplateBinding Content}" 
+                                                                                                  Name="cp" 
+                                                                                                  ContentStringFormat="{TemplateBinding ContentStringFormat}" 
+                                                                                                  HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                                                                                  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
+                                                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>  
+                                                                                <Rectangle Height="1.5" x:Name="frame" VerticalAlignment="Bottom" StrokeDashArray="1 2" Stroke="#FFB2B2B2" StrokeThickness="2"/>
                                                                             </Grid>
 
                                                                         </Border>
@@ -174,8 +175,9 @@
                                                                             </Trigger>
 
                                                                             <Trigger Property="IsSelected" Value="True">
-                                                                                <Setter Property="Background" TargetName="Bd" Value="WhiteSmoke" />
+                                                                                <Setter Property="Background" TargetName="Bd" Value="#448AFF" />
                                                                                 <Setter Property="Stroke" TargetName="frame" Value="#FF588DF0" />
+                                                                                <Setter TargetName="cp" Property="TextBlock.Foreground" Value="White" />
                                                                             </Trigger>
 
                                                                             <Trigger Property="IsMouseOver" Value="True">
@@ -198,8 +200,11 @@
                                                                     <RowDefinition Height="Auto" />
                                                                     <RowDefinition Height="Auto" />
                                                                 </Grid.RowDefinitions>
-                                                                <TextBlock Text="{Binding Name, Converter={StaticResource linkCleanerconv}}" Width="465" Margin="0,3,0,2" FontSize="14" />
-                                                                <TextBox Style="{StaticResource TextboxGray}" IsReadOnly="True" Text="{Binding Url, Converter={StaticResource linkCleanerconv}}" PreviewMouseDown="TextBox_PreviewMouseDown" Grid.Row="1" Width="465" />
+                                                                <TextBlock Text="{Binding Name, Converter={StaticResource linkCleanerconv}}"
+                                                                           Width="465" Margin="0,3,0,2" FontSize="14" />
+                                                                <TextBox Style="{StaticResource TextboxGray}" IsReadOnly="True" Text="{Binding Url, Converter={StaticResource linkCleanerconv}}"
+                                                                         PreviewMouseDown="TextBox_PreviewMouseDown"
+                                                                         Grid.Row="1" Width="465" />
                                                             </Grid>
                                                         </DataTemplate>
                                                     </ListView.ItemTemplate>

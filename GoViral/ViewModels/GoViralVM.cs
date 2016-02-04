@@ -144,7 +144,7 @@ namespace GoViral.ViewModels
 
         private CrawlerHost mCrawlerHost;
 
-        private Task PopulateListTask; 
+       // private Task PopulateListTask; 
         private TaskScheduler uiContextScheduler;
 
         private int lastSelectedIndex = -1;
@@ -159,10 +159,11 @@ namespace GoViral.ViewModels
 
             Folders = new ObservableCollection<Folder>();
 
-            PopulateListTask = Task.Factory.StartNew(() =>
-            {
-                PopulatList();
-            }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+            //PopulateListTask = Task.Factory.StartNew(() =>
+            //{
+            //    PopulatList();
+            //}, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
+            new Thread(PopulatList).Start();
 
             uiContextScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
@@ -704,9 +705,19 @@ namespace GoViral.ViewModels
 
                     string saveToFilePath = Path.Combine(saveToDir, "info");
                     //if (File.Exists(saveToFilePath)) File.Delete(saveToFilePath);
-
-                    File.WriteAllText(saveToFilePath,Folders.XmlSerializeToString());
-
+                   // try
+                   // {
+                        string sss = Folders.XmlSerializeToString();
+                        File.WriteAllText(saveToFilePath, sss);
+                    //}
+                    //catch(OutOfMemoryException)
+                    //{
+                    //    File.Delete(saveToFilePath);
+                    //    foreach (string chunk in Folders.XmlSerializeToStringChunks())
+                    //    {
+                    //        File.AppendAllText(saveToFilePath, chunk);
+                    //    }
+                    //}
                     //MemoryStream sessionData = new MemoryStream();
                     //DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<Folder>));
                     //serializer.WriteObject(sessionData, Folders);
@@ -732,44 +743,48 @@ namespace GoViral.ViewModels
 
         public void PopulatList()
         {
-            try
+            lock (mLock)
             {
-                string saveToDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "GoViral", GloableProfData.PData.ProjectName);
-                if (!Directory.Exists(saveToDir)) return;
-
-                string saveToFilePath = Path.Combine(saveToDir, "info");
-                if (!File.Exists(saveToFilePath)) return;
-
-                
-                ObservableCollection<Folder> data = File.ReadAllText(saveToFilePath).XmlDeserializeFromString<ObservableCollection<Folder>>();
-               // Folder needsToBeSelected = null;
-                foreach (Folder folder in data)
+                try
                 {
-                    setFolderEvents(folder);
-                    folder.CTMenuClick = new RelayCommand(folder.On_CTMenuClick);
-                    if(folder.SavedLinksList != null)
+                    string saveToDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "GoViral", GloableProfData.PData.ProjectName);
+                    if (!Directory.Exists(saveToDir)) return;
+
+                    string saveToFilePath = Path.Combine(saveToDir, "info");
+                    if (!File.Exists(saveToFilePath)) return;
+
+                    // File.ReadAllText(saveToFilePath);
+
+                    ObservableCollection<Folder> data = File.ReadAllText(saveToFilePath).XmlDeserializeFromString<ObservableCollection<Folder>>();
+                    // Folder needsToBeSelected = null;
+                    foreach (Folder folder in data)
                     {
-                        foreach (ListOption lo in folder.SavedLinksList)
-                        {  
-                            lo.OnFBGraphDataChanged += folder.Raise_OnFBGraphDataChanged;  
-                            //if (lo.IsSelected)
-                            //{
-                            //    needsToBeSelected = folder;
-                            //}
+                        setFolderEvents(folder);
+                        folder.CTMenuClick = new RelayCommand(folder.On_CTMenuClick);
+                        if (folder.SavedLinksList != null)
+                        {
+                            foreach (ListOption lo in folder.SavedLinksList)
+                            {
+                                lo.OnFBGraphDataChanged += folder.Raise_OnFBGraphDataChanged;
+                                //if (lo.IsSelected)
+                                //{
+                                //    needsToBeSelected = folder;
+                                //}
+                            }
                         }
+                        folder.SISavedLinks = 0;
+                        Application.Current.Dispatcher.Invoke(delegate { Folders.Add(folder); });
                     }
-                    folder.SISavedLinks = 0;
-                    Folders.Add(folder);
+                    if (SelectedFolder != null)
+                    {
+                        SelectedFolder.IsEExpanded = true;
+                    }
+                    RaisePropertyChanged("SelectedFolder");
                 }
-                if(SelectedFolder != null)
+                catch (Exception ex)
                 {
-                    SelectedFolder.IsEExpanded = true;
+                    Console.WriteLine(ex.Message);
                 }
-                RaisePropertyChanged("SelectedFolder"); 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
             }
         }
 
@@ -824,12 +839,12 @@ namespace GoViral.ViewModels
         /// </summary>
         /// <param name="link">link to store if null will use multi</param>
         /// <param name="multi">to activate this as a multy add cannot be null if link is null</param>
-        public async void AsyncAddLinkToList(string link, string type, List<string> multi, bool showLinksWindow)
+        public void AsyncAddLinkToList(string link, string type, List<string> multi, bool showLinksWindow)
         {
-            if (!PopulateListTask.IsCompleted)
-            {
-                await PopulateListTask;
-            }
+            //if (!PopulateListTask.IsCompleted)
+            //{
+            //    await PopulateListTask;
+            //}
             if(link == null)
             {
                 OpenMultyLinks(multi, showLinksWindow);
@@ -878,7 +893,7 @@ namespace GoViral.ViewModels
 
         private bool displayYouNeedToAddFolderMessage()
         {
-            if (Folders.Count == 0)
+            if (Folders.Count == 0 && !File.Exists(Path.Combine(MyFilesDatabase.GetBaseDir(), "GoViral", GloableProfData.PData.ProjectName, "info")))
             {
                 MessageBox.Show("You need to create a folder before pushing links to it.");
                 addNewFolder();

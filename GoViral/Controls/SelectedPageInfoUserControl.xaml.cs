@@ -152,7 +152,8 @@ namespace GoViral.Controls
                     {
                         string link = (mi.DataContext as Videos.Video).source.Replace("&amp;", "&");
                         link = link.Replace("amp;", "");
-                        (DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(link);
+                        (DataContext as ViewModels.GoViralVM).WebBrowser.CBrowser.Browser.GetHost().StartDownload(tag);
+                        //(DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(link);
                     }
                     catch { MessageBox.Show("No video download link found."); }
                     break;
@@ -255,7 +256,8 @@ namespace GoViral.Controls
             tag = tag.Replace("amp;","");
             if (tag.Contains(".mp4"))
             {
-                (DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(tag);
+                //(DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(tag);
+                (DataContext as ViewModels.GoViralVM).WebBrowser.CBrowser.Browser.GetHost().StartDownload(tag);
             }
             else
             {

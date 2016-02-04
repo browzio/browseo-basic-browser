@@ -38,6 +38,12 @@ namespace Xilium.CefGlue.Client
         public BrowserCntrl()
         {
             InitializeComponent();
+            this.PreviewKeyDown += BrowserCntrl_PreviewKeyDown;
+        }
+
+        private void BrowserCntrl_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+
         }
 
         public void init(string startUrl, CefState StateJavascript = CefState.Enabled, CefState StateJava= CefState.Enabled, CefState StateFlash = CefState.Enabled)
@@ -146,7 +152,16 @@ namespace Xilium.CefGlue.Client
 
         void browser_OnHandleCreated()
         {
-            CBrowser.CreateWebClient(new RequestHandleing(CBrowser), null);  
+            CefWebClient client = CBrowser.CreateWebClient(new RequestHandleing(CBrowser), null);
+            client.KeyboardHandler.OnPrePreviewKeyDown += OnBrowserPreviewKeyDown;
+        }
+
+        private void OnBrowserPreviewKeyDown(CefKeyEvent keyEvent)
+        {
+            if(keyEvent.Modifiers == CefEventFlags.ControlDown && keyEvent.Character == 'T')
+            {
+                OnCreateNewTab("");
+            }
         }
 
         #endregion

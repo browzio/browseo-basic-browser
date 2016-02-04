@@ -32,24 +32,67 @@ namespace Xilium.CefGlue.Client
 
         protected override bool OnBeforeBrowse(CefBrowser browser, CefFrame frame, CefRequest request, bool isRedirect)
         {
-            //System.Collections.Specialized.NameValueCollection headers = request.GetHeaderMap();
-            //headers.Add("dnt", "1"); 
-            //request.SetHeaderMap(headers);
+            //if (request.Method == "GET" || request.Method == "POST")
+            //{
+            //    System.Collections.Specialized.NameValueCollection headers = request.GetHeaderMap();
+            //    headers.Add("DNT", "1");
+            //    request.SetHeaderMap(headers);
+            //}
             //Console.WriteLine(request.Url);
-            return base.OnBeforeBrowse(browser, frame, request, isRedirect);
+            //var headers = request.GetHeaderMap();
+           // headers.Add("HTTP_DNT", "1");
+            //headers.Add("DNT", "1");
+            //request.SetHeaderMap(headers);
+           // return false;
+           return base.OnBeforeBrowse(browser, frame, request, isRedirect);
         }
 
         protected override bool OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request)
         {
-            //System.Collections.Specialized.NameValueCollection headers = request.GetHeaderMap();
-            //headers.Add("dnt", "1");     
-            //request.SetHeaderMap(headers);
+            if (!BrowserSettimgs.DoNotTrackEnabled)
+            {
+                var headers = request.GetHeaderMap();
+                headers.Add("DNT", "1");
+                request.SetHeaderMap(headers);
+
+                browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('doNotTrack', function () { return '1'; });", browser.GetMainFrame().Url, 0);
+            } 
+
+            //for (property in navigator) { if (navigator[property] == null) { navigator[property].value = '1'; alert(property + ' ' + navigator[property]); } }
+            //window.navigator.doNotTrack = '1';
+            return false;
+
+            //if (request.Method == "GET" || request.Method == "POST")
+            //{
+            // System.Collections.Specialized.NameValueCollection headers = request.GetHeaderMap();
+            //if (request.Url.Contains("https://mc.yandex.ru"))
+            // {
+            //   headers.Add("DNT", "1");
+            //}
+            //else
+            // {
+            //   headers.Add("dnt", "1");
+            //}
+            // request.SetHeaderMap(headers);
+            //}
             //if (request.Url.Contains("https://vupload-edge.facebook.com/ajax/video/upload/requests/receive/"))
             //{
             //   System.Collections.Specialized.NameValueCollection headers =  request.GetHeaderMap();
             //}
             //Console.WriteLine(request.Url);
-            return base.OnBeforeResourceLoad(browser, frame, request); ;
+            //return base.OnBeforeResourceLoad(browser, frame, request); 
+            //return false;
+        }
+
+        protected override void OnProtocolExecution(CefBrowser browser, string url, out bool allowOSExecution)
+        {
+            //allowOSExecution = true;
+            base.OnProtocolExecution(browser, url, out allowOSExecution);
+        }
+
+        protected override void OnResourceRedirect(CefBrowser browser, CefFrame frame, string oldUrl, ref string newUrl)
+        {
+            base.OnResourceRedirect(browser, frame, oldUrl, ref newUrl);
         }
 
 
@@ -92,11 +135,11 @@ namespace Xilium.CefGlue.Client
         //https://vupload-edge.facebook.com/ajax/video/upload/requests/receive/?__pc=EXP1%3ADEFAULT&video_id=10153808986167246&start_offset=0&source=composer&target_id=564872245&waterfall_id=3e34b270054d5055d113669a18dc2f5c&composer_entry_point_ref=feed&supports_chunking=true&upload_speed&partition_start_offset=0&partition_end_offset=1396838&__user=564872245&__a=1&__dyn=aKTyAW8-aloAwmgDDzbHaF8x8xEW9JaUK5EKiWFami8VpCC-CGBz8ym5-8miWGdxuifhKq9AozgjGq78_zpErCG228-qp7zVR88UWax2rmEWVp3bKuEjK5p8-vHx2FQEG2eminDBBzopKp2Vq_rVUkgmU&__req=5m&fb_dtsg=AQGSzAyWRVhS&ttstamp=2658171831226512187828610483&__rev=2120081
         //https://www.facebook.com/ajax/bz
         //https://www.facebook.com/ajax/bz
-        int onNext;
         protected override CefResourceHandler GetResourceHandler(CefBrowser browser, CefFrame frame, CefRequest request)
         {
-
-
+            //System.Collections.Specialized.NameValueCollection headers = request.GetHeaderMap();
+            //headers.Add("dnt", "1");
+            //request.SetHeaderMap(headers);
 
             //if (request.Method == "POST")
             //{ 
@@ -156,6 +199,17 @@ namespace Xilium.CefGlue.Client
 
             //}
             // return new DemoCefResourceHandler(browser);
+
+            //Console.WriteLine("-------------_____________-----------------");
+            //foreach (var item in request.GetHeaderMap().Keys)
+            //{
+            //    Console.WriteLine(item);
+            //    foreach (var item1 in request.GetHeaderMap().GetValues(item.ToString()))
+            //    {
+            //        Console.WriteLine(item1);
+            //    }
+            //}
+
             return base.GetResourceHandler(browser, frame, request);
         }
 
