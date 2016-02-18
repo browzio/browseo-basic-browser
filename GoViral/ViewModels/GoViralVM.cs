@@ -974,8 +974,19 @@ namespace GoViral.ViewModels
 
         public void RefreshBrowser()
         {
+            string url = "";
             if (WebBrowser != null)
+            {
+                try
+                {
+                    if (WebBrowser.CBrowser != null && WebBrowser.CBrowser.Browser != null && WebBrowser.CBrowser.Browser.GetMainFrame() != null)
+                    {
+                        url = WebBrowser.CBrowser.Browser.GetMainFrame().Url;
+                    }
+                }
+                catch { }
                 WebBrowser.DisposeBrowserComponents();
+            }
 
             if(wfh != null)
             {
@@ -984,7 +995,7 @@ namespace GoViral.ViewModels
 
             WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
             WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
-            WebBrowser.init("",
+            WebBrowser.init(url,
             BrowserSettimgs.JavascriptEnabled ? CefState.Enabled : CefState.Disabled,
             BrowserSettimgs.JavaEnabled ? CefState.Enabled : CefState.Disabled,
             BrowserSettimgs.FlashEnabled ? CefState.Enabled : CefState.Disabled);
@@ -993,6 +1004,8 @@ namespace GoViral.ViewModels
 
             wfh.Child = WebBrowser;
             RaisePropertyChanged("WebBrowserHost");
+
+            //WebBrowser.Reload();
         }
 
         public void DisposeBrowser()

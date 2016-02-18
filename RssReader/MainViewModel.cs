@@ -33,6 +33,7 @@ namespace RssReader
         }
         public event Action<string, string> OnLaunchToBrowser = delegate { };//link, rsslink
         public event Action<string> OnLaunchToTabBrowser = delegate { };//url
+        public event Action<string, string> OnSelectedSendToSeo = delegate { };//title,url
         public event Action<string> OnLaunchToTabMasher = delegate { };//url
         public event Action<string,string,string,string,string> OnSelectedSendToPbn = delegate { };//send to MAsher
       //  public event Action<string,List<string>> OnImportedTab = delegate { };//tab title, list of rss feeds
@@ -230,6 +231,7 @@ namespace RssReader
                                 rssLink.PBarVis = false;
                                 rssLink.ListResultVis = true;
                                 rssLink.OnSelectedLaunchLink += rssLink_OnSelectedLaunchLink;
+                                rssLink.OnSelectedSendToSeo += RssLink_OnSelectedSendToSeo;
                                 rssLink.OnSelectedLaunchLinkMasher += rssLink_OnSelectedLaunchLinkMasher;
                                 rssLink.OnSelectedSendToPbn += RssLink_OnSelectedSendToPbn; ;
                             }
@@ -283,6 +285,11 @@ namespace RssReader
             {
                 MessageBox.Show("An error occured while refreshing a rss feed please refresh the feed tab to reload it.");
             }
+        }
+
+        private void RssLink_OnSelectedSendToSeo(string title, string url)
+        {
+            OnSelectedSendToSeo(title, url);
         }
 
         private void RssLink_OnSelectedSendToPbn(string link, string title, string imagelink, string date, string description)

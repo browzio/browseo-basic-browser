@@ -17,7 +17,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using WpfCefDynamBrowser.ViewModels;
+using Xilium.CefGlue;
 using Xilium.CefGlue.Client;
 
 namespace BrowserHost
@@ -33,6 +35,7 @@ namespace BrowserHost
         public event Action<string, string> OnCurateToPBN = delegate { };
         public event Action<string,string,List<string>> OnAddedToGoViral = delegate { };//link,type,multi
         public event Action OnRefreshedSessionSettings = delegate { };
+        public event Action<string, string> OnSentForSeo = delegate { };//name,url
 
         public BrowserHostCntrl()
         {
@@ -44,7 +47,26 @@ namespace BrowserHost
 
             CommandBindings.Add(new CommandBinding(ApplicationCommands.New, OpenNewTab));
             CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, CloseTab));
+
+            TabControl.Loaded += TabControl_Loaded;
         }
+
+        private void TabControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            TabControl.Loaded -= TabControl_Loaded;
+
+            PresentationSource presentationSource = PresentationSource.FromVisual((Visual)sender);
+            presentationSource.ContentRendered += TabControl_ContentRendered;
+        }
+
+        void TabControl_ContentRendered(object sender, EventArgs e)
+        {
+            // Don't forget to unsubscribe from the event
+            ((PresentationSource)sender).ContentRendered -= TabControl_ContentRendered;
+            CheckAndSetOpenTabs();
+            // ..
+        }
+        
 
         private void CloseTab(object sender, ExecutedRoutedEventArgs e)
         {
@@ -107,6 +129,7 @@ namespace BrowserHost
             btvm.OnClickedSaveSessionToBookmarks += Btvm_OnClickedSaveSessionToBookmarks;
             btvm.OnRefreshTabSettings += Btvm_OnRefreshTabSettings;
             btvm.OnRefreshSessionSettings += Btvm_OnRefreshSessionSettings;
+            btvm.OnSentForSeo += Btvm_OnSentForSeo;
         }
 
         #region btvm events
@@ -193,6 +216,12 @@ namespace BrowserHost
         {
             OnAddedToGoViral(link,type, multilinks);
         }
+
+
+        private void Btvm_OnSentForSeo(string name, string url)
+        {
+            OnSentForSeo(name,url);
+        }
         #endregion
 
         public void CloseAllTabs()
@@ -244,13 +273,19 @@ namespace BrowserHost
                     }
                 }
             }
+
+            //Action emptyAction = delegate { };
+            //TabControl.Dispatcher.Invoke(DispatcherPriority.Render, emptyAction);
         }
 
         public void LaunchNewWindowToLink(string link, string rssLink)
         {
             BrowserForSocialShare bfss = new BrowserForSocialShare();
             bfss.Text = "Loading... " + rssLink;
-            bfss.browserCntrl1.init(link);
+            bfss.browserCntrl1.init(link,
+                BrowserSettimgs.JavascriptEnabled ? CefState.Enabled : CefState.Disabled,
+                BrowserSettimgs.JavaEnabled ? CefState.Enabled : CefState.Disabled,
+                BrowserSettimgs.FlashEnabled ? CefState.Enabled : CefState.Disabled);
             bfss.Show();
         }
 
@@ -263,20 +298,32 @@ namespace BrowserHost
                 scrollviewer.LineRight();
             e.Handled = true;
         }
-
-        public void CheckAndSetOpenTabs()
+        
+        private void CheckAndSetOpenTabs()
         {
             DragDropMainViewModel.Instance.OnDoubleClickedSite += Instance_OnDoubleClickedSite;
             DragDropMainViewModel.Instance.OnSelsectedLauncAll += Instance_OnSelsectedLauncAll;
 
             Task.Factory.StartNew(() =>
             {
+                Thread.Sleep(100);
                 List<string> sites = MyFilesDatabase.GetSavedSesstion(GloableProfData.PData.ProjectName);
                 Instance_OnSelsectedLauncAll(sites.ToArray());
                 Application.Current.Dispatcher.Invoke((Action)delegate
                 {
-                    if (sites.Count > 0)
-                        TabControl.SelectedIndex = -1;
+                    //if (sites.Count > 0)
+                    //    TabControl.SelectedIndex = -1;
+                   
+                    //Grid gridView = TabControl.ItemsPanel as Grid;
+                    //if (gridView != null)
+                    //{
+                    //    foreach (var column in gridView.Columns)
+                    //    {
+                    //        if (double.IsNaN(column.Width))
+                    //            column.Width = column.ActualWidth;
+                    //        column.Width = double.NaN;
+                    //    }
+                    //}
                 });
             });
         }
@@ -299,6 +346,9 @@ namespace BrowserHost
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             this.Focus();
+            //this.InvalidateVisual();
+            //this.UpdateLayout();
+            //this.Dispatcher.Invoke(emptyDelegate, DispatcherPriority.Render);
         }
     }
 }

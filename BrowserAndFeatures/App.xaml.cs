@@ -20,10 +20,13 @@ namespace BrowserAndFeatures
         public static bool browserinit = true;
         protected override void OnStartup(StartupEventArgs e)
         {
+#if DEBUG
             browserinit = false;
             FeatureCallage.SetPersonData();
+#else
 
-          //this.Shutdown();
+            this.Shutdown();
+#endif
 
 
 

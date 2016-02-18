@@ -49,12 +49,14 @@ namespace BrowserAndFeatures
             
             rssControl.OnLaunchToBrowser += RssControl_OnLaunchToBrowser; ;
             rssControl.OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;
+            rssControl.OnSelectedSendToSeo += RssControl_OnSelectedSendToSeo;
             rssControl.OnLaunchToMasher += rssControl_OnLaunchToMasher;
             rssControl.OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
 
             browser.OnCurateToPBN += Browser_OnCurateToPBN;
             browser.Loaded += Browser_Loaded;
             browser.OnRefreshedSessionSettings += Browser_OnRefreshedSessionSettings;
+            browser.OnSentForSeo += Browser_OnSentForSeo;
         }
 
         #region setup data
@@ -185,6 +187,8 @@ namespace BrowserAndFeatures
             browser.CloseAllTabs();
             BrowserInit.Shutdown();
 
+            ProcessManager.Instance.DisposeAllProcess();
+
             GC.Collect(); 
         }
 
@@ -222,9 +226,7 @@ namespace BrowserAndFeatures
                 //else if (tbControl.SelectedIndex == 5)
                 //{
                 //    previndex = tbControl.SelectedIndex;
-                //    { 
-                //        createGoViralVM();
-                //    } 
+                //    if (goViralVM == null) goViralVM = ucGoViral.DataContext as GoViralVM;
                 //}
                 else
                 {
@@ -233,7 +235,7 @@ namespace BrowserAndFeatures
             }
             else
             {
-                if (tbControl.SelectedIndex == 6)
+                if (tbControl.SelectedIndex == 7)
                 {
                     tbControl.SelectedIndex = previndex;
                     if (imw == null)
@@ -245,7 +247,7 @@ namespace BrowserAndFeatures
                         imw.Show();
                     }
                 }
-                else if (tbControl.SelectedIndex == 7)
+                else if (tbControl.SelectedIndex == 8)
                 {
                     tbControl.SelectedIndex = previndex;
                     if (ytmw == null)
@@ -294,8 +296,10 @@ namespace BrowserAndFeatures
 
         private void Browser_Loaded(object sender, RoutedEventArgs e)
         {
-            browser.CheckAndSetOpenTabs();
+            //browser.CheckAndSetOpenTabs();
             browser.OnAddedToGoViral += Browser_OnAddedToGoViral;
+
+            if (goViralVM == null) goViralVM = ucGoViral.DataContext as GoViralVM;
 
             browser.Loaded -= Browser_Loaded;
         }
@@ -303,7 +307,7 @@ namespace BrowserAndFeatures
         private void Browser_OnAddedToGoViral(string link,string type, List<string> multiLinks)
         {
             // createGoViralVM();
-            if (goViralVM == null) goViralVM = ucGoViral.DataContext as GoViralVM;
+            //if (goViralVM == null) goViralVM = ucGoViral.DataContext as GoViralVM;
             goViralVM.AsyncAddLinkToList(link, type, multiLinks, showLinksWindow: true);
         }
         #endregion
@@ -352,5 +356,24 @@ namespace BrowserAndFeatures
             imw = null;
         }
         #endregion
+
+        private void ucSharedSync_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (ucSharedSync.ViewModel == null)
+            {
+                ucSharedSync.ViewModel = new SyncedProjectsVM(SyncedProjectsVM.TypeOfSEO);
+                ucSharedSync.DataContext = ucSharedSync.ViewModel;
+            }
+        }
+
+        private void Browser_OnSentForSeo(string name, string url)
+        {
+            ucSharedSync.ViewModel.AddUrlToSavedProjectList(name, url, null);
+        }
+
+        private void RssControl_OnSelectedSendToSeo(string title, string url)
+        {
+            ucSharedSync.ViewModel.AddUrlToSavedProjectList(title, url, null);
+        }
     }
 }

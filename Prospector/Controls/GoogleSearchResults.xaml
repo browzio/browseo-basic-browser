@@ -72,6 +72,12 @@
                         </MenuItem.InputBindings>
                     </MenuItem>
 
+                    <MenuItem Header="Curaste...">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="Curaste" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+
                     <MenuItem Header="Moz Check">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding RanckCheck}" CommandParameter="MOZ" />

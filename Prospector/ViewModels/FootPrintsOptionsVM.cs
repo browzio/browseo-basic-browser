@@ -1487,12 +1487,48 @@ namespace Prospector.ViewModels
                 {
                     try
                     {
-                        OnSelectedSendToPbn(ListResults[SIListResults -1].Link, ListResults[SIListResults -1].Title, null, ListResults[SIListResults-1].Published, ListResults[SIListResults-1].Description);
+                        OnSelectedSendToPbn(ListResults[SIListResults - 1].Link, ListResults[SIListResults - 1].Title, null, ListResults[SIListResults - 1].Published, ListResults[SIListResults - 1].Description);
                         Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To pbn " + ListResults[SIListResults - 1].Link);
                     }
                     catch
                     {
                         MessageBox.Show("Couldnt curate link.");
+                    }
+                }
+            }
+            else if (commandParam == "Curaste")
+            {
+                try
+                {
+                    string htmlstring = "<blockquote>";
+                    if (!string.IsNullOrEmpty(ListResults[SIListResults].Title) && !string.IsNullOrWhiteSpace(ListResults[SIListResults].Title))
+                        htmlstring += "<h1>" + ListResults[SIListResults].Title + "</h1>";
+                    if (!string.IsNullOrEmpty(ListResults[SIListResults].Description) && !string.IsNullOrWhiteSpace(ListResults[SIListResults].Description))
+                        htmlstring += "<p>" + ListResults[SIListResults].Description + "</p>";
+                    if (!string.IsNullOrEmpty(ListResults[SIListResults].Link) && !string.IsNullOrWhiteSpace(ListResults[SIListResults].Link))
+                        htmlstring += "<a href=\"" + ListResults[SIListResults].Link + " \" > " + ListResults[SIListResults].Link + " </a>";
+                    htmlstring += "</blockquote>";
+
+                    MyFilesDatabase.SetClipboardText(htmlstring);
+                }
+                catch
+                {
+                    try
+                    {
+                        string htmlstring = "<blockquote>";
+                        if (!string.IsNullOrEmpty(ListResults[SIListResults - 1].Title) && !string.IsNullOrWhiteSpace(ListResults[SIListResults - 1].Title))
+                            htmlstring += "<H1>" + ListResults[SIListResults - 1].Title + "</H1>";
+                        if (!string.IsNullOrEmpty(ListResults[SIListResults - 1].Description) && !string.IsNullOrWhiteSpace(ListResults[SIListResults - 1].Description))
+                            htmlstring += "<P>" + ListResults[SIListResults - 1].Description + "</P>";
+                        if (!string.IsNullOrEmpty(ListResults[SIListResults - 1].Link) && !string.IsNullOrWhiteSpace(ListResults[SIListResults - 1].Link))
+                            htmlstring += "<A href=\"" + ListResults[SIListResults - 1].Link + " \" > " + ListResults[SIListResults - 1].Link + " </a>";
+                        htmlstring += "</blockquote>";
+
+                        MyFilesDatabase.SetClipboardText(htmlstring);
+                    }
+                    catch
+                    {
+                        MessageBox.Show("Failed to set clipboard curation.");
                     }
                 }
             }

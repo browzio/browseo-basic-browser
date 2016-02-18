@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Organiser.Common.Windows;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,5 +36,60 @@ namespace Organiser.Common.Classes
         public const string SHARELINK_tumblr = "http://www.tumblr.com/share/link?url=";
         public const string SHARELINK_twitter = "https://twitter.com/home?status=";
         public const string SHARELINK_wordpress = "/wp-admin/press-this.php?u=";//has to add site to beggining https://{usersInput site}
+
+        public static string GetShareUrl(string shareType, string url)
+        {
+            string fullUrl = "";
+            switch (shareType)
+            {
+                case Social.SOCIALTYPE_fb:
+                    fullUrl = Social.SHARELINK_facebook + url;
+                    break;
+
+                case Social.SOCIALTYPE_gp:
+                    fullUrl = Social.SHARELINK_googleplus + url;
+                    break;
+
+                case Social.SOCIALTYPE_digg:
+                    fullUrl = Social.SHARELINK_digg + url;
+                    break;
+
+                case Social.SOCIALTYPE_pin:
+                    return "pin";
+
+                case Social.SOCIALTYPE_reddit:
+                    fullUrl = Social.SHARELINK_reddit + url;
+                    break;
+
+                case Social.SOCIALTYPE_stumble:
+                    fullUrl = Social.SHARELINK_stumbleupon + url;
+                    break;
+
+                case Social.SOCIALTYPE_tumblr:
+                    fullUrl = Social.SHARELINK_tumblr + url;
+                    break;
+
+                case Social.SOCIALTYPE_twit:
+                    fullUrl = Social.SHARELINK_twitter + url;
+                    break;
+
+                case Social.SOCIALTYPE_wp:
+                    SetNameAndDataWindow alw = new SetNameAndDataWindow();
+                    alw.tblockInfo.Text = "Enter wordpress site (browzio.wordpress.com):";
+                    alw.ShowDialog();
+                    if (!alw.OkClicked) return "";
+                    string wpUrl = alw.tbInputText.Text;
+                    if (!wpUrl.Contains("http"))
+                        wpUrl = "https://" + wpUrl;
+                    fullUrl = wpUrl + Social.SHARELINK_wordpress + url;
+                    break;
+
+                default:
+                    fullUrl = url;
+                    break;
+            }
+
+            return fullUrl;
+        }
     }
 }

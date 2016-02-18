@@ -31,12 +31,7 @@ namespace GoViral.Controls
         }
         public SharedPostsUserControl()
         {
-            InitializeComponent();
-            if (ViewModel == null)
-            {
-                ViewModel = new SyncedProjectsVM();
-                DataContext = ViewModel;
-            }  
+            InitializeComponent();  
         }
 
         private void CheckBox_PreviewMouseUp_ChangeSI(object sender, MouseButtonEventArgs e)

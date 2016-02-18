@@ -119,6 +119,10 @@
       <Name>CefGlue-old</Name>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\AnyProjectBrowserProcess\AnyProjectBrowserProcess.csproj">
+      <Project>{e6dae4fe-e359-4d5a-81cc-ff233aa99df9}</Project>
+      <Name>AnyProjectBrowserProcess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BrowserAndFeatures\BrowserAndFeatures.csproj">
       <Project>{58cc2783-de77-4526-8fd5-0ba96ac46226}</Project>
       <Name>BrowserAndFeatures</Name>

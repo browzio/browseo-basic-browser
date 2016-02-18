@@ -36,5 +36,12 @@ namespace Organiser.Common.Classes
 
             return attr.Description;
         }
+
+        public static string RemoveAmps(this string str)
+        {
+            str = str.Replace("&amp;" ,"&");
+            str = str.Replace("amp;" ,"");
+            return str;
+        }
     }
 }

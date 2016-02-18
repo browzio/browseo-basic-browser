@@ -102,30 +102,29 @@
                                                   HorizontalScrollBarVisibility="Auto" 
                                                   PreviewMouseWheel="Sviewer_PreviewMouseWheel"
                                                   VerticalScrollBarVisibility="Hidden">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal">
+                                            <!--<Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
                                             <Grid.RowDefinitions>
                                                 <RowDefinition Height="*" />
-                                            </Grid.RowDefinitions>
+                                            </Grid.RowDefinitions>-->
                                             <TabPanel x:Name="HeaderPanel"
-                                                      SnapsToDevicePixels="True"
                                                       Margin="10,0,0,-1"
                                                       VerticalAlignment="Bottom"
                                                       Panel.ZIndex="1"
                                                       IsItemsHost="True"
                                                       KeyboardNavigation.TabIndex="1" />
-                                                <Button Style="{StaticResource addButtonStyle}" 
+                                            <Button Style="{StaticResource addButtonStyle}" 
                                                     Grid.Column="1"
                                                     Margin="-13, 3, 0, 5" 
                                                     Name="btnAddTab"
                                                     Command="ApplicationCommands.New"  />
-                                        </Grid>
-                                        
+                                        </StackPanel>
+
                                     </ScrollViewer>
-                                    </Border>
+                                </Border>
                                
                                 <Border x:Name="ContentPanel"
                                     Grid.Row="1"

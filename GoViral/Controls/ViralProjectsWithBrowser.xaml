@@ -8,7 +8,7 @@
              xmlns:controls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
              xmlns:localControls="clr-namespace:GoViral.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="600">
+             d:DesignHeight="450" d:DesignWidth="600" Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

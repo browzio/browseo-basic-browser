@@ -42,8 +42,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -69,6 +69,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Browser\CefExtenders.cs" />
     <Compile Include="Classes\BacklinkHistoryLine.cs" />
     <Compile Include="Classes\ConsoleManager.cs" />
     <Compile Include="Classes\CrawlerStates.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Classes\MozscapeResults.cs" />
     <Compile Include="Classes\NativeMethods.cs" />
     <Compile Include="Classes\ObjectCopier.cs" />
+    <Compile Include="Classes\ProcessManager.cs" />
     <Compile Include="Classes\RelayCommand.cs" />
     <Compile Include="Classes\SetWindowPosFlags.cs" />
     <Compile Include="Classes\TimeHelper.cs" />
@@ -93,10 +95,18 @@
     <Compile Include="Classes\ViewModelBase.cs" />
     <Compile Include="Controlls\ExpanderDoubleClickExpand.cs" />
     <Compile Include="Controlls\MyListView.cs" />
+    <Compile Include="Controlls\SocialButtonsUserControl.xaml.cs">
+      <DependentUpon>SocialButtonsUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\ElementSizeMathConverter.cs" />
     <Compile Include="Converters\EmptyTextToVisibilityConverter.cs" />
     <Compile Include="Converters\MaxCharCountConv.cs" />
     <Compile Include="Converters\OpisiteVisibilityConverter.cs" />
+    <Compile Include="Models\WebPageImg.cs" />
+    <Compile Include="ViewModels\PinterestImagePickerVM.cs" />
+    <Compile Include="Windows\ChoosePinterestImageWindow.xaml.cs">
+      <DependentUpon>ChoosePinterestImageWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\SetNameAndDataWindow.xaml.cs">
       <DependentUpon>SetNameAndDataWindow.xaml</DependentUpon>
     </Compile>
@@ -115,11 +125,19 @@
     <Compile Include="Windows\ServerVerifyWindow.xaml.cs">
       <DependentUpon>ServerVerifyWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controlls\SocialButtonsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GloableStyleDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="RoundScrollBarStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\ChoosePinterestImageWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -299,6 +317,16 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Image\checkmark-green-dot.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
+      <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
+      <Name>CefGlue.WindowsForms-old</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj">
+      <Project>{9080d62a-6fe7-41d2-9a77-f3d7f6c33418}</Project>
+      <Name>CefGlue-old</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

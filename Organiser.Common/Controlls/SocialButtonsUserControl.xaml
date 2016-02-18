@@ -1,0 +1,70 @@
+﻿<UserControl x:Class="Organiser.Common.Controlls.SocialButtonsUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Organiser.Common.Controlls"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3"  Name="facebook"  Click="Button_Click_1" Height="35">
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png" 
+                                                                   ToolTip="facebook"
+                                                                   Width="30" Height="30" />
+        </Button>
+
+        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Name="google" Click="Button_Click_1" Height="35">
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/googleplus-icon.png" 
+                                                                   Width="30" Height="30"
+                                                                   ToolTip="google+" />
+        </Button>
+
+        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Name="digg" Click="Button_Click_1" Height="35">
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/digg-icon.png" 
+                                                                   Width="30" Height="30"
+                                                                   ToolTip="digg" />
+        </Button>
+
+        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Name="pintrest" Click="Button_Click_1" Height="35">
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/Pinterest-icon.png" 
+                                                                  Width="30" Height="30"
+                                                                   ToolTip="pintrest" />
+        </Button>
+
+        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Name="reddit" Click="Button_Click_1" Height="35">
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/reddit-icon.png" 
+                                                                  Width="30" Height="30"
+                                                                   ToolTip="reddit" />
+        </Button>
+
+        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Name="stumbleupon" Click="Button_Click_1" Height="35">
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png" 
+                                                                   Width="30" Height="30"
+                                                                   ToolTip="stumbleupon" />
+        </Button>
+
+        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Name="tumblr" Click="Button_Click_1" Height="35">
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/tumblr-icon.png" 
+                                                                   Width="30" Height="30"
+                                                                   ToolTip="tumblr" />
+        </Button>
+
+        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Name="twitter" Click="Button_Click_1" Height="35">
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/twitter-icon.png" 
+                                                                   Width="30" Height="30"
+                                                                   ToolTip="twitter" />
+        </Button>
+
+        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Name="wordpress" Click="Button_Click_1" Height="35">
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/wordpress-icon.png" 
+                                                                   Width="30" Height="30"
+                                                                   ToolTip="wordpress" />
+        </Button>
+    </StackPanel>
+</UserControl>

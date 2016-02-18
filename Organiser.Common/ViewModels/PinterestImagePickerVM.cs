@@ -1,5 +1,6 @@
 ﻿using BrowserHost.Models;
 using BrowserHost.Windows;
+using Organiser.Common.Browser;
 using Organiser.Common.Classes;
 using System;
 using System.Collections.ObjectModel;
@@ -43,10 +44,10 @@ namespace BrowserHost.ViewModels
         {
             if (loadImgThread != null) return;
 
-            Visitor = new SourceVisitor(text =>
+            Visitor = new SourceVisitor(AddressEditable, (text, url) =>
             {
-                Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                {
+               // Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+               // {
                     loadImgThread = new Thread(() =>
                     {
                         WebPageImages.Clear();
@@ -91,10 +92,17 @@ namespace BrowserHost.ViewModels
                             {
                                 if (SLImageLink >= 0)
                                 {
-                                    Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                    if (Application.Current != null)
+                                    {
+                                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                                        {
+                                            OnLaunchSharePopup(link);
+                                        }));
+                                    }
+                                    else
                                     {
                                         OnLaunchSharePopup(link);
-                                    }));
+                                    }
                                 }
                             }
 
@@ -108,7 +116,7 @@ namespace BrowserHost.ViewModels
 
                     loadImgThread.SetApartmentState(ApartmentState.STA);
                     loadImgThread.Start();
-                }));
+                //}));
             });
         }  
     } 

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Windows.Threading;
 using System.IO;
 using System.Diagnostics;
+using Organiser.Common.Classes;
 
 namespace Contract
 {
@@ -119,6 +120,7 @@ namespace Contract
             };
 
             MProcess = Process.Start(info);
+            ProcessManager.Instance.AddProcess(MProcess);
 
             new ProcessMonitor(OnProcessExit).Start(MProcess);
 

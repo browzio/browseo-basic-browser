@@ -32,6 +32,7 @@ namespace RssReader.Controlls
         public event Action<string, string> OnLaunchToBrowser = delegate { };//link, rsslink
         public event Action<string> OnLaunchToTabBrowser = delegate { };//url
         public event Action<string> OnLaunchToMasher = delegate { };//url
+        public event Action<string, string> OnSelectedSendToSeo = delegate { };//title,url
         public event Action<string, string, string, string, string> OnSelectedSendToPbn = delegate { };//send to MAsher
 
         public ObservableCollection<MainViewModel> UserRssTabs { get; set; }
@@ -205,11 +206,17 @@ namespace RssReader.Controlls
             vm.OnLaunchToBrowser += vm_OnLaunchToBrowser;
             vm.OnLaunchToTabBrowser += vm_OnLaunchToTabBrowser;
             vm.OnLaunchToTabMasher += vm_OnLaunchToTabMasher;
-            vm.OnSelectedSendToPbn += Vm_OnSelectedSendToPbn; 
+            vm.OnSelectedSendToPbn += Vm_OnSelectedSendToPbn;
+            vm.OnSelectedSendToSeo += Vm_OnSelectedSendToSeo;
              
             if(refresh)
                 vm.RefreshRssFeed(false);
             return vm;
+        }
+
+        private void Vm_OnSelectedSendToSeo(string title, string url)
+        {
+            OnSelectedSendToSeo(title, url);
         }
 
         public void InitTabs()

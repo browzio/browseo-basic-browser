@@ -115,7 +115,7 @@ namespace GoViral.Controls
                 multiWindowForLinksAdd.Title = "Page Name , Url";
                 multiWindowForLinksAdd.Show();
             }
-
+            text = text.RemoveAmps();
             multiWindowForLinksAdd.tbInputedText.Text += text;
         }
 
@@ -127,7 +127,7 @@ namespace GoViral.Controls
 
 
         #region ucSyncedPosts
-        List<KeyValuePair<string, string>> ToSendSyncLinks = new List<KeyValuePair<string, string>>();
+       // List<KeyValuePair<string, string>> ToSendSyncLinks = new List<KeyValuePair<string, string>>();
 
 
         Organiser.Common.Windows.RssFeedsLinksMultiWindow multiWindowForLinksAdd;
@@ -166,6 +166,15 @@ namespace GoViral.Controls
             // (this.DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(source);
         }
         #endregion
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (ucSyncedPosts.ViewModel == null)
+            {
+                ucSyncedPosts.ViewModel = new ViewModels.SyncedProjectsVM(ViewModels.SyncedProjectsVM.TypeOfGoViral);
+                ucSyncedPosts.DataContext = ucSyncedPosts.ViewModel;
+            }
+        }
     }
 }
 

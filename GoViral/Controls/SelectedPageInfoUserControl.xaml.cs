@@ -150,9 +150,10 @@ namespace GoViral.Controls
                 case "Download":
                     try
                     {
-                        string link = (mi.DataContext as Videos.Video).source.Replace("&amp;", "&");
+                        string link = (mi.DataContext as Videos.Video).source;
+                        link = link.Replace("&amp;", "&");
                         link = link.Replace("amp;", "");
-                        (DataContext as ViewModels.GoViralVM).WebBrowser.CBrowser.Browser.GetHost().StartDownload(tag);
+                        (DataContext as ViewModels.GoViralVM).WebBrowser.CBrowser.Browser.GetHost().StartDownload(link);
                         //(DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(link);
                     }
                     catch { MessageBox.Show("No video download link found."); }

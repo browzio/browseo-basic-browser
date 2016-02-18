@@ -23,6 +23,7 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Add Projects" Command="{Binding OnBtnClick}" CommandParameter="AddProject" Margin="4"  />
+            <Button Content="Add Links" Command="{Binding OnBtnClick}" CommandParameter="AddLinks" Margin="4"  />
             <Button Content="Save" Command="{Binding OnBtnClick}" CommandParameter="Save" Margin="4" />
             <Button Command="{Binding OnBtnClick}" CommandParameter="Refresh" Width="25" Height="25" 
                    Margin="4">
@@ -99,6 +100,11 @@
                                         </Grid>
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
+                                <ListView.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Launch In Project Browser Window" Command="{Binding OnCommandRaisedInView}" CommandParameter="OpenInProjBrowser" />
+                                    </ContextMenu>
+                                </ListView.ContextMenu>
                             </ListView>
                         </Grid>
                     </Expander>

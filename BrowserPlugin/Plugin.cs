@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Xilium.CefGlue.Client;
+using System.Diagnostics;
 
 namespace BrowserPlugin
 {
@@ -32,6 +33,16 @@ namespace BrowserPlugin
             if (fc != null)
                 fc.CloseAll();
             base.Dispose();
+        }
+
+        public override List<Process> GetProjectsProcesses()
+        {
+            return ProcessManager.Instance.Processes;
+        }
+
+        public override void KillAllProcesses()
+        {
+            ProcessManager.Instance.DisposeAllProcess();
         }
 
         public override void OnTabFocused()

@@ -151,7 +151,6 @@ namespace Organiser.Common.Classes
         {
             string path = Path.Combine(GetBaseDir(), "Projects");
             string dir = RecursiveProjectFindByName(new DirectoryInfo(path), projectName, profileName);
-
             
             return dir;
         }
@@ -165,41 +164,53 @@ namespace Organiser.Common.Classes
                 {
                     foreach (FileInfo fi in files)
                     {
-                        if (fi.Name == "ProjectData.ini" || fi.Name == "UserData.ini")
+                        if (profileName == "")
                         {
-                            IniFile ini = new IniFile(fi.FullName);
-                            string ProjectName = ini.IniReadValue("Data", "ProjectName");
-                            string ProfileName = ini.IniReadValue("Data", "ProfileName");
-
-                            if (ProjectName.Trim().ToLower() == projectName.Trim().ToLower())
+                            if (fi.Name == "ProjectData.ini")
                             {
-                                if (ProfileName.Trim().ToLower() == profileName.Trim().ToLower())
+                                IniFile ini = new IniFile(fi.FullName);
+                                string ProjectName = ini.IniReadValue("Data", "ProjectName");
+                                if(projectName == ProjectName) return fi.Directory.FullName;
+                            }
+                        }
+                        else
+                        {
+                            if (fi.Name == "ProjectData.ini" || fi.Name == "UserData.ini")
+                            {
+                                IniFile ini = new IniFile(fi.FullName);
+                                string ProjectName = ini.IniReadValue("Data", "ProjectName");
+                                string ProfileName = ini.IniReadValue("Data", "ProfileName");
+
+                                if (ProjectName.Trim().ToLower() == projectName.Trim().ToLower())
                                 {
-                                    return fi.Directory.FullName;
-                                }
-                                else
-                                {
-                                    if (fi.Name == "ProjectData.ini")
+                                    if (ProfileName.Trim().ToLower() == profileName.Trim().ToLower())
                                     {
-                                        DirectoryInfo[] Pdirs = directoryInfo.GetDirectories();
-                                        if (Pdirs != null)
+                                        return fi.Directory.FullName;
+                                    }
+                                    else
+                                    {
+                                        if (fi.Name == "ProjectData.ini")
                                         {
-                                            foreach (var dir in Pdirs)
+                                            DirectoryInfo[] Pdirs = directoryInfo.GetDirectories();
+                                            if (Pdirs != null)
                                             {
-                                                FileInfo[] Pfiles = dir.GetFiles();
-                                                if (Pfiles != null)
+                                                foreach (var dir in Pdirs)
                                                 {
-                                                    foreach (FileInfo pfi in files)
+                                                    FileInfo[] Pfiles = dir.GetFiles();
+                                                    if (Pfiles != null)
                                                     {
-                                                        if (pfi.Name == "UserData.ini")
+                                                        foreach (FileInfo pfi in files)
                                                         {
-                                                            string Name = ini.IniReadValue("Data", "ProjectName");
-                                                            string ProName = ini.IniReadValue("Data", "ProfileName");
-                                                            if (Name.Trim().ToLower() == Name.Trim().ToLower())
+                                                            if (pfi.Name == "UserData.ini")
                                                             {
-                                                                if (ProName.Trim().ToLower() == ProName.Trim().ToLower())
+                                                                string Name = ini.IniReadValue("Data", "ProjectName");
+                                                                string ProName = ini.IniReadValue("Data", "ProfileName");
+                                                                if (Name.Trim().ToLower() == Name.Trim().ToLower())
                                                                 {
-                                                                    return pfi.Directory.FullName;
+                                                                    if (ProName.Trim().ToLower() == ProName.Trim().ToLower())
+                                                                    {
+                                                                        return pfi.Directory.FullName;
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -208,9 +219,9 @@ namespace Organiser.Common.Classes
                                             }
                                         }
                                     }
-                                }
 
-                                return fi.Directory.FullName;
+                                    return fi.Directory.FullName;
+                                }
                             }
                         }
                     }

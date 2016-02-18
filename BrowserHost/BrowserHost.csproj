@@ -84,14 +84,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\MyComboBox.cs" />
-    <Compile Include="Models\WebPageImg.cs" />
     <Compile Include="ViewModels\BrowserTabViewModel.cs" />
-    <Compile Include="ViewModels\PinterestImagePickerVM.cs" />
     <Compile Include="Views\BrowserTabView.xaml.cs">
       <DependentUpon>BrowserTabView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\ChoosePinterestImageWindow.xaml.cs">
-      <DependentUpon>ChoosePinterestImageWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="BrowserHostCntrl.xaml">
       <SubType>Designer</SubType>
@@ -111,10 +106,6 @@
     <Page Include="Views\BrowserTabView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Windows\ChoosePinterestImageWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -176,6 +167,10 @@
       <Name>Organiser.Common</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\" />
+    <Folder Include="Windows\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
