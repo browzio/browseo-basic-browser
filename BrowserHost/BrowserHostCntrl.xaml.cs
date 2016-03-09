@@ -29,12 +29,12 @@ namespace BrowserHost
     /// </summary>
     public partial class BrowserHostCntrl : UserControl
     {
-       // private const string DefaultUrlForAddedTabs = "https://www.google.com/";
-
         public ObservableCollection<BrowserTabViewModel> BrowserTabs { get; set; }
+
         public event Action<string, string> OnCurateToPBN = delegate { };
         public event Action<string,string,List<string>> OnAddedToGoViral = delegate { };//link,type,multi
         public event Action OnRefreshedSessionSettings = delegate { };
+        public event Action OnClickedReminders = delegate { };
         public event Action<string, string> OnSentForSeo = delegate { };//name,url
 
         public BrowserHostCntrl()
@@ -67,7 +67,6 @@ namespace BrowserHost
             // ..
         }
         
-
         private void CloseTab(object sender, ExecutedRoutedEventArgs e)
         {
             try
@@ -109,6 +108,7 @@ namespace BrowserHost
                 BrowserTabViewModel btvm = new BrowserTabViewModel(url == "" ? MyFilesDatabase.GetDefultHomePage() : url);
                 setBTVMEvents(btvm);
                 btvm.Title = url;
+                Task.Factory.StartNew(() => { btvm.ReminderCount = MyFilesDatabase.GetRemindersCount(GloableProfData.PData.ProjectName); });
                 if (BrowserTabs.Count > 0)
                     btvm.TabMargin = new Thickness(-20, 0, 0, 0);
                 else
@@ -127,13 +127,13 @@ namespace BrowserHost
             btvm.OnClickedSaveSession += Btvm_OnClickedSaveSession;
             btvm.OnClickedDeleteSession += Btvm_OnClickedDeleteSession;
             btvm.OnClickedSaveSessionToBookmarks += Btvm_OnClickedSaveSessionToBookmarks;
+            btvm.OnClickedReminders += Btvm_OnClickedReminders;
             btvm.OnRefreshTabSettings += Btvm_OnRefreshTabSettings;
             btvm.OnRefreshSessionSettings += Btvm_OnRefreshSessionSettings;
             btvm.OnSentForSeo += Btvm_OnSentForSeo;
         }
 
         #region btvm events
-
         private void Btvm_OnRefreshTabSettings(BrowserTabViewModel tab)
         {
             BrowserTabs.Remove(tab);
@@ -217,10 +217,14 @@ namespace BrowserHost
             OnAddedToGoViral(link,type, multilinks);
         }
 
-
         private void Btvm_OnSentForSeo(string name, string url)
         {
             OnSentForSeo(name,url);
+        }
+
+        private void Btvm_OnClickedReminders()
+        {
+            OnClickedReminders();
         }
         #endregion
 
@@ -282,10 +286,7 @@ namespace BrowserHost
         {
             BrowserForSocialShare bfss = new BrowserForSocialShare();
             bfss.Text = "Loading... " + rssLink;
-            bfss.browserCntrl1.init(link,
-                BrowserSettimgs.JavascriptEnabled ? CefState.Enabled : CefState.Disabled,
-                BrowserSettimgs.JavaEnabled ? CefState.Enabled : CefState.Disabled,
-                BrowserSettimgs.FlashEnabled ? CefState.Enabled : CefState.Disabled);
+            bfss.browserCntrl1.init(link);
             bfss.Show();
         }
 
@@ -306,25 +307,25 @@ namespace BrowserHost
 
             Task.Factory.StartNew(() =>
             {
-                Thread.Sleep(100);
                 List<string> sites = MyFilesDatabase.GetSavedSesstion(GloableProfData.PData.ProjectName);
+                Thread.Sleep(350);
                 Instance_OnSelsectedLauncAll(sites.ToArray());
-                Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    //if (sites.Count > 0)
-                    //    TabControl.SelectedIndex = -1;
-                   
-                    //Grid gridView = TabControl.ItemsPanel as Grid;
-                    //if (gridView != null)
-                    //{
-                    //    foreach (var column in gridView.Columns)
-                    //    {
-                    //        if (double.IsNaN(column.Width))
-                    //            column.Width = column.ActualWidth;
-                    //        column.Width = double.NaN;
-                    //    }
-                    //}
-                });
+                //Application.Current.Dispatcher.Invoke((Action)delegate
+                //{
+                //    //if (sites.Count > 0)
+                //    //    TabControl.SelectedIndex = -1;
+
+                //    //Grid gridView = TabControl.ItemsPanel as Grid;
+                //    //if (gridView != null)
+                //    //{
+                //    //    foreach (var column in gridView.Columns)
+                //    //    {
+                //    //        if (double.IsNaN(column.Width))
+                //    //            column.Width = column.ActualWidth;
+                //    //        column.Width = double.NaN;
+                //    //    }
+                //    //}
+                //});
             });
         }
 
@@ -349,6 +350,15 @@ namespace BrowserHost
             //this.InvalidateVisual();
             //this.UpdateLayout();
             //this.Dispatcher.Invoke(emptyDelegate, DispatcherPriority.Render);
+        }
+
+        public void SetRemindersCount()
+        {
+            int reminderscount = MyFilesDatabase.GetRemindersCount(GloableProfData.PData.ProjectName);
+            foreach (var t in BrowserTabs)
+            {
+                t.ReminderCount = reminderscount;
+            }
         }
     }
 }

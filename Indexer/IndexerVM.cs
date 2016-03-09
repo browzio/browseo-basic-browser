@@ -175,7 +175,7 @@ namespace Indexer
 
         public IndexerVM()
         {
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Indexer Opened");
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_OpenedIndeser + "");
 
             BtnOkClicked = new RelayCommand(OnBtnOkClicked);
 
@@ -333,7 +333,7 @@ namespace Indexer
                     }
                     client.Dispose();
 
-                    Organiser.Common.Classes.UsageTracker.AddTraceCookie("Indexed Links " + InputedLinks + " Response: " + Response);
+                    Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_IndexedLinks + " " + InputedLinks + " Response: " + Response);
 
                     BtnOkEnabled = true;
                     ResponseVisible = Visibility.Visible;

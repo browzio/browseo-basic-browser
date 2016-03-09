@@ -1429,7 +1429,7 @@ namespace Prospector.ViewModels
                             });
                         }
 
-                        Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector King Kontent Search " + Keyword);
+                        Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_KKSearch + " " + Keyword);
                         
                     }
                     #endregion
@@ -1455,7 +1455,7 @@ namespace Prospector.ViewModels
                         Query = String.Format(@"https://google.com/search?v=1.0&q={0}", Query);
                         Query = Query + TimeFrames[CmbTimeframeIndex].Query;
 
-                        Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Search " + Query);
+                        Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorSearch + " " + Query);
 
                         GetKeywordRankings(Query, MaxPages[CmbMaxPAgesIndex], false);
                     }
@@ -1481,14 +1481,14 @@ namespace Prospector.ViewModels
                 try
                 {
                     OnSelectedSendToPbn(ListResults[SIListResults].Link, ListResults[SIListResults].Title, null, ListResults[SIListResults].Published, ListResults[SIListResults].Description);
-                    Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To pbn " + ListResults[SIListResults].Link);
+                    Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToPBne + " " + ListResults[SIListResults].Link);
                 }
                 catch
                 {
                     try
                     {
                         OnSelectedSendToPbn(ListResults[SIListResults - 1].Link, ListResults[SIListResults - 1].Title, null, ListResults[SIListResults - 1].Published, ListResults[SIListResults - 1].Description);
-                        Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To pbn " + ListResults[SIListResults - 1].Link);
+                        Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToPBne + " " + ListResults[SIListResults - 1].Link);
                     }
                     catch
                     {
@@ -1537,14 +1537,14 @@ namespace Prospector.ViewModels
                 try
                 {
                     OnClickedSearch(ListResults[SIListResults].Link);
-                    Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To browser " + ListResults[SIListResults].Link);
+                    Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToBrowser + " " + ListResults[SIListResults].Link);
                 }
                 catch
                 {
                     try
                     {
                         OnClickedSearch(ListResults[SIListResults - 1].Link);
-                        Organiser.Common.Classes.UsageTracker.AddTraceCookie("Prospector Sent Link To browser " + ListResults[SIListResults - 1].Link);
+                        Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToBrowser + " " + ListResults[SIListResults - 1].Link);
                     }
                     catch
                     {

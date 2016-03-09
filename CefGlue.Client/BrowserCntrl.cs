@@ -46,9 +46,12 @@ namespace Xilium.CefGlue.Client
 
         }
 
-        public void init(string startUrl, CefState StateJavascript = CefState.Enabled, CefState StateJava= CefState.Enabled, CefState StateFlash = CefState.Enabled)
+        public void init(string startUrl)
         {
-            CBrowser = new CefWebBrowser();
+            CefState StateJavascript = BrowserSettimgs.JavascriptEnabled ? CefState.Enabled : CefState.Disabled;
+            CefState StateJava = BrowserSettimgs.JavaEnabled ? CefState.Enabled : CefState.Disabled;
+            CefState StateFlash = BrowserSettimgs.FlashEnabled ? CefState.Enabled : CefState.Disabled;
+           CBrowser = new CefWebBrowser();
             CBrowser.HandleWasCreated += browser_OnHandleCreated;
             if(startUrl != "")
                 CBrowser.StartUrl = startUrl;
@@ -115,8 +118,8 @@ namespace Xilium.CefGlue.Client
             if (isWindowPopUp)
                 return;
 
-            OnBrowserAddressChanged(CBrowser.Address);
             CurrAddress = CBrowser.Address;  
+            OnBrowserAddressChanged(CBrowser.Address);
         }
 
         void CBrowser_TitleChanged(object sender, TitleChangedEventArgs e)

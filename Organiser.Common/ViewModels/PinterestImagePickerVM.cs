@@ -110,7 +110,7 @@ namespace BrowserHost.ViewModels
                         }
                         else
                         {
-                            MessageBox.Show("No shareable images found on page.");
+                           // MessageBox.Show("No shareable images found on page.");
                         }
                     });
 

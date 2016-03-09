@@ -34,6 +34,9 @@ namespace BrowserAndFeatures
     /// </summary>
     public partial class FeatureCallage : UserControl
     {
+        //to host
+        public event Action OnClickedReminders = delegate { };
+
         public FeatureCallage()
         {
             InitializeComponent();
@@ -57,6 +60,7 @@ namespace BrowserAndFeatures
             browser.Loaded += Browser_Loaded;
             browser.OnRefreshedSessionSettings += Browser_OnRefreshedSessionSettings;
             browser.OnSentForSeo += Browser_OnSentForSeo;
+            browser.OnClickedReminders += Browser_OnClickedReminders;
         }
 
         #region setup data
@@ -202,7 +206,7 @@ namespace BrowserAndFeatures
 
         private void tbControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (previndex != tbControl.SelectedIndex && tbControl.SelectedIndex<6)
+            if (previndex != tbControl.SelectedIndex && tbControl.SelectedIndex<7)
             {
                 if (tbControl.SelectedIndex == 2 && rssControl.UserRssTabs.Count <=0)
                 {
@@ -235,7 +239,7 @@ namespace BrowserAndFeatures
             }
             else
             {
-                if (tbControl.SelectedIndex == 7)
+                if (tbControl.SelectedIndex == 8)
                 {
                     tbControl.SelectedIndex = previndex;
                     if (imw == null)
@@ -247,7 +251,7 @@ namespace BrowserAndFeatures
                         imw.Show();
                     }
                 }
-                else if (tbControl.SelectedIndex == 8)
+                else if (tbControl.SelectedIndex == 9)
                 {
                     tbControl.SelectedIndex = previndex;
                     if (ytmw == null)
@@ -310,6 +314,21 @@ namespace BrowserAndFeatures
             //if (goViralVM == null) goViralVM = ucGoViral.DataContext as GoViralVM;
             goViralVM.AsyncAddLinkToList(link, type, multiLinks, showLinksWindow: true);
         }
+
+        private void Browser_OnSentForSeo(string name, string url)
+        {
+            ucSharedSync.ViewModel.AddUrlToSavedProjectList(name, url, null);
+        }
+        
+        private void Browser_OnClickedReminders()
+        {
+            OnClickedReminders();
+        }
+
+        public void SetRemindersCount()
+        {
+            Task.Factory.StartNew(()=> { browser.SetRemindersCount(); }); 
+        }
         #endregion
 
         void FeatureCallage_OnClickedSearch(string query)
@@ -366,14 +385,17 @@ namespace BrowserAndFeatures
             }
         }
 
-        private void Browser_OnSentForSeo(string name, string url)
-        {
-            ucSharedSync.ViewModel.AddUrlToSavedProjectList(name, url, null);
-        }
-
         private void RssControl_OnSelectedSendToSeo(string title, string url)
         {
             ucSharedSync.ViewModel.AddUrlToSavedProjectList(title, url, null);
+        }
+
+        private void btnSpin_Click(object sender, RoutedEventArgs e)
+        {
+            if(wisi != null)
+            {
+                wisi.SpinAndCopyToClipboard();
+            }
         }
     }
 }

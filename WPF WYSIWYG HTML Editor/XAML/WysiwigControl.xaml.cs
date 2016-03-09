@@ -448,6 +448,17 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
                 catch { }
             });
         }
-        
+
+        public void SpinAndCopyToClipboard()
+        {
+            try
+            {
+                Organiser.Common.Classes.MyFilesDatabase.SetClipboardText(Helpers.Spinner.Spin(webBrowserEditor.doc.body.innerText));
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(" Unable to copy article to clipboard reason: "+ex.Message);
+            }
+        }
     }
 }

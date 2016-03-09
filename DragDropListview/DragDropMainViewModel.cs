@@ -1332,7 +1332,6 @@ namespace DragDropListview
             CheckReminders();
         }
 
-
         private int sIReminderDate;
         public int SIReminderDate
         {
@@ -1374,7 +1373,6 @@ namespace DragDropListview
                 }
             }
         }
-
 
         #endregion
 

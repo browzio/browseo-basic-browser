@@ -235,7 +235,7 @@ namespace RssReader.Mvvm
 
         public LinksToRssVM() 
         {
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Opened Rss Masher");
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_OpenedRssMash);
 
             Catigories = new ObservableCollection<string>();
             Catigories.Add("AutosAndVehicles");
@@ -463,7 +463,7 @@ namespace RssReader.Mvvm
                     });
                 }
                
-                Organiser.Common.Classes.UsageTracker.AddTraceCookie("Rss Masher Results: " + OutputedLinks);
+                Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_GotRssMashResults+": " + OutputedLinks);
 
                 EnableOkBtn = true;
             }).Start();

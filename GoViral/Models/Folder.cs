@@ -187,6 +187,15 @@ namespace GoViral.Models
                     }
                     break;
 
+                case "ORDER_GroupsOpen":
+                    List<ListOption> loOrderdGroups = SavedLinksList.OrderByDescending(l => l.FBGraphData == null || l.FBGraphData.privacy == null ? "a" : l.FBGraphData.privacy).ToList();
+                    SavedLinksList.Clear();
+                    foreach (ListOption lo in loOrderdGroups)
+                    {
+                        SavedLinksList.Add(lo);
+                    }
+                    break;
+
                 //case "ORDER_PostsByLikes":
                 //case "ORDER_PostsByShares":
                 //    if (SelectedPageFBGraphData != null)

@@ -51,8 +51,7 @@ namespace Xilium.CefGlue.Client
                 NoSandbox = true
                 //LogFile = "CefGlue.log",
             };
-
-
+            
             if (GloableProfData.PData != null)
             {
                 string path = Path.Combine(Organiser.Common.Classes.MyFilesDatabase.GetBaseDir(), "Caches\\" + GloableProfData.PData.ProjectName);
@@ -72,7 +71,7 @@ namespace Xilium.CefGlue.Client
             //CefRuntime.AddWebPluginDirectory(@"C:\Windows\system32\Macromed\Flash\");
             //CefRuntime.RefreshWebPlugins();
 
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Browser Started");
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_BrowserStart );
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

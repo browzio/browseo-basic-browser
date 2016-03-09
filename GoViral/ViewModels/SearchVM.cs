@@ -502,7 +502,9 @@ namespace GoViral.ViewModels
                     if (IsCheckedUser) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Users, url = kw.Trim() });
                     if (IsCheckedPhotos) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Photos, url = kw.Trim() });
                     if(IsCheckedVideos) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Videos, url = kw.Trim() });
+                    UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_FacebookCralEvent + " Searched fo kw " + kw);
                 }
+
 
                 mCrawlerHost.IninAdin();
             }

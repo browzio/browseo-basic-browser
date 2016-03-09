@@ -582,6 +582,7 @@ namespace GoViral.ViewModels
                             case CrawlerStates.FbGraphCrawl:
                                 FacebookGraphData fbgData = serializedXMLResult.XmlDeserializeFromString<FacebookGraphData>();
                                 preinintState.option.FBGraphData = fbgData;
+                                UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_FacebookCralEvent + " crawled page " + fbgData.name);
                                 break;
                             case CrawlerStates.LoadAllPhotos:
                             case CrawlerStates.LoadAllPhotos_Crawl:
@@ -995,10 +996,7 @@ namespace GoViral.ViewModels
 
             WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
             WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
-            WebBrowser.init(url,
-            BrowserSettimgs.JavascriptEnabled ? CefState.Enabled : CefState.Disabled,
-            BrowserSettimgs.JavaEnabled ? CefState.Enabled : CefState.Disabled,
-            BrowserSettimgs.FlashEnabled ? CefState.Enabled : CefState.Disabled);
+            WebBrowser.init(url);
             if (wfh == null)
                 wfh = new WindowsFormsHost();
 

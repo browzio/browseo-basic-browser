@@ -7,6 +7,7 @@
              xmlns:prospector="clr-namespace:Prospector.Controls;assembly=Prospector"
              xmlns:rssReaders="clr-namespace:RssReader.Controlls;assembly=RssReader"
              xmlns:goVival="clr-namespace:GoViral.Controls;assembly=GoViral"
+             xmlns:instagram="clr-namespace:GoViral.Instagram.InstControls;assembly=GoViral"
              xmlns:commonControlls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
              xmlns:wisi="clr-namespace:WPF_WYSIWYG_HTML_Editor.XAML;assembly=WYSIWYG"
              mc:Ignorable="d" 
@@ -85,7 +86,10 @@
             <TabItem Header="Browser"  Style="{StaticResource gmailTabStyle90}">
                     <browser:BrowserHostCntrl Name="browser" />
                 </TabItem>
-                <TabItem Header="Prospector" Style="{StaticResource gmailTabStyle90}" Name="tabProspector">
+            <!--<TabItem Header="Firefox"  Style="{StaticResource gmailTabStyle90}">
+                <ffbrowser:FFBrowserUserControl Name="ffBrowser" />
+            </TabItem>-->
+            <TabItem Header="Prospector" Style="{StaticResource gmailTabStyle90}" Name="tabProspector">
                     <prospector:ProspectorTabs Name="prospector" />
                     <!--<nichCntrol:NichResearchControl />-->
                 </TabItem>
@@ -104,8 +108,21 @@
                     <goVival:ProjectsWithBrowser Name="ucGoViral"  />
                 </TabItem>
                 <TabItem Header="S·E·O" Name="tabSyncer" Style="{StaticResource gmailTabStyle90}">
+                <Grid>
                     <goVival:SharedPostsUserControl Name="ucSharedSync" Loaded="ucSharedSync_Loaded"  />
-                </TabItem>
+
+                    <Button Name="btnSpin" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5" Height="25"
+                            ToolTip="Spin and Copy article in PBN poster" Click="btnSpin_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Spin" Margin="3" VerticalAlignment="Center" Foreground="White" />
+                            <Image Source="browseo (1).ico" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Inst·EO" Style="{StaticResource gmailTabStyle90}">
+                <instagram:InstTabsUserControl Name="ucInstagram" />
+            </TabItem>
                 <TabItem Header="Indexer" Name="indexer" Style="{StaticResource gmailTabStyle90}">
                 </TabItem>
             <TabItem Header="YouTube URL'r" Name="youtuber" Style="{StaticResource gmailTabStyle90}">

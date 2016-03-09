@@ -42,24 +42,24 @@ namespace WpfCefDynamBrowser.Views
 
         void BrowserTabView_Loaded(object sender, RoutedEventArgs e)
         {
-            DragDropMainViewModel.Instance.OnHasReminders += vm_OnHasReminders;
-            DragDropMainViewModel.Instance.GetRemindersCountAndNotify();
+            //DragDropMainViewModel.Instance.OnHasReminders += vm_OnHasReminders;
+            //DragDropMainViewModel.Instance.GetRemindersCountAndNotify();
 
             (DataContext as BrowserTabViewModel).OnShouldChangePropertyAddress += BrowserTabView_OnShouldChangePropertyAddress;
         }
 
-        void vm_OnHasReminders(int notificationCount)
-        {
-            if (notificationCount == 0)
-            {
-                borderNotification.Visibility = Visibility.Hidden;
-            }
-            else
-            {
-                borderNotification.Visibility = Visibility.Visible;
-                tbNotificationCount.Text = "" + notificationCount;
-            }
-        }
+        //void vm_OnHasReminders(int notificationCount)
+        //{
+        //    if (notificationCount == 0)
+        //    {
+        //        borderNotification.Visibility = Visibility.Hidden;
+        //    }
+        //    else
+        //    {
+        //        borderNotification.Visibility = Visibility.Visible;
+        //        tbNotificationCount.Text = "" + notificationCount;
+        //    }
+        //}
 
         private void openFlyout_Click(object sender, RoutedEventArgs e)
         {
@@ -181,7 +181,7 @@ namespace WpfCefDynamBrowser.Views
 
         private void Reminders_Click(object sender, RoutedEventArgs e)
         {
-            DragDropMainViewModel.Instance.OpenReminders();
+            //DragDropMainViewModel.Instance.OpenReminders();
         }
 
         private void BtnWithContextMenue_Click(object sender, RoutedEventArgs e)

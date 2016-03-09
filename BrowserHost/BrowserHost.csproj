@@ -65,6 +65,10 @@
       <HintPath>bin\x86\Debug\InputSimulator.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -84,9 +88,17 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controls\MyComboBox.cs" />
+    <Compile Include="Convertrs\ReminderDateToColorConverter.cs" />
+    <Compile Include="Convertrs\ReminersCountToVisibleConverter.cs" />
+    <Compile Include="Convertrs\RichToTextConverter.cs" />
+    <Compile Include="Models\Reminder.cs" />
     <Compile Include="ViewModels\BrowserTabViewModel.cs" />
+    <Compile Include="ViewModels\RemindersVM.cs" />
     <Compile Include="Views\BrowserTabView.xaml.cs">
       <DependentUpon>BrowserTabView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\RemindersWindow.xaml.cs">
+      <DependentUpon>RemindersWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="BrowserHostCntrl.xaml">
       <SubType>Designer</SubType>
@@ -106,6 +118,10 @@
     <Page Include="Views\BrowserTabView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\RemindersWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
@@ -127,6 +143,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.manifest" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -168,10 +185,7 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\" />
-    <Folder Include="Windows\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

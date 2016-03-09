@@ -59,7 +59,7 @@ namespace RssReader
 
         public MainViewModel()
         {
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Navigated To Rss Tab");
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_Navigatedtorsstab);
 
             AllRssFeedsResults = new ObservableCollection<RssList>();
 
@@ -299,7 +299,7 @@ namespace RssReader
 
         void rssLink_OnSelectedLaunchLinkMasher(string link)
         {
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Sent To Masher " + link);
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_SentToMasher+" " + link);
             OnLaunchToTabMasher(link);
         }
 
@@ -383,13 +383,13 @@ namespace RssReader
                     break;
             }
 
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie(type + " Social Share From RSS tab");
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie(type + " "+UsageTracker.Usage_Type_ShareFromRss);
             OnLaunchToBrowser(fullUrl, link);
         }
 
         void rssLink_OnSelectedLaunchLink(string link)
         {
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Sent To Browser From RSS tab " + link);
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_SentToBrowserfromrss + " " + link);
             OnLaunchToTabBrowser(link);
         }
 

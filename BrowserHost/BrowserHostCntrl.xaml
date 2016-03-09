@@ -25,7 +25,7 @@
                 <Style.Resources>
                     <sys:Double x:Key="CloseButtonWidth">6</sys:Double>
                     <sys:Double x:Key="CloseCircleWidth">12</sys:Double>
-                    <sys:Double x:Key="CloseButtonOffset">3.16</sys:Double>
+                    <sys:Double x:Key="CloseButtonOffset">3</sys:Double>
                 </Style.Resources>
                 <Setter Property="Height" Value="{StaticResource CloseCircleWidth}" />
                 <Setter Property="Width" Value="{StaticResource CloseCircleWidth}" />
@@ -33,20 +33,22 @@
                 <Setter Property="HorizontalAlignment" Value="Center" />
                 <Setter Property="Background" Value="Transparent" />
                 <Setter Property="Foreground" Value="DarkGray" />
+                <Setter Property="UseLayoutRounding" Value="False" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Canvas Background="Transparent" x:Name="CloseButton" Width="{StaticResource CloseCircleWidth}" Height="{StaticResource CloseCircleWidth}">
-                                <Ellipse Width="{StaticResource CloseCircleWidth}" Fill="{TemplateBinding Background}" Height="{StaticResource CloseCircleWidth}" />
-                                <Canvas Canvas.Left="{StaticResource CloseButtonOffset}" Canvas.Top="{StaticResource CloseButtonOffset}"
+                            <Grid Background="Transparent" x:Name="CloseButton" Width="{StaticResource CloseCircleWidth}" Height="{StaticResource CloseCircleWidth}">
+                                <Ellipse Width="{StaticResource CloseCircleWidth}" Fill="{TemplateBinding Background}"  Height="{StaticResource CloseCircleWidth}"
+                                         HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <!--<Canvas Canvas.Left="{StaticResource CloseButtonOffset}" Canvas.Top="{StaticResource CloseButtonOffset}"
                                         Background="Transparent"
-                                        Width="{StaticResource CloseCircleWidth}" Height="{StaticResource CloseCircleWidth}">
-                                    <Line X1="0" Y1="0" X2="{StaticResource CloseButtonWidth}" Y2="{StaticResource CloseButtonWidth}"
-                                          Stroke="{TemplateBinding Foreground}" StrokeThickness="2" />
-                                    <Line X1="0" Y1="{StaticResource CloseButtonWidth}" X2="{StaticResource CloseButtonWidth}" Y2="0"
-                                          Stroke="{TemplateBinding Foreground}" StrokeThickness="2" />
-                                </Canvas>
-                            </Canvas>
+                                        Width="{StaticResource CloseCircleWidth}" Height="{StaticResource CloseCircleWidth}">-->
+                                    <Line X1="0" Y1="0" X2="{StaticResource CloseButtonWidth}" Y2="{StaticResource CloseButtonWidth}" Margin="1,1,0,0"
+                                          Stroke="{TemplateBinding Foreground}" StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <Line X1="0" Y1="{StaticResource CloseButtonWidth}" X2="{StaticResource CloseButtonWidth}" Y2="0" Margin="1,1,0,0"
+                                          Stroke="{TemplateBinding Foreground}" StrokeThickness="2" HorizontalAlignment="Center" VerticalAlignment="Center"  />
+                                <!--</Canvas>-->
+                            </Grid>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>

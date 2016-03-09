@@ -679,6 +679,35 @@ namespace Organiser.Common.Classes
 
         #endregion
 
+
+        public static int GetRemindersCount(string projectName)
+        {
+            string remindersDir = Path.Combine(GetBaseDir(), "TaskReminders", projectName);
+            if (Directory.Exists(remindersDir))
+            {
+               return Directory.GetFiles(remindersDir).Length;
+            }
+
+            return 0;
+        }
+
+        public static List<string> GetRemindersText(string projectName)
+        {
+            string remindersDir = Path.Combine(GetBaseDir(), "TaskReminders", projectName);
+            if (Directory.Exists(remindersDir))
+            {
+                List<string> jsonRemindersList = new List<string>();
+                foreach (var f in new DirectoryInfo(remindersDir).GetFiles())
+                {
+                    jsonRemindersList.Add(File.ReadAllText(f.FullName));
+                }
+
+                return jsonRemindersList;
+            }
+
+            return null;
+        }
+
         public static void DownloadImage(string url)
         {
             string saveFileFilename = "";
@@ -881,5 +910,7 @@ namespace Organiser.Common.Classes
                 }
             }
         }
+
+
     }
 }

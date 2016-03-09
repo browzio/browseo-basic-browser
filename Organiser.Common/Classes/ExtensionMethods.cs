@@ -43,5 +43,15 @@ namespace Organiser.Common.Classes
             str = str.Replace("amp;" ,"");
             return str;
         }
+
+        public static bool IsNullOrEmpty(this string str)
+        {
+            return string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str);
+        }
+
+        public static void Show(this string str)
+        {
+            System.Windows.MessageBox.Show(str);
+        }
     }
 }

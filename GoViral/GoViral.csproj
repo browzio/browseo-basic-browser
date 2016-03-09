@@ -47,8 +47,14 @@
     <Reference Include="System.AddIn.Contract" />
     <Reference Include="System.Data" />
     <Reference Include="System.Messaging" />
+    <Reference Include="System.Net">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETPortable\v4.0\Profile\Profile344\System.Net.dll</HintPath>
+    </Reference>
     <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel.Web">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETPortable\v4.0\Profile\Profile344\System.ServiceModel.Web.dll</HintPath>
+    </Reference>
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -58,6 +64,9 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Serialization">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETPortable\v4.0\Profile\Profile344\System.Xml.Serialization.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
@@ -83,7 +92,26 @@
     <Compile Include="Converters\PhotoLinkToImageConverter.cs" />
     <Compile Include="Converters\PhotosVidsCountToTextConverter.cs" />
     <Compile Include="Converters\PostIdToUrlConverter.cs" />
+    <Compile Include="Converters\RelationshipToEnabledConv.cs" />
+    <Compile Include="Converters\RelationshipToImageConv.cs" />
+    <Compile Include="Converters\RelationshipToTextConv.cs" />
     <Compile Include="Helpers\CrawlerHost.cs" />
+    <Compile Include="Instagram\InstControls\InstaDominateUserControl.xaml.cs">
+      <DependentUpon>InstaDominateUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Instagram\InstControls\InstaSearchUserControl.xaml.cs">
+      <DependentUpon>InstaSearchUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Instagram\InstControls\InstaUserUserControl.xaml.cs">
+      <DependentUpon>InstaUserUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Instagram\InstControls\InstTabsUserControl.xaml.cs">
+      <DependentUpon>InstTabsUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Instagram\InstModels\InstaMedia.cs" />
+    <Compile Include="Instagram\InstModels\InstaUserResult.cs" />
+    <Compile Include="Instagram\InstViewModels\InstaSearchVM.cs" />
+    <Compile Include="Instagram\InstViewModels\InstaVM.cs" />
     <Compile Include="Models\FilterResults\FilterOption.cs" />
     <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\ListOption.cs" />
@@ -126,7 +154,10 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\ic_favorite_black_24dp_2x.png" />
+    <Resource Include="Images\ic_favorite_border_black_24dp_2x.png" />
+  </ItemGroup>
   <ItemGroup>
     <Page Include="Controls\SearchUserControl.xaml">
       <SubType>Designer</SubType>
@@ -144,6 +175,22 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Instagram\InstControls\InstaDominateUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Instagram\InstControls\InstaSearchUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Instagram\InstControls\InstaUserUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Instagram\InstControls\InstTabsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\ToFolderChooserWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -154,6 +201,10 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Source\Repos\InstaSharp\InstaNonPortable\InstaNonPortable.csproj">
+      <Project>{2001dee3-524c-4d55-8ac4-3bf35608b35c}</Project>
+      <Name>InstaNonPortable</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
       <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
       <Name>CefGlue.WindowsForms-old</Name>
@@ -177,6 +228,25 @@
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
       <Name>Organiser.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_user1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\instagram-logo.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_clear_black_24dp_2x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_person_black_24dp_2x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_person_add_black_24dp_2x.png" />
+    <Resource Include="Images\ic_person_outline_black_24dp_2x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_sentiment_very_dissatisfied_black_24dp_2x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

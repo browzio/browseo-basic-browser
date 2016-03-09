@@ -98,9 +98,12 @@
     <Compile Include="Controlls\SocialButtonsUserControl.xaml.cs">
       <DependentUpon>SocialButtonsUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\BooleanToVisible.cs" />
     <Compile Include="Converters\ElementSizeMathConverter.cs" />
+    <Compile Include="Converters\EmptyListToVisibleConverter.cs" />
     <Compile Include="Converters\EmptyTextToVisibilityConverter.cs" />
     <Compile Include="Converters\MaxCharCountConv.cs" />
+    <Compile Include="Converters\NullToVisibleConverter.cs" />
     <Compile Include="Converters\OpisiteVisibilityConverter.cs" />
     <Compile Include="Models\WebPageImg.cs" />
     <Compile Include="ViewModels\PinterestImagePickerVM.cs" />

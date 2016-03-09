@@ -113,6 +113,7 @@ namespace GoViral.Models
         {
             try
             {
+                UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_SEOEvent + " url " + SyndicatedPostsList[SISyndicatedPostsList].Url);
                 string projpath = MyFilesDatabase.FindProjectDirByName(Name, "");
                 string url = SyndicatedPostsList[SISyndicatedPostsList].Url;
 

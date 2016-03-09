@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfCefDynamBrowser.ViewModels"
              xmlns:mControls="clr-namespace:BrowserHost.Controls"
+             xmlns:mConv="clr-namespace:BrowserHost.Convertrs"
              xmlns:dragNdrop="clr-namespace:DragDropListview.Controls;assembly=DragDropListview"
              xmlns:commonConvs="clr-namespace:Organiser.Common.Converters;assembly=Organiser.Common"
              mc:Ignorable="d"
@@ -15,7 +16,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <commonConvs:OpisiteVisibilityConverter x:Key="convOppositVisibility" /> 
+            <commonConvs:OpisiteVisibilityConverter x:Key="convOppositVisibility" />
+            <mConv:ReminersCountToVisibleConverter x:Key="counttoVisConv" />
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
@@ -300,6 +302,7 @@
                 <Separator />
                 <TextBlock Text="{Binding OutputMessage}" />
             </StatusBar>
+            
             <Grid Background="#FFF0F0F0" Name="browserGrd">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -346,7 +349,7 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
-                        <Button Name="btnCloseFlyout" Click="btnCloseFlyout_Click" ToolTip="Collapse"
+                        <Button Name="btnCloseFlyout" Click="btnCloseFlyout_Click" ToolTip="Collapse" Cursor="Hand"
                                 Grid.Column="0" VerticalAlignment="Center" Margin="10,0,0,0" HorizontalAlignment="Left" Height="45">
                             <Button.Style>
                                 <Style TargetType="{x:Type Button}">
@@ -398,10 +401,11 @@
                         <Button Content="Import Bookmarks" Name="btnImpotBookmarks" Grid.Column="1"  Grid.Row="1"  HorizontalAlignment="Left"
                                     VerticalAlignment="Bottom"
                                     Margin="5" Click="btnImpotBookmarks_Click" />
-                        <Button Name="Reminders" Grid.Column="2" Style="{DynamicResource browser_btn}"  Grid.Row="1"  Click="Reminders_Click" 
-                                    Width="50" Height="50" HorizontalAlignment="Left" Cursor="Hand">
+                        <Button Name="Reminders" Grid.Column="2"  Grid.Row="1"  Width="50" Height="50" HorizontalAlignment="Left" Cursor="Hand" 
+                                 Style="{DynamicResource browser_btn}" Command="{Binding BoockmarksCommand}" CommandParameter="REMINDERS" >
                             <StackPanel>
-                                <Border Name="borderNotification" Visibility="Collapsed" CornerRadius="999" Margin="10,0,0,-10" Width="20" Height="20" BorderThickness="0.5" BorderBrush="Black" Opacity="0.5">
+                                <Border Name="borderNotification" Visibility="{Binding ReminderCount, Converter={StaticResource counttoVisConv}}"
+                                        CornerRadius="999" Margin="10,0,0,-10" Width="20" Height="20" BorderThickness="0.5" BorderBrush="Black" Opacity="0.5">
                                     <Border.Background>
                                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                             <GradientStop Color="#FFBB0000"/>
@@ -409,7 +413,7 @@
                                             <GradientStop Color="#FFFF0000" Offset="0.522"/>
                                         </LinearGradientBrush>
                                     </Border.Background>
-                                    <TextBlock Foreground="White" FontWeight="Bold" FontSize="11" Name="tbNotificationCount" HorizontalAlignment="Center"></TextBlock>
+                                    <TextBlock Foreground="White" FontWeight="Bold" FontSize="11" Name="tbNotificationCount" Text="{Binding ReminderCount}" HorizontalAlignment="Center"></TextBlock>
                                 </Border>
                                 <Image  HorizontalAlignment="Center" Height="25" Width="25" VerticalAlignment="Center" Stretch="Uniform" SnapsToDevicePixels="True" 
                                         Source="pack://application:,,,/Organiser.Common;component/Image/reminder.png" Opacity="0.4" />

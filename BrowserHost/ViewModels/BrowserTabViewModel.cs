@@ -39,6 +39,7 @@ namespace WpfCefDynamBrowser.ViewModels
         public event Action OnClickedSaveSession = delegate { };
         public event Action OnClickedDeleteSession = delegate { };
         public event Action OnClickedSaveSessionToBookmarks = delegate { };
+        public event Action OnClickedReminders = delegate { };
         public event Action<string> OnShouldChangePropertyAddress = delegate { }; 
         public event Action OnRefreshSessionSettings = delegate { }; //javascriptEnabled,JavaEnabled
         public event Action<BrowserTabViewModel> OnRefreshTabSettings = delegate { }; //javascriptEnabled,JavaEnabled
@@ -56,6 +57,7 @@ namespace WpfCefDynamBrowser.ViewModels
         public ICommand SaveSessionToBMs { get; set; }
         public ICommand SendToBrowserSocial { get; set; }
         public ICommand SettingsCTClick { get; set; }
+        public ICommand BoockmarksCommand { get; set; }
 
         #endregion
 
@@ -170,7 +172,8 @@ namespace WpfCefDynamBrowser.ViewModels
             SaveSessionToBMs = new DelegateCommand(SaveSessionToBMsClicked);  
             SendToBrowserSocial = new RelayCommand(SendToSocialBrowserPopUp);
             SettingsCTClick = new RelayCommand(OnSettingsCTButtonClick);
-                                                      
+            BoockmarksCommand = new RelayCommand(OnBoockmarksCommand_Raised);
+
             var version = "Brow·SEO";
             OutputMessage = version;
 
@@ -182,10 +185,7 @@ namespace WpfCefDynamBrowser.ViewModels
         public void SetBrowser(string address)
         {
             WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
-            WebBrowser.init(address,
-                JavascriptEnabled ? CefState.Enabled : CefState.Disabled,
-                JavaEnabled ? CefState.Enabled : CefState.Disabled,
-                FlashEnabled ? CefState.Enabled : CefState.Disabled);
+            WebBrowser.init(address);
 
             WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
             WebBrowser.OnBrowserMessageChanged += WebBrowser_OnBrowserMessageChanged;
@@ -568,7 +568,7 @@ namespace WpfCefDynamBrowser.ViewModels
             }
 
             //AddressEditable = address;
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Address Changed " + address);
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_AddressChange + " " + address);
         }
 
         void WebBrowser_OnBrowserTitleChanged(string ttl)
@@ -1400,7 +1400,7 @@ namespace WpfCefDynamBrowser.ViewModels
         private void SendToSocialBrowserPopUp(object param)
         {
             string shareType = (string)param;
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie("Share From Browser " + shareType);
+            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_BrowserShare + " " + shareType);
 
             string fullUrl = Social.GetShareUrl(shareType, AddressEditable);
 
@@ -1419,11 +1419,40 @@ namespace WpfCefDynamBrowser.ViewModels
         {
             BrowserForSocialShare bfss = new BrowserForSocialShare();
             bfss.Text = "Loading... " + AddressEditable;
-            bfss.browserCntrl1.init(fullUrl,
-                BrowserSettimgs.JavascriptEnabled ? CefState.Enabled : CefState.Disabled,
-                BrowserSettimgs.JavaEnabled ? CefState.Enabled : CefState.Disabled,
-                BrowserSettimgs.FlashEnabled ? CefState.Enabled : CefState.Disabled);
+            bfss.browserCntrl1.init(fullUrl);
             bfss.Show();
+        }
+        #endregion
+
+        #region bookmarks / reminders
+        private int reminderCount;
+        public int ReminderCount
+        {
+            get { return reminderCount; }
+            set { reminderCount = value; RaisePropertyChanged("ReminderCount"); }
+        }
+
+        private void OnBoockmarksCommand_Raised(object param)
+        {
+            switch ((string)param)
+            {
+                case "REMINDERS":
+                    RemindersVM rwVM = new RemindersVM();
+                    rwVM.OnOpen += OnClickedReminders;
+                    rwVM.OnNavigate += (uri) => { WebBrowser.Navigate(uri); };
+                    RemindersWindow rw = new RemindersWindow();
+                    rw.DataContext = rwVM;
+                    rw.Show();
+                    Task.Factory.StartNew(()=> 
+                    {
+                        List<string> jsonTaskList = MyFilesDatabase.GetRemindersText(GloableProfData.PData.ProjectName);
+                       if(jsonTaskList != null) rwVM.FillReminders(jsonTaskList);
+                    });
+                    break;
+
+                default:
+                    break;
+            }
         }
         #endregion
     }

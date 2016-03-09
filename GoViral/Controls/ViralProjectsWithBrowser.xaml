@@ -216,6 +216,7 @@
                                                             <Separator Margin="-30,0,0,0" />
                                                             <MenuItem Header="Order By Likes" Command="{Binding CTMenuClick}" CommandParameter="ORDER_Likes" />
                                                             <MenuItem Header="Order By Talking About" Command="{Binding CTMenuClick}" CommandParameter="ORDER_TalkingAbout" />
+                                                            <MenuItem Header="Order Groups By Privacy" Command="{Binding CTMenuClick}" CommandParameter="ORDER_GroupsOpen" />
                                                             <Separator Margin="-30,0,0,0" />
                                                             <MenuItem Header="Crawl Page Stats" Command="{Binding CTMenuClick}" CommandParameter="Stats" />
                                                             <MenuItem Header="Crawl All Stats" Command="{Binding CTMenuClick}" CommandParameter="StatsAll" />

@@ -19,6 +19,7 @@ namespace Xilium.CefGlue.Client
         public BrowserForSocialShare()
         {
             InitializeComponent();
+            this.TopMost = true;
         }
 
         private void browserCntrl1_OnBrowserStatusChanged(string obj)
@@ -83,6 +84,20 @@ namespace Xilium.CefGlue.Client
         public void SetStartUrl(string url)
         {
             startUrl = url;
+        }
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            //browserCntrl1.DisposeBrowserComponents();
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
         }
     }
 }

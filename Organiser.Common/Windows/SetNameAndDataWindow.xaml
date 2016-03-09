@@ -6,7 +6,7 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico"
-        Title="">
+        Title="" Topmost="True">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

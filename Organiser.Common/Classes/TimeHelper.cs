@@ -84,60 +84,125 @@ namespace Organiser.Common.Classes
     {
         public static DateAndTimeZone GetTimeOfProxy(string ip, string port, string username, string pass)
         {
-            WebRequest request = WebRequest.Create(@"http://time.is/");
-            if (!string.IsNullOrEmpty(ip) && !string.IsNullOrWhiteSpace(ip) && !string.IsNullOrEmpty(port) && !string.IsNullOrWhiteSpace(port))
-                request.Proxy = new WebProxy(ip, Convert.ToInt32(port));
-            else
-                return new DateAndTimeZone() { TimeZone = TimeZoneInfo.Local };
-
-            if (!string.IsNullOrEmpty(username) && !string.IsNullOrWhiteSpace(username) && !string.IsNullOrEmpty(pass) && !string.IsNullOrWhiteSpace(pass))
-                request.Proxy.Credentials = new NetworkCredential(username, pass);    
-
-            WebResponse response = request.GetResponse();
-
             DateTime dt = DateTime.Now;
-            TimeZoneInfo timeZone = TimeZoneInfo.Local; 
+            TimeZoneInfo timeZone = TimeZoneInfo.Local;
 
-            using (StreamReader stream = new StreamReader(response.GetResponseStream()))
+            try
             {
-                string html = stream.ReadToEnd();
+                WebRequest request = WebRequest.Create("https://whoer.net/");
 
-                string time = html.Split(new string[] { @"<div id=""twd"">" }, StringSplitOptions.None)[1];
-                time = time.Substring(0, time.IndexOf(@"</div>"));
-                if (time.Contains("<span id=\"ampm\" style=\"font-size:21px;line-height:21px\">"))
+                if (!string.IsNullOrEmpty(ip) && !string.IsNullOrWhiteSpace(ip) && !string.IsNullOrEmpty(port) && !string.IsNullOrWhiteSpace(port))
+                    request.Proxy = new WebProxy(ip, Convert.ToInt32(port));
+                else
+                    return new DateAndTimeZone() { TimeZone = timeZone, Date = dt };
+
+                WebResponse response = request.GetResponse();
+                
+                using (StreamReader stream = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
                 {
-                    time = time.Split(new string[] { "<span id=\"ampm\" style=\"font-size:21px;line-height:21px\">" }, StringSplitOptions.None)[0] + " " +
-                        time.Split(new string[] { "<span id=\"ampm\" style=\"font-size:21px;line-height:21px\">" }, StringSplitOptions.None)[1];
-                    time = time.Substring(0, time.IndexOf("</span>"));
-                }
+                    string html = stream.ReadToEnd();
 
-                string date = html.Split(new string[] { @"title=""Click for calendar"">" }, StringSplitOptions.None)[1];
-                date = date.Substring(0, date.IndexOf("</div>"));
+                    string gmttosplit = "<span class=\"ico-holder ico-timelocal\"> </span>";
+                    string gmttosplit2 = "<span class=\"cont\">";
+                    string gmtString = html.Substring(html.IndexOf(gmttosplit) + gmttosplit.Length);
+                    gmtString = gmtString.Substring(gmtString.IndexOf(gmttosplit2) + gmttosplit2.Length);
+                    gmtString = gmtString.Remove(gmtString.IndexOf("</span>"));
+                    gmtString = gmtString.Trim();
 
-                if(!html.Contains(@"<span>Time zone: </span>"))return new DateAndTimeZone() { Date = dt, TimeZone = timeZone };
+                    string dtString = gmtString.Remove(gmtString.IndexOf("G"));
+                    dtString = dtString.Trim();
 
-                string timezone = html.Split(new string[] { @"<span>Time zone: </span>" }, StringSplitOptions.None)[1];
-                timezone = timezone.Split(new string[] { @"<a href=""/" }, StringSplitOptions.None)[1];
-                timezone = timezone.Substring(0, timezone.IndexOf("\">"));
-
-                string id = html.Split(new string[] { @"Time zone identifier: " }, StringSplitOptions.None)[1];
-                id = id.Substring(0, id.IndexOf("<"));
-
-
-                foreach (var item in TimeZoneInfo.GetSystemTimeZones())
-                {
-                    if (item.DisplayName.Replace(":", "").Replace("0", "").Contains(timezone))
+                    //string s = "Fri Nov 01 2013 00:00:00 GMT+0100";
+                    try
                     {
-                        timeZone = item;
-                        break;
+                        dt = DateTime.ParseExact(dtString, "ddd MMM dd yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
                     }
+                    catch
+                    {
+                    }
+                    string tzString = gmtString.Substring(gmtString.IndexOf("G"));
+                    tzString = tzString.Replace("GMT", "UTC");
+                    tzString = tzString.Replace("0", "");
+                    tzString = tzString.Remove(tzString.IndexOf("("));
+                    tzString = tzString.Trim();
+                    //tzString = tzString.Remove(tzString.IndexOf(")"));
+
+                    foreach (var item in TimeZoneInfo.GetSystemTimeZones())
+                    {
+                        if (item.DisplayName.Replace(":", "").Replace("0", "").Contains(tzString))
+                        {
+                            timeZone = item;
+                            break;
+                        }
+                    }
+
                 }
-
-                dt = Convert.ToDateTime(date);
-                dt = dt.Date + Convert.ToDateTime(time).TimeOfDay;
             }
+            catch { }
+            return new DateAndTimeZone() { TimeZone = timeZone, Date = dt };
 
-            return new DateAndTimeZone() { Date = dt, TimeZone = timeZone };
+
+
+
+            //DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            //dtDateTime = dtDateTime.AddSeconds(unixStamp).ToLocalTime();
+
+
+
+            //WebRequest request = WebRequest.Create(@"http://time.is/");
+            //if (!string.IsNullOrEmpty(ip) && !string.IsNullOrWhiteSpace(ip) && !string.IsNullOrEmpty(port) && !string.IsNullOrWhiteSpace(port))
+            //    request.Proxy = new WebProxy(ip, Convert.ToInt32(port));
+            //else
+            //    return new DateAndTimeZone() { TimeZone = TimeZoneInfo.Local };
+
+            //if (!string.IsNullOrEmpty(username) && !string.IsNullOrWhiteSpace(username) && !string.IsNullOrEmpty(pass) && !string.IsNullOrWhiteSpace(pass))
+            //    request.Proxy.Credentials = new NetworkCredential(username, pass);
+
+            //WebResponse response = request.GetResponse();
+
+            //DateTime dt = DateTime.Now;
+            //TimeZoneInfo timeZone = TimeZoneInfo.Local;
+
+            //using (StreamReader stream = new StreamReader(response.GetResponseStream()))
+            //{
+            //    string html = stream.ReadToEnd();
+
+            //    string time = html.Split(new string[] { @"<div id=""twd"">" }, StringSplitOptions.None)[1];
+            //    time = time.Substring(0, time.IndexOf(@"</div>"));
+            //    if (time.Contains("<span id=\"ampm\" style=\"font-size:21px;line-height:21px\">"))
+            //    {
+            //        time = time.Split(new string[] { "<span id=\"ampm\" style=\"font-size:21px;line-height:21px\">" }, StringSplitOptions.None)[0] + " " +
+            //            time.Split(new string[] { "<span id=\"ampm\" style=\"font-size:21px;line-height:21px\">" }, StringSplitOptions.None)[1];
+            //        time = time.Substring(0, time.IndexOf("</span>"));
+            //    }
+
+            //    string date = html.Split(new string[] { @"title=""Click for calendar"">" }, StringSplitOptions.None)[1];
+            //    date = date.Substring(0, date.IndexOf("</div>"));
+
+            //    if (!html.Contains(@"<span>Time zone: </span>")) return new DateAndTimeZone() { Date = dt, TimeZone = timeZone };
+
+            //    string timezone = html.Split(new string[] { @"<span>Time zone: </span>" }, StringSplitOptions.None)[1];
+            //    timezone = timezone.Split(new string[] { @"<a href=""/" }, StringSplitOptions.None)[1];
+            //    timezone = timezone.Substring(0, timezone.IndexOf("\">"));
+
+            //    string id = html.Split(new string[] { @"Time zone identifier: " }, StringSplitOptions.None)[1];
+            //    id = id.Substring(0, id.IndexOf("<"));
+
+
+            //    foreach (var item in TimeZoneInfo.GetSystemTimeZones())
+            //    {
+            //        if (item.DisplayName.Replace(":", "").Replace("0", "").Contains(timezone))
+            //        {
+            //            timeZone = item;
+            //            break;
+            //        }
+            //    }
+
+            //    dt = Convert.ToDateTime(date);
+            //    dt = dt.Date + Convert.ToDateTime(time).TimeOfDay;
+            //}
+
+            //return new DateAndTimeZone() { Date = dt, TimeZone = timeZone };
         }
 
         public static void SetOriginalTimeZonesFromFile()
@@ -193,7 +258,6 @@ namespace Organiser.Common.Classes
 
     }
 }
-
 
 //#region time
 //[DllImport("kernel32.dll", SetLastError = true)]
