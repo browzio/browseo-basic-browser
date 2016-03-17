@@ -51,6 +51,7 @@ namespace Xilium.CefGlue.Client
                 NoSandbox = true
                 //LogFile = "CefGlue.log",
             };
+            //settings.CommandLineArgsDisabled = true;
             
             if (GloableProfData.PData != null)
             {

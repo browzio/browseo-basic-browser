@@ -2,6 +2,7 @@
 using Organiser.Common.Classes;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -14,6 +15,7 @@ namespace GoViral.Instagram.InstModels
     public class InstaMedia : Media, INotifyPropertyChanged
     {
         public event Action<InstaMedia, string> OnRaisedCommandToViewModel = delegate { };
+        [Newtonsoft.Json.JsonIgnore]
         public ICommand OnCommandFromView { get; set; }
 
         private string shortcode;
@@ -21,6 +23,20 @@ namespace GoViral.Instagram.InstModels
         {
             get { return shortcode; }
             set { shortcode = value; RaisePropertyChanged("Shortcode"); }
+        }
+
+        
+        public int CommentCount
+        {
+            get { return Comments != null ? Comments.Count : 0; }
+            set { if (Comments != null) Comments.Count = value; RaisePropertyChanged("CommentCount"); }
+        }
+
+        //CommentsData
+        public ObservableCollection<Comment> CommentsData
+        {
+            get;
+            set;
         }
 
 
@@ -37,11 +53,19 @@ namespace GoViral.Instagram.InstModels
             }
         }
 
+        private bool isChecked;
+        public bool IsChecked
+        {
+            get { return isChecked; }
+            set { isChecked = value; RaisePropertyChanged("IsChecked"); }
+        }
 
+        object comment_lock = new object();
 
         public InstaMedia()
         {
             OnCommandFromView = new RelayCommand(OnCommandFromView_Raised);
+            CommentsData = new ObservableCollection<Comment>();
             Shortcode = null;
 
             AddCommentText = "Add A Comment";
@@ -49,16 +73,16 @@ namespace GoViral.Instagram.InstModels
 
         public InstaMedia(Media m) : this()
         {
-            Type t = m.GetType();
-            foreach (FieldInfo fieldInf in t.GetFields())
-            {
-                fieldInf.SetValue(this, fieldInf.GetValue(m));
-            }
-            foreach (PropertyInfo propInf in t.GetProperties())
-            {
-                propInf.SetValue(this, propInf.GetValue(m));
-            }
+            CloneAll(m);
         }
+
+        //public void SetCommentsLock()
+        //{
+        //    if (Comments.Data == null || comment_lock == null) return;
+
+        //    comment_lock = new object();
+        //    System.Windows.Data.BindingOperations.EnableCollectionSynchronization(CommentsData, comment_lock);
+        //}
 
         private void OnCommandFromView_Raised(object obj)
         {
@@ -81,5 +105,35 @@ namespace GoViral.Instagram.InstModels
             }
         }
         public event PropertyChangedEventHandler PropertyChanged;
+
+        internal void CloneAll(InstaMedia im)
+        {
+            Type t = im.GetType();
+            foreach (FieldInfo fieldInf in t.GetFields())
+            {
+                fieldInf.SetValue(this, fieldInf.GetValue(im));
+            }
+            foreach (PropertyInfo propInf in t.GetProperties())
+            {
+                propInf.SetValue(this, propInf.GetValue(im));
+            }
+
+            RaisePropertyChanged("CommentsData");
+        }
+
+        internal void CloneAll(Media m)
+        {
+            Type t = m.GetType();
+            foreach (FieldInfo fieldInf in t.GetFields())
+            {
+                fieldInf.SetValue(this, fieldInf.GetValue(m));
+            }
+            foreach (PropertyInfo propInf in t.GetProperties())
+            {
+                propInf.SetValue(this, propInf.GetValue(m));
+            }
+
+            RaisePropertyChanged("CommentsData");
+        }
     }
 }

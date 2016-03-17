@@ -14,31 +14,51 @@ namespace GoViral.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             Relationship r = value as Relationship;
-            if (r == null)return "Follow";
+            if (r == null) return "";
+
+            
+
+            string param = parameter as string;
+            switch (param)
+            {
+                case "Follower":
+                    switch (r.IncomingStatus)
+                    {
+                        case IncomingStatus.FollowedBy:
+                            return "Following You";
+                        case IncomingStatus.RequestedBy:
+                            return "Follow Requested";
+                        case IncomingStatus.BlockedbyYou:
+                            return "Blocked";
+                        case IncomingStatus.None:
+                            return "Not Following You";
+                        default:
+                            break;
+                    }
+                    break;
+
+                case "Folowing":
+                    switch (r.OutgoingStatus)
+                    {
+                        case OutgoingStatus.Follows:
+                            return "Following";
+                        case OutgoingStatus.Requested:
+                            return "Request Sent";
+                        case OutgoingStatus.None:
+                            return "Not Following";
+                        default:
+                            break;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
+
+
+
             if (r.TargetUserIsPrivate) return "User Is Private";
-            string returnstring = "Follow";
-            switch (r.IncomingStatus)
-            {
-                case IncomingStatus.FollowedBy:
-                    return "Following You";
-                case IncomingStatus.RequestedBy:
-                    return "Reqested You";
-                case IncomingStatus.BlockedbyYou:
-                    return "Blocked You";
-                default:
-                    break;
-            }
-            switch (r.OutgoingStatus)
-            {
-                case OutgoingStatus.Follows:
-                    return "Un Follow";
-                case OutgoingStatus.Requested:
-                    return "Cancel Request";
-                case OutgoingStatus.None:
-                default:
-                    break;
-            }
-            return returnstring;
+            return "";
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

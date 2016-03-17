@@ -26,7 +26,7 @@ namespace WPF_WYSIWYG_HTML_Editor.Helpers
 
             if (end == -1)
             {
-                throw new ArgumentException("Unbalanced brace.");
+                throw new ArgumentException("Unbalanced brace. Missing closing brace.");
             }
 
             var substring = content.Substring(start + 1, content.Length - (start + 1));
@@ -35,7 +35,9 @@ namespace WPF_WYSIWYG_HTML_Editor.Helpers
 
             if (end == -1)
             {
-                throw new ArgumentException("Unbalanced brace.");
+                // var error = substring.Length > 25 ? substring.Substring(substring.Length - 20) : substring;
+                //var error = substring.Length > 25 ? substring.Remove(substring.Length - 20) : substring;
+                throw new ArgumentException("Unbalanced brace. In chunk " + Environment.NewLine + substring);
             }
 
             var splits = rest.Substring(0, end).Split(DELIMITER);

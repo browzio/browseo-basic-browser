@@ -35,6 +35,13 @@ namespace WPF_WYSIWYG_HTML_Editor
         public WPFWebBrowser()
         {
             InitializeComponent();
+
+            this.IsKeyboardFocusedChanged += WPFWebBrowser_IsKeyboardFocusedChanged;
+        }
+
+        private void WPFWebBrowser_IsKeyboardFocusedChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+
         }
 
         private DispHTMLBody Body
@@ -76,15 +83,15 @@ namespace WPF_WYSIWYG_HTML_Editor
 
         void WPFWebBrowser_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if ((bool)e.NewValue == true)
-            {
-                Dispatcher.BeginInvoke(
-                System.Windows.Threading.DispatcherPriority.ContextIdle,
-                new Action(delegate()
-                {
-                    webBrowser.Focus();
-                }));
-            }
+            //if ((bool)e.NewValue == true)
+            //{
+            //    Dispatcher.BeginInvoke(
+            //    System.Windows.Threading.DispatcherPriority.ContextIdle,
+            //    new Action(delegate()
+            //    {
+            //        webBrowser.Focus();
+            //    }));
+            //}
         }
 
         protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -120,7 +127,6 @@ namespace WPF_WYSIWYG_HTML_Editor
                 doc = webBrowser.Document as HTMLDocument;
                 doc.designMode = "On";
                 Format.doc = doc;
-                doc.focus();
                 return;
             }
             else
@@ -242,9 +248,6 @@ namespace WPF_WYSIWYG_HTML_Editor
         {
             doc = webBrowser.Document as HTMLDocument;
             doc.designMode = "On";
-            webBrowser.Focusable = true;
-            webBrowser.Focus();
-            doc.focus();
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -269,14 +272,109 @@ namespace WPF_WYSIWYG_HTML_Editor
             webBrowser = new WebBrowser();
             webBrowser.PreviewKeyDown += webBrowser_PreviewKeyDown;
             webBrowser.LoadCompleted += completed;
+            webBrowser.LoadCompleted += WebBrowser_LoadCompleted;
             gridwebBrowser.Children.Add(webBrowser);
             Script.HideScriptErrors(webBrowser, true);
-
             webBrowser.NavigateToString(Properties.Resources.New);
+
             doc = webBrowser.Document as HTMLDocument;
             doc.designMode = "On";
             Format.doc = doc;
-            doc.focus();
+        }
+        
+
+        private void WebBrowser_LoadCompleted(object sender, NavigationEventArgs e)
+        {
+            webBrowser.LoadCompleted -= WebBrowser_LoadCompleted;
+            if (hookdel == null)
+                InstallHook();
+        }
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, IntPtr windowTitle);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+        public static extern IntPtr SetWindowsHookEx(int idHook, HookHandlerDelegate lpfn, IntPtr hInstance, int threadId);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, CallingConvention = CallingConvention.StdCall)]
+        public static extern IntPtr CallNextHookEx(IntPtr idHook, int nCode, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("kernel32.dll")]
+        public static extern int GetCurrentThreadId();
+
+        [DllImport("user32.dll")]
+        static extern bool UnhookWindowsHookEx(IntPtr hInstance);
+
+        public delegate IntPtr HookHandlerDelegate(int nCode, IntPtr wParam, IntPtr lParam);
+
+        //Keyboard API constants
+        private const int WH_GETMESSAGE = 3;
+        private const int WM_KEYUP = 0x101;
+        private const int WM_KEYDOWN = 0x0100;
+        private const int WM_SYSKEYUP = 0x0105;
+        private const int WM_SYSKEYDOWN = 0x0104;
+
+
+        private const uint VK_BACK = 0x08;
+        private const uint VK_LEFT = 0x25;
+        private const uint VK_UP = 0x26;
+        private const uint VK_RIGHT = 0x27;
+        private const uint VK_DOWN = 0x28;
+
+        private List<uint> ignoreKeys = new List<uint>()
+        {
+            VK_BACK,
+            VK_LEFT,
+            VK_UP,
+            VK_RIGHT,
+            VK_DOWN,
+        };
+
+        //Remove message constants
+        private const int PM_NOREMOVE = 0x0000;
+
+        //Variables used in the call to SetWindowsHookEx
+        private IntPtr hHook = IntPtr.Zero;
+        private IntPtr callNext = IntPtr.Zero;
+        private HookHandlerDelegate hookdel;
+
+        private IntPtr HookCallBack(int nCode, IntPtr wParam, IntPtr lParam)
+        {
+            if (nCode >= 0 || wParam.ToInt32() == PM_NOREMOVE)
+            {
+                MSG msg = (MSG)Marshal.PtrToStructure(lParam, typeof(MSG));
+                if (msg.message == WM_KEYDOWN || msg.message == WM_SYSKEYDOWN || msg.message == WM_KEYUP || msg.message == WM_SYSKEYUP)
+                {
+                    if (!ignoreKeys.Contains((uint)msg.wParam))
+                        if (this.IsLoaded && ((IKeyboardInputSink)webBrowser).HasFocusWithin())
+                        {
+                            ((IKeyboardInputSink)webBrowser).TranslateAccelerator(ref msg, ModifierKeys.None);
+                            return (IntPtr)1;
+                        }
+                }
+            }
+
+            callNext = CallNextHookEx(hHook, nCode, wParam, lParam);
+            return callNext;
+        }
+
+        private void InstallHook()
+        {
+          
+            hookdel = HookCallBack;
+            IntPtr wnd = webBrowser.Handle;
+            if (wnd != IntPtr.Zero)
+            {
+                wnd = FindWindowEx(wnd, IntPtr.Zero, "Shell DocObject View", IntPtr.Zero);
+                if (wnd != IntPtr.Zero)
+                {
+                    wnd = FindWindowEx(wnd, IntPtr.Zero, "Internet Explorer_Server", IntPtr.Zero);
+                    if (wnd != IntPtr.Zero)
+                    {
+                        hHook = SetWindowsHookEx(WH_GETMESSAGE, hookdel, (IntPtr)0, GetCurrentThreadId());
+                    }
+                }
+            }
         }
     }
 

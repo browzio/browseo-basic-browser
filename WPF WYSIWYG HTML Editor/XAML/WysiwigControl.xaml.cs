@@ -388,6 +388,11 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
             Gui.SettingsAddVidLink();
         }
 
+        private void SettingsAddVidLinkMulty_Click(object sender, RoutedEventArgs e)
+        {
+            Gui.SettingsAddVidLinkMulti();
+        }
+
         public void AddSetRssFeed(string link, string title, string imglink, string date, string description)
         {
             System.Threading.Tasks.Task.Factory.StartNew(() =>
@@ -459,6 +464,19 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
             {
                 MessageBox.Show(" Unable to copy article to clipboard reason: "+ex.Message);
             }
+        }
+
+        private void ValidateSpintax_click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (DataContext != null && DataContext is XmlRpcVM)
+                {
+                    XmlRpcVM vm = DataContext as XmlRpcVM;
+                    vm.ValidateSpintax(webBrowserEditor.doc.body == null ? null : webBrowserEditor.doc.body.innerHTML);
+                }
+            }
+            catch { }
         }
     }
 }

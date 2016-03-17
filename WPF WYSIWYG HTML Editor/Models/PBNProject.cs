@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -51,7 +52,8 @@ namespace WPF_WYSIWYG_HTML_Editor.Models
                     PropertyChanged(this, new PropertyChangedEventArgs("AuthorityVisible"));
             }
         }
-        
+
+
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

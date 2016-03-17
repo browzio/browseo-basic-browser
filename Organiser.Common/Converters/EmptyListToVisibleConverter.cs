@@ -17,12 +17,25 @@ namespace Organiser.Common.Converters
             string param = parameter as string;
             //if (value == null && param != "NOT") return Visibility.Visible;
 
-            ICollection l = value as ICollection;
-
-            if (param == "NOT")
-                return l != null && l.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            if (param == "NUM")
+            {
+                int val = System.Convert.ToInt32(value);
+                return val > 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
+            if (param == "NUMYES")
+            {
+                int val = System.Convert.ToInt32(value);
+                return val < 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
             else
-                return l == null || l.Count <= 0 ? Visibility.Visible : Visibility.Collapsed;
+            {
+                ICollection l = value as ICollection;
+
+                if (param == "NOT")
+                    return l != null && l.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+                else
+                    return l == null || l.Count <= 0 ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -6,23 +6,59 @@
              xmlns:local="clr-namespace:GoViral.Instagram.InstControls"
              xmlns:mvm="clr-namespace:GoViral.Instagram.InstViewModels"
              xmlns:lConverter="clr-namespace:GoViral.Converters"
+             xmlns:gConverters="clr-namespace:Organiser.Common.Converters;assembly=Organiser.Common"
              mc:Ignorable="d" >
     <UserControl.Resources>
         <lConverter:LinkToImageConverter x:Key="linktoimageconv" />
+        <gConverters:EmptyListToVisibleConverter x:Key="emptyListToVisibleConv" />
     </UserControl.Resources>
-    <Grid Background="White">
+    <Grid Background="Transparent">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <Image Source="{Binding Path=User.ProfilePicture, Source={x:Static mvm:InstaVM.Instance}, Converter={StaticResource linktoimageconv}}"
-               Margin="5"
-               Stretch="Fill"
-               Width="35" Height="35" VerticalAlignment="Center"/>
-        <StackPanel Margin="5" Grid.Column="1">
-            <TextBox Text="{Binding User.Username, Source={x:Static mvm:InstaVM.Instance}}" IsReadOnly="True" BorderThickness="0" Background="Transparent" />
-            <TextBox Text="{Binding User.Id, Source={x:Static mvm:InstaVM.Instance}}"       IsReadOnly="True" BorderThickness="0" Background="Transparent" />
-            <TextBox Text="{Binding User.FullName, Source={x:Static mvm:InstaVM.Instance}}" IsReadOnly="True" BorderThickness="0" Background="Transparent" />
-        </StackPanel>
+        <Grid Background="White">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Image Source="{Binding Path=User.ProfilePicture, Source={x:Static mvm:InstaVM.Instance}, Converter={StaticResource linktoimageconv}}"
+                   Margin="5"
+                   Stretch="Fill"
+                   Width="35" Height="35" VerticalAlignment="Center"/>
+            <StackPanel Margin="5" Grid.Column="1">
+                <TextBox Text="{Binding User.Username, Source={x:Static mvm:InstaVM.Instance}}" IsReadOnly="True" BorderThickness="0" Background="Transparent" />
+                <TextBox Text="{Binding User.Id, Source={x:Static mvm:InstaVM.Instance}}"       IsReadOnly="True" BorderThickness="0" Background="Transparent" />
+                <TextBox Text="{Binding User.FullName, Source={x:Static mvm:InstaVM.Instance}}" IsReadOnly="True" BorderThickness="0" Background="Transparent" />
+            </StackPanel>
+        </Grid>
+
+        <Grid Grid.Column="1" VerticalAlignment="Stretch">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel>
+                <TextBlock FontSize="11"
+                           Visibility="{Binding Source={x:Static mvm:InstaVM.Instance}, Path=RateLimit, 
+                                                Converter={StaticResource emptyListToVisibleConv}, ConverterParameter=NUM}">
+                    <Run Text="Rate Limit: " />
+                    <Run Text="{Binding Source={x:Static mvm:InstaVM.Instance}, Path=RateLimit}" />
+                </TextBlock>
+                <TextBlock FontSize="11"
+                           Margin="0,0,0,5"
+                           Visibility="{Binding Source={x:Static mvm:InstaVM.Instance}, Path=RateLimitRemaining,
+                                                Converter={StaticResource emptyListToVisibleConv}, ConverterParameter=NUM}">
+                    <Run Text="Requests Left: " />
+                    <Run Text="{Binding Source={x:Static mvm:InstaVM.Instance}, Path=RateLimitRemaining}" />
+                </TextBlock>
+            </StackPanel>
+
+            <Button Content="Re Authenticate"
+                    TextElement.FontSize="11"
+                    Grid.Row="1"
+                    VerticalAlignment="Top"
+                    Command="{Binding Source={x:Static mvm:InstaVM.Instance}, Path=OnCommandFromView}" CommandParameter="LOGIN"/>
+        </Grid>
     </Grid>
 </UserControl>

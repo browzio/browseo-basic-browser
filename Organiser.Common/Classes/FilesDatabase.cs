@@ -256,6 +256,36 @@ namespace Organiser.Common.Classes
             return false;
         }
 
+        public static List<PersonData> GetAllProfiles()
+        {
+            List<PersonData> allProfiles = new List<PersonData>();
+            WalkDirectoryTreeGetAllProfiles(new DirectoryInfo(Path.Combine(GetBaseDir(), "Projects")), allProfiles);
+            return allProfiles;
+        }
+        public static void WalkDirectoryTreeGetAllProfiles(System.IO.DirectoryInfo root, List<PersonData> allProfiles)
+        {
+            System.IO.DirectoryInfo[] subDirs = null;
+
+            string filepath = Path.Combine(root.FullName, "UserData.ini");
+            if (!File.Exists(filepath)) filepath = filepath.Replace("UserData.ini", "ProjectData.ini");
+            if (File.Exists(filepath))
+            {
+                PersonData pdata = GetSubProjectPersonData(filepath);
+                pdata.ProjectDir = root.FullName;
+                allProfiles.Add(pdata);
+            }
+
+            // Now find all the subdirectories under this directory.
+            subDirs = root.GetDirectories();
+            if (subDirs != null)
+            {
+                foreach (System.IO.DirectoryInfo dirInfo in subDirs)
+                {
+                    WalkDirectoryTreeGetAllProfiles(dirInfo, allProfiles);
+                }
+            }
+        }
+
         public static PersonData GetSubProjectPersonData(string selectedProjectPath)
         {
             string sitesFilePath = selectedProjectPath;
@@ -263,6 +293,8 @@ namespace Organiser.Common.Classes
                 sitesFilePath = Path.Combine(selectedProjectPath, "UserData.ini");
             if (!File.Exists(sitesFilePath))
                 sitesFilePath = sitesFilePath.Replace("UserData.ini", "ProjectData.ini");
+
+
 
             PersonData profile = new PersonData();
 
@@ -299,9 +331,65 @@ namespace Organiser.Common.Classes
                     profile.BirthdayYear = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayYear"));
                 }
                 catch { }
+                try
+                {
+                    profile.InPBNVault = Convert.ToBoolean(ini.IniReadValue("Data", "InVault"));
+                    profile.SIPBNType = Convert.ToInt32(ini.IniReadValue("Data", "SIPBNType"));
+                }
+                catch
+                { }
+                try
+                {
+                    profile.InMonney = Convert.ToBoolean(ini.IniReadValue("Data", "InMoney"));
+                }
+                catch
+                { }
             }
             catch { }
             return profile;
+        }
+
+        public static void ReWrightProjData(PersonData pdata, string dir)
+        {
+            try
+            {
+                string sitesFilePath = dir;
+                if (!dir.Contains(".ini"))
+                    sitesFilePath = Path.Combine(dir, "UserData.ini");
+                if (!File.Exists(sitesFilePath))
+                    sitesFilePath = sitesFilePath.Replace("UserData.ini", "ProjectData.ini");
+
+                IniFile fileWrighter = new IniFile(sitesFilePath);
+                fileWrighter.IniWriteValue("Data", "ProjectName", pdata.ProjectName);
+                fileWrighter.IniWriteValue("Data", "ProfileName", pdata.ProfileName);
+                fileWrighter.IniWriteValue("Data", "FirstName", pdata.FirstName);
+                fileWrighter.IniWriteValue("Data", "LastName", pdata.LastName);
+                fileWrighter.IniWriteValue("Data", "Email", pdata.Email);
+                fileWrighter.IniWriteValue("Data", "Password", pdata.Password);
+                fileWrighter.IniWriteValue("Data", "Username", pdata.Username);
+                fileWrighter.IniWriteValue("Data", "ProxyIP", pdata.ProxyIP);
+                fileWrighter.IniWriteValue("Data", "ProxyPort", pdata.ProxyPort);
+                fileWrighter.IniWriteValue("Data", "ProxyUsername", pdata.ProxyUsername);
+                fileWrighter.IniWriteValue("Data", "ProxyPassword", pdata.ProxyPassword);
+                fileWrighter.IniWriteValue("Data", "PhoneNumber", pdata.PhoneNumber);
+                fileWrighter.IniWriteValue("Data", "Sex", "" + pdata.CmbSelectedIndexSex);
+                fileWrighter.IniWriteValue("Data", "BirthdayDay", "" + pdata.CmbSelectedIndexDay);
+                fileWrighter.IniWriteValue("Data", "BirthdayMonth", "" + pdata.CmbSelectedIndexMonth);
+                fileWrighter.IniWriteValue("Data", "BirthdayYear", "" + pdata.BirthdayYear);
+                fileWrighter.IniWriteValue("Data", "Street", "" + pdata.Street);
+                fileWrighter.IniWriteValue("Data", "City", "" + pdata.City);
+                fileWrighter.IniWriteValue("Data", "State", "" + pdata.State);
+                fileWrighter.IniWriteValue("Data", "Zip", "" + pdata.Zip);
+                fileWrighter.IniWriteValue("Data", "Country", "" + pdata.Country);
+                fileWrighter.IniWriteValue("Data", "WebAddress", pdata.WebAddress);
+                fileWrighter.IniWriteValue("Data", "Notes", "" + pdata.Notes);
+                fileWrighter.IniWriteValue("Data", "InVault", "" + pdata.InPBNVault);
+                fileWrighter.IniWriteValue("Data", "SIPBNType", "" + pdata.SIPBNType);
+                fileWrighter.IniWriteValue("Data", "InMoney", "" + pdata.InMonney);
+            }
+            catch
+            {
+            }
         }
 
         public static PersonData SetProfileFromini(string path)
@@ -910,7 +998,6 @@ namespace Organiser.Common.Classes
                 }
             }
         }
-
 
     }
 }

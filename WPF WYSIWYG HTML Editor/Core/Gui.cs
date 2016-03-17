@@ -80,13 +80,21 @@ namespace WPF_WYSIWYG_HTML_Editor
             }
         }
 
+        internal static void SettingsAddVidLinkMulti()
+        {
+            using (MultiEmbedWindow link = new MultiEmbedWindow(webBrowser.doc))
+            {
+                link.ShowDialog();
+            }
+        }
+
         public static void SettingsAddImage()
         {
             using (Image image = new Image(webBrowser.doc))
             {
                 image.ShowDialog();
             }
-
+          //  webBrowser.webBrowser.Refresh();// (webBrowser.doc.toString());
         }
 
         public static void RibbonButtonSave()
@@ -144,7 +152,7 @@ namespace WPF_WYSIWYG_HTML_Editor
             if (htmlEditor.Visibility == Visibility.Visible) return;
             htmlEditor.Visibility = Visibility.Visible;
             webBrowser.Visibility = Visibility.Collapsed;
-
+            if (webBrowser.doc == null) return;
             htmlEditor.Editor.Selection.Text = webBrowser.doc.documentElement.innerHTML;
         }
 
@@ -158,5 +166,7 @@ namespace WPF_WYSIWYG_HTML_Editor
         {
             webBrowser.newWb(DialogBox.SelectFile());    
         }
+
+
     }
 }

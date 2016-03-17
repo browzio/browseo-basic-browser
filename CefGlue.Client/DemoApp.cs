@@ -81,6 +81,10 @@
             //commandLine.AppendArgument("disable-web-security");
             //commandLine.AppendArgument("allow-file-access-from-files"); 
             commandLine.AppendArgument("allow-cross-origin-auth-promp");
+            //commandLine.AppendSwitch("disable-blink-features", "GetUserMedia");
+            //commandLine.AppendSwitch("disable-blink-features", "AudioOutputDevices");
+            //commandLine.AppendSwitch("disable-blink-features", "MediaStreamTrack");
+            //commandLine.AppendArgument("disable-blink-features"); 
             //commandLine.AppendSwitch("origin-when-crossorigin", "default");
             //string[] args = commandLine.GetArguments();
             //--allow-cross-origin-auth-promp

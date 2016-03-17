@@ -74,6 +74,7 @@
     <Compile Include="Helpers\Spinner.cs" />
     <Compile Include="Models\FTPprofile.cs" />
     <Compile Include="Models\PBNProject.cs" />
+    <Compile Include="Models\PBNProjectsFolder.cs" />
     <Compile Include="Models\SelectedProfile.cs" />
     <Compile Include="MVVM\BacklinksHistoryVM.cs" />
     <Compile Include="SpinningVM.cs" />
@@ -108,6 +109,9 @@
     </Compile>
     <Compile Include="XAML\MoneyVaultUserControl.xaml.cs">
       <DependentUpon>MoneyVaultUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="XAML\MultiEmbedWindow.xaml.cs">
+      <DependentUpon>MultiEmbedWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="XAML\PBNVaultUserControl.xaml.cs">
       <DependentUpon>PBNVaultUserControl.xaml</DependentUpon>
@@ -158,6 +162,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="XAML\MoneyVaultUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="XAML\MultiEmbedWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -328,6 +336,16 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\refresh-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_play_arrow_black_24dp_1x.png" />
+    <Resource Include="Images\ic_video_library_black_24dp_1x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Edit-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_check_black_24dp_2x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

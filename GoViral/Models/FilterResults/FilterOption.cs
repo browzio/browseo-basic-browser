@@ -32,7 +32,24 @@ namespace GoViral.Models.FilterResults
         [Description("Invited")]
         Invited,
         [Description("Maybe")]
-        Maybe
+        Maybe,
+        [Description("Users")]
+        Users,
+        [Description("Tags")]
+        Tags,
+        [Description("Media")]
+        Media,
+        [Description("Following")]
+        Following,
+        [Description("Followers")]
+        Followers,
+    }
+
+    public enum ListType
+    {
+        Users,
+        Media,
+        Tags
     }
     public class FilterOption : ViewModelBase
     {
@@ -90,5 +107,6 @@ namespace GoViral.Models.FilterResults
 
 
         public OptionType OptionState { get; set; }
+        public ListType ListState { get; set; }
     }
 }

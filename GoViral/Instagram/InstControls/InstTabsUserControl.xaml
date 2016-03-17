@@ -1,19 +1,35 @@
-﻿<UserControl
+﻿<UserControl x:Class="GoViral.Instagram.InstControls.InstTabsUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GoViral.Instagram.InstControls"
              xmlns:InstViewModels="clr-namespace:GoViral.Instagram.InstViewModels"
-             x:Class="GoViral.Instagram.InstControls.InstTabsUserControl"
+             xmlns:goVival="clr-namespace:GoViral.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
     <Grid>
         <TabControl>
-            <TabItem Header="Search">
+            <TabItem Header="Dominator"  Style="{StaticResource gmailTabStyle}">
+                <local:InstaDominateUserControl  x:FieldModifier="public" x:Name="cntrlDominator" />
+            </TabItem>
+
+            <TabItem Header="Post Sorter" Style="{StaticResource gmailTabStyle}">
+                <goVival:SharedPostsUserControl x:FieldModifier="public" x:Name="cntrlSorter" />
+            </TabItem>
+
+            <TabItem Header="Search" Name="cntrlSearch"  Style="{StaticResource gmailTabStyle}">
                 <local:InstaSearchUserControl >
                     <local:InstaSearchUserControl.DataContext>
-                        <InstViewModels:InstaSearchVM  />
+                        <InstViewModels:InstaSearchVM OnSendToDominate="InstaSearchVM_OnSendToDominate" OnSendContentToSorter="InstaSearchVM_OnSendContentToSorter"  />
                     </local:InstaSearchUserControl.DataContext>
                 </local:InstaSearchUserControl>
             </TabItem>

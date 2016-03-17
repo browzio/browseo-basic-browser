@@ -149,8 +149,11 @@ namespace Xilium.CefGlue.Client
         {
             if (isWindowPopUp)
                 return;
-
+           // CBrowser.Browser.GetMainFrame().ExecuteJavaScript("alert(window.MediaStreamTrack);", CBrowser.Browser.GetMainFrame().Url, 0);
+          //  CBrowser.Browser.GetMainFrame().ExecuteJavaScript("alert(window.MediaStreamTrack);", CBrowser.Browser.GetMainFrame().Url, 0);
             OnBrowserLoadingChanged(e.IsLoading);
+            //if(!e.IsLoading)//
+            //    CBrowser.Browser.GetMainFrame().ExecuteJavaScript("for (property in navigator) { alert(property + ' ' + navigator[property]); }", CBrowser.Browser.GetMainFrame().Url, 0);
         }
 
         void browser_OnHandleCreated()

@@ -1,0 +1,36 @@
+﻿<Window x:Class="WPF_WYSIWYG_HTML_Editor.XAML.MultiEmbedWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPF_WYSIWYG_HTML_Editor.XAML"
+        mc:Ignorable="d"
+        Title="One Video Link Per Line" Height="300" Width="500" ResizeMode="NoResize" WindowStartupLocation="CenterScreen"       
+        Icon="../Images/ic_video_library_black_24dp_1x.png">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBox Name="tbInputedText" AcceptsReturn="True" x:FieldModifier="public" VerticalScrollBarVisibility="Auto" FontFamily="Verdana" FontSize="15" />
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4">
+            
+            <Button x:Name="ButtonOK" HorizontalAlignment="Left" Height="30"  VerticalAlignment="Top" Width="92" Click="ButtonOK_Click" >
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>OK</TextBlock>
+                    <Image Source="../Resources/ok.png" Height="16" Width="16" Margin="10,0,0,0"/>
+                </StackPanel>
+            </Button>
+            <Button x:Name="ButtonCancel" HorizontalAlignment="Left" Height="30" Margin="20,0,0,0" VerticalAlignment="Top" Width="92" Click="ButtonCancel_Click" >
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock>Cancel</TextBlock>
+                    <Image Source="../Resources/cancel.png" Height="16" Width="16" Margin="10,0,0,0"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

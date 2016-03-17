@@ -31,10 +31,13 @@
                                                    TextWrapping="Wrap"
                                                    Foreground="Blue" />
 
-                            <TextBlock Text="{Binding Link, Mode=OneWay}"
-                                                   Margin="3"
-                                                   TextWrapping="Wrap"
-                                                   Foreground="Green" />
+                            <TextBox Text="{Binding Link, Mode=OneWay}"
+                                     Background="Transparent"
+                                     BorderThickness="0"
+                                     IsReadOnly="True"
+                                     Margin="3"
+                                     TextWrapping="Wrap"
+                                     Foreground="Green" />
 
                             <StackPanel Orientation="Horizontal" Visibility="{Binding AuthorityVisible}">
                                 <TextBlock Text="{Binding PageAuthority}"

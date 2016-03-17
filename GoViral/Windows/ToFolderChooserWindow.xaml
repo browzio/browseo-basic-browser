@@ -22,7 +22,7 @@
             <TextBlock Text="Url:" Width="40" VerticalAlignment="Center" />
             <TextBox Name="tbUrl" Margin="3" />
         </DockPanel>
-        <ComboBox DisplayMemberPath="FolderTitle" SelectedIndex="{Binding SIFolders}" ItemsSource="{Binding Folders}" Name="cmbFolders" />
+        <ComboBox DisplayMemberPath="FolderTitle" SelectedIndex="{Binding SIFolders}" SelectedItem="{Binding SelectedFolder}" ItemsSource="{Binding Folders}" Name="cmbFolders" />
         <Button Content="OK" Style="{StaticResource FlatbtnStyle}" Click="Button_Click" Margin="3,10,3,3" />
     </StackPanel>
 </Window>

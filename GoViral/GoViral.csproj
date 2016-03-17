@@ -95,6 +95,7 @@
     <Compile Include="Converters\RelationshipToEnabledConv.cs" />
     <Compile Include="Converters\RelationshipToImageConv.cs" />
     <Compile Include="Converters\RelationshipToTextConv.cs" />
+    <Compile Include="Converters\RelationshipToVisibleConv.cs" />
     <Compile Include="Helpers\CrawlerHost.cs" />
     <Compile Include="Instagram\InstControls\InstaDominateUserControl.xaml.cs">
       <DependentUpon>InstaDominateUserControl.xaml</DependentUpon>
@@ -108,10 +109,18 @@
     <Compile Include="Instagram\InstControls\InstTabsUserControl.xaml.cs">
       <DependentUpon>InstTabsUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Instagram\InstModels\InstaFolder.cs" />
     <Compile Include="Instagram\InstModels\InstaMedia.cs" />
-    <Compile Include="Instagram\InstModels\InstaUserResult.cs" />
+    <Compile Include="Instagram\InstModels\InstaResponseLists.cs" />
+    <Compile Include="Instagram\InstModels\InstaTag.cs" />
+    <Compile Include="Instagram\InstModels\InstaUser.cs" />
+    <Compile Include="Instagram\InstViewModels\InstaDominateVM.cs" />
     <Compile Include="Instagram\InstViewModels\InstaSearchVM.cs" />
     <Compile Include="Instagram\InstViewModels\InstaVM.cs" />
+    <Compile Include="Instagram\IntsWindows\SelectOptionToSendWindow.xaml.cs">
+      <DependentUpon>SelectOptionToSendWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Instagram\InstaResourcesDictionary.xaml.cs" />
     <Compile Include="Models\FilterResults\FilterOption.cs" />
     <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\ListOption.cs" />
@@ -175,6 +184,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Instagram\InstaResourcesDictionary.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Instagram\InstControls\InstaDominateUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -188,6 +201,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Instagram\InstControls\InstTabsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Instagram\IntsWindows\SelectOptionToSendWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -247,6 +264,24 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\ic_sentiment_very_dissatisfied_black_24dp_2x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_more_horiz_black_24dp_2x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_more_horiz_white.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_settings_resize.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_settings_resize_clean.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_clear_black_black.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ic_autorenew_black_24dp_1x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

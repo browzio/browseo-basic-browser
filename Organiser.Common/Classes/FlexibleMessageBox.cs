@@ -170,6 +170,7 @@ namespace Organiser.Common.Classes
         }
 
         #endregion
+        
 
         #region Internal form class
 
@@ -691,7 +692,7 @@ namespace Organiser.Common.Classes
                 try
                 {
                     Cursor.Current = Cursors.WaitCursor;
-                    Process.Start(e.LinkText);
+                    //Process.Start(e.LinkText);
                 }
                 catch (Exception)
                 {

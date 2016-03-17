@@ -17,30 +17,30 @@ namespace GoViral.Converters
             if (r == null) return false;
             if (r.TargetUserIsPrivate) return false;
 
-            switch (r.IncomingStatus)
-            {
-                case IncomingStatus.FollowedBy:
-                    return true;
-                case IncomingStatus.RequestedBy:
-                    return true;
-                case IncomingStatus.BlockedbyYou:
-                    return false;
-                case IncomingStatus.None:
-                    break;
-                default:
-                    break;
-            }
-            switch (r.OutgoingStatus)
-            {
-                case OutgoingStatus.Follows:
-                    return true;
-                case OutgoingStatus.Requested:
-                    return false;
-                case OutgoingStatus.None:
-                    return true;
-                default:
-                    break;
-            }
+            //switch (r.IncomingStatus)
+            //{
+            //    case IncomingStatus.FollowedBy:
+            //        return true;
+            //    case IncomingStatus.RequestedBy:
+            //        return true;
+            //    case IncomingStatus.BlockedbyYou:
+            //        return false;
+            //    case IncomingStatus.None:
+            //        break;
+            //    default:
+            //        break;
+            //}
+            //switch (r.OutgoingStatus)
+            //{
+            //    case OutgoingStatus.Follows:
+            //        return true;
+            //    case OutgoingStatus.Requested:
+            //        return false;
+            //    case OutgoingStatus.None:
+            //        return true;
+            //    default:
+            //        break;
+            //}
             return true;
         }
 

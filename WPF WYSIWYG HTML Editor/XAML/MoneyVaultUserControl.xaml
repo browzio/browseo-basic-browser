@@ -4,16 +4,59 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WPF_WYSIWYG_HTML_Editor.XAML"
-             mc:Ignorable="d">
+             mc:Ignorable="d" Name="uc" AllowDrop="True">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+
+            <DataTemplate x:Key="dtvaultList">
+                <StackPanel Orientation="Horizontal">
+                    <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
+                    <StackPanel Visibility="{Binding AuthorityVisible}" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding DomainAuthority}" Margin="2" />
+                        <TextBlock Text="{Binding PageAuthority}" Margin="2" />
+                    </StackPanel>
+                    <StackPanel>
+                        <TextBlock Text="{Binding Name}" Margin="4" FontSize="16" MinWidth="140" VerticalAlignment="Center"  />
+                        <TextBlock Text="{Binding ProjectName}" Margin="6,1,1,1" FontSize="11" MinWidth="140" VerticalAlignment="Center" FontStyle="Italic"  />
+                    </StackPanel>
+                </StackPanel>
+            </DataTemplate>
+
+            <ContextMenu x:Key="ctVaultList">
+                <MenuItem Header="Get Moz Rank">
+                    <MenuItem.InputBindings>
+                        <MouseBinding MouseAction="LeftClick" Command="{Binding VautContextMenu}" CommandParameter="MozRank" />
+                    </MenuItem.InputBindings>
+                </MenuItem>
+                <MenuItem Header="Copy Link">
+                    <MenuItem.InputBindings>
+                        <MouseBinding MouseAction="LeftClick" Command="{Binding VautContextMenu}" CommandParameter="CopyLinkMoney" />
+                    </MenuItem.InputBindings>
+                </MenuItem>
+
+                <Separator Margin="-30,0,0,0" />
+                <MenuItem Header="Get Backlink History">
+                    <MenuItem.InputBindings>
+                        <MouseBinding MouseAction="LeftClick" Command="{Binding VautContextMenu}" CommandParameter="BACKLINK_HISTORY" />
+                    </MenuItem.InputBindings>
+                </MenuItem>
+
+                <Separator Margin="-30,0,0,0" />
+                <MenuItem Header="Remove From Vault">
+                    <MenuItem.InputBindings>
+                        <MouseBinding MouseAction="LeftClick" Command="{Binding VautContextMenu}" CommandParameter="RemoveMoney" />
+                    </MenuItem.InputBindings>
+                </MenuItem>
+            </ContextMenu>
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid Margin="3">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
@@ -26,54 +69,84 @@
             <Image Source="pack://application:,,,/Organiser.Common;component/Image/refresh.png"  
                    ToolTip="Refresh" SnapsToDevicePixels="True" Stretch="Uniform" />
         </Button>
-        <TextBlock Grid.Column="1" Text="Money Vault" Margin="4" FontSize="15"  VerticalAlignment="Center" HorizontalAlignment="Center"  />
+        <TextBlock Grid.Column="0" Grid.ColumnSpan="3" Text="Money Vault" Margin="4" FontSize="15"  VerticalAlignment="Center" HorizontalAlignment="Center"  />
         
         <Button Grid.Column="0" Command="{Binding RefreshPBNVault}" CommandParameter="SetMozKey" IsEnabled="{Binding EnableBtns}" ToolTip="Set moz keys"  Height="25" Width="25" HorizontalAlignment="Left">
             <Image Source="pack://application:,,,/Organiser.Common;component/Image/settings2.png" SnapsToDevicePixels="True" Stretch="Uniform" />
         </Button>
 
-        <ListBox Grid.Row="1" ItemsSource="{Binding SavedMoneyProjects}" 
-                 Background="#fafafa"
-                 Grid.ColumnSpan="3"
-                 SelectionMode="Single"
-                 SelectedIndex="{Binding SIMoney}"
-                 Margin="3" BorderThickness="0,0,0,0">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
-                        <StackPanel Visibility="{Binding AuthorityVisible}" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding DomainAuthority}" Margin="2" />
-                            <TextBlock Text="{Binding PageAuthority}" Margin="2" />
-                        </StackPanel>
-                        <StackPanel>
-                            <TextBlock Text="{Binding Name}" Margin="4" FontSize="16" MinWidth="140" VerticalAlignment="Center"  />
-                            <TextBlock Text="{Binding ProjectName}" Margin="6,1,1,1" FontSize="11" MinWidth="140" VerticalAlignment="Center" FontStyle="Italic"  />
-                        </StackPanel>
-                    </StackPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-            <ListBox.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Get Moz Rank">
-                        <MenuItem.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding VautContextMenu}" CommandParameter="MozRank" />
-                        </MenuItem.InputBindings>
-                    </MenuItem>
-                    <MenuItem Header="Copy Link">
-                        <MenuItem.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding VautContextMenu}" CommandParameter="CopyLinkMoney" />
-                        </MenuItem.InputBindings>
-                    </MenuItem>
-                    
-                    <Separator Margin="-30,0,0,0" />
-                    <MenuItem Header="Get Backlink History">
-                        <MenuItem.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding VautContextMenu}" CommandParameter="BACKLINK_HISTORY" />
-                        </MenuItem.InputBindings>
-                    </MenuItem>
-                </ContextMenu>
-            </ListBox.ContextMenu>
-        </ListBox>
+        <Button Content="New Folder" 
+                IsEnabled="{Binding EnableBtns}"  
+                Command="{Binding RefreshPBNVault}" CommandParameter="NEWFolderPBNMoney"
+               Grid.Row="1" Grid.Column="0" Margin="3" />
+
+        <Button Content="Save" 
+                IsEnabled="{Binding EnableBtns}"  
+                Command="{Binding RefreshPBNVault}" CommandParameter="SaveMoney"
+                Grid.Column="2" Grid.Row="1" Margin="3" />
+
+        <ScrollViewer Name="sv"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
+                      Grid.ColumnSpan="3" Grid.Row="2">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <ListBox Background="Transparent"
+                         ItemsSource="{Binding SavedMoneyProjectsFolders}"
+                         VerticalAlignment="Top"
+                         BorderThickness="0"
+                         SelectionMode="Single"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         Margin="3"
+                         PreviewMouseWheel="ListBox_PreviewMouseWheel">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Expander ExpandDirection="Down" Width="{Binding ElementName=uc, Path=ActualWidth}" Drop="Expander_Drop" Collapsed="Expander_Collapsed">
+                                <Expander.Header>
+                                    <Grid>
+                                        <TextBlock Text="{Binding FolderName}" HorizontalAlignment="Left" Width="{Binding ElementName=uc, Path=ActualWidth}" VerticalAlignment="Center" />
+                                        <Grid.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Rename" Command="{Binding VautContextMenu}" CommandParameter="RenameFolderMoney" />
+                                            </ContextMenu>
+                                        </Grid.ContextMenu>
+                                    </Grid>
+                                </Expander.Header>
+                                <ListBox ItemsSource="{Binding PBNProjects}" 
+                                         VerticalAlignment="Top"
+                                         BorderThickness="0"
+                                         MouseMove="ListBox_MouseMove_1"
+                                         Background="Transparent"
+                                         SelectionMode="Single"
+                                         SelectedIndex="{Binding SIPBN}"
+                                         ItemTemplate="{StaticResource dtvaultList}"
+                                         ContextMenu="{StaticResource ctVaultList}"
+                                         Margin="3">
+                                </ListBox>
+                            </Expander>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+
+                <ListBox ItemsSource="{Binding SavedMoneyProjects}" 
+                         VerticalAlignment="Stretch"
+                         Grid.Row="1"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         SelectionMode="Single"
+                         PreviewMouseWheel="ListBox_PreviewMouseWheel"
+                         MouseMove="ListBox_MouseMove"
+                         Drop="ListBox_Drop_1"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                         SelectedIndex="{Binding SIMoney}"
+                         ItemTemplate="{StaticResource dtvaultList}"
+                         ContextMenu="{StaticResource ctVaultList}"
+                         Margin="3">
+                </ListBox>
+            </Grid>
+        </ScrollViewer>
     </Grid>
 </UserControl>

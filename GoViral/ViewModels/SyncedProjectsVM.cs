@@ -21,6 +21,7 @@ namespace GoViral.ViewModels
         #region props events and Ctor
         public const string TypeOfGoViral = "GoViral";
         public const string TypeOfSEO = "SocialEngagerOptimizer";
+        public const string TypeOfInsteo = "InsteoOptimizer";
         private string typeOfSyncerPath = "";
 
         public ICommand SelectFolderSelect_Click { get; set; }
@@ -93,18 +94,21 @@ namespace GoViral.ViewModels
                             ObservableCollection<SavedSyncProject> allSaved = File.ReadAllText(allSavedFilePath).XmlDeserializeFromString<ObservableCollection<SavedSyncProject>>();
                             foreach (SavedSyncProject p in allSaved)
                             {
+                                p.TypeOfSync = typeOfSyncerPath;
                                 Application.Current.Dispatcher.Invoke(new Action<int, SavedSyncProject>(addToSavedProjectsList), DispatcherPriority.Normal, -1, p);
                             }
                         }   
 
                         if (SavedProjectsList.Count == 0 || !SavedProjectsList.Any(p => p.Name == GloableProfData.PData.ProjectName))
                         {
-                            Application.Current.Dispatcher.Invoke(new Action<int, SavedSyncProject>(addToSavedProjectsList), DispatcherPriority.Normal, 0, new SavedSyncProject()
-                            {
-                                IsSyncedMessage = "Synced",
-                                ProjectName = GloableProfData.PData.ProjectName,
-                                SISyndicatedPostsList = 0,
-                            }); 
+                            Application.Current.Dispatcher.Invoke(new Action<int, SavedSyncProject>(addToSavedProjectsList), DispatcherPriority.Normal, 0,
+                                new SavedSyncProject()
+                                {
+                                    IsSyncedMessage = "Synced",
+                                    ProjectName = GloableProfData.PData.ProjectName,
+                                    SISyndicatedPostsList = 0,
+                                    TypeOfSync = typeOfSyncerPath
+                        }); 
                         }
 
                         foreach (FileInfo fi in new DirectoryInfo(saveToDir).GetFiles())
@@ -257,6 +261,7 @@ namespace GoViral.ViewModels
                             Dictionary<string, SavedSyncProject> deleteFromDictionary = new Dictionary<string, SavedSyncProject>();
                             foreach (var d in SavedProjectsList[SISavedProjectsList].SyndicatedPostsList.Where(dt => dt.FromProject != GloableProfData.PData.ProjectName))
                             {
+                                if (d.FromProject == null) continue;
                                 if (!deleteFromDictionary.ContainsKey(d.FromProject))
                                 {
                                     deleteFromDictionary.Add(d.FromProject, new SavedSyncProject() { ProjectName = d.FromProject });

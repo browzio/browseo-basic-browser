@@ -64,6 +64,7 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
+    <Reference Include="UIAutomationProvider" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -93,6 +94,10 @@
     <Compile Include="Classes\TrackedThread.cs" />
     <Compile Include="Classes\UsageTracker.cs" />
     <Compile Include="Classes\ViewModelBase.cs" />
+    <Compile Include="Classes\WaitCursor.cs" />
+    <Compile Include="Controlls\DateTimePicker.xaml.cs">
+      <DependentUpon>DateTimePicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controlls\ExpanderDoubleClickExpand.cs" />
     <Compile Include="Controlls\MyListView.cs" />
     <Compile Include="Controlls\SocialButtonsUserControl.xaml.cs">
@@ -128,6 +133,10 @@
     <Compile Include="Windows\ServerVerifyWindow.xaml.cs">
       <DependentUpon>ServerVerifyWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controlls\DateTimePicker.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controlls\SocialButtonsUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

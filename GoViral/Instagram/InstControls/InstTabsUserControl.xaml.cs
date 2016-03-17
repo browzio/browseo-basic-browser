@@ -24,5 +24,21 @@ namespace GoViral.Instagram.InstControls
         {
             InitializeComponent();
         }
+
+        private void InstaSearchVM_OnSendToDominate(InstModels.InstaResponseLists responseList)
+        {
+            if(cntrlDominator.DataContext is InstViewModels.InstaDominateVM)
+            {
+                (cntrlDominator.DataContext as InstViewModels.InstaDominateVM).OnReceivedFromSearch(responseList);
+            }
+        }
+
+        private void InstaSearchVM_OnSendContentToSorter(string content)
+        {
+            if(cntrlSorter.DataContext is ViewModels.SyncedProjectsVM)
+            {
+                (cntrlSorter.DataContext as ViewModels.SyncedProjectsVM).AddUrlToSavedProjectList("", "", content);
+            }
+        }
     }
 }

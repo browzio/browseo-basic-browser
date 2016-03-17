@@ -1,0 +1,119 @@
+﻿<Window x:Class="GoViral.Instagram.IntsWindows.SelectOptionToSendWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GoViral.Instagram.IntsWindows"
+        mc:Ignorable="d"
+        Title="Select Option" Topmost="True"
+         SizeToContent="Width" Height="450" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Background="WhiteSmoke" Grid.IsSharedSizeScope="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <CheckBox Content="Un/Check All" IsChecked="{Binding IsChecked}" />
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" Grid.Row="1" Margin="5,5,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ItemsControl ItemsSource="{Binding UserSearchResponse}"
+                              Grid.IsSharedSizeScope="True">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Foo" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Content="{Binding Username}" TextElement.FontWeight="Medium"
+                                          IsChecked="{Binding IsChecked}" VerticalAlignment="Center"  />
+
+                                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                                    <TextBlock Margin="5,2,2,2">
+                                        <Run Text="Followed By: " />
+                                        <Run Text="{Binding Counts.FollowedBy}" />
+                                    </TextBlock>
+                                    <TextBlock Margin="2">
+                                        <Run Text="Follows: " />
+                                        <Run Text="{Binding Counts.Follows}" />
+                                    </TextBlock>
+                                    <TextBlock Margin="2">
+                                        <Run Text="Media: " />
+                                        <Run Text="{Binding Counts.Media}" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ItemsControl ItemsSource="{Binding TagsSearchResponse}"
+                              Grid.IsSharedSizeScope="True"
+                              Margin="0,10,0,10"
+                              Grid.Row="1" >
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Foo" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Content="{Binding Name}" TextElement.FontWeight="Medium"
+                                          IsChecked="{Binding IsChecked}" VerticalAlignment="Center"  />
+
+                                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                                    <TextBlock Margin="5,2,2,2">
+                                    <Run Text="Media Count: " />
+                                    <Run Text="{Binding MediaCount}" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ItemsControl ItemsSource="{Binding MediaSearchResponse}"
+                              Grid.IsSharedSizeScope="True"
+                              Grid.Row="2" >
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Foo" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <CheckBox Content="{Binding Link}" TextElement.FontWeight="Medium"
+                                          IsChecked="{Binding IsChecked}" VerticalAlignment="Center" />
+
+                                <StackPanel Orientation="Horizontal" Grid.Column="1">
+                                    <TextBlock Margin="5,2,2,2">
+                                    <Run Text="Likes: " />
+                                    <Run Text="{Binding Likes.Count}" />
+                                    </TextBlock>
+                                    <TextBlock Margin="2">
+                                    <Run Text="Comments: " />
+                                    <Run Text="{Binding Comments.Count}" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </ScrollViewer>
+        <Button Content="Ok" Grid.Row="2" Click="Button_Click" Style="{StaticResource FlatbtnStyle}" />
+    </Grid>
+</Window>

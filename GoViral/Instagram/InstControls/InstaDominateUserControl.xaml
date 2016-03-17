@@ -4,12 +4,361 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GoViral.Instagram.InstControls"
+             xmlns:mvm="clr-namespace:GoViral.Instagram.InstViewModels"
+             xmlns:InstViewModels="clr-namespace:GoViral.Instagram.InstViewModels"
+             xmlns:gConverters="clr-namespace:Organiser.Common.Converters;assembly=Organiser.Common"
+             xmlns:lConverters="clr-namespace:GoViral.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="900">
-    <Grid>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+                <ResourceDictionary Source="../InstaResourcesDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid Background="#fafafa">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
+
+        <Expander ExpandDirection="Left" Expanded="Expander_Expanded" Collapsed="Expander_Collapsed">
+            <Expander.Header>
+                <Grid>
+                    <Grid.LayoutTransform>
+                        <RotateTransform Angle="90" />
+                    </Grid.LayoutTransform>
+                    <TextBlock Text="Saved" Foreground="{StaticResource colorInstagramBlue}" />
+                </Grid>
+            </Expander.Header>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Button HorizontalAlignment="Left" VerticalAlignment="Top" Margin="0,2,0,2" Height="23"
+                    Visibility="{Binding Source={x:Static mvm:InstaVM.Instance},
+                                         Path=User,
+                                         Converter={StaticResource nulltovisConv}}"
+                    Command="{Binding Source={x:Static mvm:InstaVM.Instance}, Path=OnCommandFromView}" CommandParameter="LOGIN">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Login" VerticalAlignment="Center" />
+                        <Image Source="/GoViral;component/Images/ic_person_black_24dp_2x.png" />
+                    </StackPanel>
+                </Button>
+                <local:InstaUserUserControl Margin="0,2,0,2"
+                                            HorizontalAlignment="Left" VerticalAlignment="Top" 
+                                            Visibility="{Binding Source={x:Static mvm:InstaVM.Instance},
+                                                             Path=User,
+                                                             Converter={StaticResource nulltovisConv},  
+                                                             ConverterParameter=NOT}" />
+
+                <StackPanel Orientation="Horizontal" Grid.Row="1">
+                    <Button Content="New Folder" Margin="3" Command="{Binding OnCommandFromView}" CommandParameter="NEWFOLDER" />
+                    <!--<Button Content="Add Links" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="MULTILINKS" />-->
+                    <Button Content="De Dupe" Margin="3" Command="{Binding OnCommandFromView}" CommandParameter="DEDUPE" />
+                    <Button Content="Save" Margin="3" Command="{Binding OnCommandFromView}" CommandParameter="SAVE" />
+                </StackPanel>
+
+                <ScrollViewer Grid.Row="2"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalAlignment="Stretch"
+                              Margin="2">
+                    <ListView ItemsSource="{Binding Folders}"
+                              SelectedItem="{Binding SelectedFolder}"
+                              ItemContainerStyle="{StaticResource dtCommentsListItemTemplate}"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                              Background="Transparent"
+                              BorderThickness="0"
+                              PreviewMouseWheel="ListView_PreviewMouseWheel">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Expander ExpandDirection="Down">
+                                    <Expander.Header>
+                                        <TextBlock Text="{Binding FolderTitle}" Foreground="{StaticResource colorInstagramBlue}" />
+                                    </Expander.Header>
+                                    <Expander.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Collapse" Click="MenuItem_Click" />
+                                        </ContextMenu>
+                                    </Expander.ContextMenu>
+                                    <ListView ItemsSource="{Binding Links}"
+                                              ItemContainerStyle="{StaticResource dtBaseListItemTemplate}"
+                                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                              ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                              Background="Transparent"
+                                              SelectionMode="Single"
+                                              BorderThickness="0">
+                                        <ListView.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel>
+                                                    <TextBox Style="{StaticResource readOnlytb}" Text="{Binding Name}">
+                                                        <TextBox.InputBindings>
+                                                            <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding OnCommandFromView}" CommandParameter="DoubleClickMediaItem" />
+                                                        </TextBox.InputBindings>
+                                                    </TextBox>
+                                                    <TextBox Style="{StaticResource readOnlytb}" Text="{Binding Url}">
+                                                        <TextBox.InputBindings>
+                                                            <MouseBinding MouseAction="LeftDoubleClick" Command="{Binding OnCommandFromView}" CommandParameter="DoubleClickMediaItem" />
+                                                        </TextBox.InputBindings>
+                                                    </TextBox>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
+                                </Expander>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </ScrollViewer>
+
+            </Grid>
+        </Expander>
+
+        <ContentPresenter Grid.Column="1"
+			              HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+			              Content="{Binding WebBrowserHost}" />
+
+        <Expander Grid.Column="2" ExpandDirection="Right" MaxWidth="500" Expanded="Expander_Expanded" Collapsed="Expander_Collapsed" Background="#fafafa">
+            <Expander.Header>
+                <Grid>
+                    <Grid.LayoutTransform>
+                        <RotateTransform Angle="90" />
+                    </Grid.LayoutTransform>
+                    <TextBlock Text="Selected Folder Media" Foreground="{StaticResource colorInstagramBlue}" />
+                </Grid>
+            </Expander.Header>
+            
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalAlignment="Stretch" Margin="2">
+                <Grid Grid.IsSharedSizeScope="True" DataContext="{Binding SelectedFolder}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!--users-->
+                    <Expander ExpandDirection="Down" PreviewMouseWheel="lv_PreviewMouseWheel">
+                        <Expander.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Foo" />
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Bar" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Users" VerticalAlignment="Center"  />
+                                <TextBlock Text="{Binding InstaResponseLists.UsersCount}" VerticalAlignment="Center"  Grid.Column="1" Margin="10,0,10,0"  />
+
+                                <Button Grid.Column="2" 
+                                        ToolTip="More Options"
+                                        Click="btnMore_Click"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Width="20" Height="20" 
+                                        Margin="3"
+                                        Cursor="Hand"
+                                        Style="{x:Null}"
+                                        ContextMenu="{StaticResource ctUsersBulkNoDominate}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/GoViral;component/Images/ic_more_horiz_black_24dp_2x.png"
+                                                           VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                           Stretch="Fill" />
+                                    </StackPanel>
+                                </Button>
+                                
+                                <Button ToolTip="Refresh"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Width="20" Height="20" 
+                                        Margin="3"
+                                        Cursor="Hand"
+                                        Style="{x:Null}"
+                                        Grid.Column="3"
+                                        Command="{Binding OnCommandFromView}" CommandParameter="RefreshUSERS">
+                                    <Image Source="/GoViral;component/Images/ic_autorenew_black_24dp_1x.png" Stretch="Fill" />
+                                </Button>
+                                
+                                <Button ToolTip="Clear"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Width="20" Height="20" 
+                                        Margin="3"
+                                        Cursor="Hand"
+                                        Style="{x:Null}"
+                                        Grid.Column="4"
+                                        Command="{Binding OnCommandFromView}" CommandParameter="CLEARUSERS">
+                                    <Image Source="/GoViral;component/Images/ic_clear_black_black.png" Stretch="Fill" />
+                                </Button>
+                            </Grid>
+                        </Expander.Header>
+                        <Expander.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Collapse" Click="MenuItem_Click" />
+                            </ContextMenu>
+                        </Expander.ContextMenu>
+                        
+                        <ListView ItemsSource="{Binding InstaResponseLists.UserSearchResponse}"
+                                  ItemContainerStyle="{StaticResource dtBaseListItemTemplate}"
+                                  ItemTemplate="{StaticResource dtUserAll}"
+                                  ItemsPanel="{StaticResource dtItemsPanes}"
+                                  Style="{StaticResource lvDefault}">
+                        </ListView>
+                    </Expander>
+
+                    <!--tags-->
+                    <Expander Grid.Row="1" ExpandDirection="Down" PreviewMouseWheel="lv_PreviewMouseWheel">
+                        <Expander.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Foo" />
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Bar" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Tags" VerticalAlignment="Center"  />
+                                <TextBlock Text="{Binding InstaResponseLists.TagsCount}" VerticalAlignment="Center"  Grid.Column="1" Margin="10,0,10,0"  />
+
+                                <Button Grid.Column="2" 
+                                        ToolTip="More Options"
+                                        Click="btnMore_Click"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Width="20" Height="20" 
+                                        Margin="3"
+                                        Cursor="Hand"
+                                        Style="{x:Null}"
+                                        ContextMenu="{StaticResource ctUTagsBulkNoDominate}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/GoViral;component/Images/ic_more_horiz_black_24dp_2x.png"
+                                                           VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                           Stretch="Fill" />
+                                    </StackPanel>
+                                </Button>
+
+                                <Button ToolTip="Refresh"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Width="20" Height="20" 
+                                        Margin="3"
+                                        Cursor="Hand"
+                                        Style="{x:Null}"
+                                        Grid.Column="3"
+                                        Command="{Binding OnCommandFromView}" CommandParameter="RefreshTags">
+                                    <Image Source="/GoViral;component/Images/ic_autorenew_black_24dp_1x.png" Stretch="Fill" />
+                                </Button>
+
+                                <Button ToolTip="Clear"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Width="20" Height="20" 
+                                        Margin="3"
+                                        Cursor="Hand"
+                                        Style="{x:Null}"
+                                        Grid.Column="4"
+                                        Command="{Binding OnCommandFromView}" CommandParameter="CLEARTAGS">
+                                    <Image Source="/GoViral;component/Images/ic_clear_black_black.png" Stretch="Fill" />
+                                </Button>
+                            </Grid>
+                        </Expander.Header>
+                        <Expander.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Collapse" Click="MenuItem_Click" />
+                            </ContextMenu>
+                        </Expander.ContextMenu>
+                        
+                        <ListView ItemsSource="{Binding InstaResponseLists.TagsSearchResponse}"
+                                  ItemContainerStyle="{StaticResource dtBaseListItemTemplate}"
+                                  ItemTemplate="{StaticResource dtTags}"
+                                  ItemsPanel="{StaticResource dtItemsPanes}"
+                                  Style="{StaticResource lvDefault}">
+                        </ListView>
+                    </Expander>
+
+                    <!--media-->
+                    <Expander Grid.Row="2" ExpandDirection="Down" PreviewMouseWheel="lv_PreviewMouseWheel">
+                        <Expander.Header>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Foo" />
+                                    <ColumnDefinition Width="Auto" SharedSizeGroup="Bar" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Text="Media" VerticalAlignment="Center"  />
+                                <TextBlock Text="{Binding InstaResponseLists.MediaCount}" VerticalAlignment="Center"  Grid.Column="1" Margin="10,0,10,0"  />
+
+                                <Button Grid.Column="2" 
+                                        ToolTip="More Options"
+                                        Click="btnMore_Click"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Width="20" Height="20" 
+                                        Margin="3"
+                                        Cursor="Hand"
+                                        Style="{x:Null}"
+                                        VerticalAlignment="Center"
+                                        ContextMenu="{StaticResource ctUMediaBulkNoDominate}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/GoViral;component/Images/ic_more_horiz_black_24dp_2x.png"
+                                                           VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                           Stretch="Fill" />
+                                    </StackPanel>
+                                </Button>
+
+
+                                <Button ToolTip="Refresh"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Width="20" Height="20" 
+                                        Margin="3"
+                                        Cursor="Hand"
+                                        Style="{x:Null}"
+                                        Grid.Column="3"
+                                        Command="{Binding OnCommandFromView}" CommandParameter="RefreshMedia">
+                                    <Image Source="/GoViral;component/Images/ic_autorenew_black_24dp_1x.png" Stretch="Fill" />
+                                </Button>
+
+                                <Button ToolTip="Clear"
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Width="20" Height="20" 
+                                        Margin="3"
+                                        Cursor="Hand"
+                                        Style="{x:Null}"
+                                        Grid.Column="4"
+                                        Command="{Binding OnCommandFromView}" CommandParameter="CLEARMedia">
+                                    <Image Source="/GoViral;component/Images/ic_clear_black_black.png" Stretch="Fill" />
+                                </Button>
+                            </Grid>
+                        </Expander.Header>
+                        <Expander.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Collapse" Click="MenuItem_Click" />
+                            </ContextMenu>
+                        </Expander.ContextMenu>
+                        
+                        <ListView ItemsSource="{Binding InstaResponseLists.MediaSearchResponse}"
+                                  ItemContainerStyle="{StaticResource dtBaseListItemTemplate}"
+                                  ItemTemplate="{StaticResource dtMedia}"
+                                  ItemsPanel="{StaticResource dtItemsPanes}"
+                                  Style="{StaticResource lvDefault}">
+                        </ListView>
+                    </Expander>
+                </Grid>
+            </ScrollViewer>
+        </Expander>
     </Grid>
 </UserControl>

@@ -86,6 +86,14 @@ namespace GoViral.ViewModels
                 else
                     return null;
             }
+            set
+            {
+                if(value != null)
+                {
+                    if (Folders.Contains(value))
+                        SIFolders = Folders.IndexOf(value);
+                }
+            }
         }
 
         private WindowsFormsHost wfh;

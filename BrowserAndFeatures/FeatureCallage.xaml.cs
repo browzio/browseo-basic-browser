@@ -1,4 +1,5 @@
-﻿using GoViral.ViewModels;
+﻿using GoViral.Instagram.InstViewModels;
+using GoViral.ViewModels;
 using Indexer;
 using Organiser.Common.Classes;
 using PData.FilesReader;
@@ -187,6 +188,14 @@ namespace BrowserAndFeatures
                 feedMasherVM.DisposeBrowser();
             feedMasherVM = null;
 
+            if (instadmVM != null)
+                instadmVM.DisposeBrowser();
+            instadmVM = null;
+
+            if (wisi.DataContext != null)
+            {
+                wisi.webBrowserEditor.webBrowser.Dispose();
+            }
 
             browser.CloseAllTabs();
             BrowserInit.Shutdown();
@@ -201,12 +210,13 @@ namespace BrowserAndFeatures
         int previndex;
         Indexer.MainWindow imw; 
         Youtuber.MainWindow ytmw;
-        GoViralVM goViralVM; 
+        GoViralVM goViralVM;
+        InstaDominateVM instadmVM;
         LinksToRssVM feedMasherVM;
 
         private void tbControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (previndex != tbControl.SelectedIndex && tbControl.SelectedIndex<7)
+            if (previndex != tbControl.SelectedIndex && tbControl.SelectedIndex<tbControl.Items.Count-2)
             {
                 if (tbControl.SelectedIndex == 2 && rssControl.UserRssTabs.Count <=0)
                 {
@@ -227,10 +237,24 @@ namespace BrowserAndFeatures
                     previndex = tbControl.SelectedIndex;
                     crreateFeedMAsherContext(); 
                 }
-                //else if (tbControl.SelectedIndex == 5)
+                //else if (tbControl.SelectedIndex == 7)
                 //{
                 //    previndex = tbControl.SelectedIndex;
-                //    if (goViralVM == null) goViralVM = ucGoViral.DataContext as GoViralVM;
+                //    if (ucInstagram.cntrlSorter.ViewModel == null)
+                //    {
+                //        ucInstagram.cntrlSorter.ViewModel = new SyncedProjectsVM(SyncedProjectsVM.TypeOfInsteo);
+                //        ucInstagram.cntrlSorter.DataContext = ucInstagram.cntrlSorter.ViewModel;
+                //    }
+
+                //    if (instadmVM == null)
+                //    {
+                //        instadmVM = new InstaDominateVM();
+                //        ucInstagram.cntrlDominator.DataContext = instadmVM;
+                //        instadmVM.OnSendContentToSorter += (content) => 
+                //        {
+                //            ucInstagram.cntrlSorter.ViewModel.AddUrlToSavedProjectList("", "", content);
+                //        };
+                //    }
                 //}
                 else
                 {
@@ -239,7 +263,7 @@ namespace BrowserAndFeatures
             }
             else
             {
-                if (tbControl.SelectedIndex == 8)
+                if (tbControl.SelectedIndex == tbControl.Items.Count - 2)
                 {
                     tbControl.SelectedIndex = previndex;
                     if (imw == null)
@@ -251,7 +275,7 @@ namespace BrowserAndFeatures
                         imw.Show();
                     }
                 }
-                else if (tbControl.SelectedIndex == 9)
+                else if (tbControl.SelectedIndex == tbControl.Items.Count - 1)
                 {
                     tbControl.SelectedIndex = previndex;
                     if (ytmw == null)

@@ -96,7 +96,7 @@
                 <TabItem Header="RSS"  Style="{StaticResource gmailTabStyle90}" Name="tabrssControl">
                     <rssReaders:RssTabbedControl Name="rssControl" />
                 </TabItem>
-                <TabItem Header="PBN Poster"  Style="{StaticResource gmailTabStyle90}" Name="tabrsswisi">
+            <TabItem Header="PublisHUB"  Style="{StaticResource gmailTabStyle90}" Name="tabrsswisi">
                     <wisi:WysiwigControl Name="wisi" />
                     <!--<wisi:WysiwigControl />-->
                     <!--<wisi:WysiwigControl Name="wysiwig" />-->
@@ -120,9 +120,9 @@
                     </Button>
                 </Grid>
             </TabItem>
-            <TabItem Header="Inst·EO" Style="{StaticResource gmailTabStyle90}">
+            <!--<TabItem Header="Inst·EO" Style="{StaticResource gmailTabStyle90}">
                 <instagram:InstTabsUserControl Name="ucInstagram" />
-            </TabItem>
+            </TabItem>-->
                 <TabItem Header="Indexer" Name="indexer" Style="{StaticResource gmailTabStyle90}">
                 </TabItem>
             <TabItem Header="YouTube URL'r" Name="youtuber" Style="{StaticResource gmailTabStyle90}">

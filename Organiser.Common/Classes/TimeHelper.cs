@@ -95,6 +95,10 @@ namespace Organiser.Common.Classes
                     request.Proxy = new WebProxy(ip, Convert.ToInt32(port));
                 else
                     return new DateAndTimeZone() { TimeZone = timeZone, Date = dt };
+                if(!username.IsNullOrEmpty() && !pass.IsNullOrEmpty())
+                {
+                    request.Proxy.Credentials = new NetworkCredential(username, pass);
+                }
 
                 WebResponse response = request.GetResponse();
                 
@@ -138,7 +142,9 @@ namespace Organiser.Common.Classes
 
                 }
             }
-            catch { }
+            catch(Exception ex)
+            {
+            }
             return new DateAndTimeZone() { TimeZone = timeZone, Date = dt };
 
 

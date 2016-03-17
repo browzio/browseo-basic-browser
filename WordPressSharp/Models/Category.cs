@@ -10,10 +10,10 @@ namespace WordPressSharp.Models
     public class Category
     {
         [XmlRpcMember("categoryId")]
-        public string Id { get; set; }
+        public int Id { get; set; }
 
         [XmlRpcMember("parentId")]
-        public string ParentId { get; set; }
+        public int ParentId { get; set; }
 
         [XmlRpcMember("categoryName")]
         public string CategoryName { get; set; }

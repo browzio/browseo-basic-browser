@@ -6,6 +6,8 @@
              xmlns:local="clr-namespace:WPF_WYSIWYG_HTML_Editor"
              xmlns:localXaml="clr-namespace:WPF_WYSIWYG_HTML_Editor.XAML"
              xmlns:localHelper="clr-namespace:WPF_WYSIWYG_HTML_Editor.Helpers"
+             xmlns:commonControlls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
+             xmlns:gConverters="clr-namespace:Organiser.Common.Converters;assembly=Organiser.Common"
              mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -13,6 +15,8 @@
                 <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <gConverters:NullToVisibleConverter x:Key="nulltovisConv" />
+            
             <Style x:Key="EditableTabHeaderControl" TargetType="{x:Type localHelper:EditableTabHeaderControl}">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -68,8 +72,9 @@
             </Style>
         </ResourceDictionary>
     </UserControl.Resources>
-        <Grid>
+        <Grid Background="WhiteSmoke">
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
@@ -77,9 +82,10 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
-        <Grid Name="grdFtpProjects" Grid.Column="1" Grid.RowSpan="2" Background="#f5f5f5">
+        <Grid Name="grdFtpProjects" Grid.Column="2" Grid.RowSpan="4" Background="#f5f5f5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -116,17 +122,18 @@
                     </Expander>
             </Grid>
 
-        <Ribbon Name="ribon" Foreground="#333333" Background="WhiteSmoke" Margin="0,-22,0,0" SelectionChanged="Ribbon_SelectionChanged">
+        <Ribbon Name="ribon" Foreground="#333333" Background="WhiteSmoke" Margin="0,-22,0,0" Grid.ColumnSpan="2" SelectionChanged="Ribbon_SelectionChanged">
             <Ribbon.ApplicationMenu>
                 <RibbonApplicationMenu Visibility="Collapsed" />
             </Ribbon.ApplicationMenu>
-            
+
             <RibbonTab Header="Editor" IsEnabled="{Binding EnableBtns}">
                 <RibbonGroup Header="Clear" Width="60" >
                     <RibbonButton x:Name="RibbonButtonNew" Label="" ToolTip="Clear"
                                       LargeImageSource="..\Images\new.png" 
                                       Click="RibbonButtonNew_Click"  />
                 </RibbonGroup>
+                
                 <RibbonGroup Header="Editor" Width="395">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
@@ -140,6 +147,7 @@
                             <ComboBox  x:Name="RibbonComboboxFonts" Width="160" Height="22" Margin="2" SelectionChanged="RibbonComboboxFonts_SelectionChanged"/>
                             <ComboBox x:Name="RibbonComboboxFontHeight" Margin="2" Width="50" Height="22" SelectionChanged="RibbonComboboxFontHeight_SelectionChanged"/>
                         </StackPanel>
+                        
                         <StackPanel Orientation="Horizontal" Margin="0,15,0,0">
                             <RibbonButton x:Name="SettingsBold" SmallImageSource="..\Images\bold.png" Click="SettingsBold_Click"/>
                             <RibbonButton x:Name="SettingsItalic" SmallImageSource="..\Images\italic.png" Click="SettingsItalic_Click"/>
@@ -147,7 +155,8 @@
                             <RibbonButton x:Name="SettingsFontColor" SmallImageSource="..\Images\Color.png" Click="SettingsFontColor_Click"/>
                             <RibbonButton x:Name="SettingsBackColor" SmallImageSource="..\Images\backcolor.png" Click="SettingsBackColor_Click"/>
                             <RibbonButton x:Name="SettingsAddLink" SmallImageSource="..\Images\link.png" Click="SettingsAddLink_Click"/>
-                            <RibbonButton x:Name="SettingsAddVidLink" SmallImageSource="..\Images\RomanE-01.png" Click="SettingsAddVidLink_Click"/>
+                            <RibbonButton x:Name="SettingsAddVidLink" SmallImageSource="..\Images\ic_play_arrow_black_24dp_1x.png" Click="SettingsAddVidLink_Click"/>
+                            <RibbonButton x:Name="SettingsAddVidLinkMulty" SmallImageSource="..\Images\ic_video_library_black_24dp_1x.png" Click="SettingsAddVidLinkMulty_Click"/>
                             <RibbonButton x:Name="SettingsAddImage" SmallImageSource="..\Images\image.png" Click="SettingsAddImage_Click"/>
                             <RibbonButton x:Name="SettingsLeftAlign" SmallImageSource="..\Images\LeftAlign.png" Click="SettingsLeftAlign_Click"/>
                             <RibbonButton x:Name="SettingsCenter2" SmallImageSource="..\Images\center2.png" Click="SettingsCenter2_Click"/>
@@ -160,7 +169,7 @@
                         </StackPanel>
                     </StackPanel>
                 </RibbonGroup>
-                <RibbonGroup Header="Custom" Width="100">
+                <RibbonGroup Header="View" Width="100">
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <RibbonButton x:Name="EditWeb1"  LargeImageSource="..\Images\Editor.png" HorizontalAlignment="Left" Click="EditWeb_Click"/>
@@ -171,57 +180,6 @@
                 <RibbonGroup Header="FR">
                     <RibbonButton  LargeImageSource="..\Images\refresh-icon.png"  Click="btnFindReplace_Click" x:Name="btnFindReplace" ToolTip="Find Replace" />
                 </RibbonGroup>
-            </RibbonTab>
-
-            <RibbonTab Header="Publish PBN" IsEnabled="{Binding EnableBtns}">
-                <RibbonGroup Header="Title">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="5">
-                            <TextBlock Text="Post Title:" Margin="3" VerticalAlignment="Center" />
-                            <TextBox Text="{Binding PostTitle}" Margin="3" Width="200" Name="tbPostTitle" />
-                        </StackPanel>
-                        <CheckBox Content="Spin Title" IsChecked="{Binding IsSpinChecked}" Margin="5" />
-                    </StackPanel>
-                </RibbonGroup>
-
-                <RibbonGroup Header="Settings">
-                    <RibbonButton IsEnabled="{Binding EnableBtns}" ToolTip="Platform Settings" Command="{Binding SettingsClicked}"
-                                  LargeImageSource="..\Images\settings-icon.png" />
-                </RibbonGroup>
-
-                <RibbonGroup Header="Publish">
-                    <StackPanel Margin="0,0,5,0">
-                        <CheckBox Content="Publish Spun Articles" IsChecked="{Binding UseSpunArticlesChecked}">
-                            <CheckBox.Style>
-                                <Style TargetType="CheckBox" BasedOn="{ StaticResource {x:Type CheckBox}}">
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding Tabs.Count}" Value="0">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </CheckBox.Style>
-
-                        </CheckBox>
-                        <CheckBox Content="Auto Spin" IsChecked="{Binding AutoSpinChecked}" />
-                        <DockPanel Visibility="{Binding DPtimesToSPinVisible}">
-                            <TextBlock Text="Times To Spin: " VerticalAlignment="Center" />
-                            <TextBox Text="{Binding TimesToSpin}" Width="30"/>
-                        </DockPanel>
-                    </StackPanel>
-                    <StackPanel Margin="0,0,3,0">
-                        <RibbonButton ToolTip="Publish to pbns selected in settings" Height="50" Name="btnPublishFTP" Click="btnPublish_Click"
-                                      LargeImageSource="..\Images\publish-bw.png" />
-                        <TextBlock Text="From Settings" />
-                    </StackPanel>
-
-                    <StackPanel Margin="3,0,0,0">
-                        <RibbonButton ToolTip="Publish to pbns selected in vaults vaulted" Height="50" Name="pbnPubfromVault" Click="pbnPubfromVault_Click"
-                                          LargeImageSource="..\Images\publish-o.png" />
-                        <TextBlock Text="From Vault" />
-                    </StackPanel>
-                </RibbonGroup>
-
                 <RibbonGroup Header="Spin">
                     <StackPanel Orientation="Horizontal">
                         <StackPanel>
@@ -231,10 +189,10 @@
                             <TextBlock Text="Spin It" HorizontalAlignment="Center" />
                         </StackPanel>
 
-                        <StackPanel>
+                        <StackPanel Margin="10,0,10,0">
                             <RibbonButton ToolTip="Clear All Spun Tabs" Height="50"  Name="btnClearAllTabs" Click="btnClearAllTabs_Click"
                                       LargeImageSource="..\Images\clear.png" />
-                            <TextBlock Text="Clear" HorizontalAlignment="Center" />
+                            <TextBlock Text="Clear Tabs" HorizontalAlignment="Center" />
                         </StackPanel>
 
                         <StackPanel>
@@ -246,20 +204,155 @@
                         </StackPanel>
                     </StackPanel>
                 </RibbonGroup>
+            </RibbonTab>
+            <RibbonTab Header="Publish PBN" IsEnabled="{Binding EnableBtns}">
 
+                <RibbonGroup Header="Preview">
+                    <RibbonButton IsEnabled="{Binding EnableBtns}"
+                                  ToolTip="Validate all spintax and preview result"  HorizontalAlignment="Center"
+                                  Click="ValidateSpintax_click"
+                                  LargeImageSource="..\Images\ic_check_black_24dp_2x.png" />
+                </RibbonGroup> 
+                
+                <!--<RibbonGroup Header="Settings">
+                    <RibbonButton IsEnabled="{Binding EnableBtns}" ToolTip="Platform Settings" 
+                                  Command="{Binding SettingsClicked}" CommandParameter="Settings"
+                                  LargeImageSource="..\Images\settings-icon.png" />
+                </RibbonGroup>-->
+
+                <RibbonGroup Header="Publish">
+                    <StackPanel Margin="0,0,5,0">
+                        <CheckBox Content="Publish From Spun Articles" IsChecked="{Binding UseSpunArticlesChecked}">
+                            <CheckBox.Style>
+                                <Style TargetType="CheckBox" BasedOn="{ StaticResource {x:Type CheckBox}}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Tabs.Count}" Value="0">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </CheckBox.Style>
+                        </CheckBox>
+                        <CheckBox Content="Auto Spin" IsChecked="{Binding AutoSpinChecked}"
+                                  ToolTip="Will only work if article is in spin syntax"/>
+                        <DockPanel Visibility="{Binding DPtimesToSPinVisible}">
+                            <TextBlock Text="Times To Spin (and post): " VerticalAlignment="Center" />
+                            <TextBox Text="{Binding TimesToSpin, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Width="30"/>
+                            <TextBlock Text="Time Interval Between Each Post (hours): " Margin="10,0,0,0" VerticalAlignment="Center" />
+                            <TextBox Text="{Binding TimeInterval, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Width="30"/>
+                        </DockPanel>
+                    </StackPanel>
+                    <!--<StackPanel Margin="0,0,3,0">
+                        <RibbonButton ToolTip="Publish to pbns selected in settings" Height="50" Name="btnPublishFTP" Click="btnPublish_Click"
+                                      LargeImageSource="..\Images\publish-bw.png" />
+                        <TextBlock Text="From Settings" />
+                    </StackPanel>-->
+
+                    <StackPanel Margin="3,0,0,0">
+                        <RibbonButton ToolTip="Publish to pbns selected in vaults vaulted" Height="50" Name="pbnPubfromVault" Click="pbnPubfromVault_Click"
+                                          LargeImageSource="..\Images\publish-o.png" />
+                        <TextBlock Text="Publish" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </RibbonGroup>
+                
                 <RibbonGroup Header="Status">
                     <TextBlock Text="{Binding Status}" VerticalAlignment="Center" Margin="10" Name="tbStatus" />
                     <ProgressBar IsIndeterminate="{Binding ProgressBarStart}" Width="{Binding ElementName=tbStatus, Path=ActualWidth}" Height="18" Margin="5" HorizontalAlignment="Center" />
                 </RibbonGroup>
             </RibbonTab>
-        </Ribbon>
             
-        <local:WPFWebBrowser Grid.Column="0" x:Name="webBrowserEditor"  Grid.Row="1" VerticalAlignment="Top" />
-        <local:HtmlEditor Grid.Column="0" x:Name="HtmlEditor1"  Grid.Row="1" Visibility="Hidden" VerticalAlignment="Top"/>
-        
+
+        </Ribbon>
+
+        <DockPanel Grid.Row="1">
+            <TextBlock Text="Post Title:" Margin="3" VerticalAlignment="Center" />
+            <CheckBox Content="Spin Title" IsChecked="{Binding IsSpinChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="5" DockPanel.Dock="Right"
+                      ToolTip="will only work if title is in spin syntax" />
+            <TextBox Text="{Binding PostTitle, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="3" Name="tbPostTitle" />
+        </DockPanel>
+
+        <Grid Grid.Row="1" Grid.RowSpan="4" Grid.Column="1" VerticalAlignment="Top" Margin="5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <GroupBox Header="Publish">
+                <StackPanel Margin="5">
+                    <TextBlock Text="Publish Date:" />
+                    <DatePicker SelectedDate="{Binding PublishDate}" />
+                    <DatePickerTextBox Text="{Binding PublishDate}" />
+                    
+                    <TextBlock Text="(Will use proxy time if time is set" Foreground="Gray" />
+                    <TextBlock Text="within 1 hour of current system time)" Foreground="Gray" />
+                    <TextBlock Text="(Also the start date for interval publishing)" Foreground="Gray" />
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Grid.Row="1" Margin="0,10,0,0" Header="Categories And Tags">
+                <StackPanel Margin="5">
+                    <TextBlock Text="(Comma seperated)" Foreground="Gray" />
+                    <StackPanel Orientation="Horizontal" Margin="2">
+                        <TextBlock Text="Categories:" Width="58" Margin="3" VerticalAlignment="Center" />
+                        <TextBox Text="{Binding Categories, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="3" Width="200" />
+                    </StackPanel>
+                    <CheckBox Content="Spin Categories" ToolTip="Must be in spin syntax to work"
+                              IsChecked="{Binding SpinCategoriesChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="0,0,0,10" />
+                    <StackPanel Orientation="Horizontal" Margin="2">
+                        <TextBlock Text="Tags:" Margin="3" Width="58" VerticalAlignment="Center" />
+                        <TextBox Text="{Binding Tags, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="3" Width="200" />
+                    </StackPanel>
+                    <CheckBox Content="Spin Tags" ToolTip="Must be in spin syntax to work"
+                              IsChecked="{Binding SpinTagsChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Featured Image" Grid.Row="2">
+                <StackPanel>
+                    <TextBlock Text="{Binding FeaturedDirPath}" TextWrapping="Wrap" Width="250"
+                               Margin="3"
+                               Visibility="{Binding FeaturedDirPath, Converter={StaticResource nulltovisConv}, ConverterParameter=NOT}"/>
+                    <Button IsEnabled="{Binding EnableBtns}" ToolTip="Select Fetured Image"
+                            Visibility="{Binding FeaturedDirPath, Converter={StaticResource nulltovisConv}}"
+                            Command="{Binding SettingsClicked}" CommandParameter="FeaturedImage"
+                            Style="{StaticResource FlatbtnStyle}" 
+                            Width="150" Height="150">
+                        <Image Source="{Binding FeaturedImage}" Stretch="Fill" />
+                    </Button>
+                    <DockPanel>
+                        <Button Content="Use Directory" Style="{StaticResource FlatbtnStyle}"
+                            Command="{Binding SettingsClicked}" CommandParameter="UseDirectory" />
+                        <Button Content="Clear Image / Path" Style="{StaticResource FlatbtnStyle}" HorizontalAlignment="Right"
+                            Command="{Binding SettingsClicked}" CommandParameter="ClearFeaturedImage" />
+                    </DockPanel>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Excerpt" Grid.Row="3">
+                <StackPanel>
+                    <TextBox Text="{Binding Exerpt, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" Margin="3" Width="280" MinHeight="60" MaxHeight="125" AcceptsReturn="True"/>
+                <CheckBox Content="Spin Excerpt" ToolTip="Must be in spin syntax to work"
+                              IsChecked="{Binding SpinExcerptChecked, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" />
+                </StackPanel>
+            </GroupBox>
+        </Grid>
+
+
+        <local:WPFWebBrowser Grid.Column="0" x:Name="webBrowserEditor" x:FieldModifier="public"  Grid.Row="2" VerticalAlignment="Top" />
+        <local:HtmlEditor Grid.Column="0" x:Name="HtmlEditor1"  Grid.Row="2" Visibility="Hidden" VerticalAlignment="Top"/>
+
+
         <TabControl Name="tbContrl" ItemsSource="{Binding Tabs}" Visibility="{Binding TabsVisible}"
-                    Grid.Column="0" Grid.Row="2" MinHeight="400" 
+                    Grid.Column="0" Grid.Row="3" MinHeight="400" 
                     ItemContainerStyle="{StaticResource ItemContainerStyle}" 
                     ContentTemplate="{StaticResource ContentTemplate}" />
-      </Grid>
+
+        <GridSplitter ResizeDirection="Rows"
+                      VerticalAlignment="Top"
+                      Grid.Column="0" Grid.Row="3" 
+                      Width="{Binding ElementName=tbContrl, Path=ActualWidth}"  Height="3"
+                      Background="Black" />
+    </Grid>
 </UserControl>
