@@ -108,17 +108,28 @@
                                         </Grid.ContextMenu>
                                     </Grid>
                                 </Expander.Header>
-                                <ListBox ItemsSource="{Binding PBNProjects}" 
-                                         VerticalAlignment="Top"
-                                         BorderThickness="0"
-                                         MouseMove="ListBox_MouseMove_1"
-                                         Background="Transparent"
-                                         SelectionMode="Single"
-                                         SelectedIndex="{Binding SIPBN}"
-                                         ItemTemplate="{StaticResource dtvaultList}"
-                                         ContextMenu="{StaticResource ctVaultList}"
-                                         Margin="3">
-                                </ListBox>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Button HorizontalAlignment="Left" Width="75" Margin="3" 
+                                            Content="Toggle Selection" 
+                                            Style="{StaticResource FlatbtnStyle}" 
+                                            Command="{Binding VautContextMenu}" CommandParameter="SelectToggle" />
+                                    <ListBox ItemsSource="{Binding PBNProjects}" 
+                                             VerticalAlignment="Top"
+                                             Grid.Row="1"
+                                             BorderThickness="0"
+                                             MouseMove="ListBox_MouseMove_1"
+                                             Background="Transparent"
+                                             SelectionMode="Single"
+                                             SelectedIndex="{Binding SIPBN}"
+                                             ItemTemplate="{StaticResource dtvaultList}"
+                                             ContextMenu="{StaticResource ctVaultList}"
+                                             Margin="3">
+                                    </ListBox>
+                                </Grid>
                             </Expander>
                         </DataTemplate>
                     </ListBox.ItemTemplate>

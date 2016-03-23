@@ -17,7 +17,18 @@ namespace WPF_WYSIWYG_HTML_Editor.Models
         public string ProjectName { get; set; }
         public string FilePath { get; set; }
         public int SIType { get; set; }
-        public bool IsSelected { get; set; }
+
+        private bool isSelected;
+        public bool IsSelected
+        {
+            get { return isSelected; }
+            set
+            {
+                isSelected = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("IsSelected"));
+            }
+        }
 
         private string domain;
         public string DomainAuthority

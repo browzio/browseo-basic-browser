@@ -223,7 +223,7 @@ namespace Crawler
                         preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
                                             @"about,id,link,founded,can_post,category,talking_about_count,likes,
                                         photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)},
-                                        videos.limit(30){permalink_url,picture,id,views,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
+                                        videos.limit(30){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
                                         posts.limit(100){caption,description,picture,full_picture,shares,link,message,via,source,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)},
                                         feed.limit(70){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
                                         &access_token=" + AccessToken;
@@ -253,7 +253,7 @@ namespace Crawler
                                             @"about,id,name,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,location,
                                         photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)},
                                         albums{photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)}},
-                                        videos.limit(30){permalink_url,picture,views,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
+                                        videos.limit(30){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
                                         posts.limit(100){caption,description,picture,full_picture,shares,link,message,via,source,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)},
                                         feed.limit(70){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
                                         &access_token=" + AccessToken;
@@ -268,7 +268,7 @@ namespace Crawler
                         {
                             pageType = CrawlerStates.PageType_Videos;
                             preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + @"?fields=
-                                            picture,id,views,embed_html,source,updated_time,description,created_time,likes.limit(0).summary(true),comments.limit(200).summary(true)&access_token=" + AccessToken;
+                                            picture,id,embed_html,source,updated_time,description,created_time,likes.limit(0).summary(true),comments.limit(200).summary(true)&access_token=" + AccessToken;
                         }
                         else if (urltillId.Contains(Social.FACEBOOK_USERS_DEFAULT_URL))
                         {
@@ -548,7 +548,7 @@ namespace Crawler
 
 
                     preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + allMediaLinkToCrawl[0] +
-                        "?fields=permalink_url,picture,id,length,embed_html,source,updated_time,views,description,title,likes.limit(0).summary(true),comments.limit(0).summary(true)&access_token=" + AccessToken;
+                        "?fields=permalink_url,picture,id,length,embed_html,source,updated_time,description,title,likes.limit(0).summary(true),comments.limit(0).summary(true)&access_token=" + AccessToken;
                     allMediaLinkToCrawl.RemoveAt(0);
                     browser.GetFocusedFrame().LoadUrl(preRegetTokenUrl);
                 }
@@ -977,7 +977,7 @@ namespace Crawler
 
 
                     preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + allMediaLinkToCrawl[0] +
-                        "?fields=permalink_url,picture,id,length,embed_html,source,views,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)&access_token=" + AccessToken;
+                        "?fields=permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)&access_token=" + AccessToken;
                     allMediaLinkToCrawl.RemoveAt(0);
                     browser.GetFocusedFrame().LoadUrl(preRegetTokenUrl);
                 }

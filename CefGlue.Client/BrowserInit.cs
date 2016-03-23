@@ -42,7 +42,7 @@ namespace Xilium.CefGlue.Client
                 SingleProcess = false,
                 MultiThreadedMessageLoop = true,
                 PersistSessionCookies = true,
-                LogSeverity = CefLogSeverity.Disable,
+                LogSeverity = CefLogSeverity.ErrorReport | CefLogSeverity.Error | CefLogSeverity.Info | CefLogSeverity.Verbose | CefLogSeverity.Warning,
                 IgnoreCertificateErrors = true,
                // UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2556.0 Safari/537.36",
                // UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36",

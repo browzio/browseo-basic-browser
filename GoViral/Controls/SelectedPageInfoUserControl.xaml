@@ -508,10 +508,10 @@
                                                             <TextBlock Text="likes:" />
                                                             <TextBlock Text="{Binding likes.summary.total_count}" />
                                                         </StackPanel>
-                                                        <StackPanel Orientation="Horizontal" Margin="1">
+                                                        <!--<StackPanel Orientation="Horizontal" Margin="1">
                                                             <TextBlock Text="views:" />
                                                             <TextBlock Text="{Binding views}" />
-                                                        </StackPanel>
+                                                        </StackPanel>-->
                                                     </StackPanel>
                                                 </ToolTip>
                                             </Image.ToolTip>
@@ -534,10 +534,10 @@
                                             <TextBlock Text="likes:" />
                                             <TextBlock Text="{Binding likes.summary.total_count}" />
                                         </StackPanel>
-                                        <StackPanel Orientation="Horizontal" Margin="1">
+                                        <!--<StackPanel Orientation="Horizontal" Margin="1">
                                             <TextBlock Text="views:" />
                                             <TextBlock Text="{Binding views}" />
-                                        </StackPanel>
+                                        </StackPanel>-->
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>

@@ -554,7 +554,8 @@ namespace GoViral.ViewModels
 
         private void cancelCrawlWork()
         {
-            mCrawlerHost.PreInitStates.Clear();
+            if (mCrawlerHost != null && mCrawlerHost.PreInitStates != null) mCrawlerHost.PreInitStates.Clear();
+
             VisibleProgress = Visibility.Collapsed;
             if(Status == "Initializing crawler...")
             {

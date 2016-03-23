@@ -25,6 +25,8 @@ namespace WPF_WYSIWYG_HTML_Editor.Models
 
         public int SIPBN { get; set; }
 
+        bool tobeChekced = true;
+
         //RefreshPBNVault
         public ICommand VautContextMenu { get; set; }
         public event Action<object> OnVautContextMenuClick_Clicked = delegate { };
@@ -61,6 +63,15 @@ namespace WPF_WYSIWYG_HTML_Editor.Models
                         bhw.Show();
                     }
                     catch { }
+                }
+                else if(param == "SelectToggle")
+                {
+                    foreach (var p in PBNProjects)
+                    {
+                        p.IsSelected = tobeChekced;
+                    }
+
+                    tobeChekced = !tobeChekced;
                 }
                 else if (param == "RenameFolderVault" || param == "RenameFolderMoney")
                 {
