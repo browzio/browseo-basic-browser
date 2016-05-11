@@ -83,6 +83,7 @@
     <Compile Include="Classes\GloableProfData.cs" />
     <Compile Include="Classes\ImageAsyncHelper.cs" />
     <Compile Include="Classes\Lists.cs" />
+    <Compile Include="Classes\MeException.cs" />
     <Compile Include="Classes\MozscapeAPI.cs" />
     <Compile Include="Classes\MozscapeResults.cs" />
     <Compile Include="Classes\NativeMethods.cs" />

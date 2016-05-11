@@ -100,7 +100,7 @@ namespace GoViral.Instagram.InstViewModels
             if (bfss == null || bfss.IsDisposed)
             {
                 bfss = new BrowserForSocialShare();
-                bfss.browserCntrl1.init(link);
+                bfss.browserCntrl1.init(link, BrowserSettimgs.FlashEnabled, BrowserSettimgs.JavascriptEnabled, BrowserSettimgs.JavaEnabled);
             }
             else
             {

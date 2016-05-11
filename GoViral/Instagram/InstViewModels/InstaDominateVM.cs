@@ -330,7 +330,7 @@ namespace GoViral.Instagram.InstViewModels
 
             WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
             WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
-            WebBrowser.init(url);
+            WebBrowser.init(url, BrowserSettimgs.FlashEnabled, BrowserSettimgs.JavascriptEnabled, BrowserSettimgs.JavaEnabled);
             if (wfh == null)
                 wfh = new WindowsFormsHost();
 

@@ -15,11 +15,18 @@ namespace Organiser.Common.Browser
     {
         protected override void OnBeforeCommandLineProcessing(string processType, CefCommandLine commandLine)
         {
-           // Debugger.Launch();
+            // Debugger.Launch();
             //commandLine.AppendSwitch("disable-gpu", "1");
             //commandLine.AppendSwitch("disable-gpu-compositing", "1");
             //commandLine.AppendSwitch("enable-begin-frame-scheduling", "1");
             //commandLine.AppendSwitch("disable-gpu-vsync", "1");
+            //if (string.IsNullOrEmpty(processType))
+            //{
+            //    commandLine.AppendSwitch("disable-gpu");
+            //    commandLine.AppendSwitch("disable-gpu-compositing");
+            //    commandLine.AppendSwitch("enable-begin-frame-scheduling");
+            //    commandLine.AppendSwitch("disable-smooth-scrolling");
+            //}
             if (GloableProfData.PData != null && !string.IsNullOrEmpty(GloableProfData.PData.ProxyIP) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyPort))
             {
                 try
@@ -115,57 +122,86 @@ namespace Organiser.Common.Browser
 
     public class DemoRequestHandler : CefRequestHandler
     {
+        //    protected override bool OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request)
+        //    {
+        //        //if (request.Url.Contains("https://fbcdn-photos-b-a.akamaihd.net/"))
+        //        //{
+        //        //    try
+        //        //    {
+        //        //        foreach (var item in request.GetHeaderMap())
+        //        //        {
+
+        //        //        }
+        //        //        foreach (var item in request.GetHeaderMap().AllKeys)
+        //        //        {
+        //        //            foreach (var item1 in request.GetHeaderMap().GetValues(item))
+        //        //            {
+
+        //        //            }
+
+        //        //        }
+        //        //        foreach (var item in request.GetHeaderMap().Keys)
+        //        //        {
+
+        //        //        }
+        //        //    }
+        //        //    catch { }
+        //        //    Debugger.Break();
+        //        //}
+        //        //try
+        //        //{
+        //        //    foreach (var item in request.GetHeaderMap())
+        //        //    {
+
+        //        //    }
+        //        //    foreach (var item in request.GetHeaderMap().AllKeys)
+        //        //    {
+        //        //        foreach (var item1 in request.GetHeaderMap().GetValues(item))
+        //        //        {
+
+        //        //        }
+
+        //        //    }
+        //        //    foreach (var item in request.GetHeaderMap().Keys)
+        //        //    {
+
+        //        //    }
+
+        //        //    foreach (var pda in request.PostData.GetElements())
+        //        //    {
+
+        //        //    }
+        //        //}
+        //        //catch { }
+        //        return base.OnBeforeResourceLoad(browser, frame, request);
+        //    }
+        //protected override CefReturnValue OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request, CefRequestCallback callback)
+        //{
+        //    if (!BrowserSettimgs.DoNotTrackEnabled)
+        //    {
+        //        var headers = request.GetHeaderMap();
+        //        headers.Add("DNT", "1");
+        //        request.SetHeaderMap(headers);
+
+        //        browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('doNotTrack', function () { return '1'; });", browser.GetMainFrame().Url, 0);
+        //    }
+        //    browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", browser.GetMainFrame().Url, 0);
+
+        //    return CefReturnValue.Continue;
+        //}
         protected override bool OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request)
         {
-            //if (request.Url.Contains("https://fbcdn-photos-b-a.akamaihd.net/"))
-            //{
-            //    try
-            //    {
-            //        foreach (var item in request.GetHeaderMap())
-            //        {
+            if (!BrowserSettimgs.DoNotTrackEnabled)
+            {
+                var headers = request.GetHeaderMap();
+                headers.Add("DNT", "1");
+                request.SetHeaderMap(headers);
 
-            //        }
-            //        foreach (var item in request.GetHeaderMap().AllKeys)
-            //        {
-            //            foreach (var item1 in request.GetHeaderMap().GetValues(item))
-            //            {
+                frame.ExecuteJavaScript("window.navigator.__defineGetter__('doNotTrack', function () { return '1'; });", request.Url, 0);
+            }
 
-            //            }
+            frame.ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", browser.GetMainFrame().Url, 0);
 
-            //        }
-            //        foreach (var item in request.GetHeaderMap().Keys)
-            //        {
-
-            //        }
-            //    }
-            //    catch { }
-            //    Debugger.Break();
-            //}
-            //try
-            //{
-            //    foreach (var item in request.GetHeaderMap())
-            //    {
-
-            //    }
-            //    foreach (var item in request.GetHeaderMap().AllKeys)
-            //    {
-            //        foreach (var item1 in request.GetHeaderMap().GetValues(item))
-            //        {
-
-            //        }
-
-            //    }
-            //    foreach (var item in request.GetHeaderMap().Keys)
-            //    {
-
-            //    }
-
-            //    foreach (var pda in request.PostData.GetElements())
-            //    {
-
-            //    }
-            //}
-            //catch { }
             return base.OnBeforeResourceLoad(browser, frame, request);
         }
         protected override bool GetAuthCredentials(CefBrowser browser, CefFrame frame, bool isProxy, string host, int port, string realm, string scheme, CefAuthCallback callback)
@@ -345,6 +381,11 @@ namespace Organiser.Common.Browser
         protected override void OnCursorChange(CefBrowser browser, IntPtr cursorHandle, CefCursorType type, CefCursorInfo customCursorInfo)
         {
         }
+
+        //protected override void OnScrollOffsetChanged(CefBrowser browser, double x, double y)
+        //{
+        //    //throw new NotImplementedException();
+        //}
 
         protected override void OnScrollOffsetChanged(CefBrowser browser)
         {

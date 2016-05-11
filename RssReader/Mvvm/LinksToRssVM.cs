@@ -107,7 +107,7 @@ namespace RssReader.Mvvm
                 {
                     WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
                     WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
-                    WebBrowser.init("");
+                    WebBrowser.init("",BrowserSettimgs.FlashEnabled,BrowserSettimgs.JavascriptEnabled,BrowserSettimgs.JavaEnabled);
                     wfh = new WindowsFormsHost() { Child = WebBrowser };
                 }
                 return wfh;

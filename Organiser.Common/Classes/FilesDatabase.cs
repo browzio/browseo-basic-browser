@@ -20,6 +20,7 @@ namespace Organiser.Common.Classes
         public static bool FlashEnabled = true;
         public static bool DoNotTrackEnabled = true; 
         public static bool SetSysDateEnabled = false;
+        public static bool WebRTCEnabled = true;
 
         private static List<string> timeZoneList;
         public static List<string> AvailableTimeZones
@@ -441,7 +442,7 @@ namespace Organiser.Common.Classes
             }
         }
 
-        public static void SaveSession(string projectName, List<string> links)
+        public static void SaveSession(string projectName, List<string> links, bool isff = false)
         {
             links.Add(
                 BrowserSettimgs.FlashEnabled +
@@ -449,18 +450,22 @@ namespace Organiser.Common.Classes
                 "," + BrowserSettimgs.JavascriptEnabled +
                 "," + BrowserSettimgs.SetSysDateEnabled +
                 "," + BrowserSettimgs.SITimeZone+
-                "," + BrowserSettimgs.DoNotTrackEnabled);
+                "," + BrowserSettimgs.DoNotTrackEnabled+
+                "," + BrowserSettimgs.WebRTCEnabled);
 
             string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
+            if(isff) directory = Path.Combine(GetBaseDir(), "FFSavedSessions", projectName);
             if (!Directory.Exists(directory)) Directory.CreateDirectory(directory);
 
             string filePath = Path.Combine(directory, "sites.txt");    
             File.WriteAllLines(filePath, links.ToArray());
         }
 
-        public static List<string> GetSavedSesstion(string projectName)
+        public static List<string> GetSavedSesstion(string projectName, bool isff = false)
         {
             string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
+            if(isff) directory = Path.Combine(GetBaseDir(), "FFSavedSessions", projectName);
+
             if (!Directory.Exists(directory)) return new List<string>();
 
             string filePath = Path.Combine(directory, "sites.txt");
@@ -485,6 +490,10 @@ namespace Organiser.Common.Classes
                         if(browserSettings.Length > 5)
                         {
                             BrowserSettimgs.DoNotTrackEnabled = Convert.ToBoolean(browserSettings[5]);
+                        }
+                        if(browserSettings.Length > 6)
+                        {
+                            BrowserSettimgs.WebRTCEnabled = Convert.ToBoolean(browserSettings[6]);
                         }
                         if (BrowserSettimgs.SetSysDateEnabled)
                         {

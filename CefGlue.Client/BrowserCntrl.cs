@@ -46,14 +46,15 @@ namespace Xilium.CefGlue.Client
 
         }
 
-        public void init(string startUrl)
+        public void init(string startUrl, bool flashEnabled, bool javascriptEnabled, bool javaEnabled)
         {
-            CefState StateJavascript = BrowserSettimgs.JavascriptEnabled ? CefState.Enabled : CefState.Disabled;
-            CefState StateJava = BrowserSettimgs.JavaEnabled ? CefState.Enabled : CefState.Disabled;
-            CefState StateFlash = BrowserSettimgs.FlashEnabled ? CefState.Enabled : CefState.Disabled;
-           CBrowser = new CefWebBrowser();
+            CefState StateJavascript = javascriptEnabled ? CefState.Enabled : CefState.Disabled;
+            CefState StateJava = javaEnabled ? CefState.Enabled : CefState.Disabled;
+            CefState StateFlash = flashEnabled ? CefState.Enabled : CefState.Disabled;
+
+            CBrowser = new CefWebBrowser();
             CBrowser.HandleWasCreated += browser_OnHandleCreated;
-            if(startUrl != "")
+            if (startUrl != "")
                 CBrowser.StartUrl = startUrl;
             CBrowser.Width = this.Width;
             CBrowser.Height = this.Height;
@@ -68,14 +69,14 @@ namespace Xilium.CefGlue.Client
             };
             CBrowser.BringToFront();
 
-            
+
             CBrowser.TitleChanged += CBrowser_TitleChanged;
             CBrowser.AddressChanged += CBrowser_AddressChanged;
             CBrowser.StatusMessage += CBrowser_StatusMessage;
             CBrowser.BeforePopup += CBrowser_BeforePopup;
             CBrowser.LoadingStateChange += CBrowser_LoadingStateChange;
             CBrowser.ConsoleMessage += CBrowser_ConsoleMessage;
-            CBrowser.OnContextMenuItemClicked += CBrowser_OnContextMenuItemClicked;    
+            CBrowser.OnContextMenuItemClicked += CBrowser_OnContextMenuItemClicked;
 
             this.SuspendLayout();
             this.Controls.Add(CBrowser);
@@ -203,7 +204,7 @@ namespace Xilium.CefGlue.Client
                 }
             }catch { }
         }
-
+        
         public void Reload()
         {
             try

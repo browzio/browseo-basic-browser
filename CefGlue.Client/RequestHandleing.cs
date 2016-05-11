@@ -40,14 +40,23 @@ namespace Xilium.CefGlue.Client
             //}
             //Console.WriteLine(request.Url);
             //var headers = request.GetHeaderMap();
-           // headers.Add("HTTP_DNT", "1");
+            // headers.Add("HTTP_DNT", "1");
             //headers.Add("DNT", "1");
             //request.SetHeaderMap(headers);
-           // return false;
-           return base.OnBeforeBrowse(browser, frame, request, isRedirect);
-        }
+            // return false;
+            //if (!BrowserSettimgs.DoNotTrackEnabled)
+            //{
+            //    var headers = request.GetHeaderMap();
+            //    headers.Add("DNT", "1");
+            //    request.SetHeaderMap(headers);
 
-      //  (function() { function g(){$("#rtc_hasMicrophone,#rtc_hasWebcam,#rtc_isDeviceEnumeration").text("false");$("#rtc_device_ids").text("n/a")} function h(b, c, d){ return '<span class="country-flag" style="background-image:url(/img/flags/' + c + '.png)">' + (d ? '<a href="/whois/' + b + '" title="Get IP Address Details" target="_blank">' : "") + b + (d ? "</a>" : "") + "&nbsp;&nbsp;&nbsp;</span>"}function n(b){$.ajax({ url: "/xhr/webrtc/" + b,type: "GET",success: function(c){$("#rtc_public").append(h(b, c, !0))} })}$("#webrtc-content table").removeClass("undef"); var p = window.process && "object" == typeof window.process&& window.process.versions && window.process.versions["node-webkit"], e = !!navigator.webkitGetUserMedia; if (e) var k = "undefined" !== typeof navigator.userAgent?e && navigator.mozGetUserMedia ? 0 : parseInt(navigator.userAgent.match(/ Chrom(e | ium)\/ ([0 - 9] +)\./)[2]):21; var l = !!window.webkitRTCPeerConnection || !!window.mozRTCPeerConnection, m; m = l ? '<span class="bad">!</span> True' : '<span class="good">&#215;</span> False';$("#rtc_isWebRTCEnabled").html(m);$("#rtc_isAudioContextSupported").text(!!window.AudioContext || !!window.webkitAudioContext);$("#rtc_isScreenCapturingSupported").text(e && 26 <= k && (p ? !0 : "https:" == location.protocol));$("#rtc_isSctpDataChannelsSupported").text(!!navigator.mozGetUserMedia || e && 25 <= k);$("#rtc_isRtpDataChannelsSupported").text(e && 31 <= k); if (window.MediaStreamTrack) { MediaStreamTrack.getSources || (MediaStreamTrack.getSources = MediaStreamTrack.getMediaDevices); window.MediaStreamTrack && MediaStreamTrack.getSources || g(); try { MediaStreamTrack.getSources(function(b){ for (var c = { }, d = 0; d < b.length; d++) c[b[d].kind] = !0,"n/a" ==$("#rtc_device_ids").text() &&$("#rtc_device_ids").empty(),$("#rtc_device_ids").append("kind:<code>" + b[d].kind + "</code> id:<code>" + b[d].id + "</code><br>");$("#rtc_isDeviceEnumeration").html('<span class="bad">!</span> True');$("#rtc_hasMicrophone").text(!!c.audio);$("#rtc_hasWebcam").text(!!c.video)})} catch (q) { g()} } else g(); var a; (function(b){ function c(a){ try { var c =/ ([0 - 9]{ 1,3} (\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(a)[1];void 0===d[c]&&b(c); d[c]=!0}catch(e){}}var d = { }, a = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection; a||(a=document.getElementById("iframe").contentWindow,a=a.RTCPeerConnection||a.mozRTCPeerConnection||a.webkitRTCPeerConnection);var e = { optional:[{RtpDataChannels:!0}]},g={iceServers:[{urls:"stun:stun.services.mozilla.com"}]},f;try{f=new a(g, e)}catch(h){return}f.onicecandidate=function(a) { a.candidate && c(a.candidate.candidate)}; f.createDataChannel("");f.createOffer(function(a) { f.setLocalDescription(a, function(){ },function(){ })},function() { });setTimeout(function() { f.localDescription.sdp.split("\n").forEach(function(a){ 0 === a.indexOf("a=candidate:") && c(a)})},1E3)})(function(b) { a = b.match(/^ (192\.168\.| 169\.254\.| 10\.| 172\.(1[6 - 9] | 2\d | 3[01]))/)?"#rtc_local":b.match(/^[a - f0 - 9]{ 1,4} (:[a-f0-9]{1,4}){7}$/)?"#rtc_ipv6":"#rtc_public";"n/a"==$(a).text()&&($(a).empty(),$(a).parent().removeClass("none"));"#rtc_local"==a?$(a).append(h(b,"_local",!1)):"#rtc_public"==a? n(b):"#rtc_ipv6"==a&&$(a).append(h(b,"x",!1));l||(l=!0,$("#rtc_isWebRTCEnabled").html('<span class="bad">!</span> True'))})})();
+            //    browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('doNotTrack', function () { return '1'; });", browser.GetMainFrame().Url, 0);
+            //}
+            //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", browser.GetMainFrame().Url, 0);
+
+
+            return base.OnBeforeBrowse(browser, frame, request, isRedirect);
+        }
         protected override bool OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request)
         {
             if (!BrowserSettimgs.DoNotTrackEnabled)
@@ -56,40 +65,451 @@ namespace Xilium.CefGlue.Client
                 headers.Add("DNT", "1");
                 request.SetHeaderMap(headers);
 
-                browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('doNotTrack', function () { return '1'; });", browser.GetMainFrame().Url, 0);
+                frame.ExecuteJavaScript("window.navigator.__defineGetter__('doNotTrack', function () { return '1'; });", request.Url, 0);
             }
-            browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", browser.GetMainFrame().Url, 0);
-            //window.MediaStreamTrack
-            // browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('navigator.mediaDevices.enumerateDevices', function () { return null; });", browser.GetMainFrame().Url, 0);
-            // browser.GetMainFrame().ExecuteJavaScript("for (property in navigator) { alert(property + ' ' + navigator[property]); }", browser.GetMainFrame().Url, 0);
-            // browser.GetMainFrame().ExecuteJavaScript("alert(navigator.mediaDevices);", browser.GetMainFrame().Url, 0);
-            //browser.GetMainFrame().ExecuteJavaScript("alert(navigator.mediaDevices.enumerateDevices);", browser.GetMainFrame().Url, 0);
 
-            //for (property in navigator) { if (navigator[property] == null) { navigator[property].value = '1'; alert(property + ' ' + navigator[property]); } }
-            //window.navigator.doNotTrack = '1';
-            return false;
+            frame.ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", browser.GetMainFrame().Url, 0);
 
-            //if (request.Method == "GET" || request.Method == "POST")
-            //{
-            // System.Collections.Specialized.NameValueCollection headers = request.GetHeaderMap();
-            //if (request.Url.Contains("https://mc.yandex.ru"))
-            // {
-            //   headers.Add("DNT", "1");
-            //}
-            //else
-            // {
-            //   headers.Add("dnt", "1");
-            //}
-            // request.SetHeaderMap(headers);
-            //}
-            //if (request.Url.Contains("https://vupload-edge.facebook.com/ajax/video/upload/requests/receive/"))
-            //{
-            //   System.Collections.Specialized.NameValueCollection headers =  request.GetHeaderMap();
-            //}
-            //Console.WriteLine(request.Url);
-            //return base.OnBeforeResourceLoad(browser, frame, request); 
-            //return false;
+            return base.OnBeforeResourceLoad(browser, frame, request);
         }
+        ///// <summary>
+        ///// (function() { 
+        ///// function g(){$("#rtc_hasMicrophone,#rtc_hasWebcam,#rtc_isDeviceEnumeration").text("false");$("#rtc_device_ids").text("n/a")} 
+        ///// function h(b, c, d){ return '<span class="country-flag" style="background-image:url(/img/flags/' + c + '.png)">' + (d ? '<a href="/whois/' + b + '" title="Get IP Address Details" target="_blank">' : "") + b + (d ? "</a>" : "") + "&nbsp;&nbsp;&nbsp;</span>"}
+        ///// function n(b){$.ajax({ url: "/xhr/webrtc/" + b,type: "GET",success: function(c){$("#rtc_public").append(h(b, c, !0))} })}$("#webrtc-content table").removeClass("undef"); 
+        ///// var p = window.process && "object" == typeof window.process&& window.process.versions && window.process.versions["node-webkit"], e = !!navigator.webkitGetUserMedia;
+        ///// if (e) var k = "undefined" !== typeof navigator.userAgent?e && navigator.mozGetUserMedia ? 0 : parseInt(navigator.userAgent.match(/ Chrom(e | ium)\/ ([0 - 9] +)\./)[2]):21;
+        ///// var l = !!window.webkitRTCPeerConnection || !!window.mozRTCPeerConnection, m; m = l ? '<span class="bad">!</span> True' : '<span class="good">&#215;</span>
+        ///// False';$("#rtc_isWebRTCEnabled").html(m);
+        ///// $("#rtc_isAudioContextSupported").text(!!window.AudioContext || !!window.webkitAudioContext);
+        ///// $("#rtc_isScreenCapturingSupported").text(e && 26 <= k && (p ? !0 : "https:" == location.protocol));
+        ///// $("#rtc_isSctpDataChannelsSupported").text(!!navigator.mozGetUserMedia || e && 25 <= k);$("#rtc_isRtpDataChannelsSupported").text(e && 31 <= k);
+        ///// if (window.MediaStreamTrack) { MediaStreamTrack.getSources || (MediaStreamTrack.getSources = MediaStreamTrack.getMediaDevices); window.MediaStreamTrack && MediaStreamTrack.getSources || g(); 
+        ///// try { MediaStreamTrack.getSources(
+        ///// function(b){ for (var c = { }, d = 0; d < b.length; d++) c[b[d].kind] = !0,"n/a" ==$("#rtc_device_ids").text() &&$("#rtc_device_ids").empty(),
+        ///// $("#rtc_device_ids").append("kind:<code>" + b[d].kind + "</code> id:<code>" + b[d].id + "</code><br>");$("#rtc_isDeviceEnumeration").html('<span class="bad">!</span> True');
+        ///// $("#rtc_hasMicrophone").text(!!c.audio);$("#rtc_hasWebcam").text(!!c.video)})} catch (q) { g()} } else g(); var a; 
+        ///// (function(b){ function c(a){ try { var c =/ ([0 - 9]{ 1,3} (\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(a)[1];void 0===d[c]&&b(c); d[c]=!0}catch(e){}}
+        ///// var d = { },
+        ///// a = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection; a||
+        ///// (a=document.getElementById("iframe").contentWindow,a=a.RTCPeerConnection||a.mozRTCPeerConnection||a.webkitRTCPeerConnection);
+        ///// var e = { optional:[{RtpDataChannels:!0}]},g={iceServers:[{urls:"stun:stun.services.mozilla.com"}]},f;try{f=new a(g, e)}catch(h){return}
+        ///// f.onicecandidate=function(a) { a.candidate && c(a.candidate.candidate)}; f.createDataChannel("");
+        ///// f.createOffer(function(a) { f.setLocalDescription(a, function(){ },function(){ })},function() { });
+        ///// setTimeout(function() { f.localDescription.sdp.split("\n").forEach(function(a){ 0 === a.indexOf("a=candidate:") && c(a)})},1E3)})
+        ///// (function(b) { a = b.match(/^ (192\.168\.| 169\.254\.| 10\.| 172\.(1[6 - 9] | 2\d | 3[01]))/)?"#rtc_local":b.match(/^[a - f0 - 9]{ 1,4} 
+        ///// (:[a-f0-9]{1,4}){7}$/)?"#rtc_ipv6":"#rtc_public";"n/a"==$(a).text()&&($(a).empty(),$(a).parent().removeClass("none"));"#rtc_local"==a?$(a).append(h(b,"_local",!1)):
+        ///// "#rtc_public"==a? n(b):"#rtc_ipv6"==a&&$(a).append(h(b,"x",!1));l||(l=!0,$("#rtc_isWebRTCEnabled").html('<span class="bad">!</span> True'))})})();
+        ///// 
+        ///// </summary>
+        ///// <param name="browser"></param>
+        ///// <param name="frame"></param>
+        ///// <param name="request"></param>
+        ///// <param name="callback"></param>
+        ///// <returns></returns>
+        //protected override CefReturnValue OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request, CefRequestCallback callback)
+        //{
+        //    //Console.WriteLine(request.Url);
+        //    //if (request.Url.Contains("chromestatus.com"))
+        //    //{
+        //    //    return CefReturnValue.Cancel;
+        //    //}
+        //    //if (request.Url.Contains("/xhr/webrtc/"))
+        //    //{
+        //    //    return CefReturnValue.Cancel;
+        //    //}
+        //    //browser.GetMainFrame().ExecuteJavaScript("for (property in window) { if (typeof property === 'undefined'){var a = 0;}else{ console.log(property + ' ' + window[property]); }}", request.Url, 0);
+        //    //Console.WriteLine("______++++++++________");
+        //    //browser.GetMainFrame().ExecuteJavaScript("for (property in navigator) { console.log(property + ' ' + navigator[property]); }", request.Url, 0);
+        //    //Console.WriteLine("______**********________");
+        //    //Console.WriteLine(request.Url);
+        //    //if (!BrowserSettimgs.DoNotTrackEnabled)
+        //    {
+        //        var headers = request.GetHeaderMap();
+        //        headers.Add("DNT", "1");
+        //        request.SetHeaderMap(headers);
+
+        //        browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('doNotTrack', function () { return '1'; });", request.Url, 0);
+        //    }
+
+        //    if (!BrowserSettimgs.JavaEnabled)
+        //        browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('javaEnabled', function () { return false; });", request.Url, 0);
+
+        //    //string jsForExecution = "nativeImplementation('htmltext');";
+        //    //blocked
+        //    //frame.ExecuteJavaScript("alert(test.myval);", request.Url, 0);
+
+        //    //            string js3 = @"
+        //    //chrome.webRTCIPHandlingPolicy ='disable_non_proxied_udp';
+        //    //";
+        //    //            frame.ExecuteJavaScript(js3, request.Url, 0);
+
+        //    //            string js = @"
+        //    ///*
+        //    // *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+        //    // *
+        //    // *  Use of this source code is governed by a BSD-style license
+        //    // *  that can be found in the LICENSE file in the root of the source
+        //    // *  tree.
+        //    // */
+
+        //    ///* exported getPolicyFromBooleans */
+
+        //    //'use strict';
+
+        //    //var pn = chrome.network;
+        //    //var pi = null;
+
+        //    //function browserSupportsIPHandlingPolicy() {
+        //    //  return pn.webRTCIPHandlingPolicy !== undefined;
+        //    //}
+
+        //    //function browserSupportsNonProxiedUdpBoolean() {
+        //    //  return pn.webRTCNonProxiedUdpEnabled !== undefined;
+        //    //}
+
+        //    //// Handle the case when this is installed in pre-M48.
+        //    //if (!browserSupportsIPHandlingPolicy()) {
+        //    //  chrome.privacy.IPHandlingPolicy = {};
+        //    //  chrome.privacy.IPHandlingPolicy.DEFAULT = 0;
+        //    //  chrome.privacy.IPHandlingPolicy.DEFAULT_PUBLIC_AND_PRIVATE_INTERFACES = 1;
+        //    //  chrome.privacy.IPHandlingPolicy.DEFAULT_PUBLIC_INTERFACE_ONLY = 2;
+        //    //  chrome.privacy.IPHandlingPolicy.DISABLE_NON_PROXIED_UDP = 3;
+        //    //}
+
+        //    //pi = chrome.privacy.IPHandlingPolicy;
+
+        //    //// Helper function to convert the parameters to policy synchronously.
+        //    //function convertToPolicy(allowMultiRoute, allowUdp) {
+        //    // // if (!allowUdp) {
+        //    // //   return pi.DISABLE_NON_PROXIED_UDP;
+        //    ////  }
+
+        //    ////  if (!allowMultiRoute) {
+        //    //    return pi.DEFAULT_PUBLIC_INTERFACE_ONLY;
+        //    ////  }
+
+        //    //  return pi.DEFAULT;
+        //    //}
+
+        //    //// This function just returns the new policy value based on the 2 booleans
+        //    //// without changing any preferences.
+        //    //function getPolicyFromBooleans(callback) {
+        //    //  pn.webRTCMultipleRoutesEnabled.get({}, function(allowMultiRoute) {
+        //    //    if (!browserSupportsNonProxiedUdpBoolean()) {
+        //    //      callback(convertToPolicy(allowMultiRoute.value, true));
+        //    //    } else {
+        //    //      pn.webRTCNonProxiedUdpEnabled.get({}, function(allowUdp) {
+        //    //        callback(convertToPolicy(allowMultiRoute.value,
+        //    //                                 allowUdp.value));
+        //    //      });
+        //    //    }
+        //    //  });
+        //    //}
+
+
+        //    ///*
+        //    // *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+        //    // *
+        //    // *  Use of this source code is governed by a BSD-style license
+        //    // *  that can be found in the LICENSE file in the root of the source
+        //    // *  tree.
+        //    // */
+
+        //    //// This file sets the policy when the extension is installed and registered for
+        //    //// chrome.runtime.onInstalled event to convert the booleans in pre-M48 version
+        //    //// to IPHandlingPolicy when chrome is upgraded to M48.
+
+        //    //'use strict';
+
+        //    //// If this is installed in a pre-M48 version of Chrome, the only thing to do
+        //    //  // here is to disable MultipleRoute.
+        //    //  var pn = chrome.network;
+        //    //  var pi = chrome.privacy.IPHandlingPolicy;
+
+        //    //  if (!browserSupportsIPHandlingPolicy()) {
+        //    //    pn.webRTCMultipleRoutesEnabled.set({
+        //    //      value: false
+        //    //    });
+        //    //  }
+
+        //    //  // This function resets the 2 booleans to default values so we can ignore them
+        //    //  // as if they were not set in future chrome.runtime.onInstalled event. This is
+        //    //  // to avoid repeated conversions and overwrite the current setting.
+        //    //  function resetOldBooleans(callback) {
+        //    //    pn.webRTCNonProxiedUdpEnabled.set({
+        //    //      value: true
+        //    //    }, function() {
+        //    //      pn.webRTCMultipleRoutesEnabled.set({
+        //    //        value: true
+        //    //      }, function() {
+        //    //        callback('Successfully reset the booleans');
+        //    //      });
+        //    //    });
+        //    //  }
+
+        //    //  // Converts the old booleans to the new policy in Preferences and resets the 2
+        //    //  // previous booleans to the default. Future chrome updates could trigger this
+        //    //  // function again but they will either stop the conversion if
+        //    //  // webRTCIPHandlingPolicy is not 'default' or for the case of 'default', since
+        //    //  // the previous booleans have been reset to default, it'll be translate to
+        //    //            function convertBooleansToPolicy(isInstall, callback) {
+        //    //  if (!browserSupportsIPHandlingPolicy())
+        //    //  {
+        //    //      return;
+        //    //  }
+
+        //    //  pn.webRTCIPHandlingPolicy.get({
+        //    //  }, function(details) {
+        //    //                if (details.value !== chrome.privacy.IPHandlingPolicy.DEFAULT)
+        //    //                {
+        //    //                    if (callback)
+        //    //                    {
+        //    //                        callback(
+        //    //                          'webRTCIPHandlingPolicy has a non-default value, stop now.'
+        //    //                        );
+        //    //                    }
+        //    //                    return;
+        //    //                }
+
+        //    //                getPolicyFromBooleans(function(policy) {
+        //    //                    if (policy === pi.DEFAULT && isInstall)
+        //    //                    {
+        //    //                        // It's safe to use the enum value here since
+        //    //                        // browserSupportsIPHandlingPolicy must be true.
+        //    //                        policy = pi.DEFAULT_PUBLIC_AND_PRIVATE_INTERFACES;
+        //    //                    }
+        //    //                    pn.webRTCIPHandlingPolicy.set({
+        //    //                        value: policy
+        //    //                    }, resetOldBooleans(callback));
+        //    //                });
+        //    //            });
+        //    //        }
+
+        //    //        function onInstall(details)
+        //    //        {
+        //    //            if (details.reason === 'install' /* extension is installed */ ||
+        //    //              details.reason === 'update' /* extension is upgraded */ ||
+        //    //              details.reason === 'chrome_update' /* chrome is upgraded */ )
+        //    //            {
+        //    //                convertBooleansToPolicy(
+        //    //                  details.reason === 'install',
+        //    //                  function(status) {
+        //    //                    console.log(status);
+        //    //                });
+        //    //            }
+        //    //        }
+
+        //    //        chrome.runtime.onInstalled.addListener(onInstall);
+        //    //";
+        //    //            browser.GetMainFrame().ExecuteJavaScript(js, request.Url, 0);
+        //    //            string js2 = @"
+        //    ///*
+        //    // *  Copyright (c) 2015 The WebRTC project authors. All Rights Reserved.
+        //    // *
+        //    // *  Use of this source code is governed by a BSD-style license
+        //    // *  that can be found in the LICENSE file in the root of the source
+        //    // *  tree.
+        //    // */
+
+        //    //// This file sets the policy when the extension is installed and registered for
+        //    //// chrome.runtime.onInstalled event to convert the booleans in pre-M48 version
+        //    //// to IPHandlingPolicy when chrome is upgraded to M48.
+
+        //    //'use strict';
+
+        //    //// If this is installed in a pre-M48 version of Chrome, the only thing to do
+        //    //// here is to disable MultipleRoute.
+        //    //var pn = chrome.privacy.network;
+        //    //var pi = chrome.privacy.IPHandlingPolicy;
+
+        //    //if (!browserSupportsIPHandlingPolicy()) {
+        //    //  pn.webRTCMultipleRoutesEnabled.set({
+        //    //    value: false
+        //    //  });
+        //    //}
+
+        //    //// This function resets the 2 booleans to default values so we can ignore them
+        //    //// as if they were not set in future chrome.runtime.onInstalled event. This is
+        //    //// to avoid repeated conversions and overwrite the current setting.
+        //    //function resetOldBooleans(callback) {
+        //    //  pn.webRTCNonProxiedUdpEnabled.set({
+        //    //    value: true
+        //    //  }, function() {
+        //    //    pn.webRTCMultipleRoutesEnabled.set({
+        //    //      value: true
+        //    //    }, function() {
+        //    //      callback('Successfully reset the booleans');
+        //    //    });
+        //    //  });
+        //    //}
+
+        //    //// Converts the old booleans to the new policy in Preferences and resets the 2
+        //    //// previous booleans to the default. Future chrome updates could trigger this
+        //    //// function again but they will either stop the conversion if
+        //    //            function convertBooleansToPolicy(isInstall, callback) {
+        //    //if (!browserSupportsIPHandlingPolicy())
+        //    //{
+        //    //    return;
+        //    //}
+
+        //    //pn.webRTCIPHandlingPolicy.get({
+        //    //}, function(details) {
+        //    //                if (details.value !== chrome.privacy.IPHandlingPolicy.DEFAULT)
+        //    //                {
+        //    //                    if (callback)
+        //    //                    {
+        //    //                        callback(
+        //    //                          'webRTCIPHandlingPolicy has a non-default value, stop now.'
+        //    //                        );
+        //    //                    }
+        //    //                    return;
+        //    //                }
+
+        //    //                getPolicyFromBooleans(function(policy) {
+        //    //                    if (policy === pi.DEFAULT && isInstall)
+        //    //                    {
+        //    //                        // It's safe to use the enum value here since
+        //    //                        // browserSupportsIPHandlingPolicy must be true.
+        //    //                        policy = pi.DEFAULT_PUBLIC_AND_PRIVATE_INTERFACES;
+        //    //                    }
+        //    //                    pn.webRTCIPHandlingPolicy.set({
+        //    //                        value: policy
+        //    //                    }, resetOldBooleans(callback));
+        //    //                });
+        //    //            });
+        //    //        }
+
+        //    //        function onInstall(details)
+        //    //        {
+        //    //            if (details.reason === 'install' /* extension is installed */ ||
+        //    //              details.reason === 'update' /* extension is upgraded */ ||
+        //    //              details.reason === 'chrome_update' /* chrome is upgraded */ )
+        //    //            {
+        //    //                convertBooleansToPolicy(
+        //    //                  details.reason === 'install',
+        //    //                  function(status) {
+        //    //                    console.log(status);
+        //    //                });
+        //    //            }
+        //    //        }
+
+        //    //        chrome.runtime.onInstalled.addListener(onInstall);
+
+        //    //";
+
+        //    //browser.GetMainFrame().ExecuteJavaScript(js2, request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('chrome.privacy.network.webRTCMultipleRoutesEnabled', function () { return false; });", request.Url, 0);
+        //    ////peerConnection 
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('RTCConfiguration', function () { return 'none'; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('RTCPeerConnection', function () { return null; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('mozRTCPeerConnection', function () { return null; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('webkitRTCPeerConnection', function () { return null; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('msRTCPeerConnection', function () { return null; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('RtpDataChannels', function () { return '0'; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('iceServers', function () { return null; });", request.Url, 0);
+
+        //    ////sessionDescription 
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('RTCSessionDescription', function () { return null; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('mozRTCSessionDescription', function () { return null; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('webkitRTCSessionDescription', function () { return null; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('msRTCSessionDescription', function () { return null; });", request.Url, 0);
+
+
+        //    //frame.ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.navigator.__defineGetter__('getUserMedia', function () { return null; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.navigator.__defineGetter__('mozGetUserMedia', function () { return null; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.navigator.__defineGetter__('webkitGetUserMedia', function () { return null; });", request.Url, 0);
+        //    //frame.ExecuteJavaScript("window.navigator.__defineGetter__('msGetUserMedia', function () { return null; });", request.Url, 0);
+
+
+
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('webkitGetUserMedia', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('mozGetUserMedia', function () { return null; });", request.Url, 0);
+
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('RtpDataChannels', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('RtpDataChannels', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('RTCIdentityProvider', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('RTCIdentityProvider', function () { return null; });", request.Url, 0);
+
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('RTCConfiguration', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('RTCConfiguration', function () { return null; });", request.Url, 0);
+
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('RTCIceServer', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('RTCIceServer', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('RTCIceTransportPolicy', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('RTCIceTransportPolicy ', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('RTCBundlePolicy', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('RTCBundlePolicy', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('RTCRtcpMuxPolicy', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('RTCRtcpMuxPolicy', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('RTCCertificate ', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('RTCCertificate', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('RTCMultipleRoutesEnabled', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('RTCMultipleRoutesEnabled', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('chrome', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('chrome', function () { return null; });", request.Url, 0);
+        //    ////
+
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('MediaStreamTrack', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('RTCPeerConnection', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('mozRTCPeerConnection', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('webkitRTCPeerConnection', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('webkitGetUserMedia', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('mozGetUserMedia', function () { return null; });", request.Url, 0);
+
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('webkitGetUserMedia', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('mediaDevices', function () { return null; });", request.Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('requestMediaKeySystemAccess', function () { return null; });", request.Url, 0);
+
+        //    return CefReturnValue.Continue;
+        //}
+        //protected override bool OnResourceResponse(CefBrowser browser, CefFrame frame, CefRequest request, CefResponse response)
+        //{
+        //    return base.OnResourceResponse(browser, frame, request, response);
+        //}
+        //protected override bool OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request)
+        //{
+        //    if (!BrowserSettimgs.DoNotTrackEnabled)
+        //    {
+        //        var headers = request.GetHeaderMap();
+        //        headers.Add("DNT", "1");
+        //        request.SetHeaderMap(headers);
+
+        //        browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('doNotTrack', function () { return '1'; });", browser.GetMainFrame().Url, 0);
+        //    }
+        //    browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", browser.GetMainFrame().Url, 0);
+        //    //window.MediaStreamTrack
+        //    // browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('navigator.mediaDevices.enumerateDevices', function () { return null; });", browser.GetMainFrame().Url, 0);
+        //    // browser.GetMainFrame().ExecuteJavaScript("for (property in navigator) { alert(property + ' ' + navigator[property]); }", browser.GetMainFrame().Url, 0);
+        //    // browser.GetMainFrame().ExecuteJavaScript("alert(navigator.mediaDevices);", browser.GetMainFrame().Url, 0);
+        //    //browser.GetMainFrame().ExecuteJavaScript("alert(navigator.mediaDevices.enumerateDevices);", browser.GetMainFrame().Url, 0);
+
+        //    //for (property in navigator) { if (navigator[property] == null) { navigator[property].value = '1'; alert(property + ' ' + navigator[property]); } }
+        //    //window.navigator.doNotTrack = '1';
+        //    return false;
+
+        //    //if (request.Method == "GET" || request.Method == "POST")
+        //    //{
+        //    // System.Collections.Specialized.NameValueCollection headers = request.GetHeaderMap();
+        //    //if (request.Url.Contains("https://mc.yandex.ru"))
+        //    // {
+        //    //   headers.Add("DNT", "1");
+        //    //}
+        //    //else
+        //    // {
+        //    //   headers.Add("dnt", "1");
+        //    //}
+        //    // request.SetHeaderMap(headers);
+        //    //}
+        //    //if (request.Url.Contains("https://vupload-edge.facebook.com/ajax/video/upload/requests/receive/"))
+        //    //{
+        //    //   System.Collections.Specialized.NameValueCollection headers =  request.GetHeaderMap();
+        //    //}
+        //    //Console.WriteLine(request.Url);
+        //    //return base.OnBeforeResourceLoad(browser, frame, request); 
+        //    //return false;
+        //}
 
         protected override void OnProtocolExecution(CefBrowser browser, string url, out bool allowOSExecution)
         {
@@ -97,10 +517,10 @@ namespace Xilium.CefGlue.Client
             base.OnProtocolExecution(browser, url, out allowOSExecution);
         }
 
-        protected override void OnResourceRedirect(CefBrowser browser, CefFrame frame, string oldUrl, ref string newUrl)
-        {
-            base.OnResourceRedirect(browser, frame, oldUrl, ref newUrl);
-        }
+        //protected override void OnResourceRedirect(CefBrowser browser, CefFrame frame, string oldUrl, ref string newUrl)
+        //{
+        //    base.OnResourceRedirect(browser, frame, oldUrl, ref newUrl);
+        //}
 
 
         //            frame.ExecuteJavaScript(@"
@@ -272,40 +692,49 @@ namespace Xilium.CefGlue.Client
         }
     }
 
-    public class DemoCefUrlRequestClient : CefUrlRequestClient
-    {
-        static int i = 0;
-        protected override void OnDownloadData(CefUrlRequest request, Stream data)
-        { 
+    //public class DemoCefUrlRequestClient : CefUrlRequestClient
+    //{
+    //    static int i = 0;
+    //    protected override void OnDownloadData(CefUrlRequest request, Stream data)
+    //    { 
 
-        }
+    //    }
 
-        protected override void OnDownloadProgress(CefUrlRequest request, ulong current, ulong total)
-        {  
+    //    protected override void OnDownloadProgress(CefUrlRequest request, long current, long total)
+    //    {
+           
+    //    }
 
-        }
+    //    //protected override void OnDownloadProgress(CefUrlRequest request, ulong current, ulong total)
+    //    //{  
 
-        protected override void OnRequestComplete(CefUrlRequest request)
-        {
-            if (i == 0)
-            {
-                CefRequest nrequest = CefRequest.Create();
+    //    //}
 
-                // nrequest.SetHeaderMap(request.GetHeaderMap());
-                System.Collections.Specialized.NameValueCollection headers = new System.Collections.Specialized.NameValueCollection();
-                headers.Add("Content-Type", "application/x-www-form-urlencoded");
-                nrequest.Set("https://vupload-edge.facebook.com/ajax/video/upload/requests/post/%3F__pc%3DEXP1%3ADEFAULT%26__a%3D1", "POST", null, headers);
+    //    protected override void OnRequestComplete(CefUrlRequest request)
+    //    {
+    //        if (i == 0)
+    //        {
+    //            CefRequest nrequest = CefRequest.Create();
 
-                CefRuntime.PostTask(CefThreadId.IO, new RequestUrlTask(nrequest));
-                i = 1;
-            }
-        }
+    //            // nrequest.SetHeaderMap(request.GetHeaderMap());
+    //            System.Collections.Specialized.NameValueCollection headers = new System.Collections.Specialized.NameValueCollection();
+    //            headers.Add("Content-Type", "application/x-www-form-urlencoded");
+    //            nrequest.Set("https://vupload-edge.facebook.com/ajax/video/upload/requests/post/%3F__pc%3DEXP1%3ADEFAULT%26__a%3D1", "POST", null, headers);
 
-        protected override void OnUploadProgress(CefUrlRequest request, ulong current, ulong total)
-        {  
+    //            CefRuntime.PostTask(CefThreadId.IO, new RequestUrlTask(nrequest));
+    //            i = 1;
+    //        }
+    //    }
 
-        }
-    }
+    //    protected override void OnUploadProgress(CefUrlRequest request, long current, long total)
+    //    {
+    //    }
+
+    //    //protected override void OnUploadProgress(CefUrlRequest request, ulong current, ulong total)
+    //    //{  
+
+    //    //}
+    //}
 
     public class DemoCefResourceHandler : CefResourceHandler
     {

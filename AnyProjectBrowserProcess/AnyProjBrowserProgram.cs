@@ -143,7 +143,7 @@ namespace AnyProjectBrowserProcess
             browser.Text = "Loading... Project Name: " + GloableProfData.PData.ProjectName + " IP: " + GloableProfData.PData.ProxyIP + " PORT: " + GloableProfData.PData.ProxyPort;
             browser.SetSocialButtonsVisable(type);
             browser.SetStartUrl(url);
-            browser.browserCntrl1.init(url);
+            browser.browserCntrl1.init(url, true, true, true);
             Application.Run(browser);
 
             Shutdown();

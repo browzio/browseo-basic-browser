@@ -63,15 +63,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
-      <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
-      <Name>CefGlue.WindowsForms-old</Name>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj">
       <Project>{9080d62a-6fe7-41d2-9a77-f3d7f6c33418}</Project>
       <Name>CefGlue-old</Name>
-      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">
+      <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>
+      <Name>CefGlue.Client</Name>
     </ProjectReference>
     <ProjectReference Include="..\CrawlerContracts\CrawlerContracts.csproj">
       <Project>{3749fa3f-e42d-4e28-a77c-68fe06dcd8d2}</Project>

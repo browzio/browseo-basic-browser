@@ -86,6 +86,8 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Management.Instrumentation" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
@@ -121,12 +123,10 @@
     <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
       <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
       <Name>CefGlue.WindowsForms-old</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj">
       <Project>{9080d62a-6fe7-41d2-9a77-f3d7f6c33418}</Project>
       <Name>CefGlue-old</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\DragDropListview\DragDropListview.csproj">
       <Project>{f2c9dcf4-9c94-4389-9532-e9e7d0412c01}</Project>

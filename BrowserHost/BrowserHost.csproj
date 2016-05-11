@@ -87,39 +87,12 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controls\MyComboBox.cs" />
-    <Compile Include="Convertrs\ReminderDateToColorConverter.cs" />
-    <Compile Include="Convertrs\ReminersCountToVisibleConverter.cs" />
-    <Compile Include="Convertrs\RichToTextConverter.cs" />
-    <Compile Include="Models\Reminder.cs" />
+    <Compile Include="ChromeBrowserHostControl.xaml.cs">
+      <DependentUpon>ChromeBrowserHostControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewModels\BrowserTabViewModel.cs" />
-    <Compile Include="ViewModels\RemindersVM.cs" />
-    <Compile Include="Views\BrowserTabView.xaml.cs">
-      <DependentUpon>BrowserTabView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Windows\RemindersWindow.xaml.cs">
-      <DependentUpon>RemindersWindow.xaml</DependentUpon>
-    </Compile>
-    <Page Include="BrowserHostCntrl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Compile Include="BrowserHostCntrl.xaml.cs">
-      <DependentUpon>BrowserHostCntrl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Page Include="Views\BrowserTabView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Windows\RemindersWindow.xaml">
+    <Compile Include="ViewModels\ChromeBrowserTabViewModel.cs" />
+    <Page Include="ChromeBrowserHostControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -157,12 +130,14 @@
     <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
       <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
       <Name>CefGlue.WindowsForms-old</Name>
-      <Private>False</Private>
     </ProjectReference>
     <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj">
       <Project>{9080d62a-6fe7-41d2-9a77-f3d7f6c33418}</Project>
       <Name>CefGlue-old</Name>
-      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Browser.Common\Browser.Common.csproj">
+      <Project>{c6134f4b-6ab7-4969-9b28-044c473247dc}</Project>
+      <Name>Browser.Common</Name>
     </ProjectReference>
     <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">
       <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>

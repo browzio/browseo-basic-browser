@@ -21,7 +21,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms.Integration;
 using System.Windows.Input;
-using WpfCefDynamBrowser.Views;
 using Xilium.CefGlue;
 using Xilium.CefGlue.Client;
 using System.Collections.Generic;
@@ -172,7 +171,7 @@ namespace WpfCefDynamBrowser.ViewModels
             SaveSessionToBMs = new DelegateCommand(SaveSessionToBMsClicked);  
             SendToBrowserSocial = new RelayCommand(SendToSocialBrowserPopUp);
             SettingsCTClick = new RelayCommand(OnSettingsCTButtonClick);
-            BoockmarksCommand = new RelayCommand(OnBoockmarksCommand_Raised);
+           // BoockmarksCommand = new RelayCommand(OnBoockmarksCommand_Raised);
 
             var version = "Brow·SEO";
             OutputMessage = version;
@@ -185,7 +184,7 @@ namespace WpfCefDynamBrowser.ViewModels
         public void SetBrowser(string address)
         {
             WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
-            WebBrowser.init(address);
+            WebBrowser.init(address, FlashEnabled, JavascriptEnabled, JavaEnabled);
 
             WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
             WebBrowser.OnBrowserMessageChanged += WebBrowser_OnBrowserMessageChanged;
@@ -1328,6 +1327,14 @@ namespace WpfCefDynamBrowser.ViewModels
             }
         }
 
+        private Visibility setBrowserSetingsAvailable = Visibility.Visible;
+        public Visibility SetBrowserSettingsAvailable
+        {
+            get { return setBrowserSetingsAvailable; }
+            set { setBrowserSetingsAvailable = value; RaisePropertyChanged("SetBrowserSettingsAvailable"); }
+        }
+
+
         bool oldJavaCript, oldJava, oldFlash, oldSysDate, oldDnt;
         int oldTZSI = 0;
 
@@ -1419,41 +1426,41 @@ namespace WpfCefDynamBrowser.ViewModels
         {
             BrowserForSocialShare bfss = new BrowserForSocialShare();
             bfss.Text = "Loading... " + AddressEditable;
-            bfss.browserCntrl1.init(fullUrl);
+            bfss.browserCntrl1.init(fullUrl, FlashEnabled, JavascriptEnabled, JavaEnabled);
             bfss.Show();
         }
         #endregion
 
-        #region bookmarks / reminders
-        private int reminderCount;
-        public int ReminderCount
-        {
-            get { return reminderCount; }
-            set { reminderCount = value; RaisePropertyChanged("ReminderCount"); }
-        }
+    //    #region bookmarks / reminders
+    //    private int reminderCount;
+    //    public int ReminderCount
+    //    {
+    //        get { return reminderCount; }
+    //        set { reminderCount = value; RaisePropertyChanged("ReminderCount"); }
+    //    }
 
-        private void OnBoockmarksCommand_Raised(object param)
-        {
-            switch ((string)param)
-            {
-                case "REMINDERS":
-                    RemindersVM rwVM = new RemindersVM();
-                    rwVM.OnOpen += OnClickedReminders;
-                    rwVM.OnNavigate += (uri) => { WebBrowser.Navigate(uri); };
-                    RemindersWindow rw = new RemindersWindow();
-                    rw.DataContext = rwVM;
-                    rw.Show();
-                    Task.Factory.StartNew(()=> 
-                    {
-                        List<string> jsonTaskList = MyFilesDatabase.GetRemindersText(GloableProfData.PData.ProjectName);
-                       if(jsonTaskList != null) rwVM.FillReminders(jsonTaskList);
-                    });
-                    break;
+    //    private void OnBoockmarksCommand_Raised(object param)
+    //    {
+    //        switch ((string)param)
+    //        {
+    //            case "REMINDERS":
+    //                RemindersVM rwVM = new RemindersVM();
+    //                rwVM.OnOpen += OnClickedReminders;
+    //                rwVM.OnNavigate += (uri) => { WebBrowser.Navigate(uri); };
+    //                RemindersWindow rw = new RemindersWindow();
+    //                rw.DataContext = rwVM;
+    //                rw.Show();
+    //                Task.Factory.StartNew(()=> 
+    //                {
+    //                    List<string> jsonTaskList = MyFilesDatabase.GetRemindersText(GloableProfData.PData.ProjectName);
+    //                   if(jsonTaskList != null) rwVM.FillReminders(jsonTaskList);
+    //                });
+    //                break;
 
-                default:
-                    break;
-            }
-        }
-        #endregion
+    //            default:
+    //                break;
+    //        }
+    //    }
+    //    #endregion
     }
 }

@@ -27,6 +27,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 using Xilium.CefGlue.Client;
+using zFirefoxBrowser.Helpers;
 
 namespace BrowserAndFeatures
 {
@@ -42,8 +43,11 @@ namespace BrowserAndFeatures
         {
             InitializeComponent();
 
-            if(App.browserinit)
+            if (App.browserinit)
+            {
                 BrowserInit.Init();
+                FoxInit.Init();
+            }
 
            
             MyFilesDatabase.GetSites(); 
@@ -62,6 +66,12 @@ namespace BrowserAndFeatures
             browser.OnRefreshedSessionSettings += Browser_OnRefreshedSessionSettings;
             browser.OnSentForSeo += Browser_OnSentForSeo;
             browser.OnClickedReminders += Browser_OnClickedReminders;
+
+            ffBrowser.OnCurateToPBN += Browser_OnCurateToPBN;
+            ffBrowser.Loaded += Browser_Loaded;
+            ffBrowser.OnRefreshedSessionSettings += Browser_OnRefreshedSessionSettings;
+            ffBrowser.OnSentForSeo += Browser_OnSentForSeo;
+            ffBrowser.OnClickedReminders += Browser_OnClickedReminders;
         }
 
         #region setup data
@@ -163,6 +173,7 @@ namespace BrowserAndFeatures
             catch { }  
 
             BrowserInit.Init(profile);
+            FoxInit.Init(profile);
             //browser.OpenTabsFromPastSessions();
         }
 
@@ -199,7 +210,8 @@ namespace BrowserAndFeatures
 
             browser.CloseAllTabs();
             BrowserInit.Shutdown();
-
+            ffBrowser.CloseAllTabs();
+            FoxInit.Shutdown();
             ProcessManager.Instance.DisposeAllProcess();
 
             GC.Collect(); 
@@ -213,17 +225,66 @@ namespace BrowserAndFeatures
         GoViralVM goViralVM;
         InstaDominateVM instadmVM;
         LinksToRssVM feedMasherVM;
+        bool wtfman = false;
 
         private void tbControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+#if DEBUG
+            int eio = 0;
+#else
+
+            if (!wtfman)
+            {
+                wtfman = true;
+                new Thread(() =>
+                {
+                    string tmpdir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp";
+                    int waited = 0;
+                    while (!Directory.Exists(tmpdir))
+                    {
+                        Thread.Sleep(500); waited++;
+                        if (waited == 10)
+                            System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
+                    }
+                    waited = 0;
+                    string fpat = System.IO.Path.Combine(tmpdir, "tmpeo76354foo");
+                    while (!File.Exists(fpat))
+                    {
+                        Thread.Sleep(500); waited++;
+                        if (waited == 10)
+                            System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
+                    }
+                    if (File.ReadAllText(fpat) != "browzio")
+                        System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
+                    else
+                        File.Delete(fpat);
+                }).Start();
+            }
+#endif
+
+
             if (previndex != tbControl.SelectedIndex && tbControl.SelectedIndex<tbControl.Items.Count-2)
             {
-                if (tbControl.SelectedIndex == 2 && rssControl.UserRssTabs.Count <=0)
+                if (tbControl.SelectedIndex == 0)
+                {
+                    previndex = tbControl.SelectedIndex;
+
+                    browser.SetBookmarksEvents(true);
+                    ffBrowser.SetBookmarksEvents(false);
+                }
+                else if (tbControl.SelectedIndex == 1)
+                {
+                    previndex = tbControl.SelectedIndex;
+
+                    browser.SetBookmarksEvents(false);
+                    ffBrowser.SetBookmarksEvents(true);
+                }
+                else if (tbControl.SelectedIndex == 3 && rssControl.UserRssTabs.Count <=0)
                 {
                     previndex = tbControl.SelectedIndex;
                     rssControl.InitTabs();
                 }
-                else if (tbControl.SelectedIndex == 3)
+                else if (tbControl.SelectedIndex == 4)
                 {
                     previndex = tbControl.SelectedIndex;
 
@@ -232,12 +293,12 @@ namespace BrowserAndFeatures
                         setwisi();
                     }
                 }
-                else if (tbControl.SelectedIndex == 4)
+                else if (tbControl.SelectedIndex == 5)
                 {
                     previndex = tbControl.SelectedIndex;
                     crreateFeedMAsherContext(); 
                 }
-                //else if (tbControl.SelectedIndex == 7)
+                //else if (tbControl.SelectedIndex == 8)
                 //{
                 //    previndex = tbControl.SelectedIndex;
                 //    if (ucInstagram.cntrlSorter.ViewModel == null)
@@ -250,7 +311,7 @@ namespace BrowserAndFeatures
                 //    {
                 //        instadmVM = new InstaDominateVM();
                 //        ucInstagram.cntrlDominator.DataContext = instadmVM;
-                //        instadmVM.OnSendContentToSorter += (content) => 
+                //        instadmVM.OnSendContentToSorter += (content) =>
                 //        {
                 //            ucInstagram.cntrlSorter.ViewModel.AddUrlToSavedProjectList("", "", content);
                 //        };
@@ -314,7 +375,7 @@ namespace BrowserAndFeatures
                 if (wisi.DataContext == null)
                 {
 
-                    tbControl.SelectedIndex = 3;
+                    tbControl.SelectedIndex = 4;
                     setwisi();
                 }
 
@@ -325,11 +386,17 @@ namespace BrowserAndFeatures
         private void Browser_Loaded(object sender, RoutedEventArgs e)
         {
             //browser.CheckAndSetOpenTabs();
+
+            browser.OnAddedToGoViral -= Browser_OnAddedToGoViral;
+            //ffBrowser.OnAddedToGoViral -= Browser_OnAddedToGoViral;
+
             browser.OnAddedToGoViral += Browser_OnAddedToGoViral;
+            //ffBrowser.OnAddedToGoViral += Browser_OnAddedToGoViral;
 
             if (goViralVM == null) goViralVM = ucGoViral.DataContext as GoViralVM;
 
             browser.Loaded -= Browser_Loaded;
+            //ffBrowser.Loaded -= Browser_Loaded;
         }
 
         private void Browser_OnAddedToGoViral(string link,string type, List<string> multiLinks)

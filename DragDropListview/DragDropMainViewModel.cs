@@ -418,7 +418,14 @@ namespace DragDropListview
             FolderTypes folderType = FolderTypes.Regular;
             if (FoldersAndSitesList.Count > 0 && SIFoldersSide >= 0)
             {
-                folderType = FoldersAndSitesList[SIFoldersSide].TypeOfFolder;
+                try
+                {
+                    folderType = FoldersAndSitesList[SIFoldersSide].TypeOfFolder;
+                }
+                catch
+                {
+                    folderType = FolderTypes.Regular;
+                }
             }
 
             switch (clickType)

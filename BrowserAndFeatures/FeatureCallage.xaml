@@ -10,6 +10,7 @@
              xmlns:instagram="clr-namespace:GoViral.Instagram.InstControls;assembly=GoViral"
              xmlns:commonControlls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
              xmlns:wisi="clr-namespace:WPF_WYSIWYG_HTML_Editor.XAML;assembly=WYSIWYG"
+             xmlns:ffbrowser="clr-namespace:zFirefoxBrowser.Controls;assembly=zFirefoxBrowser"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1100">
     <UserControl.Resources>
@@ -84,11 +85,11 @@
                 </Style>
             </TabControl.Style>
             <TabItem Header="Browser"  Style="{StaticResource gmailTabStyle90}">
-                    <browser:BrowserHostCntrl Name="browser" />
+                    <browser:ChromeBrowserHostControl Name="browser" />
                 </TabItem>
-            <!--<TabItem Header="Firefox"  Style="{StaticResource gmailTabStyle90}">
+            <TabItem Header="Firefox"  Style="{StaticResource gmailTabStyle90}">
                 <ffbrowser:FFBrowserUserControl Name="ffBrowser" />
-            </TabItem>-->
+            </TabItem>
             <TabItem Header="Prospector" Style="{StaticResource gmailTabStyle90}" Name="tabProspector">
                     <prospector:ProspectorTabs Name="prospector" />
                     <!--<nichCntrol:NichResearchControl />-->

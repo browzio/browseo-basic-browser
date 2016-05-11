@@ -18,6 +18,11 @@ namespace BrowserPlugin
 
         public override event Action<string> OnMessageFromPlugin;
 
+        public override void CheckVersion(string version)
+        {
+           // if(version!="")
+        }
+
         public override FrameworkElement CreateControl(bool cbAllowProspector, bool cbAllowRSS, bool cbAllowPBN, bool cbAllowFeedMash, bool cbAllowIndexer, bool cbYoutube, bool canSeeProxyData, bool hasKK, int birthdayYear, string children, string city, int cmbSelectedIndexDay, int cmbSelectedIndexMonth, int cmbSelectedIndexSex, string country, string dir, string email, string filePath, string firstName, bool inMonney, bool inPBNVault, string lastName, string notes, string password, string phoneNumber, string profileName, string projectDir, string projectName, string proxyIP, string proxyPassword, string proxyPort, string proxyUsername, int sIPBNType, string state, string street, string username, string webAddress, string zip)
         {
             //fc.SetPersonData();
