@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RssReader.Models
 {
@@ -30,6 +31,34 @@ namespace RssReader.Models
                 isChecked = value;
                 if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("IsChecked"));
+            }
+        }
+
+
+        private Visibility visibleHasNext = Visibility.Collapsed;
+        public Visibility VisibleHasNext
+        {
+            get { return visibleHasNext; }
+            set
+            {
+                visibleHasNext = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("VisibleHasNext"));
+                }
+            }
+        }
+        private Visibility visibleProjIcon = Visibility.Collapsed;
+        public Visibility VisibleProjIcon
+        {
+            get { return visibleProjIcon; }
+            set
+            {
+                visibleProjIcon = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("VisibleProjIcon"));
+                }
             }
         }
 

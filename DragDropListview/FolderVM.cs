@@ -5,6 +5,7 @@ using System.Text;
 using System.Collections.ObjectModel;
 using System.Windows.Media.Imaging;
 using System.ComponentModel;
+using System.Windows;
 
 namespace DragDropListview
 {
@@ -13,6 +14,33 @@ namespace DragDropListview
         public FolderVM()
         {
             Sites = new ObservableCollection<Bookmark>();
+        }
+
+        private Visibility visibleHasNext = Visibility.Collapsed;
+        public Visibility VisibleHasNext
+        {
+            get { return visibleHasNext; }
+            set
+            {
+                visibleHasNext = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("VisibleHasNext"));
+                }
+            }
+        }
+        private Visibility visibleProjIcon = Visibility.Collapsed;
+        public Visibility VisibleProjIcon
+        {
+            get { return visibleProjIcon; }
+            set
+            {
+                visibleProjIcon = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("VisibleProjIcon"));
+                }
+            }
         }
 
         private string name;

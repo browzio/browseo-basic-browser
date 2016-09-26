@@ -102,14 +102,18 @@ namespace GoViral.Models
             switch ((string)param)
             {
                 case "OpenInProjBrowser":
-                    new Thread(launchInBrowser).Start();
+                    new Thread(launchInBrowser).Start(false);
+                    break;
+
+                case "OpenInProjBrowserFF":
+                    new Thread(launchInBrowser).Start(true);
                     break;
                 default:
                     break;
             }
         }
 
-        private void launchInBrowser()
+        private void launchInBrowser(object isFF)
         {
             try
             {
@@ -117,14 +121,24 @@ namespace GoViral.Models
                 string projpath = MyFilesDatabase.FindProjectDirByName(Name, "");
                 string url = SyndicatedPostsList[SISyndicatedPostsList].Url;
 
+                bool toff = Convert.ToBoolean(isFF);
+
+
                 var info = new ProcessStartInfo
                 {
-                    Arguments = projpath.Replace(" ", MyFilesDatabase.SPLITTER) + " " + url.Replace(" ", MyFilesDatabase.SPLITTER) + " " + TypeOfSync,
                     CreateNoWindow = true,
                     UseShellExecute = false,
-                    FileName = "AnyProjectBrowserProcess.exe"//Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AnyProjectBrowserProcess.exe"),
                 };
-
+                if (toff)
+                {
+                    info.Arguments = "\"" + projpath + "\"" + " " + "\""+ url + "\"" + " " + TypeOfSync;
+                    info.FileName = "AnyProjFFProcess.exe";
+                }
+                else
+                {
+                    info.Arguments = projpath.Replace(" ", MyFilesDatabase.SPLITTER) + " " + url.Replace(" ", MyFilesDatabase.SPLITTER) + " " + TypeOfSync;
+                    info.FileName = "AnyProjectBrowserProcess.exe";//Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AnyProjectBrowserProcess.exe"),
+                }
                 
                 Process p = Process.Start(info);
                 ProcessManager.Instance.AddProcess(p);

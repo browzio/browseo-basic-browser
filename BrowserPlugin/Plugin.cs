@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Xilium.CefGlue.Client;
 using System.Diagnostics;
+using zFirefoxBrowser.Helpers;
 
 namespace BrowserPlugin
 {
@@ -30,9 +31,11 @@ namespace BrowserPlugin
             //fc.SetPersonData(birthdayYear, children, city, cmbSelectedIndexDay, cmbSelectedIndexMonth, cmbSelectedIndexSex, country, dir, email, filePath, firstName, inMonney, inPBNVault, lastName, notes, password, phoneNumber, profileName, projectDir, projectName, proxyIP, proxyPassword, proxyPort, proxyUsername, sIPBNType, state, street, username, webAddress, zip);
 
             BrowserInit.SetPersonData(birthdayYear, children, city, cmbSelectedIndexDay, cmbSelectedIndexMonth, cmbSelectedIndexSex, country, dir, email, filePath, firstName, inMonney, inPBNVault, lastName, notes, password, phoneNumber, profileName, projectDir, projectName, proxyIP, proxyPassword, proxyPort, proxyUsername, sIPBNType, state, street, username, webAddress, zip);
+            FoxInit.SetPersonData(birthdayYear, children, city, cmbSelectedIndexDay, cmbSelectedIndexMonth, cmbSelectedIndexSex, country, dir, email, filePath, firstName, inMonney, inPBNVault, lastName, notes, password, phoneNumber, profileName, projectDir, projectName, proxyIP, proxyPassword, proxyPort, proxyUsername, sIPBNType, state, street, username, webAddress, zip);
             fc = new FeatureCallage();
             fc.SetPermissions(cbAllowProspector, cbAllowRSS, cbAllowPBN, cbAllowFeedMash, cbAllowIndexer, cbYoutube, canSeeProxyData, hasKK);
             fc.OnClickedReminders += Fc_OnClickedReminders;
+            fc.OnRequestedScreenLocation += Fc_OnRequestedScreenLocation;
             return fc;
         }
 
@@ -84,6 +87,7 @@ namespace BrowserPlugin
                     break;
 
                 default:
+                    fc.GotScrennCords(message);
                     break;
             }
         }
@@ -96,6 +100,13 @@ namespace BrowserPlugin
         private void Fc_OnClickedReminders()
         {
             if(OnMessageFromPlugin != null) OnMessageFromPlugin("REMINDERS_CLICK");
+        }
+
+
+
+        private void Fc_OnRequestedScreenLocation()
+        {
+            if (OnMessageFromPlugin != null) OnMessageFromPlugin("SCREEN_SIZE");
         }
     }
 }

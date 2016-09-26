@@ -24,13 +24,13 @@
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Command="{Binding DockPannelButtonsClick}" Width="25" Height="25" CommandParameter="OpenRssLinksWindow">
-                <Image Source="pack://application:,,,/Organiser.Common;component/Image/rss.png" 
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/rss.png"  Margin="-4,0,-4,-2"
                                                                    ToolTip="Edit Rss Feeds"
                                                                    Stretch="Uniform" />
             </Button>
             <Button Command="{Binding DockPannelButtonsClick}" CommandParameter="Refresh" Width="25" Height="25" 
                    Margin="10,0,0,0">
-                <Image Source="pack://application:,,,/Organiser.Common;component/Image/refresh.png"  ToolTip="Refresh" SnapsToDevicePixels="True" Stretch="Uniform" />
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/refresh.png"  Margin="-4,0,-4,-2"  ToolTip="Refresh" SnapsToDevicePixels="True" Stretch="Uniform" />
             </Button>
         </StackPanel>
         

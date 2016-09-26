@@ -1,6 +1,6 @@
 ﻿using GoViral.Instagram.InstViewModels;
 using GoViral.ViewModels;
-using Indexer;
+using IMacroMultyLayout.ViewModels;
 using Organiser.Common.Classes;
 using PData.FilesReader;
 using Prospector.ViewModels;
@@ -38,6 +38,7 @@ namespace BrowserAndFeatures
     {
         //to host
         public event Action OnClickedReminders = delegate { };
+        public event Action OnRequestedScreenLocation = delegate { };
 
         public FeatureCallage()
         {
@@ -49,12 +50,12 @@ namespace BrowserAndFeatures
                 FoxInit.Init();
             }
 
-           
-            MyFilesDatabase.GetSites(); 
+
+            MyFilesDatabase.GetSites();
 
             (prospector.DataContext as FootPrintsOptionsVM).OnClickedSearch += FeatureCallage_OnClickedSearch;
             (prospector.DataContext as FootPrintsOptionsVM).OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
-            
+
             rssControl.OnLaunchToBrowser += RssControl_OnLaunchToBrowser; ;
             rssControl.OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;
             rssControl.OnSelectedSendToSeo += RssControl_OnSelectedSendToSeo;
@@ -72,6 +73,40 @@ namespace BrowserAndFeatures
             ffBrowser.OnRefreshedSessionSettings += Browser_OnRefreshedSessionSettings;
             ffBrowser.OnSentForSeo += Browser_OnSentForSeo;
             ffBrowser.OnClickedReminders += Browser_OnClickedReminders;
+            ffBrowser.OnRequestedWindowLocation += FfBrowser_OnRequestedWindowLocation;
+
+
+
+
+
+            //Dispatcher.BeginInvoke(new Action(()=> 
+            //{
+            //    if (!BrowserInit.settings.MultiThreadedMessageLoop)
+            //    {
+            //        int times = 5;
+            //        SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+            //        //System.Windows.Threading.Dispatcher.CurrentDispatcher.BeginInvoke(System.Windows.Threading.DispatcherPriority.ContextIdle,new Action(()=> 
+            //        //{
+            //        //    Xilium.CefGlue.CefRuntime.DoMessageLoopWork();
+            //        //}) );
+            //        System.Windows.Forms.Application.Idle += (sender, e) =>
+            //        {
+            //            //await semaphoreSlim.WaitAsync();
+            //            //await Task.Delay(100);
+            //            //if (times == 5) Xilium.CefGlue.CefRuntime.DoMessageLoopWork();
+            //            //times--;
+            //            //if (times == 0) times = 5;
+            //            //semaphoreSlim.Release();
+
+            //            Dispatcher.BeginInvoke(new Action(() =>
+            //            {
+            //                Xilium.CefGlue.CefRuntime.DoMessageLoopWork();
+            //            }), null);
+            //        };
+            //    }
+
+            //    System.Windows.Forms.Application.Run();
+            //}), null);
         }
 
         #region setup data
@@ -81,8 +116,8 @@ namespace BrowserAndFeatures
             if (!allowRSS) tabrssControl.Visibility = System.Windows.Visibility.Collapsed;
             if (!allowPBN) tabrsswisi.Visibility = System.Windows.Visibility.Collapsed;
             if (!allowFeedMash) feed.Visibility = System.Windows.Visibility.Collapsed;
-            if (!allowIndexer) indexer.Visibility = System.Windows.Visibility.Collapsed;
-            if (!allowYoutube) youtuber.Visibility = System.Windows.Visibility.Collapsed;
+            //if (!allowIndexer) indexer.Visibility = System.Windows.Visibility.Collapsed;
+            //if (!allowYoutube) youtuber.Visibility = System.Windows.Visibility.Collapsed;
             if (!hasKK) prospector.tabKingKontent.Visibility = System.Windows.Visibility.Collapsed;
             if (canSeeProxys) MyFilesDatabase.CanSeeProxys = true;
         }
@@ -125,6 +160,11 @@ namespace BrowserAndFeatures
 
             BrowserInit.Init(profile);
             //browser.OpenTabsFromPastSessions();
+        }
+
+        public void GotScrennCords(string message)
+        {
+            ffBrowser.GotScreenCords(message);
         }
 
         public static void SetPersonData()
@@ -220,17 +260,17 @@ namespace BrowserAndFeatures
         #region other features tabs
 
         int previndex;
-        Indexer.MainWindow imw; 
-        Youtuber.MainWindow ytmw;
+        //Indexer.MainWindow imw; 
+        //Youtuber.MainWindow ytmw;
         GoViralVM goViralVM;
         InstaDominateVM instadmVM;
         LinksToRssVM feedMasherVM;
-        bool wtfman = false;
+        static bool wtfman = false;
 
         private void tbControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 #if DEBUG
-            int eio = 0;
+            int wtf = 0;
 #else
 
             if (!wtfman)
@@ -247,14 +287,14 @@ namespace BrowserAndFeatures
                             System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
                     }
                     waited = 0;
-                    string fpat = System.IO.Path.Combine(tmpdir, "tmpeo76354foo");
+                    string fpat = System.IO.Path.Combine(tmpdir, "temerprings");
                     while (!File.Exists(fpat))
                     {
                         Thread.Sleep(500); waited++;
                         if (waited == 10)
                             System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
                     }
-                    if (File.ReadAllText(fpat) != "browzio")
+                    if (File.ReadAllText(fpat).Trim() != "transition4")
                         System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
                     else
                         File.Delete(fpat);
@@ -263,91 +303,92 @@ namespace BrowserAndFeatures
 #endif
 
 
-            if (previndex != tbControl.SelectedIndex && tbControl.SelectedIndex<tbControl.Items.Count-2)
+            //if (previndex != tbControl.SelectedIndex && tbControl.SelectedIndex<tbControl.Items.Count-2)
+            //{
+            if (tbControl.SelectedIndex == 0)
             {
-                if (tbControl.SelectedIndex == 0)
-                {
-                    previndex = tbControl.SelectedIndex;
+                browser.SetBookmarksEvents(false);
+                ffBrowser.SetBookmarksEvents(true);
+            }
+            else if (tbControl.SelectedIndex == 1)
+            {
+                browser.SetBookmarksEvents(true);
+                ffBrowser.SetBookmarksEvents(false);
+            }
+            else if (tbControl.SelectedIndex == 3 && rssControl.UserRssTabs.Count <= 0)
+            {
+                rssControl.InitTabs();
+            }
+            else if (tbControl.SelectedIndex == 4)
+            {
 
-                    browser.SetBookmarksEvents(true);
-                    ffBrowser.SetBookmarksEvents(false);
-                }
-                else if (tbControl.SelectedIndex == 1)
+                if (wisi.DataContext == null)
                 {
-                    previndex = tbControl.SelectedIndex;
-
-                    browser.SetBookmarksEvents(false);
-                    ffBrowser.SetBookmarksEvents(true);
-                }
-                else if (tbControl.SelectedIndex == 3 && rssControl.UserRssTabs.Count <=0)
-                {
-                    previndex = tbControl.SelectedIndex;
-                    rssControl.InitTabs();
-                }
-                else if (tbControl.SelectedIndex == 4)
-                {
-                    previndex = tbControl.SelectedIndex;
-
-                    if (wisi.DataContext == null)
-                    {
-                        setwisi();
-                    }
-                }
-                else if (tbControl.SelectedIndex == 5)
-                {
-                    previndex = tbControl.SelectedIndex;
-                    crreateFeedMAsherContext(); 
-                }
-                //else if (tbControl.SelectedIndex == 8)
-                //{
-                //    previndex = tbControl.SelectedIndex;
-                //    if (ucInstagram.cntrlSorter.ViewModel == null)
-                //    {
-                //        ucInstagram.cntrlSorter.ViewModel = new SyncedProjectsVM(SyncedProjectsVM.TypeOfInsteo);
-                //        ucInstagram.cntrlSorter.DataContext = ucInstagram.cntrlSorter.ViewModel;
-                //    }
-
-                //    if (instadmVM == null)
-                //    {
-                //        instadmVM = new InstaDominateVM();
-                //        ucInstagram.cntrlDominator.DataContext = instadmVM;
-                //        instadmVM.OnSendContentToSorter += (content) =>
-                //        {
-                //            ucInstagram.cntrlSorter.ViewModel.AddUrlToSavedProjectList("", "", content);
-                //        };
-                //    }
-                //}
-                else
-                {
-                    previndex = tbControl.SelectedIndex;
+                    setwisi();
                 }
             }
-            else
+            else if (tbControl.SelectedIndex == 5)
             {
-                if (tbControl.SelectedIndex == tbControl.Items.Count - 2)
+                crreateFeedMAsherContext();
+            }
+            else if (tbControl.SelectedIndex == 8)
+            {
+                if(macroRunner.DataContext == null || macroRunner.DataContext.GetType() != typeof(MultyMacroVm))
                 {
-                    tbControl.SelectedIndex = previndex;
-                    if (imw == null)
-                    {
-                        imw = new Indexer.MainWindow();
-                        imw.Title = "Indexer - One Link On A Line keep http://";
-                        imw.Topmost = true;
-                        imw.Closed += ltrw_Closed;
-                        imw.Show();
-                    }
-                }
-                else if (tbControl.SelectedIndex == tbControl.Items.Count - 1)
-                {
-                    tbControl.SelectedIndex = previndex;
-                    if (ytmw == null)
-                    {
-                        ytmw = new Youtuber.MainWindow();
-                        ytmw.Topmost = true;
-                        ytmw.Closed += ltrw_Closed;
-                        ytmw.Show();
-                    }
+                    MultyMacroVm vm = new MultyMacroVm();
+                    macroRunner.DataContext = vm;
                 }
             }
+            //else if (tbControl.SelectedIndex == 8)
+            //{
+            //    previndex = tbControl.SelectedIndex;
+            //    if (ucInstagram.cntrlSorter.ViewModel == null)
+            //    {
+            //        ucInstagram.cntrlSorter.ViewModel = new SyncedProjectsVM(SyncedProjectsVM.TypeOfInsteo);
+            //        ucInstagram.cntrlSorter.DataContext = ucInstagram.cntrlSorter.ViewModel;
+            //    }
+
+            //    if (instadmVM == null)
+            //    {
+            //        instadmVM = new InstaDominateVM();
+            //        ucInstagram.cntrlDominator.DataContext = instadmVM;
+            //        instadmVM.OnSendContentToSorter += (content) =>
+            //        {
+            //            ucInstagram.cntrlSorter.ViewModel.AddUrlToSavedProjectList("", "", content);
+            //        };
+            //    }
+            //}
+            //else
+            //    {
+            //        previndex = tbControl.SelectedIndex;
+            //    }
+            //}
+            //else
+            //{
+            //    if (tbControl.SelectedIndex == tbControl.Items.Count - 2)
+            //    {
+            //        tbControl.SelectedIndex = previndex;
+            //        if (imw == null)
+            //        {
+            //            imw = new Indexer.MainWindow();
+            //            imw.Title = "Indexer - One Link On A Line keep http://";
+            //            imw.Topmost = true;
+            //            imw.Closed += ltrw_Closed;
+            //            imw.Show();
+            //        }
+            //    }
+            //    else if (tbControl.SelectedIndex == tbControl.Items.Count - 1)
+            //    {
+            //        tbControl.SelectedIndex = previndex;
+            //        if (ytmw == null)
+            //        {
+            //            ytmw = new Youtuber.MainWindow();
+            //            ytmw.Topmost = true;
+            //            ytmw.Closed += ltrw_Closed;
+            //            ytmw.Show();
+            //        }
+            //    }
+            //}
         }
 
         private void crreateFeedMAsherContext()
@@ -425,7 +466,7 @@ namespace BrowserAndFeatures
         void FeatureCallage_OnClickedSearch(string query)
         {
             browser.SearchFor(query);
-            tbControl.SelectedIndex = 0;
+            tbControl.SelectedIndex = 1;
         }
 
         private void RssControl_OnLaunchToBrowser(string link, string rssLink)
@@ -447,7 +488,7 @@ namespace BrowserAndFeatures
             //tbControl.SelectedIndex = 3;
             if (wisi.DataContext == null)
             {  
-                tbControl.SelectedIndex = 3;
+                tbControl.SelectedIndex = 4;
                 setwisi();
             }
 
@@ -462,10 +503,15 @@ namespace BrowserAndFeatures
 
         void ltrw_Closed(object sender, EventArgs e)
         {
-            ytmw = null; 
-            imw = null;
+            //ytmw = null; 
+            //imw = null;
         }
         #endregion
+        
+        private void FfBrowser_OnRequestedWindowLocation()
+        {
+            OnRequestedScreenLocation();
+        }
 
         private void ucSharedSync_Loaded(object sender, RoutedEventArgs e)
         {

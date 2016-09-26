@@ -63,6 +63,7 @@
     <Compile Include="Controls\IndexerMainUserControl.xaml.cs">
       <DependentUpon>IndexerMainUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="IndexerVM.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -95,13 +96,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
-      <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
-      <Name>Organiser.Common</Name>
-      <Private>False</Private>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

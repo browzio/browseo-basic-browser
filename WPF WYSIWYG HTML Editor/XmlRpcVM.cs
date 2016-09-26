@@ -7,7 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
+//using System.IO;
+using Delimon.Win32.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Cache;
@@ -26,6 +27,10 @@ using WPF_WYSIWYG_HTML_Editor.XAML;
 using mshtml;
 using WPF_WYSIWYG_HTML_Editor.MVVM;
 using WordPressSharp.Constants;
+
+using Directory = Organiser.Common.Classes.MyFilesDatabase.Directory;
+using Path = Organiser.Common.Classes.MyFilesDatabase.Path;
+using File = Organiser.Common.Classes.MyFilesDatabase.File;
 
 namespace WPF_WYSIWYG_HTML_Editor
 {
@@ -1438,6 +1443,7 @@ namespace WPF_WYSIWYG_HTML_Editor
 
                 foreach (var line in lines)
                 {
+                    if (line.IsNullOrEmpty()) continue;
                     string[] lineInfo = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
                     string dirPath = lineInfo[2];
 
@@ -1473,12 +1479,13 @@ namespace WPF_WYSIWYG_HTML_Editor
             string filePath = Path.Combine(vaultDir, configFile);
             if (!File.Exists(filePath)) return;
 
-            List<string> fileLines = File.ReadAllLines(filePath).ToList();
+            string[] fileLines = File.ReadAllLines(filePath);
+            if (fileLines == null) return;
 
-
-            for (int i = 0; i < fileLines.Count; i++)
+            for (int i = 0; i < fileLines.Length; i++)
             {
                 string line = fileLines[i];
+                if (line.IsNullOrEmpty()) continue;
                 string[] lineInfo = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
                 string DirPath = lineInfo[2];
 
@@ -1504,10 +1511,10 @@ namespace WPF_WYSIWYG_HTML_Editor
                 }
             }
 
-            if (hadErrors == true)
-            {
-                await resaveList(pBNProjects, pBNFolders, configFile);
-            }
+            //if (hadErrors == true)
+            //{
+            //    await resaveList(pBNProjects, pBNFolders, configFile);
+            //}
         }
 
         private bool getAnyDirsExist(string dirPath, ObservableCollection<PBNProjectsFolder> pBNFolders)
@@ -1534,15 +1541,20 @@ namespace WPF_WYSIWYG_HTML_Editor
                 hadErrors = null;
                 dirPath = MyFilesDatabase.FindProjectDirByName(name, profname);
             }
-
-            PersonData profile = MyFilesDatabase.GetSubProjectPersonData(dirPath);
-            if (profile == null || profile.WebAddress.IsNullOrEmpty() || (!profile.InPBNVault && !profile.InMonney))
+            PersonData profile = null;
+            try
+            {
+                 profile = MyFilesDatabase.GetSubProjectPersonData(dirPath);
+            }
+            catch { profile = null; }
+            if (profile == null || (!profile.InPBNVault && !profile.InMonney))
             {
                 hadErrors = true;
             }
 
             return hadErrors;
         }
+
 
         private async Task resaveList(ObservableCollection<PBNProject> pBNProjects, ObservableCollection<PBNProjectsFolder> pBNFolders, string configFile)
         {

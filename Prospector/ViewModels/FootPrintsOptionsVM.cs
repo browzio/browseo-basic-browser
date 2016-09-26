@@ -583,6 +583,76 @@ namespace Prospector.ViewModels
             }
         }
 
+        private bool checked_PostsWithVids;
+        public bool Checked_PostsWithVids
+        {
+            get { return checked_PostsWithVids; }
+            set
+            {
+                checked_PostsWithVids = value;
+                if (value)
+                {
+                    Checked_PostsWithVidsAll = false;
+                    Checked_PostsWithNoVids = false;
+                }
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Checked_PostsWithVids"));
+                }
+            }
+        }
+
+        private bool checked_PostsWithNoVids;
+        public bool Checked_PostsWithNoVids
+        {
+            get { return checked_PostsWithNoVids; }
+            set
+            {
+                checked_PostsWithNoVids = value;
+                if (value)
+                {
+                    Checked_PostsWithVidsAll = false;
+                    Checked_PostsWithVids = false;
+                }
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Checked_PostsWithNoVids"));
+                }
+            }
+        }
+        private bool checked_PostsWithVidsAll;
+        public bool Checked_PostsWithVidsAll
+        {
+            get { return checked_PostsWithVidsAll; }
+            set
+            {
+                checked_PostsWithVidsAll = value;
+                if (value)
+                {
+                    Checked_PostsWithNoVids = false;
+                    Checked_PostsWithVids = false;
+                }
+
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Checked_PostsWithVidsAll"));
+                }
+            }
+        }
+        //ResponseSize
+        private int responseSize;
+        public int ResponseSize
+        {
+            get { return responseSize; }
+            set
+            {
+                responseSize = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("ResponseSize"));
+                }
+            }
+        }
         private bool checked_KeywordExactMatch;
         public bool Checked_KeywordExactMatch
         {
@@ -626,6 +696,7 @@ namespace Prospector.ViewModels
                 }
             }
         }
+        //
 
         //UseProxy
         private bool useProxy;
@@ -719,6 +790,8 @@ namespace Prospector.ViewModels
             IsNotSerching = true;
             Visible_savebtn = true;
             NotVisible_WebHose = true;
+            Checked_PostsWithVidsAll = true;
+            ResponseSize = 25;
 
             MyFilesDatabase.SetMozIds();
             setProxyDetailes();
@@ -1326,8 +1399,6 @@ namespace Prospector.ViewModels
                     if (TCSelectedTabIndex == FootPrintsOptionsVM.Webhose)
                     {
                         WebhoseRequest clientRequest = new WebhoseRequest("d8010e66-8d57-4242-a2e1-22e2ad61a45f");
-
-                        //exapmle for query
                         WebhoseQuery clientQuery = new WebhoseQuery();
 
                         clientQuery.AddAllTerms(Keyword); // what you want to search
@@ -1396,20 +1467,26 @@ namespace Prospector.ViewModels
                             clientQuery.BodyText = Keyword;
                         }
 
+                        if (Checked_PostsWithVidsAll) clientQuery.HasVideo = null;
+                        if (Checked_PostsWithNoVids) clientQuery.HasVideo = false;
+                        if (Checked_PostsWithVids) clientQuery.HasVideo = true;
+
                         // filtring by country  
                         if (!string.IsNullOrWhiteSpace(CountryCode) && !string.IsNullOrEmpty(CountryCode))
                              clientQuery.AddCountries(CountryCode);
 
-                        clientQuery.ResponseSize = 25;
+                        clientQuery.ResponseSize = ResponseSize;
 
 
-                        WebhoseResponse responceWithQuery = clientRequest.getResponse(clientQuery);
-                        foreach (WebhosePost post in responceWithQuery.posts)
+                        WebhoseResponse1 responceWithQuery = clientRequest.getResponse1(clientQuery);
+                        responceWithQuery.posts = responceWithQuery.posts.OrderByDescending(r => r.thread.performance_score == null ? 0 : Convert.ToInt32(r.thread.performance_score)).ThenByDescending(r => r.thread.domain_rank == null ? 0 : Convert.ToInt32(r.thread.domain_rank)).ToArray();
+                        foreach (WebhosePost1 post in responceWithQuery.posts)
                         {
                             string description = post.text;
-                            if(!string.IsNullOrEmpty(description) && !string.IsNullOrWhiteSpace(description) && description.Length > 500)
+                            if(!string.IsNullOrEmpty(description) && !string.IsNullOrWhiteSpace(description))
                             {
-                                description = description.Substring(0, 500);
+                                if (description.Length > 500) description = description.Substring(0, 500);
+                                description = description.Trim();
                             }
 
                             SearchResult sResult = new SearchResult()
@@ -1419,8 +1496,19 @@ namespace Prospector.ViewModels
                                 Link = post.url,
                                 Description = description,
                                 SearchEngine = "Webhose",
-                                Position = post.ordInThread,
-                                Published = post.published
+                                Position = post.ord_in_thread,
+                                Published = post.published,
+                                DomainScore = "Domain Rank: " + post.thread.domain_rank,
+                                WebhoseExtraVisible = Visibility.Visible,
+                                PerformanceScore = "Performance: " + post.thread.performance_score,
+                                Lang =  post.language,
+                                 Type = "Type: " + post.thread.site_type,
+                                   Pnum = "Participants: " + post.thread.participants_count,
+                                    Country = "Country: " + post.thread.country,
+                                     Ptotal = "Replies: " + post.thread.replies_count,
+                                Spamscore = "Spam Score: " + post.thread.spam_score,
+
+
                             };
                             Application.Current.Dispatcher.Invoke((Action)delegate
                             {

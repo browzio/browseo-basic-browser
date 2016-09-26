@@ -1,6 +1,7 @@
 ﻿using GoViral.Models;
 using GoViral.Windows;
 using Organiser.Common.Classes;
+using Organiser.Common.ViewModels;
 using Organiser.Common.Windows;
 using System;
 using System.Collections.Generic;
@@ -33,8 +34,6 @@ namespace GoViral.ViewModels
             get { return savedProjectsList; }
             set { savedProjectsList = value; }
         }
-
-        ObservableCollection<SavedSyncProject> savedProjectsListAdded;
         private int sISavedProjectsList;
         public int SISavedProjectsList
         {
@@ -47,7 +46,6 @@ namespace GoViral.ViewModels
         public SyncedProjectsVM(string type)
         {
             OnBtnClick = new RelayCommand(OnBtnClick_Clicked);
-            SelectFolderSelect_Click = new RelayCommand(SelectFolderSelect_ClickIsChecked);
 
             SavedProjectsList = new ObservableCollection<SavedSyncProject>();
                                    
@@ -223,18 +221,22 @@ namespace GoViral.ViewModels
                 }
             }
         }
-
-        private void OnBtnClick_Clicked(object obj)
+        bool isrefreshing = false;
+        private async void OnBtnClick_Clicked(object obj)
         {
-            Mouse.OverrideCursor = Cursors.Wait;
-            lock (mLock)
+            try
             {
+                if (isrefreshing) return;
+                isrefreshing = true;
+                Mouse.OverrideCursor = Cursors.Wait;
+                // lock (mLock)
+                // {
                 Mouse.OverrideCursor = null;
 
                 switch ((string)obj)
                 {
                     case "AddProject":
-                        AddProjects("", "");
+                        await AddProjects("", "");
                         break;
 
                     case "AddLinks":
@@ -246,16 +248,19 @@ namespace GoViral.ViewModels
                         break;
 
                     case "Save":
-                        new Thread(Saved).Start();
+                        await Task.Run(() => Saved(null));
+                        //new Thread(Saved).Start();
                         break;
 
                     case "Refresh":
                         SavedProjectsList.Clear();
-                        new Thread(LoadSyncedProjectsList).Start();
+                        //new Thread(LoadSyncedProjectsList).Start();
+                        await Task.Run(() => LoadSyncedProjectsList());
                         break;
 
                     #region context menu
                     case "CMDelete":
+                        if (!"Are you sure?".Show(true)) return;
                         if (SISavedProjectsList > -1 && SavedProjectsList.Count > 0)
                         {
                             Dictionary<string, SavedSyncProject> deleteFromDictionary = new Dictionary<string, SavedSyncProject>();
@@ -279,7 +284,9 @@ namespace GoViral.ViewModels
                                 SavedProjectsList.RemoveAt(SISavedProjectsList);
                             }
 
-                            new Thread(Saved).Start(deleteFromDictionary);
+                            await Task.Run(() => Saved(deleteFromDictionary));
+
+                            //new Thread(Saved).Start(deleteFromDictionary);
                         }
                         break;
 
@@ -384,17 +391,28 @@ namespace GoViral.ViewModels
                                         }
                                     }
 
-                                    new Thread(Saved).Start(deleteFromDictionary);
+                                    await Task.Run(() => Saved(deleteFromDictionary));
                                 }
                             }
                         }
                         break;
+
+                    case "CMClear":
+                        if (!"Are you sure?".Show(true)) return;
+                        if (SISavedProjectsList > -1 && SavedProjectsList.Count > 0)
+                        {
+                            SavedProjectsList[SISavedProjectsList].SyndicatedPostsList.Clear();
+                        }
+                            break;
                     #endregion
 
                     default:
                         break;
                 }
+                // }
             }
+            catch { }
+            isrefreshing = false;
         }
 
         private void LinksWindow_Closed(object sender, EventArgs e)
@@ -407,72 +425,24 @@ namespace GoViral.ViewModels
             }
         }
 
-        private void SelectFolderSelect_ClickIsChecked(object obj)
+        private async Task<bool> AddProjects(string url, string pageName, string mulltyLinks = null)
         {
-            string param = obj as string;
-            if (param == null) return;
+            ChooseProjectsVM cpvm = new ChooseProjectsVM();
+            await cpvm.InitProjectsWindowList();
+            if (!cpvm.ShowListWindowDialog()) return false;
 
-            foreach (var p in SavedProjectsList)
+            foreach (var sp in cpvm.SavedProjectsListAdded)
             {
-                p.IsChecked = param == "All" ? true : false;
-            }
-            if (savedProjectsListAdded != null)
-            {
-                foreach (var p in savedProjectsListAdded)
-                {
-                    p.IsChecked = param == "All" ? true : false;
-                }
-            }
+                if (!sp.IsChecked || sp.IsFolder) continue;
 
-            //switch ((string)obj)
-            //{
-            //    case "All":
-            //        foreach (var p in SavedProjectsList)
-            //        {
-            //            p.IsChecked = true;
-            //        }
-            //        break;
-
-            //    case "None":
-            //        foreach (var p in SavedProjectsList)
-            //        {
-            //            p.IsChecked = false;
-            //        }
-            //        break;
-            //    default:
-            //        break;
-            //}
-        }
-
-        private bool AddProjects(string url, string pageName, string mulltyLinks = null)
-        {
-            List<KeyValuePair<string, string>> allprojectNames = MyFilesDatabase.GetAllProjectsAndDirs();
-            savedProjectsListAdded = new ObservableCollection<SavedSyncProject>();
-            foreach (var pro in allprojectNames)
-            {
-                savedProjectsListAdded.Add(new SavedSyncProject()
+                var projtoaddTo = new SavedSyncProject()
                 {
                     IsSyncedMessage = "Synced",
-                    ProjectName = pro.Key,
+                    ProjectName = sp.Name,
                     SISyndicatedPostsList = 0,
                     TypeOfSync = typeOfSyncerPath,
-                    IsChecked = SavedProjectsList.Any(p => p.ProjectName == pro.Key && p.IsChecked)
-                });
-            }
-
-            ChooseFolderWindow cfw = new ChooseFolderWindow();
-            cfw.DataContext = this;
-            cfw.lstItems.ItemsSource = savedProjectsListAdded;
-            cfw.Title = "Select Project";
-            cfw.ShowDialog();
-            if (!cfw.OkClicked) return false;
-
-            foreach (var sp in savedProjectsListAdded)
-            {
-                if (!sp.IsChecked) continue;
-
-                var projtoaddTo = sp;
-                var projExists = SavedProjectsList.FirstOrDefault(p => p.ProjectName.Trim().ToLower() == sp.ProjectName.Trim().ToLower());
+                }; 
+                var projExists = SavedProjectsList.FirstOrDefault(p => p.ProjectName.Trim().ToLower() == sp.Name.Trim().ToLower());
                 if (projExists != null) projtoaddTo = projExists;
 
                 projtoaddTo.IsChecked = true;

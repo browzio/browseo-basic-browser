@@ -7,7 +7,8 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         SizeToContent="WidthAndHeight"
-        Title="Project And Profile Details" MouseLeftButtonDown="Window_MouseLeftButtonDown">
+        Title="Project And Profile Details" MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>

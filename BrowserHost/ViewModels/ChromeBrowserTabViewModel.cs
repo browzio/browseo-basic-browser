@@ -26,6 +26,8 @@ using Xilium.CefGlue.Client;
 using System.Collections.Generic;
 using System.Linq;
 using Browser.Common.Windows;
+using Organiser.Common.Classes.Facebook;
+//using Xilium.CefGlue.WPF;
 
 namespace WpfCefDynamBrowser.ViewModels
 {
@@ -65,6 +67,13 @@ namespace WpfCefDynamBrowser.ViewModels
             }
         }
 
+        //private WpfCefBrowser webBrowserHost2;
+        //public WpfCefBrowser WebBrowserHost2
+        //{
+        //    get { return webBrowserHost2; }
+        //    set { webBrowserHost2 = value; RaisePropertyChanged("WebBrowserHost2"); }
+        //}
+
 
         #endregion
 
@@ -80,6 +89,10 @@ namespace WpfCefDynamBrowser.ViewModels
             base.OnRefreshTabSettings += ChromeBrowserTabViewModel_OnRefreshTabSettings;
 
             SetWebrtcVisible = Visibility.Collapsed;
+            //WebBrowserHost.Visibility = Visibility.Collapsed;
+
+            //WebBrowserHost2 = new WpfCefBrowser();
+            //WebBrowserHost2.NavigateTo(address);
         }
 
         private void ChromeBrowserTabViewModel_OnRefreshTabSettings(Browser.Common.ViewModels.BrowserTabViewModel obj)
@@ -104,7 +117,7 @@ namespace WpfCefDynamBrowser.ViewModels
         {
             WebBrowser = new BrowserCntrl();
             WebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-            WebBrowser.init(address, JavaEnabled,JavascriptEnabled,JavaEnabled);
+            WebBrowser.init(address, FlashEnabled, JavascriptEnabled, JavaEnabled);
 
             WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
             WebBrowser.OnBrowserMessageChanged += WebBrowser_OnBrowserMessageChanged;
@@ -152,12 +165,24 @@ namespace WpfCefDynamBrowser.ViewModels
                     //WebBrowser.CBrowser.Browser.GetHost().SendFocusEvent
                     // WebBrowser.CBrowser.Browser.GetHost().ShowDevTools(CefWindowInfo.Create(), new DemoClient(), new CefBrowserSettings() { }, new CefPoint(110,110));
                     break;
+
+                case 111:
+                    try
+                    {
+                        var host = WebBrowser.GetBrowser().GetHost();
+                        var wi = CefWindowInfo.Create();
+                        wi.SetAsPopup(IntPtr.Zero, "DevTools");
+                        host.ShowDevTools(wi, new DevToolsWebClient() , new CefBrowserSettings(), new CefPoint(0, 0));
+                    }
+                    catch { }
+                    break;
+
                 #region curate
                 case 666:
                 case 222:
                     try
                     {
-                        if (WebBrowser.CBrowser.Browser.GetMainFrame() == null || WebBrowser.CBrowser.Browser.GetMainFrame().Url == null) return;
+                        if (WebBrowser.GetTheMainFrame() == null || WebBrowser.GetTheMainFrame().Url == null) return;
 
                         string dir = Path.Combine(MyFilesDatabase.GetBaseDir(), "TempHTML");
                         if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
@@ -173,7 +198,7 @@ namespace WpfCefDynamBrowser.ViewModels
                                                 "var htmltext = span.innerHTML.toString();" +
                                                 "range.insertNode(span);" +
                                                 "nativeImplementation(htmltext);";
-                        WebBrowser.CBrowser.Browser.GetMainFrame().ExecuteJavaScript(jsForExecution, WebBrowser.CBrowser.Browser.GetMainFrame().Url, 0);
+                        WebBrowser.GetTheMainFrame().ExecuteJavaScript(jsForExecution, WebBrowser.GetTheMainFrame().Url, 0);
 
 
 
@@ -233,9 +258,9 @@ namespace WpfCefDynamBrowser.ViewModels
                     System.Threading.Tasks.Task.Factory.StartNew(() =>
                     {
                         string imgUrl = "";
-                        if (WebBrowser.CBrowser.Browser.GetMainFrame() != null && WebBrowser.CBrowser.Browser.GetMainFrame().Url != null)
+                        if (WebBrowser.GetTheMainFrame() != null && WebBrowser.GetTheMainFrame().Url != null)
                         {
-                            string url = WebBrowser.CBrowser.Browser.GetMainFrame().Url;
+                            string url = WebBrowser.GetTheMainFrame().Url;
 
                             imgUrl = getImageUrl(url);
                         }
@@ -300,23 +325,21 @@ namespace WpfCefDynamBrowser.ViewModels
                         MessageBox.Show("Cant complete action make sure the mouse pointer is hovering over the link you want.");
                         return;
                     }
-                    WebBrowser.CBrowser.Browser.GetMainFrame().GetSource(new SourceVisitor(htmlSource =>
+                    string linkToGet = HuverLink;
+                    string link = HuverLink;
+                    WebBrowser.GetTheMainFrame().GetSource(new SourceVisitor(htmlSource =>
                     {
                         try
                         {
                             string splitter = getsplitter();
-                                    ///events/174736672890597/?ref=br_rs&amp;action_history=null
-                                    ///events/656447624373019/?ref=br_rs&action_history=null
-                                    string linkToGet = HuverLink;
-                            string link = HuverLink;
                             if (AddressEditable.Contains("facebook.com/groups/?category=membership"))
                             {
                                 string fromsource = linkToGet.Replace(Social.FACEBOOK_GROUPS_DEFAULT_URL, "/groups/");
                                 fromsource = htmlSource.Substring(htmlSource.IndexOf(fromsource));
-                                string name = link.Substring(link.IndexOf(">") + 1);
+                                string name = fromsource.Substring(fromsource.IndexOf(">") + 1);
                                 name = name.Remove(name.IndexOf("<"));
 
-                                string id = link.Substring(link.IndexOf("id="));
+                                string id = fromsource.Substring(fromsource.IndexOf("id="));
                                 id = id.Replace("id=", "");
                                 id = id.Remove(id.IndexOf("\""));
 
@@ -350,18 +373,27 @@ namespace WpfCefDynamBrowser.ViewModels
                             List<string> linksToReturn = new List<string>();
                             if (AddressEditable.Contains("facebook.com/groups/?category=membership"))
                             {
-                                List<string> links = htmlSource.Split(new string[] { "groupsRecommendedTitle" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                                List<string> links = htmlSource.Split(new string[] { "group_browse_new" }, StringSplitOptions.RemoveEmptyEntries).ToList();
                                 links.RemoveAt(0);
-                                foreach (var link in links)
+                                foreach (var linkl in links)
                                 {
-                                    string name = link.Substring(link.IndexOf(">") + 1);
-                                    name = name.Remove(name.IndexOf("<"));
+                                    string name = "", id = "";
+                                    try
+                                    {
+                                        name = linkl.Substring(linkl.IndexOf(">") + 1);
+                                        name = name.Remove(name.IndexOf("<"));
 
-                                    string id = link.Substring(link.IndexOf("id=") + 3);
-                                    id = id.Remove(id.IndexOf("\""));
+                                        id = linkl.Substring(linkl.IndexOf("id=") + 3);
+                                        id = id.Remove(id.IndexOf("\""));
+
+                                        Convert.ToInt64(id);
+                                    }
+                                    catch
+                                    { continue; }
 
                                     linksToReturn.Add(Social.FACEBOOK_GROUPS_DEFAULT_URL + name + "-" + id);
                                 }
+
                             }
                             else
                             {
@@ -371,10 +403,10 @@ namespace WpfCefDynamBrowser.ViewModels
                                 links.RemoveAt(0);
 
 
-                                foreach (string link in links)
+                                foreach (string linkl in links)
                                 {
-                                    string linkToGet = link.Remove(link.IndexOf("\""));
-                                    string linkToAdd = getLinkFromUrlAndSource(linkToGet, htmlSource, splitter);
+                                    string linkToGetl = linkl.Remove(linkl.IndexOf("\""));
+                                    string linkToAdd = getLinkFromUrlAndSource(linkToGetl, htmlSource, splitter);
                                     linksToReturn.Add(linkToAdd);
                                 }
                             }
@@ -389,7 +421,7 @@ namespace WpfCefDynamBrowser.ViewModels
                             MessageBox.Show("Couldnt pull pages.");
                         }
                     });
-                    WebBrowser.CBrowser.Browser.GetMainFrame().GetSource(visitor);
+                    WebBrowser.GetTheMainFrame().GetSource(visitor);
                     break;
                 #endregion
 
@@ -397,13 +429,28 @@ namespace WpfCefDynamBrowser.ViewModels
                     break;
             }
         }
+        private class DevToolsWebClient : CefClient
+        {
+        }
 
         private string getsplitter()
         {
             string splitter = "<div class=\"_gll\"><a href=\"";
-            if (AddressEditable.Contains("/places/"))
+            if (AddressEditable.Contains("/keywords_places/"))
             {
-                splitter = "<a target=\"_blank\" href=\"";
+                splitter = "<a href=\"";
+            }
+            else if (AddressEditable.Contains("/pages/"))
+            {
+                splitter = "<div class=\"_gll\"><div><a href=\"";
+            }
+            else if (AddressEditable.Contains("/videos/"))
+            {
+                splitter = "<div class=\"_42by\"><a rel=\"theater\" href=\"";
+            }
+            else if (AddressEditable.Contains("/photos/"))
+            {
+                splitter = "<a class=\"_23q\" href=\"";
             }
 
             return splitter;
@@ -414,38 +461,65 @@ namespace WpfCefDynamBrowser.ViewModels
             string type = AddressEditable.Replace("https://www.facebook.com/search/", "");
             type = type.Remove(type.IndexOf("/"));
 
-            string id = htmlSource.Substring(0, htmlSource.IndexOf(splitter + url));
-            id = id.Replace("&quot;", "");
-            id = id.Replace("quot;", "");
-            id = id.Substring(id.LastIndexOf("data-bt=\"{id:"));
-            id = id.Substring(id.IndexOf(":") + 1);
-            id = id.Remove(id.IndexOf(","));
-
-            string name = url;
-            if (name.Contains("/?ref=br_rs"))
+            string id = "", name = "";
+            if (type == "videos")
             {
-                bool gotName = false;
-                if (name.Contains("&amp;action_history=null"))
+                var datas = htmlSource.Split(new string[] { "data-bt=\"{&quot;id&quot;:" }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var d in datas)
                 {
-                    try
+                    string toCheck = url.Replace("https://www.facebook.com/", "");
+                    if (toCheck.StartsWith("/")) toCheck = toCheck.Substring(1);
+                     toCheck = toCheck.Remove(toCheck.IndexOf("/"));
+                    if (d.Contains(toCheck))
                     {
-                        name = htmlSource.Substring(htmlSource.IndexOf(splitter + url));
-                        name = name.Substring(0, name.IndexOf("</a>"));
-                        name = name.Substring(name.LastIndexOf(">") + 1);
-                        gotName = true;
+                        id = d.Remove(d.IndexOf(","));
+                        name = toCheck;
+                        break;
                     }
-                    catch { name = url; }
                 }
-                if (!gotName)
-                {
-                    name = name.Replace("/?ref=br_rs", "");
-                    name = name.Substring(name.LastIndexOf("/") + 1);
-                }
+            }
+            else if (type == "photos")
+            {
+                id = url.Substring(url.IndexOf("fbid=") + 5);
+                id = id.Remove(id.IndexOf("&"));
+
+                name = id;
             }
             else
             {
-                name = name.Replace("https://www.facebook.com/", "");
-                name = name.Replace("/", "");
+                id = htmlSource.Substring(0, htmlSource.IndexOf(splitter + url));
+                id = id.Replace("&quot;", "");
+                id = id.Replace("quot;", "");
+                id = id.Substring(id.LastIndexOf("data-bt=\"{id:"));
+                id = id.Substring(id.IndexOf(":") + 1);
+                id = id.Remove(id.IndexOf(","));
+
+                name = url;
+                if (name.Contains("/?ref=br_rs"))
+                {
+                    bool gotName = false;
+                    if (name.Contains("&amp;action_history=null"))
+                    {
+                        try
+                        {
+                            name = htmlSource.Substring(htmlSource.IndexOf(splitter + url));
+                            name = name.Substring(0, name.IndexOf("</a>"));
+                            name = name.Substring(name.LastIndexOf(">") + 1);
+                            gotName = true;
+                        }
+                        catch { name = url; }
+                    }
+                    if (!gotName)
+                    {
+                        name = name.Replace("/?ref=br_rs", "");
+                        name = name.Substring(name.LastIndexOf("/") + 1);
+                    }
+                }
+                else
+                {
+                    name = name.Replace("https://www.facebook.com/", "");
+                    name = name.Replace("/", "");
+                }
             }
 
             string link = "https://www.facebook.com/" + type + "/" + name + "-" + id;
@@ -476,6 +550,7 @@ namespace WpfCefDynamBrowser.ViewModels
 
         void WebBrowser_OnBrowserStatusChanged(string oMessage)
         {
+            if (oMessage == null) return;
             HuverLink = oMessage;
         }
 
@@ -489,20 +564,20 @@ namespace WpfCefDynamBrowser.ViewModels
             RaiseOnShouldChangePropertyAddress(address);
 
             StatusMessage = "Loading...";
-            if (address == "about:blank")
-            {
-                if (WebBrowserHost.Visibility == Visibility.Visible)
-                {
-                    WebBrowserHost.Visibility = Visibility.Collapsed;
-                }
-            }
-            else
-            {
-                if (WebBrowserHost.Visibility == Visibility.Collapsed)
-                {
-                    WebBrowserHost.Visibility = Visibility.Visible;
-                }
-            }
+            //if (address == "about:blank")
+            //{
+            //    //if (WebBrowserHost.Visibility == Visibility.Visible)
+            //    //{
+            //    //    WebBrowserHost.Visibility = Visibility.Collapsed;
+            //    //}
+            //}
+            //else
+            //{
+            //    //if (WebBrowserHost.Visibility == Visibility.Collapsed)
+            //    //{
+            //    //    WebBrowserHost.Visibility = Visibility.Visible;
+            //    //}
+            //}
 
             //AddressEditable = address;
             Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_AddressChange + " " + address);
@@ -555,13 +630,13 @@ namespace WpfCefDynamBrowser.ViewModels
 
         private async void Inject()
         {
-            if (WebBrowser.CBrowser.Browser.GetMainFrame() == null || WebBrowser.CBrowser.Browser.GetMainFrame().Url == null) return;
-            string curUrl = WebBrowser.CBrowser.Browser.GetMainFrame().Url;
+            if (WebBrowser.GetTheMainFrame() == null || WebBrowser.GetTheMainFrame().Url == null) return;
+            string curUrl = WebBrowser.GetTheMainFrame().Url;
 
-            PersonData profile = await getSelectedProfile();
+            PersonData profile = await getSelectedProfile(false);
             if (profile == null) return;
 
-            string linkToExecute = WebBrowser.CBrowser.Browser.GetMainFrame().Url;
+            string linkToExecute = WebBrowser.GetTheMainFrame().Url;
             string emailForBlogOrWp = profile.Username;
             if (linkToExecute.ToLower().Contains("blog.com"))
             {
@@ -1000,7 +1075,7 @@ namespace WpfCefDynamBrowser.ViewModels
                 return;
             }
 
-            WebBrowser.CBrowser.Browser.GetMainFrame().ExecuteJavaScript(jsForExecution, linkToExecute, 0);
+            WebBrowser.GetTheMainFrame().ExecuteJavaScript(jsForExecution, linkToExecute, 0);
 
 
             //string hasMultiple = "false";
@@ -1048,8 +1123,8 @@ namespace WpfCefDynamBrowser.ViewModels
             {
                 PinterestImagePickerVM pinterestImagePicker = new PinterestImagePickerVM();
                 pinterestImagePicker.OnLaunchSharePopup += launchSharePopUP;
-                pinterestImagePicker.VisitSource(AddressEditable);
-                WebBrowser.CBrowser.Browser.GetMainFrame().GetSource(pinterestImagePicker.Visitor);
+                pinterestImagePicker.VisitSource(AddressEditable,false);
+                WebBrowser.GetTheMainFrame().GetSource(pinterestImagePicker.Visitor);
             }
         }
 

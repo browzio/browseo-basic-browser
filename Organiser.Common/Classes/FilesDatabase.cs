@@ -5,7 +5,8 @@ using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.IO;
+//using System.IO;
+using Delimon.Win32.IO;
 using System.Net;
 using System.Text;
 using System.Windows;
@@ -15,12 +16,192 @@ namespace Organiser.Common.Classes
 {
     public class BrowserSettimgs
     {
+      //8514oem
+      //AR BERKLEY
+      //AR BLANCA
+      //AR BONNIE
+      //AR CARTER
+      //AR CENA
+      //AR CHRISTY
+      //AR DARLING
+      //AR DECODE
+      //AR DELANEY
+      //AR DESTINE
+      //AR ESSENCE
+      //AR HERMANN
+      //AR JULIAN
+      //Arial
+      //Arial Black
+      //Arimo
+      //Calibri
+      //Calibri Light
+      //Cambria
+      //Cambria Math
+      //Candara
+      //Comic Sans MS
+      //Consolas
+      //Constantia
+      //Corbel
+      //Courier
+      //Courier New
+      //DejaVu Sans
+      //DejaVu Sans Condensed
+      //DejaVu Sans Light
+      //DejaVu Sans Mono
+      //DejaVu Serif
+      //DejaVu Serif Condensed
+      //DengXian
+      //Ebrima
+      //Fixedsys
+      //Franklin Gothic Medium
+      //Gabriola
+      //Gadugi
+      //Gentium Basic
+      //Gentium Book Basic
+      //Georgia
+      //Impact
+      //Javanese Text
+      //Leelawadee UI
+      //Leelawadee UI Semilight
+      //Lucida Console
+      //Lucida Sans Unicode
+      //MS Gothic
+      //MS PGothic
+      //MS Sans Serif
+      //MS Serif
+      //MS UI Gothic
+      //MV Boli
+      //Malgun Gothic
+      //Malgun Gothic Semilight
+      //Marlett
+      //Microsoft Himalaya
+      //Microsoft JhengHei
+      //Microsoft JhengHei Light
+      //Microsoft JhengHei UI
+      //Microsoft JhengHei UI Light
+      //Microsoft MHei
+      //Microsoft NeoGothic
+      //Microsoft New Tai Lue
+      //Microsoft PhagsPa
+      //Microsoft Sans Serif
+      //Microsoft Tai Le
+      //Microsoft YaHei
+      //Microsoft YaHei Light
+      //Microsoft YaHei UI
+      //Microsoft YaHei UI Light
+      //Microsoft Yi Baiti
+      //MingLiU-ExtB
+      //MingLiU_HKSCS-ExtB
+      //Modern
+      //Mongolian Baiti
+      //Myanmar Text
+      //NSimSun
+      //Nirmala UI
+      //Nirmala UI Semilight
+      //OpenSymbol
+      //PMingLiU-ExtB
+      //Palatino Linotype
+      //Roman
+      //Script
+      //Segoe MDL2 Assets
+      //Segoe Print
+      //Segoe Script
+      //Segoe UI
+      //Segoe UI Black
+      //Segoe UI Emoji
+      //Segoe UI Historic
+      //Segoe UI Light
+      //Segoe UI Semibold
+      //Segoe UI Semilight
+      //Segoe UI Symbol
+      //Segoe WP
+      //Segoe WP Black
+      //Segoe WP Light
+      //Segoe WP SemiLight
+      //Segoe WP Semibold
+      //SimSun
+      //SimSun-ExtB
+      //Sitka Banner
+      //Sitka Display
+      //Sitka Heading
+      //Sitka Small
+      //Sitka Subheading
+      //Sitka Text
+      //Small Fonts
+      //Sylfaen
+      //Symbol
+      //System
+      //Tahoma
+      //TeamViewer11
+      //Terminal
+      //Times New Roman
+      //Trebuchet MS
+      //Verdana
+      //Webdings
+      //Wingdings
+      //Yu Gothic
+      //Yu Gothic Light
+      //Yu Gothic Medium
+      //Yu Gothic UI
+      //Yu Gothic UI Light
+      //Yu Gothic UI Semibold
+      //Yu Gothic UI Semilight
+      
+      //UTF-8
+      //Windows-1252
+      //UTF-16LE
+      //Windows-1256
+      //ISO-8859-6
+      //ISO-8859-4
+      //ISO-8859-13
+      //Windows-1257
+      //ISO-8859-14
+      //ISO-8859-2
+      //Windows-1250
+      //GBK
+      //gb18030
+      //Big5
+      //ISO-8859-5
+      //Windows-1251
+      //KOI8-R
+      //KOI8-U
+      //IBM866
+      //ISO-8859-7
+      //Windows-1253
+      //Windows-1255
+      //ISO-8859-8-I
+      //ISO-8859-8
+      //Shift_JIS
+      //EUC-JP
+      //ISO-2022-JP
+      //ISO-8859-10
+      //ISO-8859-3
+      //ISO-8859-15
+      //Macintosh
+     static BrowserSettimgs()
+        {
+            ResetDefaoultFonts();
+        }
+        public static void ResetDefaoultFonts()
+        {
+            BrowserSettimgs.SIFontStandard = BrowserSettimgs.AvailableFonts.IndexOf("Times New Roman");
+            BrowserSettimgs.SIFontSerif = BrowserSettimgs.AvailableFonts.IndexOf("Times New Roman");
+            BrowserSettimgs.SIFontSansSerif = BrowserSettimgs.AvailableFonts.IndexOf("Arial");
+            BrowserSettimgs.SIFontFixedWidth = BrowserSettimgs.AvailableFonts.IndexOf("Consolas");
+            BrowserSettimgs.DefaultFontSize = 16;
+            BrowserSettimgs.MnimumFontSize = 0;
+            BrowserSettimgs.SIFontEncodings = BrowserSettimgs.AvailableEncodeings.IndexOf("Windows-1252");
+        }
         public static bool JavaEnabled = true;
         public static bool JavascriptEnabled = true;
         public static bool FlashEnabled = true;
         public static bool DoNotTrackEnabled = true; 
         public static bool SetSysDateEnabled = false;
         public static bool WebRTCEnabled = true;
+        public static bool WebGLEnabled = true;
+
+        public static string UserAgentFF = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0";
+        public static string UserAgentChrome = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36";
 
         private static List<string> timeZoneList;
         public static List<string> AvailableTimeZones
@@ -60,10 +241,277 @@ namespace Organiser.Common.Classes
             set { timeZoneList = value; }
         }
         public static int SITimeZone { get; set; }
+
+        private static List<string> availableFonts;
+        public static List<string> AvailableFonts
+        {
+            get
+            {
+                if(availableFonts == null)
+                {
+                    availableFonts = new List<string>();
+                    availableFonts.Add("8514oem");
+                    availableFonts.Add("AR BERKLEY");
+                    availableFonts.Add("AR BLANCA");
+                    availableFonts.Add("AR BONNIE");
+                    availableFonts.Add("AR CARTER");
+                    availableFonts.Add("AR CENA");
+                    availableFonts.Add("AR CHRISTY");
+                    availableFonts.Add("AR DARLING");
+                    availableFonts.Add("AR DECODE");
+                    availableFonts.Add("AR DELANEY");
+                    availableFonts.Add("AR DESTINE");
+                    availableFonts.Add("AR ESSENCE");
+                    availableFonts.Add("AR HERMANN");
+                    availableFonts.Add("AR JULIAN");
+                    availableFonts.Add("Arial");
+                    availableFonts.Add("Arial Black");
+                    availableFonts.Add("Arimo");
+                    availableFonts.Add("Calibri");
+                    availableFonts.Add("Calibri Light");
+                    availableFonts.Add("Cambria");
+                    availableFonts.Add("Cambria Math");
+                    availableFonts.Add("Candara");
+                    availableFonts.Add("Comic Sans MS");
+                    availableFonts.Add("Consolas");
+                    availableFonts.Add("Constantia");
+                    availableFonts.Add("Corbel");
+                    availableFonts.Add("Courier");
+                    availableFonts.Add("Courier New");
+                    availableFonts.Add("DejaVu Sans");
+                    availableFonts.Add("DejaVu Sans Condensed");
+                    availableFonts.Add("DejaVu Sans Light");
+                    availableFonts.Add("DejaVu Sans Mono");
+                    availableFonts.Add("DejaVu Serif");
+                    availableFonts.Add("DejaVu Serif Condensed");
+                    availableFonts.Add("DengXian");
+                    availableFonts.Add("Ebrima");
+                    availableFonts.Add("Fixedsys");
+                    availableFonts.Add("Franklin Gothic Medium");
+                    availableFonts.Add("Gabriola");
+                    availableFonts.Add("Gadugi");
+                    availableFonts.Add("Gentium Basic");
+                    availableFonts.Add("Gentium Book Basic");
+                    availableFonts.Add("Georgia");
+                    availableFonts.Add("Impact");
+                    availableFonts.Add("Javanese Text");
+                    availableFonts.Add("Leelawadee UI");
+                    availableFonts.Add("Leelawadee UI Semilight");
+                    availableFonts.Add("Lucida Console");
+                    availableFonts.Add("Lucida Sans Unicode");
+                    availableFonts.Add("MS Gothic");
+                    availableFonts.Add("MS PGothic");
+                    availableFonts.Add("MS Sans Serif");
+                    availableFonts.Add("MS Serif");
+                    availableFonts.Add("MS UI Gothic");
+                    availableFonts.Add("MV Boli");
+                    availableFonts.Add("Malgun Gothic");
+                    availableFonts.Add("Malgun Gothic Semilight");
+                    availableFonts.Add("Marlett");
+                    availableFonts.Add("Microsoft Himalaya");
+                    availableFonts.Add("Microsoft JhengHei");
+                    availableFonts.Add("Microsoft JhengHei Light");
+                    availableFonts.Add("Microsoft JhengHei UI");
+                    availableFonts.Add("Microsoft JhengHei UI Light");
+                    availableFonts.Add("Microsoft MHei");
+                    availableFonts.Add("Microsoft NeoGothic");
+                    availableFonts.Add("Microsoft New Tai Lue");
+                    availableFonts.Add("Microsoft PhagsPa");
+                    availableFonts.Add("Microsoft Sans Serif");
+                    availableFonts.Add("Microsoft Tai Le");
+                    availableFonts.Add("Microsoft YaHei");
+                    availableFonts.Add("Microsoft YaHei Light");
+                    availableFonts.Add("Microsoft YaHei UI");
+                    availableFonts.Add("Microsoft YaHei UI Light");
+                    availableFonts.Add("Microsoft Yi Baiti");
+                    availableFonts.Add("MingLiU-ExtB");
+                    availableFonts.Add("MingLiU_HKSCS-ExtB");
+                    availableFonts.Add("Modern");
+                    availableFonts.Add("Mongolian Baiti");
+                    availableFonts.Add("Myanmar Text");
+                    availableFonts.Add("NSimSun");
+                    availableFonts.Add("Nirmala UI");
+                    availableFonts.Add("Nirmala UI Semilight");
+                    availableFonts.Add("OpenSymbol");
+                    availableFonts.Add("PMingLiU-ExtB");
+                    availableFonts.Add("Palatino Linotype");
+                    availableFonts.Add("Roman");
+                    availableFonts.Add("Script");
+                    availableFonts.Add("Segoe MDL2 Assets");
+                    availableFonts.Add("Segoe Print");
+                    availableFonts.Add("Segoe Script");
+                    availableFonts.Add("Segoe UI");
+                    availableFonts.Add("Segoe UI Black");
+                    availableFonts.Add("Segoe UI Emoji");
+                    availableFonts.Add("Segoe UI Historic");
+                    availableFonts.Add("Segoe UI Light");
+                    availableFonts.Add("Segoe UI Semibold");
+                    availableFonts.Add("Segoe UI Semilight");
+                    availableFonts.Add("Segoe UI Symbol");
+                    availableFonts.Add("Segoe WP");
+                    availableFonts.Add("Segoe WP Black");
+                    availableFonts.Add("Segoe WP Light");
+                    availableFonts.Add("Segoe WP SemiLight");
+                    availableFonts.Add("Segoe WP Semibold");
+                    availableFonts.Add("SimSun");
+                    availableFonts.Add("SimSun-ExtB");
+                    availableFonts.Add("Sitka Banner");
+                    availableFonts.Add("Sitka Display");
+                    availableFonts.Add("Sitka Heading");
+                    availableFonts.Add("Sitka Small");
+                    availableFonts.Add("Sitka Subheading");
+                    availableFonts.Add("Sitka Text");
+                    availableFonts.Add("Small Fonts");
+                    availableFonts.Add("Sylfaen");
+                    availableFonts.Add("Symbol");
+                    availableFonts.Add("System");
+                    availableFonts.Add("Tahoma");
+                    availableFonts.Add("TeamViewer11");
+                    availableFonts.Add("Terminal");
+                    availableFonts.Add("Times New Roman");
+                    availableFonts.Add("Trebuchet MS");
+                    availableFonts.Add("Verdana");
+                    availableFonts.Add("Webdings");
+                    availableFonts.Add("Wingdings");
+                    availableFonts.Add("Yu Gothic");
+                    availableFonts.Add("Yu Gothic Light");
+                    availableFonts.Add("Yu Gothic Medium");
+                    availableFonts.Add("Yu Gothic UI");
+                    availableFonts.Add("Yu Gothic UI Light");
+                    availableFonts.Add("Yu Gothic UI Semibold");
+                    availableFonts.Add("Yu Gothic UI Semilight");
+                }
+
+                return availableFonts;
+            }
+        }
+
+        public static int SIFontStandard { get; set; }
+        public static int SIFontSerif { get; set; }
+        public static int SIFontSansSerif { get; set; }
+        public static int SIFontFixedWidth { get; set; }
+        public static bool HideFonts { get; set; }
+
+        public static int DefaultFontSize { get; set; }
+        public static int MnimumFontSize { get; set; }
+
+        private static List<string> availableEncodings;
+
+        public static List<string> AvailableEncodeings
+        {
+            get
+            {
+                if (availableEncodings == null)
+                {
+                    availableEncodings = new List<string>();
+                    availableEncodings.Add("UTF-8");
+                    availableEncodings.Add("Windows-1252");
+                    availableEncodings.Add("UTF-16LE");
+                    availableEncodings.Add("Windows-1256");
+                    availableEncodings.Add("ISO-8859-6");
+                    availableEncodings.Add("ISO-8859-4");
+                    availableEncodings.Add("ISO-8859-13");
+                    availableEncodings.Add("Windows-1257");
+                    availableEncodings.Add("ISO-8859-14");
+                    availableEncodings.Add("ISO-8859-2");
+                    availableEncodings.Add("Windows-1250");
+                    availableEncodings.Add("GBK");
+                    availableEncodings.Add("gb18030");
+                    availableEncodings.Add("Big5");
+                    availableEncodings.Add("ISO-8859-5");
+                    availableEncodings.Add("Windows-1251");
+                    availableEncodings.Add("KOI8-R");
+                    availableEncodings.Add("KOI8-U");
+                    availableEncodings.Add("IBM866");
+                    availableEncodings.Add("ISO-8859-7");
+                    availableEncodings.Add("Windows-1253");
+                    availableEncodings.Add("Windows-1255");
+                    availableEncodings.Add("ISO-8859-8-I");
+                    availableEncodings.Add("ISO-8859-8");
+                    availableEncodings.Add("Shift_JIS");
+                    availableEncodings.Add("EUC-JP");
+                    availableEncodings.Add("ISO-2022-JP");
+                    availableEncodings.Add("ISO-8859-10");
+                    availableEncodings.Add("ISO-8859-3");
+                    availableEncodings.Add("ISO-8859-15");
+                    availableEncodings.Add("Macintosh");
+                }
+
+                return availableEncodings;
+            }
+        }
+
+        public static int SIFontEncodings { get; set; }
     }
 
     public class MyFilesDatabase
     {
+        public class Path
+        {
+            public static string Combine(params string[] path)
+            {
+                string toreturn = "";
+                foreach (var item in path)
+                {
+                    toreturn += item + "\\";
+                }
+                toreturn = toreturn.Replace("\\\\", "\\");
+                if (toreturn.EndsWith("\\")) toreturn = toreturn.Remove(toreturn.LastIndexOf("\\"));
+
+                return toreturn;
+            }
+        }
+        public class File : Delimon.Win32.IO.File
+        {
+            new public static void WriteAllText(string path, string contents)
+            {
+                if (File.Exists(path)) File.Delete(path);
+
+                Delimon.Win32.IO.File.WriteAllText(path, contents);
+            }
+
+            new public static void WriteAllText(string path, string contents, Encoding enc)
+            {
+                if (File.Exists(path)) File.Delete(path);
+
+                Delimon.Win32.IO.File.WriteAllText(path, contents, enc);
+            }
+
+            new public static void WriteAllLines(string path, string[] contents)
+            {
+                WriteAllLines(path, contents.ToList());
+            }
+
+            public static void WriteAllLines(string path, IEnumerable<string> contents)
+            {
+                string content = "";
+                foreach (var line in contents)
+                {
+                    content += line + Environment.NewLine;
+                }
+                WriteAllText(path, content);
+            }
+
+            new public static bool Exists(string path)
+            {
+                return Delimon.Win32.IO.File.Exists(path);
+            }
+        }
+        public class Directory : Delimon.Win32.IO.Directory
+        {
+            new public static void CreateDirectory(string path)
+            {
+                string thenewDirectorys = path;
+                thenewDirectorys = thenewDirectorys.Replace(GetBaseDir(), "");
+                var dirs = thenewDirectorys.Split(new string[] { "\\" }, StringSplitOptions.RemoveEmptyEntries);
+                string appendedDirs = Path.Combine(GetBaseDir());
+                foreach (var dir in dirs)
+                {
+                    appendedDirs = appendedDirs + "\\" + dir;
+                    if (!Directory.Exists(appendedDirs)) Delimon.Win32.IO.Directory.CreateDirectory(appendedDirs);
+                }
+            }
+        }
         public const string SPLITTER = "{[:]}";
 
         public static bool CanSeeProxys = false;
@@ -76,7 +524,12 @@ namespace Organiser.Common.Classes
         {
             return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\RAWSocialOrganizer";
         }
+        public static string GetBaseProjectsDir()
+        {
+            return GetBaseDir() + "\\Projects";
+        }
 
+        #region projects
         public static List<KeyValuePair<string, string>> GetSubProjectsFolders(string path, string projname)
         {
             List<KeyValuePair<string, string>> projects = new List<KeyValuePair<string, string>>();
@@ -95,28 +548,28 @@ namespace Organiser.Common.Classes
             return projects;
         }
 
-        public static List<KeyValuePair<string, string>> GetAllProjectsAndDirs()
+        public static List<KeyValuePair<string, string>> GetAllProjectsAndDirs(bool all)
         {
             List<KeyValuePair<string, string>> projects = new List<KeyValuePair<string, string>>();
             string path = Path.Combine(GetBaseDir(), "Projects");
 
             if (Directory.Exists(path))
             {
-                WalkDirectoryTree(new DirectoryInfo(path), ref projects);
+                WalkDirectoryTree(new DirectoryInfo(path),all, ref projects);
                 return projects;
             }
             
             return projects;
         }
 
-        public static void WalkDirectoryTree(System.IO.DirectoryInfo root, ref List<KeyValuePair<string, string>> projects)
+        public static void WalkDirectoryTree(DirectoryInfo root,bool all, ref List<KeyValuePair<string, string>> projects)
         {
-            System.IO.FileInfo[] files = null;
-            System.IO.DirectoryInfo[] subDirs = null;
+            FileInfo[] files = null;
+            DirectoryInfo[] subDirs = null;
 
             try
             {
-                files = root.GetFiles("*.*");
+                files = root.GetFiles();
             }
             catch (UnauthorizedAccessException e)
             {
@@ -131,19 +584,21 @@ namespace Organiser.Common.Classes
 
             if (subDirs != null)
             {
-                foreach (System.IO.DirectoryInfo dirInfo in subDirs)
+                foreach (DirectoryInfo dirInfo in subDirs)
                 {
                     string ProjName = dirInfo.Name;
-                    if (!dirInfo.GetFiles().Any(f => f.Name.Contains("UserData")) && !ProjName.Contains("_folder"))
+
+                    if (!dirInfo.GetFiles().Any(f => f.Name.Contains("UserData")) && 
+                        (!ProjName.Contains("_folder") || (all && ProjName.Contains("_folder"))))
                     {
-                        if (ProjName.Contains("_tier_"))
-                        {
-                            ProjName = ProjName.Replace("_tier_", "");
-                        }
+                        if (dirInfo.Parent != null && dirInfo.Parent.Name != "Projects" && !ProjName.Contains("_tier_") && !ProjName.Contains("_folder_")) continue;
+                        if (ProjName.StartsWith("_tier_")) ProjName = ProjName.Substring(6);
+                        if (ProjName.StartsWith("_folder_")) ProjName = ProjName.Substring(8);
+
                         projects.Add(new KeyValuePair<string, string>(ProjName, dirInfo.FullName));
                     }
 
-                    WalkDirectoryTree(dirInfo, ref projects);
+                    WalkDirectoryTree(dirInfo,all, ref projects);
                 }
             }
         }
@@ -245,6 +700,8 @@ namespace Organiser.Common.Classes
             return "";
         }
 
+
+
         public static bool HasMultipleProfiles(string path)
         {
             //string path = Path.Combine(GetBaseDir(), "Projects\\" + projectName);
@@ -263,9 +720,9 @@ namespace Organiser.Common.Classes
             WalkDirectoryTreeGetAllProfiles(new DirectoryInfo(Path.Combine(GetBaseDir(), "Projects")), allProfiles);
             return allProfiles;
         }
-        public static void WalkDirectoryTreeGetAllProfiles(System.IO.DirectoryInfo root, List<PersonData> allProfiles)
+        public static void WalkDirectoryTreeGetAllProfiles(DirectoryInfo root, List<PersonData> allProfiles)
         {
-            System.IO.DirectoryInfo[] subDirs = null;
+            DirectoryInfo[] subDirs = null;
 
             string filepath = Path.Combine(root.FullName, "UserData.ini");
             if (!File.Exists(filepath)) filepath = filepath.Replace("UserData.ini", "ProjectData.ini");
@@ -280,7 +737,7 @@ namespace Organiser.Common.Classes
             subDirs = root.GetDirectories();
             if (subDirs != null)
             {
-                foreach (System.IO.DirectoryInfo dirInfo in subDirs)
+                foreach (DirectoryInfo dirInfo in subDirs)
                 {
                     WalkDirectoryTreeGetAllProfiles(dirInfo, allProfiles);
                 }
@@ -431,11 +888,12 @@ namespace Organiser.Common.Classes
 
             return profile;
         }
-
+        #endregion
         #region sessions
-        public static void DeleteSession(string projectName)
+        public static void DeleteSession(string projectName, bool isff = false)
         {
             string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
+            if (isff) directory = Path.Combine(GetBaseDir(), "FFSavedSessions", projectName);
             if (Directory.Exists(directory))
             {
                 Directory.Delete(directory, true);
@@ -451,7 +909,18 @@ namespace Organiser.Common.Classes
                 "," + BrowserSettimgs.SetSysDateEnabled +
                 "," + BrowserSettimgs.SITimeZone+
                 "," + BrowserSettimgs.DoNotTrackEnabled+
-                "," + BrowserSettimgs.WebRTCEnabled);
+                "," + BrowserSettimgs.WebRTCEnabled +
+                "," + BrowserSettimgs.UserAgentChrome.Replace(",", MyFilesDatabase.SPLITTER) +
+                "," + BrowserSettimgs.UserAgentFF.Replace(",", MyFilesDatabase.SPLITTER) +
+                "," + BrowserSettimgs.SIFontStandard +
+                "," + BrowserSettimgs.SIFontSerif +
+                "," + BrowserSettimgs.SIFontSansSerif +
+                "," + BrowserSettimgs.SIFontFixedWidth +
+                "," + BrowserSettimgs.DefaultFontSize +
+                "," + BrowserSettimgs.MnimumFontSize +
+                "," + BrowserSettimgs.SIFontEncodings +
+                "," + BrowserSettimgs.WebGLEnabled +
+                "," + BrowserSettimgs.HideFonts);
 
             string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
             if(isff) directory = Path.Combine(GetBaseDir(), "FFSavedSessions", projectName);
@@ -461,10 +930,42 @@ namespace Organiser.Common.Classes
             File.WriteAllLines(filePath, links.ToArray());
         }
 
+        public static string GeChromeAgentRealQuick(string projectName)
+        {
+            string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
+            if (!Directory.Exists(directory)) return BrowserSettimgs.UserAgentChrome;
+
+            string filePath = Path.Combine(directory, "sites.txt");
+            if (!File.Exists(filePath)) return BrowserSettimgs.UserAgentChrome;
+
+            try
+            {
+                List<string> fileLines = File.ReadAllLines(filePath).ToList();
+                if (fileLines.Count > 0)
+                {
+                    fileLines.RemoveAll(line => string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line));
+                    string lastLine = fileLines[fileLines.Count - 1];
+                    if (lastLine.Contains(","))
+                    {
+                        string[] browserSettings = lastLine.Split(',');
+                        if (browserSettings.Length > 7)
+                        {
+                            BrowserSettimgs.UserAgentChrome = browserSettings[7].Replace(MyFilesDatabase.SPLITTER, ",");
+                        }
+                    }
+                }
+            }
+            catch
+            {
+            }
+
+            return BrowserSettimgs.UserAgentChrome;
+        }
+
         public static List<string> GetSavedSesstion(string projectName, bool isff = false)
         {
             string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
-            if(isff) directory = Path.Combine(GetBaseDir(), "FFSavedSessions", projectName);
+            if (isff) directory = Path.Combine(GetBaseDir(), "FFSavedSessions", projectName);
 
             if (!Directory.Exists(directory)) return new List<string>();
 
@@ -476,8 +977,8 @@ namespace Organiser.Common.Classes
             {
                 if (fileLines.Count > 0)
                 {
-                   fileLines.RemoveAll(line => string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line));
-                   string lastLine = fileLines[fileLines.Count - 1];
+                    fileLines.RemoveAll(line => string.IsNullOrEmpty(line) || string.IsNullOrWhiteSpace(line));
+                    string lastLine = fileLines[fileLines.Count - 1];
 
                     if (lastLine.Contains(","))
                     {
@@ -487,13 +988,36 @@ namespace Organiser.Common.Classes
                         BrowserSettimgs.JavascriptEnabled = Convert.ToBoolean(browserSettings[2]);
                         BrowserSettimgs.SetSysDateEnabled = Convert.ToBoolean(browserSettings[3]);
                         BrowserSettimgs.SITimeZone = Convert.ToInt32(browserSettings[4]);
-                        if(browserSettings.Length > 5)
+                        if (browserSettings.Length > 5)
                         {
                             BrowserSettimgs.DoNotTrackEnabled = Convert.ToBoolean(browserSettings[5]);
                         }
-                        if(browserSettings.Length > 6)
+                        if (browserSettings.Length > 6)
                         {
                             BrowserSettimgs.WebRTCEnabled = Convert.ToBoolean(browserSettings[6]);
+                        }
+                        if (!isff && browserSettings.Length > 7)
+                        {
+                            BrowserSettimgs.UserAgentChrome = browserSettings[7].Replace(MyFilesDatabase.SPLITTER, ",");
+                        }
+                        if (isff && browserSettings.Length > 8)
+                        {
+                            BrowserSettimgs.UserAgentFF = browserSettings[8].Replace(MyFilesDatabase.SPLITTER, ",");
+                        }
+                        if (browserSettings.Length > 9)
+                        {
+                            BrowserSettimgs.SIFontStandard = Convert.ToInt32(browserSettings[9]);
+                            BrowserSettimgs.SIFontSerif = Convert.ToInt32(browserSettings[10]);
+                            BrowserSettimgs.SIFontSansSerif = Convert.ToInt32(browserSettings[11]);
+                            BrowserSettimgs.SIFontFixedWidth = Convert.ToInt32(browserSettings[12]);
+                            BrowserSettimgs.DefaultFontSize = Convert.ToInt32(browserSettings[13]);
+                            BrowserSettimgs.MnimumFontSize = Convert.ToInt32(browserSettings[14]);
+                            BrowserSettimgs.SIFontEncodings = Convert.ToInt32(browserSettings[15]);
+                            BrowserSettimgs.WebGLEnabled = Convert.ToBoolean(browserSettings[16]);
+                        }
+                        if (browserSettings.Length > 17)
+                        {
+                            BrowserSettimgs.HideFonts = Convert.ToBoolean(browserSettings[17]);
                         }
                         if (BrowserSettimgs.SetSysDateEnabled)
                         {
@@ -507,6 +1031,15 @@ namespace Organiser.Common.Classes
             {
                 Console.WriteLine(ex.Message);
             }
+            try
+            {
+                if (fileLines.Count > 0)
+                {
+                    string lastLine = fileLines[fileLines.Count - 1];
+                    if (lastLine.Contains(",")) fileLines.RemoveAt(fileLines.Count - 1);
+                }
+            }
+            catch { }
             return fileLines;
         }
         #endregion
@@ -825,7 +1358,7 @@ namespace Organiser.Common.Classes
 
                     byte[] data = webClient.DownloadData(url);
 
-                    using (MemoryStream mem = new MemoryStream(data))
+                    using (System.IO.MemoryStream mem = new System.IO.MemoryStream(data))
                     {
                         using (var yourImage = System.Drawing.Image.FromStream(mem))
                         {
@@ -870,43 +1403,51 @@ namespace Organiser.Common.Classes
 
         public static void CheckRamUsage()
         {
-            if (availmem == 0)
+            try
             {
-                Microsoft.VisualBasic.Devices.ComputerInfo ci = new Microsoft.VisualBasic.Devices.ComputerInfo();
-                availmem = ci.AvailablePhysicalMemory;
-                availmem = availmem / (1024 * 1024);
-            }
-
-            if (timesToCheck++ >= 5)
-            {
-                if (ramCheckerThread == null || !ramCheckerThread.IsAlive)
+                if (availmem == 0)
                 {
-                    ramCheckerThread = new System.Threading.Thread(() =>
-                    {
-                        double total = 0;
-                        bool showedMSgBox = false;
-                        foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcessesByName("BrowserAndFeatures"))
-                        {
-                            var counter = new System.Diagnostics.PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
-                            total += counter.RawValue / (1024 * 1024);
-                            if ((availmem - total) < 350)
-                            {
-                                if (!showedMSgBox)
-                                    Application.Current.Dispatcher.Invoke((Action)delegate
-                                    {
-                                        MessageBox.Show(
-                                            "You have only " + (availmem - total) + "mb of ram space left please close down other applications" +
-                                            " to free up ram before continuing. Or refrain from openning more tabs, keep in mind" +
-                                            " you will risk your computer and Browseo's performance.");
-                                    });
-                                showedMSgBox = true;
-                            }
-                        }
-                    });
-                    ramCheckerThread.Start();
+                    Microsoft.VisualBasic.Devices.ComputerInfo ci = new Microsoft.VisualBasic.Devices.ComputerInfo();
+                    availmem = ci.AvailablePhysicalMemory;
+                    availmem = availmem / (1024 * 1024);
                 }
-                timesToCheck = 0;
+
+                if (timesToCheck++ >= 5)
+                {
+                    if (ramCheckerThread == null || !ramCheckerThread.IsAlive)
+                    {
+                        ramCheckerThread = new System.Threading.Thread(() =>
+                        {
+                            try
+                            {
+                                double total = 0;
+                                bool showedMSgBox = false;
+                                foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcessesByName("BrowserAndFeatures"))
+                                {
+                                    var counter = new System.Diagnostics.PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
+                                    total += counter.RawValue / (1024 * 1024);
+                                    if ((availmem - total) < 350)
+                                    {
+                                        if (!showedMSgBox)
+                                            Application.Current.Dispatcher.Invoke((Action)delegate
+                                            {
+                                                MessageBox.Show(
+                                                    "You have only " + (availmem - total) + "mb of ram space left please close down other applications" +
+                                                    " to free up ram before continuing. Or refrain from openning more tabs, keep in mind" +
+                                                    " you will risk your computer and Browseo's performance.");
+                                            });
+                                        showedMSgBox = true;
+                                    }
+                                }
+                            }
+                            catch { }
+                        });
+                        ramCheckerThread.Start();
+                    }
+                    timesToCheck = 0;
+                }
             }
+            catch { }
         }
 
         public static string GetDefultHomePage()
@@ -981,7 +1522,7 @@ namespace Organiser.Common.Classes
             // example:
             // skype_plugin_core_proxy_window: 02490E80
         }
-        public static void SetClipboardText(string text)
+        public static void SetClipboardText(string text, bool showException = true)
         {
             try
             {
@@ -991,6 +1532,8 @@ namespace Organiser.Common.Classes
             }
             catch (Exception ex)
             {
+                if (!showException) return;
+
                 try
                 {
                     string msg = ex.Message;
@@ -1008,5 +1551,108 @@ namespace Organiser.Common.Classes
             }
         }
 
+        public static void SetUpPdaaFromPath(string projectPath)
+        {
+            string filepath = Path.Combine(projectPath, "ProjectData.ini");
+            IniFile ini = new IniFile(filepath);
+            GloableProfData.PData = new PersonData();
+            try
+            {
+                GloableProfData.PData.ProjectName = ini.IniReadValue("Data", "ProjectName");
+                GloableProfData.PData.ProfileName = ini.IniReadValue("Data", "ProfileName");
+                GloableProfData.PData.FirstName = ini.IniReadValue("Data", "FirstName");
+                GloableProfData.PData.LastName = ini.IniReadValue("Data", "LastName");
+                GloableProfData.PData.Email = ini.IniReadValue("Data", "Email");
+                GloableProfData.PData.Password = ini.IniReadValue("Data", "Password");
+                GloableProfData.PData.Username = ini.IniReadValue("Data", "Username");
+                GloableProfData.PData.ProxyIP = ini.IniReadValue("Data", "ProxyIP");
+                GloableProfData.PData.ProxyPort = ini.IniReadValue("Data", "ProxyPort");
+                GloableProfData.PData.ProxyUsername = ini.IniReadValue("Data", "ProxyUsername");
+                GloableProfData.PData.ProxyPassword = ini.IniReadValue("Data", "ProxyPassword");
+                GloableProfData.PData.PhoneNumber = ini.IniReadValue("Data", "PhoneNumber");
+                GloableProfData.PData.Street = ini.IniReadValue("Data", "Street");
+                GloableProfData.PData.City = ini.IniReadValue("Data", "City");
+                GloableProfData.PData.State = ini.IniReadValue("Data", "State");
+                GloableProfData.PData.Zip = ini.IniReadValue("Data", "Zip");
+                GloableProfData.PData.Country = ini.IniReadValue("Data", "Country");
+                GloableProfData.PData.WebAddress = ini.IniReadValue("Data", "WebAddress");
+                GloableProfData.PData.Notes = ini.IniReadValue("Data", "Notes");
+                try
+                {
+                    GloableProfData.PData.CmbSelectedIndexSex = Convert.ToInt32(ini.IniReadValue("Data", "Sex"));
+                    GloableProfData.PData.CmbSelectedIndexDay = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayDay"));
+                    GloableProfData.PData.CmbSelectedIndexMonth = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayMonth"));
+                }
+                catch { }
+                GloableProfData.PData.ProjectDir = projectPath;
+                try
+                {
+                    GloableProfData.PData.BirthdayYear = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayYear"));
+                }
+                catch { }
+
+
+                MyFilesDatabase.GetSavedSesstion(GloableProfData.PData.ProjectName);
+            }
+            catch { }
+        }
+
+        #region imacros
+        public static string GetBaseMacroDir()
+        {
+            string ddir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\RAWSocialOrganizer\\MacroDefaultDir";
+            if (!Directory.Exists(ddir)) Directory.CreateDirectory(ddir);
+
+            return ddir;
+        }
+        public static string GetBaseMacroDownloadDir()
+        {
+            string ddir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\RAWSocialOrganizer\\MacroDefaultDir\\Downloads";
+            if (!Directory.Exists(ddir)) Directory.CreateDirectory(ddir);
+
+            return ddir;
+        }
+        public static string GetBaseMacroDatasourcesDir()
+        {
+            string ddir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\RAWSocialOrganizer\\MacroDefaultDir\\Datasources";
+            if (!Directory.Exists(ddir)) Directory.CreateDirectory(ddir);
+
+            return ddir;
+        }
+        public static string GetBaseMacroSettingsDir()
+        {
+            string ddir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\RAWSocialOrganizer\\MacroDefaultDir\\Settings";
+            if (!Directory.Exists(ddir)) Directory.CreateDirectory(ddir);
+
+            return ddir;
+        }
+        public static string GetBaseMacroScriptsDir()
+        {
+            string ddir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\RAWSocialOrganizer\\MacroDefaultDir\\Scripts";
+            if (!Directory.Exists(ddir)) Directory.CreateDirectory(ddir);
+
+            return ddir;
+        }
+
+        public static void SaveImportedProjectsForMultyMacro(string projectName, string data)
+        {
+            string ddir = Path.Combine(GetBaseDir(), "MacrosMultyTabs", projectName);
+            if (!Directory.Exists(ddir)) Directory.CreateDirectory(ddir);
+
+            string fPath = Path.Combine(ddir, "savedProjects");
+            File.WriteAllText(fPath, data);
+        }
+
+        public static string GEtImportedProjectsForMultyMacroData(string projectName)
+        {
+            string ddir = Path.Combine(GetBaseDir(), "MacrosMultyTabs", projectName);
+            if (!Directory.Exists(ddir)) return "";
+
+            string fPath = Path.Combine(ddir, "savedProjects");
+            if (!File.Exists(fPath)) return "";
+
+            return File.ReadAllText(fPath);
+        }
+        #endregion
     }
 }

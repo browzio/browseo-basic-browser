@@ -122,7 +122,7 @@
                     </Expander>
             </Grid>
 
-        <Ribbon Name="ribon" Foreground="#333333" Background="WhiteSmoke" Margin="0,-22,0,0" Grid.ColumnSpan="2" SelectionChanged="Ribbon_SelectionChanged">
+        <Ribbon Name="ribon" Foreground="#333333" Background="WhiteSmoke" Margin="0,0,0,0" Grid.ColumnSpan="2" SelectionChanged="Ribbon_SelectionChanged">
             <Ribbon.ApplicationMenu>
                 <RibbonApplicationMenu Visibility="Collapsed" />
             </Ribbon.ApplicationMenu>

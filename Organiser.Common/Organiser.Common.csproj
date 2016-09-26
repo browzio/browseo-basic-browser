@@ -41,6 +41,9 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Delimon.Win32.IO">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Delimon\Delimon.Win32.IO\Delimon.Win32.IO.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -79,13 +82,16 @@
     <Compile Include="Classes\ExtensionMethods.cs" />
     <Compile Include="Classes\Facebook\FacebookGraphResult.cs" />
     <Compile Include="Classes\Facebook\FacebookGraphSearch.cs" />
+    <Compile Include="Classes\Facebook\SourceCrawler.cs" />
     <Compile Include="Classes\FlexibleMessageBox.cs" />
     <Compile Include="Classes\GloableProfData.cs" />
     <Compile Include="Classes\ImageAsyncHelper.cs" />
     <Compile Include="Classes\Lists.cs" />
+    <Compile Include="Classes\MacroPlayer.cs" />
     <Compile Include="Classes\MeException.cs" />
     <Compile Include="Classes\MozscapeAPI.cs" />
     <Compile Include="Classes\MozscapeResults.cs" />
+    <Compile Include="Classes\MyTreeViewHelper.cs" />
     <Compile Include="Classes\NativeMethods.cs" />
     <Compile Include="Classes\ObjectCopier.cs" />
     <Compile Include="Classes\ProcessManager.cs" />
@@ -104,6 +110,9 @@
     <Compile Include="Controlls\SocialButtonsUserControl.xaml.cs">
       <DependentUpon>SocialButtonsUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controlls\TrvMacrosUserControl.xaml.cs">
+      <DependentUpon>TrvMacrosUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\BooleanToVisible.cs" />
     <Compile Include="Converters\ElementSizeMathConverter.cs" />
     <Compile Include="Converters\EmptyListToVisibleConverter.cs" />
@@ -111,10 +120,18 @@
     <Compile Include="Converters\MaxCharCountConv.cs" />
     <Compile Include="Converters\NullToVisibleConverter.cs" />
     <Compile Include="Converters\OpisiteVisibilityConverter.cs" />
+    <Compile Include="Models\ProjectImported.cs" />
     <Compile Include="Models\WebPageImg.cs" />
+    <Compile Include="ViewModels\ChooseProjectsVM.cs" />
     <Compile Include="ViewModels\PinterestImagePickerVM.cs" />
     <Compile Include="Windows\ChoosePinterestImageWindow.xaml.cs">
       <DependentUpon>ChoosePinterestImageWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\MacroEditsWindow.xaml.cs">
+      <DependentUpon>MacroEditsWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\MacroPromptWindow.xaml.cs">
+      <DependentUpon>MacroPromptWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\SetNameAndDataWindow.xaml.cs">
       <DependentUpon>SetNameAndDataWindow.xaml</DependentUpon>
@@ -142,6 +159,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controlls\TrvMacrosUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="GloableStyleDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -153,6 +174,14 @@
     <Page Include="Windows\ChoosePinterestImageWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\MacroEditsWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\MacroPromptWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\SelectProfileWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -332,14 +361,64 @@
     <Resource Include="Image\checkmark-green-dot.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
-      <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
-      <Name>CefGlue.WindowsForms-old</Name>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
+      <Name>CefGlue.WindowsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj">
-      <Project>{9080d62a-6fe7-41d2-9a77-f3d7f6c33418}</Project>
-      <Name>CefGlue-old</Name>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
+      <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
+      <Name>CefGlue</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltipvideoUpload.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltipKeywords.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltipiftt.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltipfbProfilephoto.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltipCreateBoard.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltippintrestLikeReshare.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltipFBurl.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\browseo-logo-icon-blue-48.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\browseo-logo-icon-blue-32.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltipKeywordComment.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltipKeywordFilePaths.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltipKeywordFilePathsScrape.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\bg.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ic_play_arrow_black_24dp_1x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltipKeywordNameDescription.png" />
+    <Resource Include="Image\tooltipKeywordtext.png" />
+    <Resource Include="Image\tooltipPosttext.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\tooltipPosttextURL.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

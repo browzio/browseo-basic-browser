@@ -44,7 +44,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             
-            <StackPanel Margin="25,0,0,0" VerticalAlignment="Center" >
+            <StackPanel Margin="25,0,0,0" VerticalAlignment="Top" >
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Keyword:"  VerticalAlignment="Center"
                                Visibility="{Binding Path= Visible_Custom,Converter={StaticResource boolToVis}}" />
@@ -89,6 +89,14 @@
                     <TextBlock Text="visit countrycode.org for full list" Foreground="Blue" Cursor="Hand" PreviewMouseUp="TextBlock_PreviewMouseUp"  VerticalAlignment="Top"  Margin="0,13,0,0" />
                 </StackPanel>
 
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel>
+                        <TextBlock Text="Response " VerticalAlignment="Center" />
+                        <TextBlock Text="Size: " VerticalAlignment="Center" />
+                    </StackPanel>
+                    <TextBox Text="{Binding ResponseSize}" Width="40"  Margin="5" VerticalAlignment="Center" />
+                </StackPanel>
+
                 <Button Command="{Binding SaveFootprint}" Content="Save Footprint"
                         Visibility="{Binding Path= Visible_savebtn,Converter={StaticResource boolToVis}}" HorizontalAlignment="Left" Margin="0,5,5,0"/>
             </StackPanel>
@@ -97,6 +105,12 @@
                 <StackPanel>
                     <CheckBox Content="KW In Title" IsChecked="{Binding KWinTitleIsChecked}" Margin="2" />
                     <CheckBox Content="KW In Content" IsChecked="{Binding KWinContentIsChecked}" Margin="2" />
+
+                    <StackPanel Margin="0,10,0,0">
+                        <RadioButton  Content="Posts With Videos" IsChecked="{Binding Checked_PostsWithVids}" Margin="2"  />
+                        <RadioButton  Content="Posts Without Videos" IsChecked="{Binding Checked_PostsWithNoVids}" Margin="2"  />
+                        <RadioButton  Content="All Posts" IsChecked="{Binding Checked_PostsWithVidsAll}" Margin="2"  />
+                    </StackPanel>
                 </StackPanel>
                 
                 <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
@@ -262,38 +276,6 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Grid.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Height" Value="25" />
-                        <Setter Property="Margin" Value="0" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Border 
-                                Background="#a1a5ad" Cursor="Hand"
-                                Padding="{TemplateBinding Padding}" MinWidth="25"
-                                CornerRadius="0" x:Name="Border">
-                                        <ContentControl Content="{TemplateBinding Content}"
-                                                HorizontalAlignment="Center" Margin="3"
-                                                VerticalAlignment="Center" TextElement.Foreground="White"/>
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsPressed" Value="True">
-                                            <Setter TargetName="Border" Property="Background">
-                                                <Setter.Value>
-                                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                        <GradientStop Color="#FF376ED4" Offset="0"/>
-                                                        <GradientStop Color="#FF588DF0" Offset="0.332"/>
-                                                    </LinearGradientBrush>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Grid.Resources>
                 <Button Command="{Binding RefreshSaved}" CommandParameter="Refresh" Height="25" Width="25" HorizontalAlignment="Right">
                     <Image Source="pack://application:,,,/Organiser.Common;component/Image/refresh.png"  
                    ToolTip="Refresh" SnapsToDevicePixels="True" Stretch="Uniform" />

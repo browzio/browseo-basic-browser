@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using zFirefoxBrowser.Helpers;
 using zFirefoxBrowser.ViewModels;
 
 namespace zFirefoxBrowser.Controls
@@ -28,12 +29,14 @@ namespace zFirefoxBrowser.Controls
     public partial class FFBrowserUserControl : UserControl
     {
         public ObservableCollection<FoxTabViewModel> BrowserTabs { get; set; }
+        public FoxTabViewModel SelectedTab { get; set; }
 
         public event Action<string, string> OnCurateToPBN = delegate { };
         public event Action<string, string, List<string>> OnAddedToGoViral = delegate { };//link,type,multi
         public event Action OnRefreshedSessionSettings = delegate { };
         public event Action OnClickedReminders = delegate { };
         public event Action<string, string> OnSentForSeo = delegate { };//name,url
+        public event Action OnRequestedWindowLocation = delegate { };
 
         public FFBrowserUserControl()
         {
@@ -92,8 +95,32 @@ namespace zFirefoxBrowser.Controls
                     btvm.TabMargin = new Thickness(-3, 0, 0, 0);
                 BrowserTabs.Add(btvm);
 
-               browserHost.TabControl.SelectedIndex = browserHost.TabControl.Items.Count - 1;
+                browserHost.TabControl.SelectedIndex = browserHost.TabControl.Items.Count - 1;
             });
+
+            //Application.Current.Dispatcher.Invoke((Action)delegate
+            //{
+            //    Thread thread = new Thread(() =>
+            //    {
+            //        FoxTabViewModel btvm = new FoxTabViewModel(url == "" ? MyFilesDatabase.GetDefultHomePage() : url);
+            //        setBTVMEvents(btvm);
+            //        btvm.Title = url;
+            //        Task.Factory.StartNew(() => { btvm.ReminderCount = MyFilesDatabase.GetRemindersCount(GloableProfData.PData.ProjectName); });
+            //        if (BrowserTabs.Count > 0)
+            //            btvm.TabMargin = new Thickness(-20, 0, 0, 0);
+            //        else
+            //            btvm.TabMargin = new Thickness(-3, 0, 0, 0);
+            //        BrowserTabs.Add(btvm);
+
+            //        browserHost.TabControl.SelectedIndex = browserHost.TabControl.Items.Count - 1;
+            //        System.Windows.Threading.Dispatcher.Run();
+            //    });
+
+
+            //    thread.SetApartmentState(ApartmentState.STA);
+            //    thread.Start();
+            //});
+
         }
 
         private void setBTVMEvents(FoxTabViewModel btvm)
@@ -102,13 +129,28 @@ namespace zFirefoxBrowser.Controls
             btvm.OnCurateToPBN += Btvm_OnCurateToPBN;
             btvm.OnAddedToGoViral += Btvm_OnAddedToGoViral;
             btvm.OnClickedSaveSession += Btvm_OnClickedSaveSession;
+            btvm.OnSetUserAgent += Btvm_OnSetUserAgent;
             btvm.OnClickedDeleteSession += Btvm_OnClickedDeleteSession;
             btvm.OnClickedSaveSessionToBookmarks += Btvm_OnClickedSaveSessionToBookmarks;
             btvm.OnClickedReminders += Btvm_OnClickedReminders;
             //btvm.OnRefreshTabSettingsTab += Btvm_OnRefreshTabSettings;
             btvm.OnRefreshSessionSettings += Btvm_OnRefreshSessionSettings;
             btvm.OnSentForSeo += Btvm_OnSentForSeo;
+            btvm.OnRequestedWindowLocation += Btvm_OnRequestedWindowLocation;
+            btvm.AnyPlaingJS += Btvm_AnyPlaingJS;
         }
+
+        private bool Btvm_AnyPlaingJS()
+        {
+            return BrowserTabs.Any(b=>b.runningInJsMode);
+        }
+
+        private void Btvm_OnRequestedWindowLocation()
+        {
+            OnRequestedWindowLocation();
+        }
+
+
         #region btvm events
         private void Btvm_OnRefreshTabSettings(FoxTabViewModel tab)
         {
@@ -150,62 +192,28 @@ namespace zFirefoxBrowser.Controls
             tmpList.Clear();
             OnRefreshedSessionSettings();
         }
+
+        public void GotScreenCords(string message)
+        {
+            SelectedTab.GotScreenCords(message);
+        }
+
         private void refreshGsettings()
         {
-            if(Thread.CurrentThread != Dispatcher.Thread)
+            //if(Thread.CurrentThread != Dispatcher.Thread)
+            //{
+            //    Dispatcher.BeginInvoke(new Action(refreshGsettings));
+            //    return;
+            //}
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                Dispatcher.BeginInvoke(new Action(refreshGsettings));
-                return;
-            }
-            if (!BrowserSettimgs.DoNotTrackEnabled)
-            {
-                GeckoPreferences.Default["privacy.donottrackheader.enabled"] = true;
-                GeckoPreferences.Default["services.sync.prefs.sync.privacy.donottrackheader.enabled"] = true;
-            }
-            else
-            {
-                GeckoPreferences.Default["privacy.donottrackheader.enabled"] = false;
-                GeckoPreferences.Default["services.sync.prefs.sync.privacy.donottrackheader.enabled"] = false;
-            }
-
-            if (BrowserSettimgs.FlashEnabled)
-            {
-                //plugin.state.flash
-                GeckoPreferences.Default["plugin.state.flash"] = 2;
-            }
-            else
-            {
-                GeckoPreferences.Default["plugin.state.flash"] = 0;
-            }
-
-            if (BrowserSettimgs.JavaEnabled)
-            {
-                //plugin.state.java;1
-                GeckoPreferences.Default["plugin.state.java"] = 1;
-            }
-            else
-            {
-                GeckoPreferences.Default["plugin.state.java"] = 0;
-            }
-
-            if (BrowserSettimgs.JavascriptEnabled)
-            {
-                //javascript.enabled;true
-                GeckoPreferences.Default["javascript.enabled"] = true;
-            }
-            else
-            {
-                GeckoPreferences.Default["javascript.enabled"] = false;
-            }
-
-            if (BrowserSettimgs.WebRTCEnabled)
-            {
-                GeckoPreferences.Default["media.peerconnection.enabled"] = true;
-            }
-            else
-            {
-                GeckoPreferences.Default["media.peerconnection.enabled"] = false;
-            }
+                FoxInit.SetSettings();
+            });
+        }
+        private void Btvm_OnSetUserAgent(string agent)
+        {
+            BrowserSettimgs.UserAgentFF = agent;   
+            Btvm_OnRefreshSessionSettings();
         }
 
         private void Btvm_OnClickedSaveSessionToBookmarks()
@@ -222,7 +230,7 @@ namespace zFirefoxBrowser.Controls
 
         private void Btvm_OnClickedDeleteSession()
         {
-            MyFilesDatabase.DeleteSession(GloableProfData.PData.ProjectName);
+            MyFilesDatabase.DeleteSession(GloableProfData.PData.ProjectName, true);
         }
 
         private void Btvm_OnClickedSaveSession()
@@ -278,11 +286,22 @@ namespace zFirefoxBrowser.Controls
             });
         }
 
-        private void Instance_OnSelsectedLauncAll(string[] sites)
+        private async void Instance_OnSelsectedLauncAll(string[] sites)
         {
             foreach (string site in sites)
             {
+                if (site.Contains(",")) continue;
                 CreateNewTab(site);
+                if (!GloableProfData.PData.ProxyIP.IsNullOrEmpty())
+                {
+                    await Task.Run(()=>{
+                        while (!FoxInit.DidsetProxy)
+                        {
+                            Thread.Sleep(500);
+                        }
+                        Thread.Sleep(250);
+                    });
+                }
             }
         }
 
@@ -298,16 +317,32 @@ namespace zFirefoxBrowser.Controls
             DragDropMainViewModel.Instance.OnDoubleClickedSite -= Instance_OnDoubleClickedSite;
             DragDropMainViewModel.Instance.OnSelsectedLauncAll -= Instance_OnSelsectedLauncAll;
 
+            //MacroManger.OnPlayMacro -= MacroManager_OnPlayMacro; 
+
             if (set)
             {
                 DragDropMainViewModel.Instance.OnDoubleClickedSite += Instance_OnDoubleClickedSite;
                 DragDropMainViewModel.Instance.OnSelsectedLauncAll += Instance_OnSelsectedLauncAll;
+
+               // MacroManger.OnPlayMacro += MacroManager_OnPlayMacro;
             }
             else
             {
                 DragDropMainViewModel.Instance.OnDoubleClickedSite -= Instance_OnDoubleClickedSite;
                 DragDropMainViewModel.Instance.OnSelsectedLauncAll -= Instance_OnSelsectedLauncAll;
+
+               // MacroManger.OnPlayMacro -= MacroManager_OnPlayMacro;
             }
+        }
+
+
+
+       
+        private async void MacroManager_OnPlayMacro(MacroManger mPlayer, IIMPlayType isiim, int times)
+        {
+            if (SelectedTab == null) return;
+
+           await SelectedTab.RunMacro(mPlayer, isiim, times);
         }
     }
 }

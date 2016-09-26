@@ -103,6 +103,7 @@
                                 <ListView.ContextMenu>
                                     <ContextMenu>
                                         <MenuItem Header="Launch In Project Browser Window" Command="{Binding OnCommandRaisedInView}" CommandParameter="OpenInProjBrowser" />
+                                        <MenuItem Header="Launch In Project Browser FF" Command="{Binding OnCommandRaisedInView}" CommandParameter="OpenInProjBrowserFF" />
                                     </ContextMenu>
                                 </ListView.ContextMenu>
                             </ListView>
@@ -112,8 +113,10 @@
             </ListView.ItemTemplate>
             <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Delete Folder" Command="{Binding OnBtnClick}" CommandParameter="CMDelete" />
                     <MenuItem Header="Edit" Command="{Binding OnBtnClick}" CommandParameter="CMEdit" />
+                    <Separator Margin="-30,0,0,0" />
+                    <MenuItem Header="Clear Links" Command="{Binding OnBtnClick}" CommandParameter="CMClear" />
+                    <MenuItem Header="Delete Folder" Command="{Binding OnBtnClick}" CommandParameter="CMDelete" />
                 </ContextMenu>
             </ListView.ContextMenu>
         </ListView>    

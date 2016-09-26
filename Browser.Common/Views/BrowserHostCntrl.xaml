@@ -70,7 +70,12 @@
                         <ControlTemplate TargetType="Button">
                             <Grid Height="27" VerticalAlignment="Top" Width="40">
                                 <Path  Name="TabFill" Data="M0.5,1 C0.5,0.72385763 0.72385763,0.5 1,0.5 L26,0.5 C26.276142,0.5 26.5,0.72385763 26.5,1 L38.5,15.5 C38.5,15.776142 37.996731,16 37.720588,16 L12.720588,16 C12.444446,16 12.5,15.776142 12.5,15.5 z" 
-                                       Fill="#FFFFFFFF" Height="16.5" Stretch="Fill" Stroke="#FF999999" VerticalAlignment="Top" HorizontalAlignment="Right" Width="35" Margin="0,10,0,0" />
+                                       Fill="#FFF7F7F7" Height="16.5" Stretch="Fill" VerticalAlignment="Top" HorizontalAlignment="Right" Width="35" Margin="0,10,0,0" Stroke="Black" StrokeThickness="0.4">
+                                    <Path.Effect>
+                                        <!--<BlurEffect Radius="2" RenderingBias="Performance" KernelType="Gaussian"  />-->
+                                        <DropShadowEffect BlurRadius="3" ShadowDepth="0" Color="White" Direction="0" />
+                                    </Path.Effect>
+                                </Path>
                             </Grid>
 
                             <ControlTemplate.Triggers>
@@ -92,9 +97,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type commonControlls:NonReloadingTabControl}">
-                            <Grid ClipToBounds="True"
-                                  KeyboardNavigation.TabNavigation="Local"
-                                  SnapsToDevicePixels="True">
+                            <Grid ClipToBounds="True" KeyboardNavigation.TabNavigation="Local" SnapsToDevicePixels="True">
                                 <Grid.RowDefinitions>
                                     <RowDefinition x:Name="RowDefinition0" Height="Auto" />
                                     <RowDefinition x:Name="RowDefinition1" Height="*" />
@@ -120,7 +123,7 @@
                                                       KeyboardNavigation.TabIndex="1" />
                                             <Button Style="{StaticResource addButtonStyle}" 
                                                     Grid.Column="1"
-                                                    Margin="-13, 3, 0, 5" 
+                                                    Margin="-13, -5, 0, 3" 
                                                     Name="btnAddTab"
                                                     Command="ApplicationCommands.New"  />
                                         </StackPanel>
@@ -155,8 +158,8 @@
                                 <Path Name="TabFill" Margin="0 0 0 1" Grid.ColumnSpan="2" VerticalAlignment="Top" Stretch="Fill" Data="M39,96 C48.75,96 59.25,0 76,0 92.75,0 247,0 258,0 269,0 285.5,95.75 295,96">
                                     <Path.Fill>
                                         <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                            <GradientStop Color="#FFF3F3F3" Offset="0"/>
-                                            <GradientStop Color="#FFEAEAEA" Offset="1"/>
+                                            <GradientStop Color="#FFEAEAEA" Offset="0"/>
+                                            <GradientStop Color="#FFE4E4E4" Offset="1"/>
                                         </LinearGradientBrush>
                                     </Path.Fill>
                                 </Path>
@@ -166,16 +169,32 @@
                             </Grid>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Fill" TargetName="TabFill" Value="White" />
+                                    <!--<Setter Property="Fill" TargetName="TabFill" Value="White" />-->
+                                    <Setter TargetName="TabFill" Property="Fill">
+                                        <Setter.Value>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="White" Offset="0"/>
+                                                <GradientStop Color="#FFF7F7F7" Offset="0.332"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
                                     <Setter Property="Margin" TargetName="TabFill" Value="0 0 0 -1" />
                                     <Setter Property="Margin" TargetName="TabPath" Value="0" />
                                 </Trigger>
-
-                                <Trigger Property="IsMouseOver"  Value="True">
-                                    <Setter TargetName="TabFill" Property="Fill" Value="White" />
-                                    <!--<Setter Property="Margin" TargetName="TabFill" Value="0 0 0 -1" />
-                                    <Setter Property="Margin" TargetName="TabPath" Value="0" />-->
-                                </Trigger>
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsSelected" Value="False"/>
+                                        <Condition Property="IsMouseOver"  Value="True" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="TabFill" Property="Fill">
+                                        <Setter.Value>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="White" Offset="0"/>
+                                                <GradientStop Color="WhiteSmoke" Offset="0.332"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </MultiTrigger>
                             </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Setter.Value>
@@ -190,6 +209,7 @@
                                                 SelectionChanged="TabControl_SelectionChanged"
                                                 Margin="0,0,0,0" 
                                                 ItemsSource="{Binding BrowserTabs, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}"
+                                                SelectedItem="{Binding SelectedTab}"
                                                 SelectedIndex="0">
             <TabControl.ContentTemplate>
                 <DataTemplate>

@@ -314,9 +314,9 @@ namespace GoViral.Instagram.InstViewModels
             {
                 try
                 {
-                    if (WebBrowser.CBrowser != null && WebBrowser.CBrowser.Browser != null && WebBrowser.CBrowser.Browser.GetMainFrame() != null)
+                    if (WebBrowser.CBrowser != null && WebBrowser.GetBrowser() != null && WebBrowser.GetTheMainFrame() != null)
                     {
-                        url = WebBrowser.CBrowser.Browser.GetMainFrame().Url;
+                        url = WebBrowser.GetTheMainFrame().Url;
                     }
                 }
                 catch { }

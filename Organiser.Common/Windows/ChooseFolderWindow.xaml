@@ -19,19 +19,62 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-            <Button Content="Select All" Width="100" Margin="5" Command="{Binding SelectFolderSelect_Click}" CommandParameter="All" Style="{StaticResource FlatbtnStyle}" />
-            <Button Content="Select None" Width="100" Margin="5" Command="{Binding SelectFolderSelect_Click}" CommandParameter="None" Style="{StaticResource FlatbtnStyle}" />
-        </StackPanel>
-        
-        <ListBox Grid.Row="1" Name="lstItems" x:FieldModifier="public" IsSynchronizedWithCurrentItem="True">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Name}" MaxWidth="200" Margin="5" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <UniformGrid Rows="1">
+            <Button Content="Select All" Margin="5" Command="{Binding SelectFolderSelect_Click}" CommandParameter="All" Style="{StaticResource FlatbtnStyle}" />
+            <Button Content="Select None" Margin="5" Command="{Binding SelectFolderSelect_Click}" CommandParameter="None" Style="{StaticResource FlatbtnStyle}" />
+        </UniformGrid>
 
+        <ScrollViewer  Grid.Row="1" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <ItemsControl Name="lstItems" x:FieldModifier="public">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="{Binding TabMargin}" Visibility="{Binding ProjVisible}">
+                            <Grid.Style>
+                                <Style TargetType="{x:Type Grid}">
+                                    <Style.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Background" Value="WhiteSmoke" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Grid.Style>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Image Width="15" Height="15" HorizontalAlignment="Left"
+                                   Visibility="{Binding VisibleHasNext}" 
+                                    Source="pack://application:,,,/Organiser.Common;component/Image/ic_play_arrow_black_24dp_1x.png">
+                                <Image.LayoutTransform>
+                                    <RotateTransform Angle="{Binding AngleTransformImage}"/>
+                                </Image.LayoutTransform>
+                                <Image.InputBindings>
+                                    <MouseBinding Gesture="LeftClick" Command="{Binding OnCommandFromView}" CommandParameter="ClickedExpand" />
+                                </Image.InputBindings>
+                            </Image>
+                            
+                            <CheckBox Grid.Column="1" MaxWidth="200" HorizontalAlignment="Left"
+                                      IsChecked="{Binding IsChecked}" Content="{Binding Name}" />
+
+                            <Image Grid.Column="2" Margin="1" Width="10" Height="10" Stretch="Uniform" Visibility="{Binding VisibleProjIcon}">
+                                <Image.Style>
+                                    <Style TargetType="{x:Type Image}">
+                                        <Setter Property="Source" Value="pack://application:,,,/Organiser.Common;component/Image/browseo-logo-icon-blue-48.png" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=IsFolder}" Value="True">
+                                                <Setter Property="Source" Value="pack://application:,,,/Organiser.Common;component/Image/closed_folder.png"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Image.Style>
+                            </Image>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        
         <StackPanel Grid.Row="3">
             <Button Content="Ok" Margin="5" Click="Button_Click" Style="{StaticResource FlatbtnStyle}" />
             <Button Content="Load All Projects" Margin="5" Name="btnLoadAllProjects" Visibility="Collapsed" x:FieldModifier="public" Click="btnLoadAllProjects_Click" Style="{StaticResource FlatbtnStyle}" />

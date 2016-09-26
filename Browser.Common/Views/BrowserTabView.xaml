@@ -8,6 +8,8 @@
              xmlns:mConv="clr-namespace:Browser.Common.Convertrs"
              xmlns:dragNdrop="clr-namespace:DragDropListview.Controls;assembly=DragDropListview"
              xmlns:commonConvs="clr-namespace:Organiser.Common.Converters;assembly=Organiser.Common"
+             xmlns:commonClass="clr-namespace:Organiser.Common.Classes;assembly=Organiser.Common"
+             xmlns:commonControls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
              mc:Ignorable="d"
              d:DesignWidth="640"
              d:DesignHeight="480">
@@ -16,7 +18,56 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
             </ResourceDictionary.MergedDictionaries>
+
+            <SolidColorBrush Color="#5c5c5c" x:Key="text_fg"/>
+            <SolidColorBrush Color="#f5f5f5" x:Key="bg_gray"/>
+            <SolidColorBrush Color="#eeeeee" x:Key="gray_bg"/>
+            <Style x:Key="TreeViewItemFocusVisual">
+                <Setter Property="Control.Template">
+                    <Setter.Value>
+                        <ControlTemplate>
+                            <Rectangle/>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <PathGeometry x:Key="TreeArrow" Figures="M0,0 L0,6 L6,0 z"/>
+            <Style x:Key="ExpandCollapseToggleStyle" TargetType="{x:Type ToggleButton}">
+                <Setter Property="Focusable" Value="False"/>
+                <Setter Property="Width" Value="16"/>
+                <Setter Property="Height" Value="16"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type ToggleButton}">
+                            <Border Background="Transparent" Height="16" Padding="5,5,5,5" Width="16">
+                                <Path x:Name="ExpandPath" Data="{StaticResource TreeArrow}" Fill="Transparent" Stroke="#FF989898">
+                                    <Path.RenderTransform>
+                                        <RotateTransform Angle="135" CenterY="3" CenterX="3"/>
+                                    </Path.RenderTransform>
+                                </Path>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Stroke" TargetName="ExpandPath" Value="#FF1BBBFA"/>
+                                    <Setter Property="Fill" TargetName="ExpandPath" Value="Transparent"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter Property="RenderTransform" TargetName="ExpandPath">
+                                        <Setter.Value>
+                                            <RotateTransform Angle="180" CenterY="3" CenterX="3"/>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Fill" TargetName="ExpandPath" Value="#FF595959"/>
+                                    <Setter Property="Stroke" TargetName="ExpandPath" Value="#FF262626"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <commonConvs:OpisiteVisibilityConverter x:Key="convOppositVisibility" />
+            <commonConvs:BooleanToVisible x:Key="convBoolYesNotVisibility" />
             <mConv:ReminersCountToVisibleConverter x:Key="counttoVisConv" />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -58,19 +109,31 @@
                                Source="pack://application:,,,/Organiser.Common;component/Image/refresh.png" />
                     </Button>
 
+                    <Button Name="openMacros"  
+                            DockPanel.Dock="Right"
+                            Click="openMacros_Click"
+                            ToolTip="Open Macros"
+                            Margin="0,0,10,0"
+                            Command="{Binding OpenMacrosCommand}"
+                            Style="{DynamicResource browser_btn}"
+                            Visibility="{Binding SetMacrosAvailableVisible}">
+                        <Image HorizontalAlignment="Center" 
+                               VerticalAlignment="Center" 
+                               Stretch="Uniform" 
+                               Source="pack://application:,,,/Organiser.Common;component/Image/browseo-logo-icon-blue-32.png" />
+                    </Button>
+
                     <Button Name="openFlyout"  
-                    DockPanel.Dock="Right"
-                    Click="openFlyout_Click"
-                    ToolTip="Open Saved Sites"
-                    Margin="5,0,10,0"
-                    Command="{Binding FillListCommand}"
-                    Style="{DynamicResource browser_btn}">
-                        <Image 
-                               HorizontalAlignment="Center" 
+                            DockPanel.Dock="Right"
+                            Click="openFlyout_Click"
+                            ToolTip="Open Saved Sites"
+                            Margin="4,0,4,0"
+                            Command="{Binding FillListCommand}"
+                            Style="{DynamicResource browser_btn}">
+                        <Image HorizontalAlignment="Center" 
                                VerticalAlignment="Center" 
                                Stretch="None" 
                                Source="pack://application:,,,/Organiser.Common;component/Image/add.png" />
-
                     </Button>
 
                     <Button Name="Settings" 
@@ -106,45 +169,155 @@
                                         </Style.Triggers>
                                     </Style>
                                 </ContextMenu.Resources>
-                                <MenuItem Header="Save Session" Command="{Binding SaveSession}" />
-                                <MenuItem Header="Delete Last Session" Command="{Binding DeleteSession}" />
+                                <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled" Height="500">
+                                    <StackPanel Background="White">
+                                        <!--<Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>-->
+                                        <MenuItem Margin="2" Header="Save Session" Command="{Binding SaveSession}" />
+                                        <MenuItem Margin="2" Header="Delete Last Session" Command="{Binding DeleteSession}" Grid.Row="1" />
 
-                                <Separator Margin="-30,0,0,0" />
+                                        <Separator Grid.Row="2"  Margin="-30,0,0,0" />
 
-                                <MenuItem Header="Save Open Tabs" ToolTip="Will save all open tabs to a bookmarks folder" Command="{Binding SaveSessionToBMs}" />
+                                        <MenuItem Margin="2"  Grid.Row="3" Header="Save Open Tabs" ToolTip="Will save all open tabs to a bookmarks folder" Command="{Binding SaveSessionToBMs}" />
 
-                                <Separator Margin="-30,0,0,0" />
+                                        <Separator Grid.Row="4"  Margin="-30,0,0,0" />
 
-                                <CheckBox Content="Flash" IsChecked="{Binding FlashEnabled, UpdateSourceTrigger=PropertyChanged}" />
-                                <CheckBox Content="Javascript" IsChecked="{Binding JavascriptEnabled, UpdateSourceTrigger=PropertyChanged}" />
-                                <CheckBox Content="Java" IsChecked="{Binding JavaEnabled, UpdateSourceTrigger=PropertyChanged}" />
-                                <CheckBox Content="WebRTC" IsChecked="{Binding WebRTCEnabled, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding SetWebrtcVisible}" />
+                                        <!--<MenuItem Header="Security Settings">
 
-                                <Separator Margin="-30,0,0,0" />
+                                        </MenuItem>-->
+                                        <MenuItem Margin="2" Grid.Row="6" >
+                                            <MenuItem.Header>
+                                                <CheckBox Content="Flash+Plugins" IsChecked="{Binding FlashEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                            </MenuItem.Header>
+                                        </MenuItem>
+                                        <MenuItem Margin="2" Grid.Row="7" >
+                                            <MenuItem.Header>
+                                                <CheckBox Content="WebGL" ToolTip="Disabling may cause website to run slower on some computers with a good graphics card but faster on others that dont, but will block from fingerprinting your webGL identity" 
+                                                          IsChecked="{Binding WebGLEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                            </MenuItem.Header>
+                                        </MenuItem>
+                                        <MenuItem Margin="2" Grid.Row="8" >
+                                            <MenuItem.Header>
+                                                <CheckBox Content="Javascript" IsChecked="{Binding JavascriptEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                            </MenuItem.Header>
+                                        </MenuItem>
+                                        <MenuItem Margin="2" Grid.Row="9"  Visibility="{Binding SetWebrtcVisible}">
+                                            <MenuItem.Header>
+                                                <CheckBox Content="Java" IsChecked="{Binding JavaEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                            </MenuItem.Header>
+                                        </MenuItem>
+                                        <MenuItem Margin="2" Grid.Row="10"  Visibility="{Binding SetWebrtcVisible}">
+                                            <MenuItem.Header>
+                                                <CheckBox Content="WebRTC" IsChecked="{Binding WebRTCEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                            </MenuItem.Header>
+                                        </MenuItem>
+                                        <MenuItem Margin="2" Grid.Row="5" >
+                                            <MenuItem.Header>
+                                                <CheckBox Content="Allow Tracking (DNT)" IsChecked="{Binding DoNotTrackEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                            </MenuItem.Header>
+                                        </MenuItem>
 
-                                <CheckBox Content="Allow Tracking (DNT)"  ToolTip="Can only be set with session settings" IsChecked="{Binding DoNotTrackEnabled, UpdateSourceTrigger=PropertyChanged}" />
-                                <CheckBox Content="Sync Time" ToolTip="Can only be set with session settings" IsChecked="{Binding SetSysDateEnabled, UpdateSourceTrigger=PropertyChanged}" />
-                                <Grid>
-                                    <StackPanel Visibility="{Binding VisibleDtPbar}">
-                                        <TextBlock Text="Getting Time Zone" />
-                                        <ProgressBar IsIndeterminate="True" />
+
+
+                                        <Separator Grid.Row="11"  Margin="-30,0,0,0" />
+
+                                        <MenuItem Margin="2" Grid.Row="12">
+                                            <MenuItem.Header>
+                                                <CheckBox  Content="Sync Time" IsChecked="{Binding SetSysDateEnabled, UpdateSourceTrigger=PropertyChanged}" />
+                                            </MenuItem.Header>
+                                        </MenuItem>
+                                        <Grid Margin="2" Grid.Row="13">
+                                            <StackPanel Visibility="{Binding VisibleDtPbar}">
+                                                <TextBlock Text="Getting Time Zone" />
+                                                <ProgressBar IsIndeterminate="True" />
+                                            </StackPanel>
+
+                                            <ComboBox SelectedIndex="{Binding SITimeZone}" 
+                                                      ItemsSource="{Binding AvailableTimeZones}"
+                                                      Visibility="{Binding Path=VisibleDtPbar, Converter={StaticResource convOppositVisibility}}"
+                                                      MaxWidth="200" />
+                                        </Grid>
+                                        <Separator Grid.Row="14"  Margin="-30,0,0,0" />
+                                        <MenuItem Margin="2" Grid.Row="10"  Visibility="{Binding SetWebrtcVisible}">
+                                            <MenuItem.Header>
+                                                <CheckBox Content="Hide Fonts" IsChecked="{Binding HideFonts, UpdateSourceTrigger=PropertyChanged}" />
+                                            </MenuItem.Header>
+                                        </MenuItem>
+                                        <DockPanel Margin="2" Grid.Row="15">
+                                            <TextBlock Text="Defailt Font Size" Width="150" />
+                                            <TextBox Text="{Binding DefaultFontSize}"  MinWidth="50" MaxWidth="200" />
+                                        </DockPanel>
+                                        <DockPanel Margin="2" Grid.Row="16" >
+                                            <TextBlock Text="Minimum Font Size" Width="150" />
+                                            <TextBox Text="{Binding MnimumFontSize}"  MinWidth="50" MaxWidth="200" />
+                                        </DockPanel>
+                                        <StackPanel Margin="2" Grid.Row="17" >
+                                            <TextBlock Text="Standard Font" />
+                                            <ComboBox SelectedIndex="{Binding SIFontStandard}" ItemsSource="{Binding AvailableFonts}" MaxWidth="200" />
+                                        </StackPanel>
+                                        <StackPanel Margin="2" Grid.Row="18" >
+                                            <TextBlock Text="Serif Font" />
+                                            <ComboBox SelectedIndex="{Binding SIFontSerif}" ItemsSource="{Binding AvailableFonts}" MaxWidth="200" />
+                                        </StackPanel>
+                                        <StackPanel Margin="2" Grid.Row="19" >
+                                            <TextBlock Text="Sans-serif Font" />
+                                            <ComboBox SelectedIndex="{Binding SIFontSansSerif}" ItemsSource="{Binding AvailableFonts}" MaxWidth="200" />
+                                        </StackPanel>
+                                        <StackPanel Margin="2" Grid.Row="20" >
+                                            <TextBlock Text="Fixed-width Font" />
+                                            <ComboBox SelectedIndex="{Binding SIFontFixedWidth}" ItemsSource="{Binding AvailableFonts}" MaxWidth="200" />
+                                        </StackPanel>
+
+                                        <MenuItem Margin="2" Grid.Row="21"  Visibility="{Binding SetBrowserSettingsAvailable}">
+                                            <MenuItem.Header>
+                                                <StackPanel>
+                                                    <TextBlock Text="Encoding" />
+                                                    <ComboBox SelectedIndex="{Binding SIFontEncodings}" ItemsSource="{Binding AvailableEncodeings}" MaxWidth="200" />
+                                                </StackPanel>
+                                            </MenuItem.Header>
+                                        </MenuItem>
+                                        <Button Margin="3" Grid.Row="22"  Content="Reset Default Fonts" Command="{Binding SettingsCTClick}" CommandParameter="ResetDefaultFonts" Click="cmsBtn_Click" Width="230" />
+                                        <Separator Grid.Row="23"  Margin="-30,0,0,0" />
+
+                                        <Button Margin="3" Grid.Row="24"  Content="Set User Agent" Command="{Binding SettingsCTClick}" CommandParameter="UserAgent" Click="cmsBtn_Click" Width="230" />
+
+                                        <Separator Grid.Row="25"  Margin="-30,0,0,0" />
+
+                                        <DockPanel Margin="4" Grid.Row="26" >
+                                            <!--<Button Content="Apply To Tab" Command="{Binding SettingsCTClick}" CommandParameter="TAB" Click="cmsBtn_Click" 
+                                                    DockPanel.Dock="Left"
+                                                    Visibility="{Binding SetBrowserSettingsAvailable}"/>-->
+                                            <Button Content="Apply To Session" Command="{Binding SettingsCTClick}" CommandParameter="SESSION" Click="cmsBtn_Click" Width="230"
+                                                    DockPanel.Dock="Right" />
+                                        </DockPanel>
                                     </StackPanel>
-
-                                    <ComboBox SelectedIndex="{Binding SITimeZone}" 
-                                              ItemsSource="{Binding AvailableTimeZones}"
-                                              Visibility="{Binding Path=VisibleDtPbar, Converter={StaticResource convOppositVisibility}}"
-                                              MaxWidth="200" />
-                                </Grid>
-
-                                <Separator Margin="-30,0,0,0" />
-
-                                <DockPanel>
-                                    <Button Content="Apply To Tab" Command="{Binding SettingsCTClick}" CommandParameter="TAB" Click="cmsBtn_Click" 
-                                            DockPanel.Dock="Left"
-                                            Visibility="{Binding SetBrowserSettingsAvailable}"/>
-                                    <Button Content="Apply To Session" Command="{Binding SettingsCTClick}" CommandParameter="SESSION" Click="cmsBtn_Click"
-                                            DockPanel.Dock="Right" />
-                                </DockPanel>
+                                </ScrollViewer>
                             </ContextMenu>
                         </Button.ContextMenu>
                     </Button>
@@ -311,6 +484,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Rectangle>
                     <Rectangle.Fill>
@@ -334,6 +508,7 @@
                 </Rectangle>
 
                 <ContentPresenter Content="{Binding WebBrowserHost}" Name="host" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                <!--<ContentControl Content="{Binding WebBrowserHost2}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />-->
 
                 <Expander Name="flyOut" 
                           ExpandDirection="Right"
@@ -424,6 +599,133 @@
                             </StackPanel>
                         </Button>
                         <dragNdrop:DraggableListBox Width="310" Grid.Row="2" Grid.ColumnSpan="3" Margin="10" BorderThickness="0"/>
+                    </Grid>
+                </Expander>
+
+                <Expander Name="MacroflyOut" 
+                          x:FieldModifier="public"
+                          ExpandDirection="Right"
+                          Style="{StaticResource AnimatedExpanderStyle}"
+                          Grid.Column="2"
+                          Visibility="Collapsed"
+                          Width="330"
+                          IsExpanded="False">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="70" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Name="btnCloseMacroFlyout" Click="btnCloseMacroFlyout_Click"  ToolTip="Collapse" Cursor="Hand"
+                                Grid.Column="0" VerticalAlignment="Center" Margin="10,0,10,0" HorizontalAlignment="Left" Height="45">
+                            <Button.Style>
+                                <Style TargetType="{x:Type Button}">
+                                    <Setter Property="ClipToBounds" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="Transparent">
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="Auto" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Grid.LayoutTransform>
+                                                            <TransformGroup>
+                                                                <TransformGroup.Children>
+                                                                    <TransformCollection>
+                                                                        <RotateTransform Angle="-90"/>
+                                                                    </TransformCollection>
+                                                                </TransformGroup.Children>
+                                                            </TransformGroup>
+                                                        </Grid.LayoutTransform>
+                                                        <Ellipse x:Name="circle" HorizontalAlignment="Center" Height="40" Width="40" Stroke="Black" VerticalAlignment="Center" StrokeThickness="1" />
+                                                        <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5"
+                                                              HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="#797878"
+                                                              StrokeThickness="2" VerticalAlignment="Center" Height="11" 
+                                                             Margin="10,10,10,10" Stretch="Fill" Width="20"/>
+                                                    </Grid>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter Property="Stroke" TargetName="circle" Value="#FF787878" />
+                                                    </Trigger>
+                                                    <Trigger Property="IsPressed" Value="True">
+                                                        <Setter Property="Stroke" Value="#FF515151" TargetName="circle"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <TextBlock Text="BrowSEO IA Macros" Grid.Column="1" HorizontalAlignment="Center" Margin="0,3,5,0" VerticalAlignment="Center" FontSize="25"  />
+                        
+                        <TextBlock Text="{Binding UpdateText}" Grid.ColumnSpan="2" Grid.Row="1" HorizontalAlignment="Center" Margin="0,3,5,0" />
+                        <Expander ExpandDirection="Down" Grid.ColumnSpan="2" Grid.Row="2" Margin="5" Header="Data" ToolTip="Each macro selected or checked will run at least once per line of data enterd">
+                            <TextBox Text="{Binding DataSourceSlideoutText}" AcceptsReturn="True" Width="310" MinHeight="100" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                        </Expander>
+
+                        <commonControls:TrvMacrosUserControl Grid.Row="3" Grid.ColumnSpan="2" Margin="5"  Width="310" />
+
+                        <Grid  Visibility="{Binding IsRunning, Converter={StaticResource convBoolYesNotVisibility}, ConverterParameter=YES}"
+                               Grid.Row="3" Grid.ColumnSpan="2" Margin="5"  >
+                            <ListView ItemsSource="{Binding MacroPlayer.Macros}" SelectedIndex="{Binding SIMacroCommand, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}"
+                                      BorderThickness="0" Background="White" VerticalAlignment="Stretch"
+                                      Width="310">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Margin="1" Background="{Binding BGRunning}">
+                                            <TextBlock Text="{Binding Line}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </Grid>
+
+                        <StackPanel Grid.Row="4" Grid.ColumnSpan="2">
+                            <UniformGrid Rows="1"  IsEnabled="{Binding IsPlayEnabled}">
+                                <Button Content="Play Selected" Margin="3"  Style="{StaticResource FlatbtnStyle}"
+                                    Command="{Binding OnCommandFromView}" CommandParameter="MacroPlay" ToolTip="Plays Selected Macro Once" />
+                                <Button Content="Play Checked" Margin="3"  Style="{StaticResource FlatbtnStyle}" 
+                                    Command="{Binding OnCommandFromView}" CommandParameter="MacroPlayChecked" ToolTip="Plays Each Checked MAcro Once"  />
+                            </UniformGrid>
+                            <Button Content="{Binding ContentForPaused}" Margin="3" Style="{StaticResource FlatbtnStyle}" IsEnabled="{Binding IsRunning}"
+                                    Command="{Binding OnCommandFromView}" CommandParameter="MacroPause" />
+                            <Button Content="Stop" Margin="3"  Style="{StaticResource FlatbtnStyle}" IsEnabled="{Binding IsRunning}"
+                                    Command="{Binding OnCommandFromView}" CommandParameter="MacroStop" />
+
+                            <StackPanel Margin="3">
+                                <TextBlock Text="Repeat" Margin="10,8,3,0" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Margin="5">
+                                        <TextBlock Text="Current:" Margin="10,3,3,3" />
+                                        <TextBox Name="tbCurrent" Margin="10,3,3,3" IsEnabled="False" Text="{Binding CurrentLoopPos}"  />
+                                    </StackPanel>
+                                    <StackPanel Margin="5" Grid.Column="1">
+                                        <TextBlock Text="Max:" Margin="10,3,3,3" />
+                                        <TextBox Name="tbMax" Margin="10,3,3,3" Text="{Binding MaxLoop}"  />
+                                    </StackPanel>
+                                </Grid>
+                                <UniformGrid Rows="1" Margin="10,0,10,10"  IsEnabled="{Binding IsPlayEnabled}">
+                                    <Button Content="Play Loop Selected" Style="{StaticResource FlatbtnStyle}" 
+                                            Command="{Binding OnCommandFromView}" CommandParameter="MacroPlayLoop" ToolTip="Plays selected macro the amount of times enterd." />
+                                    <Button Content="Play Loop Checked" Style="{StaticResource FlatbtnStyle}"
+                                            Command="{Binding OnCommandFromView}" CommandParameter="MacroPlayLoopChecked" ToolTip="Plays each checked macro the amount of times enterd."  />
+                                </UniformGrid>
+                            </StackPanel>
+                    </StackPanel>
                     </Grid>
                 </Expander>
             </Grid>

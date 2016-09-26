@@ -71,6 +71,7 @@
     <Compile Include="Converters\booleanToVisible.cs" />
     <Compile Include="Converters\IsEmptyToBackgroundColorConverter.cs" />
     <Compile Include="Helpers\GoogleCrawler.cs" />
+    <Compile Include="Helpers\SocialCounts.cs" />
     <Compile Include="Helpers\WebPageRequests.cs" />
     <Compile Include="Models\Footprint.cs" />
     <Compile Include="Models\MyKeyVal.cs" />

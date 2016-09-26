@@ -49,6 +49,16 @@ namespace Organiser.Common.Classes
         /// </summary>
         /// <param name="text">The text.</param>
         /// <returns>The dialog result.</returns>
+        public static void Show(string text, bool showdialog = false)
+        {
+            FlexibleMessageBoxForm.Show(null, text, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, showdialog);
+        }
+
+        /// <summary>
+        /// Shows the specified message box.
+        /// </summary>
+        /// <param name="text">The text.</param>
+        /// <returns>The dialog result.</returns>
         public static void Show(string text)
         {
             FlexibleMessageBoxForm.Show(null, text, string.Empty, MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1);
@@ -779,7 +789,7 @@ namespace Organiser.Common.Classes
             /// <param name="icon">The icon.</param>
             /// <param name="defaultButton">The default button.</param>
             /// <returns>The dialog result.</returns>
-            public static void Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton)
+            public static void Show(IWin32Window owner, string text, string caption, MessageBoxButtons buttons, MessageBoxIcon icon, MessageBoxDefaultButton defaultButton, bool showdialog = false)
             {
                 //Create a new instance of the FlexibleMessageBox form
                 var flexibleMessageBoxForm = new FlexibleMessageBoxForm();
@@ -806,9 +816,12 @@ namespace Organiser.Common.Classes
 
                 //Set the dialogs start position when given. Otherwise center the dialog on the current screen.
                 SetDialogStartPosition(flexibleMessageBoxForm, owner);
-
+                
                 //Show the dialog
-                flexibleMessageBoxForm.Show(owner);
+                if (showdialog)
+                    flexibleMessageBoxForm.ShowDialog(owner);
+                else
+                    flexibleMessageBoxForm.Show(owner);
             }
 
             #endregion

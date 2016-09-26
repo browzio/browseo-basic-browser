@@ -15,14 +15,14 @@
     <StackPanel Background="WhiteSmoke">
         <CheckBox Name="browseoProj" Margin="5" x:FieldModifier="public" Checked="browseoProj_Checked_1">
             <StackPanel Orientation="Horizontal">
-                <Image Source="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico" 
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/browseo-logo-icon-blue-48.png" 
                        Width="20" />
                 <TextBlock Text="  Browseo Project" />
             </StackPanel>
         </CheckBox>
         <CheckBox Name="browseoFolder" Margin="5" x:FieldModifier="public" Checked="browseoProj_Checked_1">
             <StackPanel Orientation="Horizontal">
-                <Image Source="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico" 
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/browseo-logo-icon-blue-48.png" 
                        Width="20" />
                 <TextBlock Text="  Links Window" />
             </StackPanel>

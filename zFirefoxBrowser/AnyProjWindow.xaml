@@ -1,0 +1,9 @@
+﻿<Window x:Class="zFirefoxBrowser.AnyProjWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:browserCommonViews="clr-namespace:Browser.Common.Views;assembly=Browser.Common"
+        Title=""  Height="600" Width="1000" Topmost="True" Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico">
+    <Grid>
+        <browserCommonViews:BrowserTabView Name="browserTabView" x:FieldModifier="public" />
+    </Grid>
+</Window>

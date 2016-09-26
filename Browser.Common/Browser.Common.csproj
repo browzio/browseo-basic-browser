@@ -37,6 +37,10 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Delimon.Win32.IO, Version=4.0.4764.1936, Culture=neutral, PublicKeyToken=6f601db60ebd9657, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Delimon\Delimon.Win32.IO\Delimon.Win32.IO.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
@@ -64,6 +68,7 @@
     <Compile Include="Convertrs\RichToTextConverter.cs" />
     <Compile Include="Cotrols\MyComboBox.cs" />
     <Compile Include="Models\Reminder.cs" />
+    <Compile Include="Models\UserAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -79,6 +84,7 @@
     </Compile>
     <Compile Include="ViewModels\BrowserTabViewModel.cs" />
     <Compile Include="ViewModels\RemindersVM.cs" />
+    <Compile Include="ViewModels\UserAgentVM.cs" />
     <Compile Include="Views\BrowserHostCntrl.xaml.cs">
       <DependentUpon>BrowserHostCntrl.xaml</DependentUpon>
     </Compile>
@@ -87,6 +93,9 @@
     </Compile>
     <Compile Include="Windows\RemindersWindow.xaml.cs">
       <DependentUpon>RemindersWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\UserAgentSelectorWindow.xaml.cs">
+      <DependentUpon>UserAgentSelectorWindow.xaml</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -119,6 +128,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\RemindersWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Windows\UserAgentSelectorWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

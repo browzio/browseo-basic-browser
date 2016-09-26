@@ -12,7 +12,7 @@ using Organiser.Common.Classes;
 using System.IO;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
-using System.Windows.Input;   
+using System.Windows.Input;
 using DragDropListview.Windows;
 using System.Threading;
 using Organiser.Common.Windows;
@@ -21,6 +21,7 @@ using System.Windows.Media;
 using System.Threading.Tasks;
 using Organiser.Common;
 using Microsoft.Win32;
+using Organiser.Common.ViewModels;
 
 namespace DragDropListview
 {
@@ -1038,7 +1039,7 @@ namespace DragDropListview
             } 
         }
 
-        public void OpenImportBookmarksOptions()
+        public async void OpenImportBookmarksOptions()
         {
             SelectBookmarkImportTypeWindow bookmarkTypeWindow = new SelectBookmarkImportTypeWindow();
             bookmarkTypeWindow.browseoGloable.Visibility = Visibility.Collapsed;
@@ -1046,12 +1047,23 @@ namespace DragDropListview
             if (!bookmarkTypeWindow.OkClicked) return;
             if (bookmarkTypeWindow.browseoProj.IsChecked == true)
             {
-                SelectProfileWindow spw = new SelectProfileWindow();
-                spw.Title = "Select Project";
-                spw.ShowDialog();
-                if (spw.OkClicked)
+                //SelectProfileWindow spw = new SelectProfileWindow();
+                //spw.Title = "Select Project";
+                //spw.ShowDialog();
+                //if (spw.OkClicked)
+                //{
+                //    MergeBookMarksFromProjectPath(spw.SelectedProjectName);
+                //}
+                ChooseProjectsVM cpvm = new ChooseProjectsVM();
+                await cpvm.InitProjectsWindowList();
+                if (cpvm.ShowListWindowDialog())
                 {
-                    MergeBookMarksFromProjectPath(spw.SelectedProjectName);
+                    foreach (var sp in cpvm.SavedProjectsListAdded)
+                    {
+                        if (!sp.IsChecked || sp.IsFolder) continue;
+
+                        MergeBookMarksFromProjectPath(sp.Name);
+                    }
                 }
             }
             else if (bookmarkTypeWindow.browseoFolder.IsChecked == true)

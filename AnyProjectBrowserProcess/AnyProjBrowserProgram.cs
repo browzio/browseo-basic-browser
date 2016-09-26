@@ -81,7 +81,7 @@ namespace AnyProjectBrowserProcess
                     //set up project data
                     string projectPath = args[0];
                     projectPath = projectPath.Replace(MyFilesDatabase.SPLITTER, " ");
-                    InitializeProjectData(projectPath);
+                    MyFilesDatabase.SetUpPdaaFromPath(projectPath);
                 }
                 catch { }
 
@@ -114,8 +114,8 @@ namespace AnyProjectBrowserProcess
                     PersistSessionCookies = true,
                     LogSeverity = CefLogSeverity.Disable,
                     IgnoreCertificateErrors = true,
-                    UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36",
-                    NoSandbox = true,
+                    UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
+                    NoSandbox = false,
                     CachePath = cachepath,
                 };
                 // Start the browser process (a child process).
@@ -160,16 +160,16 @@ namespace AnyProjectBrowserProcess
                     {
                         try
                         {
-                            if (cbrowser.Browser != null)
+                            if (browser.browserCntrl1.GetBrowser() != null)
                             {
-                                var host = cbrowser.Browser.GetHost();
+                                var host = browser.browserCntrl1.GetBrowser().GetHost();
                                 if (host != null)
                                 {
                                     host.CloseBrowser();
                                     host.Dispose();
                                 }
 
-                                cbrowser.Browser.Dispose();
+                                browser.browserCntrl1.GetBrowser().Dispose();
                             }
                         }
                         catch { }
@@ -182,53 +182,7 @@ namespace AnyProjectBrowserProcess
             }
             catch { }
         }
-
-        private static void InitializeProjectData(string projectPath)
-        {
-            string filepath = Path.Combine(projectPath, "ProjectData.ini");
-            IniFile ini = new IniFile(filepath);
-            GloableProfData.PData = new PersonData();
-            try
-            {
-                GloableProfData.PData.ProjectName = ini.IniReadValue("Data", "ProjectName");
-                GloableProfData.PData.ProfileName = ini.IniReadValue("Data", "ProfileName");
-                GloableProfData.PData.FirstName = ini.IniReadValue("Data", "FirstName");
-                GloableProfData.PData.LastName = ini.IniReadValue("Data", "LastName");
-                GloableProfData.PData.Email = ini.IniReadValue("Data", "Email");
-                GloableProfData.PData.Password = ini.IniReadValue("Data", "Password");
-                GloableProfData.PData.Username = ini.IniReadValue("Data", "Username");
-                GloableProfData.PData.ProxyIP = ini.IniReadValue("Data", "ProxyIP");
-                GloableProfData.PData.ProxyPort = ini.IniReadValue("Data", "ProxyPort");
-                GloableProfData.PData.ProxyUsername = ini.IniReadValue("Data", "ProxyUsername");
-                GloableProfData.PData.ProxyPassword = ini.IniReadValue("Data", "ProxyPassword");
-                GloableProfData.PData.PhoneNumber = ini.IniReadValue("Data", "PhoneNumber");
-                GloableProfData.PData.Street = ini.IniReadValue("Data", "Street");
-                GloableProfData.PData.City = ini.IniReadValue("Data", "City");
-                GloableProfData.PData.State = ini.IniReadValue("Data", "State");
-                GloableProfData.PData.Zip = ini.IniReadValue("Data", "Zip");
-                GloableProfData.PData.Country = ini.IniReadValue("Data", "Country");
-                GloableProfData.PData.WebAddress = ini.IniReadValue("Data", "WebAddress");
-                GloableProfData.PData.Notes = ini.IniReadValue("Data", "Notes");
-                try
-                {
-                    GloableProfData.PData.CmbSelectedIndexSex = Convert.ToInt32(ini.IniReadValue("Data", "Sex"));
-                    GloableProfData.PData.CmbSelectedIndexDay = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayDay"));
-                    GloableProfData.PData.CmbSelectedIndexMonth = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayMonth"));
-                }
-                catch { }
-                GloableProfData.PData.ProjectDir = projectPath;
-                try
-                {
-                    GloableProfData.PData.BirthdayYear = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayYear"));
-                }
-                catch { }
-
-
-                MyFilesDatabase.GetSavedSesstion(GloableProfData.PData.ProjectName);
-            }
-            catch { }
-        }
-
+        
         public void Dispose()
         {
             Shutdown();

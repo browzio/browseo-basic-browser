@@ -213,15 +213,20 @@ namespace GoViral.ViewModels
                     break;
 
                 case "Delete":
-                    if(MessageBox.Show("Are you sure you want to delete " + Folders[SIFolders].FolderTitle, "Are You Sure?", MessageBoxButton.YesNo,MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    if (SIFolders == -1 || SIFolders > Folders.Count) return;
+                    try
                     {
-                        Folders.RemoveAt(SIFolders);
-
-                        Task.Factory.StartNew(() =>
+                        if (MessageBox.Show("Are you sure you want to delete " + Folders[SIFolders].FolderTitle, "Are You Sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
                         {
-                            SaveList();
-                        });
+                            Folders.RemoveAt(SIFolders);
+
+                            Task.Factory.StartNew(() =>
+                            {
+                                SaveList();
+                            });
+                        }
                     }
+                    catch { }
                     break;
 
                 case "ORDER_PostsByLikes":
@@ -988,9 +993,9 @@ namespace GoViral.ViewModels
             {
                 try
                 {
-                    if (WebBrowser.CBrowser != null && WebBrowser.CBrowser.Browser != null && WebBrowser.CBrowser.Browser.GetMainFrame() != null)
+                    if (WebBrowser.CBrowser != null && WebBrowser.GetBrowser() != null && WebBrowser.GetBrowser().GetMainFrame() != null)
                     {
-                        url = WebBrowser.CBrowser.Browser.GetMainFrame().Url;
+                        url = WebBrowser.GetBrowser().GetMainFrame().Url;
                     }
                 }
                 catch { }

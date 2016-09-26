@@ -75,8 +75,9 @@
             <CheckBox Content="RSS Mashup" VerticalAlignment="Center" IsEnabled="{Binding EnableOkBtn}" Margin="5,0,0,0" IsChecked="{Binding IsRssMashup}" />
             <Button Content="ClearData" Margin="3" Width="90" HorizontalAlignment="Right"
                         IsEnabled="{Binding EnableOkBtn}"
-                        Command="{Binding BtnClicked}" CommandParameter="ClearData" />
-            
+                        Command="{Binding BtnClicked}" CommandParameter="ClearData">
+            </Button>
+
             <TextBox Grid.Row="1" Name="tbInputedText" IsEnabled="{Binding EnableOkBtn}" Text="{Binding InputedText,UpdateSourceTrigger=PropertyChanged,Mode=TwoWay}" 
                              AcceptsReturn="True" VerticalScrollBarVisibility="Auto" FontFamily="Verdana" FontSize="15" />
 

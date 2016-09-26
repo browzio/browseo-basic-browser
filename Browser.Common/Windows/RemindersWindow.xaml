@@ -4,9 +4,59 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Browser.Common.Windows"
+        xmlns:lConv="clr-namespace:Browser.Common.Convertrs"
         mc:Ignorable="d"
-        Title="RemindersWindow" Height="300" Width="300">
-    <Grid>
-        
+        Title="Reminders" Height="400" Width="850" WindowStartupLocation="CenterScreen" Topmost="True" Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <lConv:ReminderDateToColorConverter x:Key="dateToColorConv" />
+            <lConv:RichToTextConverter x:Key="paragraphConv" />
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid Background="WhiteSmoke">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <ListView ItemsSource="{Binding Reminders}" 
+                  ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
+                  BorderThickness="0" 
+                  Name="lv" 
+                  Grid.IsSharedSizeScope="True" Margin="3">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="Foo" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="FooBar" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Text="{Binding duedate, StringFormat='{}{0:MM/dd/yyyy}'}" Foreground="{Binding duedate, Converter={StaticResource dateToColorConv}}" 
+                                   FontWeight="Medium" VerticalAlignment="Center"  />
+                        <TextBlock Text="{Binding title}" VerticalAlignment="Center" Grid.Column="1" FontWeight="Medium" Margin="5,0,0,0" />
+                        <RichTextBox BorderThickness="0" TextChanged="myRichTextBox_TextChanged" IsDocumentEnabled="True" IsReadOnly="True" Grid.Column="2" Width="500" Name="myRichTextBox" Margin="7,0,0,0">
+                            <FlowDocument>
+                                <Paragraph>
+                                    <Run Name="theText" Text="{Binding description}"/>
+                                </Paragraph>
+                            </FlowDocument>
+                            <RichTextBox.Resources>
+                                <Style TargetType="{x:Type Paragraph}">
+                                    <Setter Property="Margin" Value="0"/>
+                                </Style>
+                            </RichTextBox.Resources>
+                        </RichTextBox>
+                    </Grid>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
+        <Button HorizontalAlignment="Right" Content="Open Tasks" Grid.Row="1" Margin="3" Command="{Binding OnCommand}" CommandParameter="OPEN" />
     </Grid>
 </Window>

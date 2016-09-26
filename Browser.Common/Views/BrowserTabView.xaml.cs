@@ -50,6 +50,7 @@ namespace Browser.Common.Views
                 flyOut.IsExpanded = true;
                 flyOut.Visibility = Visibility.Visible;
                 host.Width = host.ActualWidth - 330;
+               // else host.Width = host.ActualWidth - 330;
             }
         }
 
@@ -57,21 +58,71 @@ namespace Browser.Common.Views
         {
             flyOut.IsExpanded = false;
             flyOut.Visibility = Visibility.Collapsed;
-            host.Width = browserGrd.ActualWidth;
+            if (!MacroflyOut.IsExpanded) host.Width = browserGrd.ActualWidth;
+            else host.Width = host.ActualWidth + 330;
         }
 
-        //private void flyOut_ClosingFinished(object sender, RoutedEventArgs e)
-        //{
-        //    host.Width = browserGrd.ActualWidth;
-        //}
+        MacroManger managerForTab;
+        public event Action OnInitializedMacros = delegate { };
+        public async void openMacros_Click(object sender, RoutedEventArgs e)
+        {
+            if (!MacroflyOut.IsExpanded)
+            {
+                host.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+                MacroflyOut.IsExpanded = true;
+                MacroflyOut.Visibility = Visibility.Visible;
+               if(host.ActualWidth > 330) host.Width = host.ActualWidth - 330;
+
+
+                MacroflyOut.Cursor = Cursors.Wait;
+                await MacroSettings.InitMacrosSettings();
+                if (MacroflyOut.DataContext == null || MacroflyOut.DataContext.GetType() != typeof(MacroManger))
+                {
+                    if (managerForTab == null)
+                    {
+                        managerForTab = new MacroManger();
+                        managerForTab.OnPlayMacro += ManagerForTab_OnPlayMacro;
+                    }
+                    MacroflyOut.DataContext = managerForTab;
+                    try
+                    {
+                        await managerForTab.LoadIMacros(false);
+                    }
+                    catch { "Failed To Load Macro List".Show(); }
+
+                    OnInitializedMacros();
+                }
+                MacroflyOut.Cursor = this.Cursor;
+            }
+        }
+
+        private async void ManagerForTab_OnPlayMacro(MacroManger manger, IIMPlayType type, int loop)
+        {
+            if (DataContext is BrowserTabViewModel)
+            {
+              await  (DataContext as BrowserTabViewModel).OnPlayMacro(manger, type, loop);
+            }
+        }
+
+        private void btnCloseMacroFlyout_Click(object sender, RoutedEventArgs e)
+        {
+            MacroflyOut.IsExpanded = false;
+            MacroflyOut.Visibility = Visibility.Collapsed;
+            if (!flyOut.IsExpanded) host.Width = browserGrd.ActualWidth;
+            else host.Width = host.ActualWidth + 330;
+        }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             host.Width = browserGrd.ActualWidth;
             host.Height = browserGrd.ActualHeight;
-            if (flyOut.IsExpanded)
+            if ((flyOut.IsExpanded && !MacroflyOut.IsExpanded) || (!flyOut.IsExpanded && MacroflyOut.IsExpanded))
             {
                 host.Width = browserGrd.ActualWidth - 330;
+            }
+            else if (flyOut.IsExpanded && MacroflyOut.IsExpanded)
+            {
+                host.Width = browserGrd.ActualWidth - 660;
             }
         }
 

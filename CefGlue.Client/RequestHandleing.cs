@@ -32,6 +32,7 @@ namespace Xilium.CefGlue.Client
 
         protected override bool OnBeforeBrowse(CefBrowser browser, CefFrame frame, CefRequest request, bool isRedirect)
         {
+            //DemoApp.BrowserMessageRouter.OnBeforeBrowse(browser, frame);
             //if (request.Method == "GET" || request.Method == "POST")
             //{
             //    System.Collections.Specialized.NameValueCollection headers = request.GetHeaderMap();
@@ -54,11 +55,41 @@ namespace Xilium.CefGlue.Client
             //}
             //browser.GetMainFrame().ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", browser.GetMainFrame().Url, 0);
 
+            ////userAgent
+            //var headersua = request.GetHeaderMap();
+            //var useragent = headersua["User-Agent"];
+            //if (useragent != null)
+            //{
+            //    headersua["User-Agent"] = BrowserInit.settings.UserAgent;
+            //    request.SetHeaderMap(headersua);
+            //}
+            ////frame.ExecuteJavaScript("window.__defineGetter__('userAgent', function () { return '" + BrowserInit.settings.UserAgent + "'; });", request.Url, 0);
+            ////appVersion
+            //frame.ExecuteJavaScript("window.navigator.__defineGetter__('userAgent', function () { return '" + BrowserInit.settings.UserAgent + "'; });", request.Url, 0);
+            //frame.ExecuteJavaScript("window.navigator.__defineGetter__('appVersion', function () { return '5.0'; });", request.Url, 0);
+            ////frame.ExecuteJavaScript("for (property in navigator) { console.log(property + ' ' + navigator[property]); }", request.Url, 0);
+
+            //frame.ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", request.Url, 0);
 
             return base.OnBeforeBrowse(browser, frame, request, isRedirect);
         }
-        protected override bool OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request)
+        protected override CefReturnValue OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request, CefRequestCallback callback)
         {
+            frame.ExecuteJavaScript("window.__defineGetter__('Notification', function () { return false; });", frame.Url, 0);
+
+            //frame.ExecuteJavaScript("window.screen.__defineGetter__('width', function () { return 1440; });", frame.Url, 0);
+            //frame.ExecuteJavaScript("window.screen.__defineGetter__('height', function () { return 900; });", frame.Url, 0);
+
+            //frame.ExecuteJavaScript("screen.__defineGetter__('availWidth', function () { return 1440; });", frame.Url, 0);
+            //frame.ExecuteJavaScript("screen.__defineGetter__('availHeight', function () { return 900; });", frame.Url, 0);
+
+            //frame.ExecuteJavaScript("screen.__defineGetter__('width', function () { return 1440; });", frame.Url, 0);
+            //frame.ExecuteJavaScript("screen.__defineGetter__('height', function () { return 900; });", frame.Url, 0);
+
+            //frame.ExecuteJavaScript("screen.__defineGetter__('availWidth', function () { return 1440; });", frame.Url, 0);
+            //frame.ExecuteJavaScript("screen.__defineGetter__('availHeight', function () { return 900; });", frame.Url, 0);
+            //frame.ExecuteJavaScript("window.__defineGetter__('appVersion', function () { return '5.0'; });", browser.GetMainFrame().Url, 0);
+
             if (!BrowserSettimgs.DoNotTrackEnabled)
             {
                 var headers = request.GetHeaderMap();
@@ -68,10 +99,101 @@ namespace Xilium.CefGlue.Client
                 frame.ExecuteJavaScript("window.navigator.__defineGetter__('doNotTrack', function () { return '1'; });", request.Url, 0);
             }
 
-            frame.ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", browser.GetMainFrame().Url, 0);
+            ////userAgent
+            if (BrowserInit.settings != null && BrowserInit.settings.UserAgent != null && BrowserInit.settings.UserAgent != BrowserSettimgs.UserAgentChrome)
+            {
+                var headersua = request.GetHeaderMap();
+                var useragent = headersua["User-Agent"];
+                if (useragent != null)
+                {
+                    headersua["User-Agent"] = BrowserInit.settings.UserAgent;
+                    request.SetHeaderMap(headersua);
+                }
+                //frame.ExecuteJavaScript("window.__defineGetter__('userAgent', function () { return '" + BrowserInit.settings.UserAgent + "'; });", request.Url, 0);
+                //appVersion
+                frame.ExecuteJavaScript("window.navigator.__defineGetter__('userAgent', function () { return '" + BrowserSettimgs.UserAgentChrome + "'; });", request.Url, 0);
+                frame.ExecuteJavaScript("window.navigator.__defineGetter__('appVersion', function () { return '5.0'; });", browser.GetMainFrame().Url, 0);
+                browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('userAgent', function () { return '" + BrowserSettimgs.UserAgentChrome + "'; });", browser.GetMainFrame().Url, 0);
+                browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('appVersion', function () { return '5.0'; });", browser.GetMainFrame().Url, 0);
+                //frame.ExecuteJavaScript("for (property in navigator) { console.log(property + ' ' + navigator[property]); }", request.Url, 0);
+            }
+           //if(request.ResourceType == CefResourceType.FontResource)
+           // {
+           //     callback.Cancel();
+           //     return CefReturnValue.Cancel;
+           // }
+           // frame.ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", request.Url, 0);
 
-            return base.OnBeforeResourceLoad(browser, frame, request);
+            return base.OnBeforeResourceLoad(browser, frame, request, callback);
         }
+
+
+        //protected override void OnRenderProcessTerminated(CefBrowser browser, CefTerminationStatus status)
+        //{
+        //    DemoApp.BrowserMessageRouter.OnRenderProcessTerminated(browser);
+        //}
+        //protected override bool OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request)
+        //{
+        //    //frame.ExecuteJavaScript("document.createElement = null;", request.Url, 0);
+        //   // frame.ExecuteJavaScript("document.charset = 'windows-1252';", request.Url, 0);
+        //    //frame.ExecuteJavaScript("document.defaultCharset = 'undefined';", request.Url, 0);
+        //    //            browser.GetMainFrame().ExecuteJavaScript(@"
+        //    //var elements = document.getElementsByTagName('img');
+        //    //for (var i=0; i<elements.length; i++) 
+        //    //{
+        //    //    alert(elements[i].src);
+        //    //}
+
+        //    ////var list = document.getElementsByTagName('*');
+        //    //////alert(list);
+        //    //////alert(list.length);
+        //    ////for (var i=0; i < list.length; i++) 
+        //    ////{
+        //    ////list[i].style.display='block';
+        //    ////    //for (var j = 0; j < list[i].attributes.length; j++) 
+        //    ////    //{
+        //    ////    //    var attrib = list[i].attributes[j];
+
+        //    ////    //    alert(attrib.Name);
+        //    ////    //    alert(attrib.Value);
+        //    ////    //}
+        //    ////}
+        //    //", browser.GetMainFrame().Url, 0);
+        //    //Console.WriteLine(frame.Url);
+        //    //Console.WriteLine(request.Url);
+        //    if (!BrowserSettimgs.DoNotTrackEnabled)
+        //    {
+        //        var headers = request.GetHeaderMap();
+        //        headers.Add("DNT", "1");
+        //        request.SetHeaderMap(headers);
+
+        //        frame.ExecuteJavaScript("window.navigator.__defineGetter__('doNotTrack', function () { return '1'; });", request.Url, 0);
+        //    }
+
+        //    ////userAgent
+        //    if (BrowserInit.settings != null && BrowserInit.settings.UserAgent != null)
+        //    {
+        //        var headersua = request.GetHeaderMap();
+        //        var useragent = headersua["User-Agent"];
+        //        if (useragent != null)
+        //        {
+        //            headersua["User-Agent"] = BrowserInit.settings.UserAgent;
+        //            request.SetHeaderMap(headersua);
+        //        }
+        //        //frame.ExecuteJavaScript("window.__defineGetter__('userAgent', function () { return '" + BrowserInit.settings.UserAgent + "'; });", request.Url, 0);
+        //        //appVersion
+        //        frame.ExecuteJavaScript("window.navigator.__defineGetter__('userAgent', function () { return '" + BrowserSettimgs.UserAgentChrome + "'; });", request.Url, 0);
+        //        frame.ExecuteJavaScript("window.navigator.__defineGetter__('appVersion', function () { return '5.0'; });", browser.GetMainFrame().Url, 0);
+        //        browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('userAgent', function () { return '" + BrowserSettimgs.UserAgentChrome + "'; });", browser.GetMainFrame().Url, 0);
+        //        browser.GetMainFrame().ExecuteJavaScript("window.navigator.__defineGetter__('appVersion', function () { return '5.0'; });", browser.GetMainFrame().Url, 0);
+        //        //frame.ExecuteJavaScript("for (property in navigator) { console.log(property + ' ' + navigator[property]); }", request.Url, 0);
+        //    }
+
+        //    frame.ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", request.Url, 0);
+
+        //    return base.OnBeforeResourceLoad(browser, frame, request);
+        //}
+
         ///// <summary>
         ///// (function() { 
         ///// function g(){$("#rtc_hasMicrophone,#rtc_hasWebcam,#rtc_isDeviceEnumeration").text("false");$("#rtc_device_ids").text("n/a")} 
@@ -564,6 +686,19 @@ namespace Xilium.CefGlue.Client
         //https://www.facebook.com/ajax/bz
         protected override CefResourceHandler GetResourceHandler(CefBrowser browser, CefFrame frame, CefRequest request)
         {
+            ////userAgent
+            //var headersua = request.GetHeaderMap();
+            //var useragent = headersua["User-Agent"];
+            //if (useragent != null)
+            //{
+            //    headersua["User-Agent"] = BrowserInit.settings.UserAgent;
+            //    request.SetHeaderMap(headersua);
+            //}
+            ////frame.ExecuteJavaScript("window.__defineGetter__('userAgent', function () { return '" + BrowserInit.settings.UserAgent + "'; });", request.Url, 0);
+            ////appVersion
+            //frame.ExecuteJavaScript("window.navigator.__defineGetter__('userAgent', function () { return '" + BrowserInit.settings.UserAgent + "'; });", request.Url, 0);
+            //frame.ExecuteJavaScript("window.navigator.__defineGetter__('appVersion', function () { return '5.0'; });", request.Url, 0);
+
             //System.Collections.Specialized.NameValueCollection headers = request.GetHeaderMap();
             //headers.Add("dnt", "1");
             //request.SetHeaderMap(headers);

@@ -1,4 +1,4 @@
-﻿using Helpers;
+﻿using LocalHelpers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -49,7 +49,7 @@ namespace Youtuber
 
         public YoutuberVM()
         {
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie(Organiser.Common.Classes.UsageTracker.Usage_Type_ToYoutubeUrler);
+           // Organiser.Common.Classes.UsageTracker.AddTraceCookie(Organiser.Common.Classes.UsageTracker.Usage_Type_ToYoutubeUrler);
             OkClicked = new RelayCommand(OnOkClicked);
 
             mYoutubeVariationsChecker.Add("https://youtube.com/watch?feature=youtu.be&v=");
@@ -186,7 +186,7 @@ namespace Youtuber
 
                     if (code == "") return;
 
-                    Organiser.Common.Classes.UsageTracker.AddTraceCookie(Organiser.Common.Classes.UsageTracker.Usage_Type_CreatedYoutubeUrls+" : " + InputCode);
+                   // Organiser.Common.Classes.UsageTracker.AddTraceCookie(Organiser.Common.Classes.UsageTracker.Usage_Type_CreatedYoutubeUrls+" : " + InputCode);
 
                     foreach (string link in mYoutubeVariationsList)
                     {

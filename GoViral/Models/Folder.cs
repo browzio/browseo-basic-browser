@@ -196,6 +196,17 @@ namespace GoViral.Models
                     }
                     break;
 
+                case "CopyLink":
+                    try
+                    {
+                        var url = SavedLinksList[SISavedLinks].Url;
+                        url = url.Substring(url.LastIndexOf("-") + 1);
+                        string fbDefault = "https://www.facebook.com/" + url;
+                        MyFilesDatabase.SetClipboardText(fbDefault);
+                    }
+                    catch{ }
+                    break;
+
                 //case "ORDER_PostsByLikes":
                 //case "ORDER_PostsByShares":
                 //    if (SelectedPageFBGraphData != null)

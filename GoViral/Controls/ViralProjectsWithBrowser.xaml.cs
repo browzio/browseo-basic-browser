@@ -162,7 +162,7 @@ namespace GoViral.Controls
 
         private void ucSearch_OnOpenInBrowserForDownloadRequested(string source)
         {
-            ViewModel.WebBrowser.CBrowser.Browser.GetHost().StartDownload(source);
+            ViewModel.WebBrowser.GetBrowser().GetHost().StartDownload(source);
             // (this.DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(source);
         }
         #endregion

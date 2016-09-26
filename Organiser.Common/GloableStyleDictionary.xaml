@@ -150,7 +150,7 @@
         </Setter>
     </Style>
 
-    <Style TargetType="Button">
+    <!--<Style TargetType="Button">
         <Setter Property="Height" Value="25" />
         <Setter Property="Margin" Value="0" />
         <Setter Property="Template">
@@ -177,6 +177,53 @@
                                         <GradientStop Color="#FF588DF0" Offset="0.332"/>
                                     </LinearGradientBrush>
                                 </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>-->
+
+
+    <Style TargetType="Button">
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Cursor="Hand"
+                            Background="#5ea9f5"
+                                            Padding="{TemplateBinding Padding}"
+                                            MinWidth="25"
+                                            BorderBrush="LightGray"
+                                            BorderThickness="1"
+                                            x:Name="Border" CornerRadius="1">
+                        <!--<Border.Background>
+                            <LinearGradientBrush EndPoint="0,1.5" StartPoint="0,0">
+                                <GradientStop Color="#5ea9f5" Offset="0.6"/>
+                                <GradientStop Color="#4b87c4" Offset="0.8"/>
+                            </LinearGradientBrush>
+                        </Border.Background>-->
+                        <ContentControl Content="{TemplateBinding Content}"
+                                                        HorizontalAlignment="Center" 
+                                                        Margin="5,0,5,2"
+                                                        VerticalAlignment="Center" 
+                                                        TextElement.Foreground="White">
+                            <!--<ContentControl.Effect>
+                                <DropShadowEffect BlurRadius="2" ShadowDepth="0.7" Color="Black" Direction="290" />
+                            </ContentControl.Effect>-->
+                        </ContentControl>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="#4b87c4">
+                                <!--<Setter.Value>
+                                    <LinearGradientBrush EndPoint="0,1.5" StartPoint="0,0">
+                                        <GradientStop Color="#5ea9f5" Offset="0.6"/>
+                                        <GradientStop Color="#4b87c4" Offset="0.5"/>
+                                    </LinearGradientBrush>
+                                </Setter.Value>-->
                             </Setter>
                         </Trigger>
                     </ControlTemplate.Triggers>
@@ -395,8 +442,38 @@
                 </Trigger>-->
         </Style.Triggers>
     </Style>
-
-    <Style TargetType="{x:Type TabItem}" x:Key="gmailTabStyle">
+    <!--<ControlTemplate TargetType="{x:Type TabItem}">
+        <Grid Cursor="Hand" Name="grdContent">
+            <Border Name="Border" 
+                                    Height="27" Width="90"
+                                    Background="#f5f5f5" Margin="6" BorderBrush="LightGray" BorderThickness="1">
+                <ContentPresenter x:Name="TitleContent" VerticalAlignment="Center" HorizontalAlignment="Center" ContentSource="Header" Margin="0,0,0,1" TextElement.FontSize="12" TextElement.FontWeight="Normal" TextElement.Foreground="Black" />
+            </Border>
+        </Grid>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter TargetName="Border" Property="Background" Value="#26ACE1">
+                    
+    <Setter.Value>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF376ED4" Offset="0"/>
+                                                <GradientStop Color="#FF588DF0" Offset="0.332"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+    
+                </Setter>
+                <Setter TargetName="Border" Property="BorderThickness" Value="1" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="White" />
+                <Setter TargetName="TitleContent" Property="TextElement.Foreground" Value="White" />
+            </Trigger>
+            
+    <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Border" Property="BorderBrush" Value="White" />
+                                </Trigger>
+    
+        </ControlTemplate.Triggers>
+    </ControlTemplate>-->
+    <!--<Style TargetType="{x:Type TabItem}" x:Key="gmailTabStyle">
         <Setter Property="VerticalAlignment" Value="Bottom"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -424,9 +501,39 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>-->
+    <Style TargetType="{x:Type TabItem}" x:Key="gmailTabStyle">
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabItem}">
+                    <Grid Cursor="Hand">
+                        <Border Name="Border" 
+                                    Height="23"
+                                    Background="#f5f5f5" BorderBrush="LightGray" BorderThickness="1" Margin="15,0,0,5">
+                            <ContentPresenter x:Name="TitleContent" VerticalAlignment="Center" Margin="10,0,10,0" HorizontalAlignment="Center" ContentSource="Header" TextElement.Foreground="Black"/>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="#1E8EFF" />
+                            <Setter TargetName="Border" Property="BorderThickness" Value="1" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="White" />
+                            <Setter TargetName="TitleContent" Property="TextElement.Foreground" Value="White" />
+                        </Trigger>
+
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="White" />
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
-    <Style TargetType="{x:Type TabItem}" x:Key="gmailTabStyle90">
+    <!--<Style TargetType="{x:Type TabItem}" x:Key="gmailTabStyle90">
         <Setter Property="VerticalAlignment" Value="Bottom"/>
         <Setter Property="Template">
             <Setter.Value>
@@ -453,7 +560,7 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-    </Style>
+    </Style>-->
 
     <!--#region  context menu-->
     <!--<Style x:Key="{x:Static MenuItem.SeparatorStyleKey}" TargetType="Separator">
@@ -492,8 +599,8 @@
                             </Grid.ColumnDefinitions>
                             <ContentPresenter x:Name="Icon" ContentSource="Icon" Margin="1" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="Center"/>
                             <!--<Border x:Name="GlyphPanel" BorderBrush="#CDD3E6" BorderThickness="1" Background="#E6EFF4" CornerRadius="3" Height="22" Margin="1" Visibility="Hidden" Width="22">
-                                <Path x:Name="Glyph" Data="{StaticResource Checkmark}" Fill="#0C12A1" FlowDirection="LeftToRight" Height="11" Width="9"/>
-                            </Border>-->
+                                    <Path x:Name="Glyph" Data="{StaticResource Checkmark}" Fill="#0C12A1" FlowDirection="LeftToRight" Height="11" Width="9"/>
+                                </Border>-->
                             <Border x:Name="GlyphPanel" BorderBrush="#CDD3E6" BorderThickness="1" Background="#E6EFF4" CornerRadius="3" Height="22" Margin="1" Visibility="Hidden" Width="5">
                                 <Path x:Name="Glyph" Data="{StaticResource Checkmark}" Fill="#0C12A1" FlowDirection="LeftToRight" Height="11" Width="5"/>
                             </Border>

@@ -85,7 +85,7 @@
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
                             <Border 
-                                Background="#a1a5ad" Cursor="Hand"
+                                Background="#5ea9f5" Cursor="Hand"
                                 Padding="{TemplateBinding Padding}" MinWidth="25"
                                 CornerRadius="0" x:Name="Border">
                                 <ContentControl Content="{TemplateBinding Content}"
@@ -97,8 +97,8 @@
                                     <Setter TargetName="Border" Property="Background">
                                         <Setter.Value>
                                             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                <GradientStop Color="#FF376ED4" Offset="0"/>
-                                                <GradientStop Color="#FF588DF0" Offset="0.332"/>
+                                                <GradientStop Color="#5ea9f5" Offset="0.6"/>
+                                                <GradientStop Color="#4b87c4" Offset="0.5"/>
                                             </LinearGradientBrush>
                                         </Setter.Value>
                                     </Setter>
@@ -192,12 +192,10 @@
                                     Height="25" 
                                     Style="{StaticResource tabButtonStyle}" />-->
                                 <Border Name="contentRect"
-                                        Height="23" 
-                                        Margin="5,0"
-                                        Background="#ffa1a5ad"
-                                        >
+                                        Height="23"
+                                        Background="#f5f5f5" BorderBrush="LightGray" BorderThickness="1" Margin="5,0">
                                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                       <TextBlock Text="{Binding TabTitle}" ClipToBounds="True" Margin="10,0" Foreground="White" VerticalAlignment="Center"  />
+                                        <TextBlock Name="TitleContent" Text="{Binding TabTitle}" ClipToBounds="True" Margin="10,0" Foreground="Black" VerticalAlignment="Center"  />
                                         <Button Command="ApplicationCommands.Close" Width="25"
                                                 Style="{StaticResource CloseButtonStyle}">
                                             <Image Source="../Images/close.png" Stretch="None" VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -211,22 +209,20 @@
                                     </Border.ContextMenu>-->
                                 </Border>
                             </Grid>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsSelected" Value="True">
-                                    <Setter Property="Background" TargetName="contentRect">
-                                            <Setter.Value>
-                                                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                                    <GradientStop Color="#FF376ED4" Offset="0"/>
-                                                    <GradientStop Color="#FF588DF0" Offset="0.332"/>
-                                                </LinearGradientBrush>
-                                            </Setter.Value>
-                                        </Setter>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="contentRect" Property="Background" Value="#1E8EFF" />
+                                    <Setter TargetName="contentRect" Property="BorderThickness" Value="1" />
+                                    <Setter TargetName="contentRect" Property="BorderBrush" Value="White" />
+                                    <Setter TargetName="TitleContent" Property="TextElement.Foreground" Value="White" />
                                 </Trigger>
 
-                          
-                            
-                      </ControlTemplate.Triggers>
-                    </ControlTemplate>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="contentRect" Property="BorderBrush" Value="White" />
+                                </Trigger>
+
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>

@@ -141,7 +141,7 @@ namespace Crawler
                 PersistSessionCookies = true,
                 LogSeverity = CefLogSeverity.Disable,
                 IgnoreCertificateErrors = true,
-                UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36",
+                UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36",
                 CachePath = path,
                 WindowlessRenderingEnabled = true,
                 NoSandbox = true,
@@ -502,7 +502,7 @@ namespace Crawler
                     //<div id="BrowseResultsContainer">
                     string firstResponders = source.Substring(source.IndexOf("id=\"BrowseResultsContainer\">"));
                     firstResponders = firstResponders.Substring(0, firstResponders.IndexOf("result_below_fold"));
-                    foreach (var d in getIdsFromVideoScrape(firstResponders))
+                    foreach (var d in FBSourceCrawler.GetIdsFromVideoScrape(firstResponders))
                     {
                         if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
                     }
@@ -510,7 +510,7 @@ namespace Crawler
                     //result_below_fold
                     string secondResponders = source.Substring(source.IndexOf("result_below_fold"));
                     secondResponders = secondResponders.Remove(secondResponders.IndexOf("fbBrowseScrollingPagerContainer"));
-                    foreach (var d in getIdsFromVideoScrape(secondResponders))
+                    foreach (var d in FBSourceCrawler.GetIdsFromVideoScrape(secondResponders))
                     {
                         if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
                     }
@@ -520,7 +520,7 @@ namespace Crawler
                     afterScrolledData.RemoveAt(0);
                     foreach (var item in afterScrolledData)
                     {
-                        foreach (var d in getIdsFromVideoScrape(item))
+                        foreach (var d in FBSourceCrawler.GetIdsFromVideoScrape(item))
                         {
                             if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
                         }
@@ -583,23 +583,7 @@ namespace Crawler
             }
         }
 
-        private List<string> getIdsFromVideoScrape(string source)
-        {
-            List<string> thisIdList = new List<string>();
-            try
-            {
-                List<string> sourceAfterSplit = source.Split(new string[] { "data-bt=\"{id:" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                sourceAfterSplit.RemoveAt(0);
-                foreach (string line in sourceAfterSplit)
-                {
-                    string id = line.Remove(line.IndexOf(","));
-                    id = id.Trim();
-                    thisIdList.Add(id);
-                }
-            }
-            catch { }
-            return thisIdList;
-        }
+
 
         private void GetPhotosFromSearchCrawl(string source)
         {

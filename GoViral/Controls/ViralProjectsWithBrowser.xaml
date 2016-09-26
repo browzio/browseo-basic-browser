@@ -223,6 +223,8 @@
                                                             <Separator Margin="-30,0,0,0" />
                                                             <MenuItem Header="Cancel Crawl Check" Command="{Binding CTMenuClick}" CommandParameter="Cancel" />
                                                             <MenuItem Header="Cancel Crawl All" Command="{Binding CTMenuClick}" CommandParameter="CancelAll" />
+                                                            <Separator Margin="-30,0,0,0" />
+                                                            <MenuItem Header="Copy Link" Command="{Binding CTMenuClick}" CommandParameter="CopyLink" />
                                                         </ContextMenu>
                                                     </ListView.ContextMenu>
                                                 </ListView>

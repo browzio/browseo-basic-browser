@@ -27,6 +27,7 @@ namespace BrowserHost
     public partial class ChromeBrowserHostControl : UserControl
     {
         public ObservableCollection<ChromeBrowserTabViewModel> BrowserTabs { get; set; }
+        public ChromeBrowserTabViewModel SelectedTab { get; set; }
 
         public event Action<string, string> OnCurateToPBN = delegate { };
         public event Action<string, string, List<string>> OnAddedToGoViral = delegate { };//link,type,multi
@@ -102,6 +103,7 @@ namespace BrowserHost
             btvm.OnCurateToPBN += Btvm_OnCurateToPBN;
             btvm.OnAddedToGoViral += Btvm_OnAddedToGoViral;
             btvm.OnClickedSaveSession += Btvm_OnClickedSaveSession;
+            btvm.OnSetUserAgent += Btvm_OnSetUserAgent;
             btvm.OnClickedDeleteSession += Btvm_OnClickedDeleteSession;
             btvm.OnClickedSaveSessionToBookmarks += Btvm_OnClickedSaveSessionToBookmarks;
             btvm.OnClickedReminders += Btvm_OnClickedReminders;
@@ -109,6 +111,7 @@ namespace BrowserHost
             btvm.OnRefreshSessionSettings += Btvm_OnRefreshSessionSettings;
             btvm.OnSentForSeo += Btvm_OnSentForSeo;
         }
+
         #region btvm events
         private void Btvm_OnRefreshTabSettings(ChromeBrowserTabViewModel tab)
         {
@@ -133,10 +136,10 @@ namespace BrowserHost
 
         private void Btvm_OnRefreshSessionSettings()
         {
-            foreach (ChromeBrowserTabViewModel btvm in BrowserTabs)
-            {
-                btvm.Dispose();
-            }
+            //foreach (ChromeBrowserTabViewModel btvm in BrowserTabs)
+            //{
+            //    btvm.Dispose();
+            //}
 
             List<ChromeBrowserTabViewModel> tmpList = new List<ChromeBrowserTabViewModel>(BrowserTabs);
             BrowserTabs.Clear();
@@ -145,8 +148,14 @@ namespace BrowserHost
                 CreateNewTab(btvm.AddressEditable);
             }
 
-            tmpList.Clear();
+            //tmpList.Clear();
             OnRefreshedSessionSettings();
+        }
+        private void Btvm_OnSetUserAgent(string agent)
+        {
+            BrowserInit.settings.UserAgent = BrowserSettimgs.UserAgentChrome = agent;
+
+            Btvm_OnRefreshSessionSettings();
         }
 
         private void Btvm_OnClickedSaveSessionToBookmarks()
@@ -265,6 +274,7 @@ namespace BrowserHost
         {
             foreach (string site in sites)
             {
+                if (site.Contains(",")) continue;
                 CreateNewTab(site);
             }
         }
@@ -290,18 +300,27 @@ namespace BrowserHost
             DragDropMainViewModel.Instance.OnDoubleClickedSite -= Instance_OnDoubleClickedSite;
             DragDropMainViewModel.Instance.OnSelsectedLauncAll -= Instance_OnSelsectedLauncAll;
 
+            //MacroManger.OnPlayMacro -= MacroManger_OnPlayMacro;
+
             if (set)
             {
                 DragDropMainViewModel.Instance.OnDoubleClickedSite += Instance_OnDoubleClickedSite;
                 DragDropMainViewModel.Instance.OnSelsectedLauncAll += Instance_OnSelsectedLauncAll;
+
+                //MacroManger.OnPlayMacro += MacroManger_OnPlayMacro;
             }
             else
             {
                 DragDropMainViewModel.Instance.OnDoubleClickedSite -= Instance_OnDoubleClickedSite;
                 DragDropMainViewModel.Instance.OnSelsectedLauncAll -= Instance_OnSelsectedLauncAll;
+
+               // MacroManger.OnPlayMacro -= MacroManger_OnPlayMacro;
             }
         }
 
+        private void MacroManger_OnPlayMacro(MacroManger macroListing,bool isiim, int times)
+        {
+        }
 
         private void browserHost_OnContentRenderd()
         {

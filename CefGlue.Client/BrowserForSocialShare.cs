@@ -66,8 +66,8 @@ namespace Xilium.CefGlue.Client
 
                 PinterestImagePickerVM pinterestImagePicker = new PinterestImagePickerVM();
                 pinterestImagePicker.OnLaunchSharePopup += PinterestImagePicker_OnLaunchSharePopup;
-                pinterestImagePicker.VisitSource(browserCntrl1.CBrowser.Browser.GetMainFrame().Url);
-                browserCntrl1.CBrowser.Browser.GetMainFrame().GetSource(pinterestImagePicker.Visitor);
+                pinterestImagePicker.VisitSource(browserCntrl1.GetTheMainFrame().Url,false);
+                browserCntrl1.GetTheMainFrame().GetSource(pinterestImagePicker.Visitor);
             }
         }
 

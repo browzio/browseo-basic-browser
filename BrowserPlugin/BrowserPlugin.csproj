@@ -109,17 +109,21 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
-      <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
-      <Name>CefGlue.WindowsForms-old</Name>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
+      <Name>CefGlue.WindowsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj">
-      <Project>{9080d62a-6fe7-41d2-9a77-f3d7f6c33418}</Project>
-      <Name>CefGlue-old</Name>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
+      <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
+      <Name>CefGlue</Name>
     </ProjectReference>
     <ProjectReference Include="..\AnyProjectBrowserProcess\AnyProjectBrowserProcess.csproj">
       <Project>{e6dae4fe-e359-4d5a-81cc-ff233aa99df9}</Project>
       <Name>AnyProjectBrowserProcess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AnyProjFFProcess\AnyProjFFProcess.csproj">
+      <Project>{09b014dc-bfc6-4e41-a7e8-c6b8c285758d}</Project>
+      <Name>AnyProjFFProcess</Name>
     </ProjectReference>
     <ProjectReference Include="..\Browser.Common\Browser.Common.csproj">
       <Project>{c6134f4b-6ab7-4969-9b28-044c473247dc}</Project>
@@ -171,9 +175,9 @@
       <Project>{0d0b3748-c24c-464a-b051-b06c983831ef}</Project>
       <Name>GoViral</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Indexer\Indexer.csproj">
-      <Project>{0b51ac08-7106-431f-8359-0f86e9f48dca}</Project>
-      <Name>Indexer</Name>
+    <ProjectReference Include="..\IMacroMultyLayout\IMacroMultyLayout.csproj">
+      <Project>{e1263358-1615-4191-a13d-d04d73f136d2}</Project>
+      <Name>IMacroMultyLayout</Name>
     </ProjectReference>
     <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
@@ -198,10 +202,6 @@
     <ProjectReference Include="..\WPFPieChart\WPFPieChartTwo.csproj">
       <Project>{59210896-68d1-4a34-91cc-8d015eca7061}</Project>
       <Name>WPFPieChartTwo</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Youtuber\Youtuber.csproj">
-      <Project>{9ee91744-7d3f-4f68-8b98-395759ab4eb0}</Project>
-      <Name>Youtuber</Name>
     </ProjectReference>
     <ProjectReference Include="..\zFirefoxBrowser\zFirefoxBrowser.csproj">
       <Project>{9f8c4c2c-6d6b-4869-abcc-3947111ead18}</Project>

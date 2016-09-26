@@ -88,7 +88,7 @@ namespace Organiser.Common
             }
             else
             {
-                directoryValues = MyFilesDatabase.GetAllProjectsAndDirs();
+                directoryValues = MyFilesDatabase.GetAllProjectsAndDirs(false);
             }
 
             foreach (var item in directoryValues)

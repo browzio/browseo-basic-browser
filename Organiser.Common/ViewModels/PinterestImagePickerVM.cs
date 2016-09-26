@@ -40,84 +40,96 @@ namespace BrowserHost.ViewModels
             WebPageImages = new ObservableCollection<WebPageImg>();    
         }
 
-        public void VisitSource(string AddressEditable)
+        public void VisitSource(string AddressEditable, bool isff, string source = "")
         {
             if (loadImgThread != null) return;
 
-            Visitor = new SourceVisitor(AddressEditable, (text, url) =>
+            if (!isff)
             {
-               // Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-               // {
-                    loadImgThread = new Thread(() =>
+                Visitor = new SourceVisitor(AddressEditable, (text, url) =>
+                {
+                    // Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                    // {
+                    showImagesFromSource(AddressEditable, text);
+                    //}));
+                });
+            }
+            else
+            {
+                showImagesFromSource(AddressEditable, source);
+            }
+        }
+
+        private void showImagesFromSource(string AddressEditable, string text)
+        {
+            loadImgThread = new Thread(() =>
+            {
+                WebPageImages.Clear();
+                try
+                {
+                    foreach (Match m in Regex.Matches(text, "<img.+?src=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase | RegexOptions.Multiline))
                     {
-                        WebPageImages.Clear();
+                        // if (WebPageImages.Count > 10) break;
+
                         try
                         {
-                            foreach (Match m in Regex.Matches(text, "<img.+?src=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase | RegexOptions.Multiline))
+                            string src = m.Groups[1].Value;
+                            if (src.ToLower().Contains(".png") || src.ToLower().Contains(".jpg") || src.ToLower().Contains(".jpeg"))
                             {
-                                // if (WebPageImages.Count > 10) break;
-
-                                try
+                                if (!src.Contains("http") && !src.Contains("https"))
                                 {
-                                    string src = m.Groups[1].Value;
-                                    if (src.ToLower().Contains(".png") || src.ToLower().Contains(".jpg") || src.ToLower().Contains(".jpeg"))
-                                    {
-                                        if (!src.Contains("http") && !src.Contains("https"))
-                                        {
-                                            src = src.Replace("//", "");
-                                            src = "http://" + src;
-                                        }
-
-                                        WebPageImages.Add(new WebPageImg()
-                                        {
-                                            ImgUrl = src,
-                                            WebUrl = AddressEditable
-                                        });
-                                    }
+                                    src = src.Replace("//", "");
+                                    src = "http://" + src;
                                 }
-                                catch { }
+
+                                WebPageImages.Add(new WebPageImg()
+                                {
+                                    ImgUrl = src,
+                                    WebUrl = AddressEditable
+                                });
                             }
                         }
                         catch { }
+                    }
+                }
+                catch { }
 
-                        if (WebPageImages.Count > 0)
+                if (WebPageImages.Count > 0)
+                {
+                    ChoosePinterestImageWindow cpiw = new ChoosePinterestImageWindow();
+                    cpiw.DataContext = this;
+                    cpiw.ShowDialog();
+                    string link = Social.SHARELINK_pintrest + AddressEditable + "&media=" + WebPageImages[SLImageLink].ImgUrl;
+                    WebPageImages.Clear();
+                    WebPageImages = null;
+                    if (cpiw.OkClicked)
+                    {
+                        if (SLImageLink >= 0)
                         {
-                            ChoosePinterestImageWindow cpiw = new ChoosePinterestImageWindow();
-                            cpiw.DataContext = this;
-                            cpiw.ShowDialog();
-                            string link = Social.SHARELINK_pintrest + AddressEditable + "&media=" + WebPageImages[SLImageLink].ImgUrl;
-                            WebPageImages.Clear();
-                            WebPageImages = null;
-                            if (cpiw.OkClicked)
+                            if (Application.Current != null)
                             {
-                                if (SLImageLink >= 0)
+                                Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                                 {
-                                    if (Application.Current != null)
-                                    {
-                                        Application.Current.Dispatcher.BeginInvoke(new Action(() =>
-                                        {
-                                            OnLaunchSharePopup(link);
-                                        }));
-                                    }
-                                    else
-                                    {
-                                        OnLaunchSharePopup(link);
-                                    }
-                                }
+                                    OnLaunchSharePopup(link);
+                                }));
                             }
-
-                            GC.Collect();
+                            else
+                            {
+                                OnLaunchSharePopup(link);
+                            }
                         }
-                        else
-                        {
-                           // MessageBox.Show("No shareable images found on page.");
-                        }
-                    });
+                    }
 
-                    loadImgThread.SetApartmentState(ApartmentState.STA);
-                    loadImgThread.Start();
-                //}));
+                    GC.Collect();
+                }
+                else
+                {
+                    // MessageBox.Show("No shareable images found on page.");
+                }
             });
-        }  
+
+            loadImgThread.SetApartmentState(ApartmentState.STA);
+            loadImgThread.Start();
+        }
     } 
 }

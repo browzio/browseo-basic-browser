@@ -222,13 +222,13 @@
       <Project>{2001dee3-524c-4d55-8ac4-3bf35608b35c}</Project>
       <Name>InstaNonPortable</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue.WindowsForms\CefGlue.WindowsForms-old.csproj">
-      <Project>{706abb6a-2a0b-4d0f-b496-3d6b67edd6d4}</Project>
-      <Name>CefGlue.WindowsForms-old</Name>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
+      <Name>CefGlue.WindowsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\xilium Old backup\xilium-xilium.cefglue-335450e6011d\CefGlue\CefGlue-old.csproj">
-      <Project>{9080d62a-6fe7-41d2-9a77-f3d7f6c33418}</Project>
-      <Name>CefGlue-old</Name>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
+      <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
+      <Name>CefGlue</Name>
     </ProjectReference>
     <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">
       <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>

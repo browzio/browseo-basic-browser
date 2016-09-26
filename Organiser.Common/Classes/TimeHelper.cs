@@ -1,4 +1,5 @@
-﻿using SocialOrganizer.Models;
+﻿using Newtonsoft.Json;
+using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -80,12 +81,98 @@ namespace Organiser.Common.Classes
         public TimeZoneInfo TimeZone { get; set; }
     }
 
+    //public class GeobytesJsonResponse
+    //{
+    //    public string geobytesforwarderfor { get; set; }
+    //    public string geobytesremoteip { get; set; }
+    //    public string geobytesipaddress { get; set; }
+    //    public string geobytescertainty { get; set; }
+    //    public string geobytesinternet { get; set; }
+    //    public string geobytescountry { get; set; }
+    //    public string geobytesregionlocationcode { get; set; }
+    //    public string geobytesregion { get; set; }
+    //    public string geobytescode { get; set; }
+    //    public string geobyteslocationcode { get; set; }
+    //    public string geobytesdma { get; set; }
+    //    public string geobytescity { get; set; }
+    //    public string geobytescityid { get; set; }
+    //    public string geobytesfqcn { get; set; }
+    //    public string geobyteslatitude { get; set; }
+    //    public string geobyteslongitude { get; set; }
+    //    public string geobytescapital { get; set; }
+    //    public string geobytestimezone { get; set; }
+    //    public string geobytesnationalitysingular { get; set; }
+    //    public string geobytespopulation { get; set; }
+    //    public string geobytesnationalityplural { get; set; }
+    //    public string geobytesmapreference { get; set; }
+    //    public string geobytescurrency { get; set; }
+    //    public string geobytescurrencycode { get; set; }
+    //    public string geobytestitle { get; set; }
+    //}
+    public class GeobytesJsonResponse
+    {
+        public string statusCode { get; set; }
+        public string statusMessage { get; set; }
+        public string ipAddress { get; set; }
+        public string countryCode { get; set; }
+        public string countryName { get; set; }
+        public string regionName { get; set; }
+        public string cityName { get; set; }
+        public string zipCode { get; set; }
+        public string latitude { get; set; }
+        public string longitude { get; set; }
+        public string timeZone { get; set; }
+    }
+
     public class TimeHelper
     {
         public static DateAndTimeZone GetTimeOfProxy(string ip, string port, string username, string pass)
         {
             DateTime dt = DateTime.Now;
             TimeZoneInfo timeZone = TimeZoneInfo.Local;
+            if (!ip.IsNullOrEmpty())
+            {
+                try
+                {
+                    using (var client = new WebClient())
+                    {
+                        if (!string.IsNullOrEmpty(ip) && !string.IsNullOrWhiteSpace(ip) && !string.IsNullOrEmpty(port) && !string.IsNullOrWhiteSpace(port))
+                            client.Proxy = new WebProxy(ip, Convert.ToInt32(port));
+                        if (!username.IsNullOrEmpty() && !pass.IsNullOrEmpty())
+                            client.Proxy.Credentials = new NetworkCredential(username, pass);
+
+                        string json = client.DownloadString("http://api.ipinfodb.com/v3/ip-city/?key=39bbb1b9a652bbd63a560a475aee4e5214a78d07ed68b61ca1a44ab42bbb0af8&ip="+ip+"&format=json");
+                        GeobytesJsonResponse geoResponse = JsonConvert.DeserializeObject<GeobytesJsonResponse>(json.ToLower());
+                        if (geoResponse != null && geoResponse.statusCode.ToUpper() == "OK")
+                        {
+                            foreach (var tz in TimeZoneInfo.GetSystemTimeZones())
+                            {
+                                //string zone = tz.DisplayName.Remove(tz.DisplayName.IndexOf(")"));
+                                //zone = zone.Substring(zone.IndexOf("C") + 1);
+                                //if (zone == geoResponse.timeZone)
+                                //{
+                                //   var name = tz.StandardName;
+                                //    //string city = tz.DisplayName.Substring(tz.DisplayName.IndexOf(")") + 1).Trim().ToLower();
+                                //    //if (city.Contains(geoResponse.geobytescapital) ||
+                                //    //    city.Contains(geoResponse.geobytescity) ||
+                                //    //    city.Contains(geoResponse.geobytescountry) ||
+                                //    //    city.Contains(geoResponse.geobytesregion))
+                                //    //{
+                                //    //    return new DateAndTimeZone() { Date = DateTime.Now, TimeZone = tz };
+                                //    //}
+                                //}
+                                if (tz.DisplayName.ToLower().Contains(geoResponse.regionName) || geoResponse.regionName.Contains(tz.DisplayName.ToLower()) ||
+                                    tz.DisplayName.ToLower().Contains(geoResponse.countryName) || geoResponse.countryName.Contains(tz.DisplayName.ToLower()) ||
+                                    tz.DisplayName.ToLower().Contains(geoResponse.cityName) || geoResponse.cityName.Contains(tz.DisplayName.ToLower()))
+                                {
+                                    return new DateAndTimeZone() { Date = DateTime.Now, TimeZone = tz };
+                                }
+                            }
+                        }
+                    }
+                }
+                catch { }
+            }
 
             try
             {

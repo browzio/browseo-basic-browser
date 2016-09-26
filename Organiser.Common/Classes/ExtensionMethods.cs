@@ -53,5 +53,10 @@ namespace Organiser.Common.Classes
         {
             System.Windows.MessageBox.Show(str);
         }
+
+        public static bool Show(this string str, bool questionbox)
+        {
+            return System.Windows.MessageBox.Show(str, "BrowSEO", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question) == System.Windows.MessageBoxResult.Yes;
+        }
     }
 }

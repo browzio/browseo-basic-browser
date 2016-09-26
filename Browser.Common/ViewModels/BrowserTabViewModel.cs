@@ -44,6 +44,7 @@ namespace Browser.Common.ViewModels
         public event Action OnRefreshSessionSettings = delegate { }; //javascriptEnabled,JavaEnabled
         public event Action<BrowserTabViewModel> OnRefreshTabSettings = delegate { }; //javascriptEnabled,JavaEnabled
         public event Action<string, string> OnSentForSeo = delegate { };//currenturlName,url
+        public event Action<string> OnSetUserAgent = delegate { };//UserAgent
 
 
         public ICommand OpenCPCommand { get; set; }
@@ -53,6 +54,7 @@ namespace Browser.Common.ViewModels
         public ICommand SaveSessionToBMs { get; set; }
         public ICommand SettingsCTClick { get; set; }
         public ICommand BoockmarksCommand { get; set; }
+        public ICommand OpenMacrosCommand { get; set; }
 
         #endregion
         private System.Windows.Forms.UserControl webBrowser;
@@ -100,6 +102,7 @@ namespace Browser.Common.ViewModels
             get { return outputMessage; }
             set { outputMessage = value; RaisePropertyChanged("OutputMessage"); }
         }
+
         //HuverLink
         private string huverLink;
         public string HuverLink
@@ -183,6 +186,8 @@ namespace Browser.Common.ViewModels
 
         public virtual void NavigateToSelectedSite(string text) { }
 
+        public virtual Task OnPlayMacro(MacroManger manger, IIMPlayType type, int loop) { return null; }
+
 
         public void RaiseOnAddedToGoViral(string link, string v, List<string> p)
         {
@@ -244,6 +249,79 @@ namespace Browser.Common.ViewModels
             set { BrowserSettimgs.SITimeZone = value; RaisePropertyChanged("SITimeZone"); }
         }
 
+        public List<string> AvailableFonts
+        {
+            get
+            {
+                List<string> avail = BrowserSettimgs.AvailableFonts;
+                RaisePropertyChanged("SIFontStandard");
+                RaisePropertyChanged("SIFontSerif");
+                RaisePropertyChanged("SIFontSansSerif");
+                RaisePropertyChanged("SIFontFixedWidth");
+                RaisePropertyChanged("DefaultFontSize");
+                RaisePropertyChanged("MnimumFontSize");
+                return avail;
+            }
+        }
+        public int SIFontStandard
+        {
+            get { return BrowserSettimgs.SIFontStandard; }
+            set { BrowserSettimgs.SIFontStandard = value; RaisePropertyChanged("SIFontStandard"); }
+        }
+        public int SIFontSerif
+        {
+            get { return BrowserSettimgs.SIFontSerif; }
+            set { BrowserSettimgs.SIFontSerif = value; RaisePropertyChanged("SIFontSerif"); }
+        }
+        public int SIFontSansSerif
+        {
+            get { return BrowserSettimgs.SIFontSansSerif; }
+            set { BrowserSettimgs.SIFontSansSerif = value; RaisePropertyChanged("SIFontSansSerif"); }
+        }
+        public int SIFontFixedWidth
+        {
+            get { return BrowserSettimgs.SIFontFixedWidth; }
+            set { BrowserSettimgs.SIFontFixedWidth = value; RaisePropertyChanged("SIFontFixedWidth"); }
+        }
+        //HideFonts
+        public bool HideFonts
+        {
+            get { return BrowserSettimgs.HideFonts; }
+            set { BrowserSettimgs.HideFonts = value; RaisePropertyChanged("HideFonts"); }
+        }
+
+        public int DefaultFontSize
+        {
+            get { return BrowserSettimgs.DefaultFontSize; }
+            set { BrowserSettimgs.DefaultFontSize = value; RaisePropertyChanged("DefaultFontSize"); }
+        }
+        public int MnimumFontSize
+        {
+            get { return BrowserSettimgs.MnimumFontSize; }
+            set { BrowserSettimgs.MnimumFontSize = value; RaisePropertyChanged("MnimumFontSize"); }
+        }
+
+        public List<string> AvailableEncodeings
+        {
+            get
+            {
+                List<string> avail = BrowserSettimgs.AvailableEncodeings;
+                RaisePropertyChanged("SIFontEncodings");
+                return avail;
+            }
+        }
+        public int SIFontEncodings
+        {
+            get { return BrowserSettimgs.SIFontEncodings; }
+            set { BrowserSettimgs.SIFontEncodings = value; RaisePropertyChanged("SIFontEncodings"); }
+        }
+
+        public bool WebGLEnabled
+        {
+            get { return BrowserSettimgs.WebGLEnabled; }
+            set { BrowserSettimgs.WebGLEnabled = value; RaisePropertyChanged("WebGLEnabled"); }
+        }
+
         private Visibility visibleDtPbar;
         public Visibility VisibleDtPbar
         {
@@ -259,7 +337,6 @@ namespace Browser.Common.ViewModels
             {
                 javascriptEnabled = value;
                 RaisePropertyChanged("JavascriptEnabled");
-
             }
         }
 
@@ -372,11 +449,19 @@ namespace Browser.Common.ViewModels
             set { setWebrtcVisible = value; RaisePropertyChanged("SetWebrtcVisible"); }
         }
 
-        bool oldJavaCript, oldJava, oldFlash, oldSysDate, oldDnt, oldwebrtc;
-        int oldTZSI = 0;
+        private Visibility setMacrosAvailableVisible = Visibility.Collapsed;
+        public Visibility SetMacrosAvailableVisible
+        {
+            get { return setMacrosAvailableVisible; }
+            set { setMacrosAvailableVisible = value; RaisePropertyChanged("SetMacrosAvailableVisible"); }
+        }
 
+        bool oldJavaCript, oldJava, oldFlash, oldSysDate, oldDnt, oldwebrtc, oldWebGL;
+        int oldTZSI = 0, oldSIFontStandard = 0, oldSIFontSerif = 0, oldSIFontSansSerif = 0, oldSIFontFixedWidth = 0, oldDefaultFontSize = 0, oldMnimumFontSize = 0, oldSIFontEncodings = 0;
+        bool saved = false;
         internal void SettingsMenuOpen()
         {
+            saved = false;
             oldJavaCript = JavascriptEnabled;
             oldJava = JavaEnabled;
             oldFlash = FlashEnabled;
@@ -384,6 +469,14 @@ namespace Browser.Common.ViewModels
             oldDnt = DoNotTrackEnabled;
             oldTZSI = SITimeZone;
             oldwebrtc = WebRTCEnabled;
+            oldSIFontStandard = SIFontStandard;
+            oldSIFontSerif = SIFontSerif;
+            oldSIFontSansSerif = SIFontSansSerif;
+            oldSIFontFixedWidth = SIFontFixedWidth;
+            oldDefaultFontSize = DefaultFontSize;
+            oldMnimumFontSize = MnimumFontSize;
+            oldSIFontEncodings = SIFontEncodings;
+            oldWebGL = WebGLEnabled;
         }
 
         internal void SettingsMenuClosed()
@@ -395,6 +488,16 @@ namespace Browser.Common.ViewModels
             DoNotTrackEnabled = oldDnt;
             SITimeZone = oldTZSI;
             WebRTCEnabled = oldwebrtc;
+            if (saved) return;
+
+            SIFontStandard = oldSIFontStandard;
+            SIFontSerif= oldSIFontSerif;
+            SIFontSansSerif= oldSIFontSansSerif;
+            SIFontFixedWidth= oldSIFontFixedWidth;
+            DefaultFontSize= oldDefaultFontSize;
+            MnimumFontSize= oldMnimumFontSize;
+            SIFontEncodings= oldSIFontEncodings;
+            WebGLEnabled = oldWebGL;
         }
 
         private void OnSettingsCTButtonClick(object param)
@@ -406,6 +509,7 @@ namespace Browser.Common.ViewModels
                     break;
 
                 case "SESSION":
+                    saved = true;
                     BrowserSettimgs.SetSysDateEnabled = SetSysDateEnabled;
                     BrowserSettimgs.JavascriptEnabled = JavascriptEnabled;
                     BrowserSettimgs.JavaEnabled = JavaEnabled;
@@ -435,6 +539,31 @@ namespace Browser.Common.ViewModels
                         if (oldSysDate) TimeHelper.SetOriginalTimeZonesFromFile();
                         OnRefreshSessionSettings();
                     }
+                    break;
+
+                case "ResetDefaultFonts":
+                    BrowserSettimgs.ResetDefaoultFonts();
+                    OnRefreshSessionSettings();
+                    break;
+
+                case "UserAgent":
+                    UserAgentVM uavm = new UserAgentVM();
+                    if (SetWebrtcVisible == Visibility.Visible) uavm.SetUpFFAgents();
+                    else uavm.SetUpChromeAgents();
+
+                    UserAgentSelectorWindow uaw = new UserAgentSelectorWindow();
+                    uaw.DataContext = uavm;
+                    uaw.Show();
+
+                    uavm.OnSelectedUserAgentChange += (agent) => 
+                    {
+                        OnSetUserAgent(agent);
+                        try
+                        {
+                            uaw.Close();
+                        }
+                        catch { }
+                    };
                     break;
 
                 default:
@@ -477,7 +606,7 @@ namespace Browser.Common.ViewModels
 
         private async void OpenCP()
         {
-            PersonData profile = await getSelectedProfile();
+            PersonData profile = await getSelectedProfile(false);
             if (profile == null) return;
 
             if (CPWthread == null || !CPWthread.IsAlive)
@@ -510,7 +639,7 @@ namespace Browser.Common.ViewModels
             }
         }
 
-        public async Task<PersonData> getSelectedProfile()
+        public async Task<PersonData> getSelectedProfile(bool isfromMacro, string imacroName = "")
         {
             return await Task<PersonData>.Factory.StartNew(() =>
             {
@@ -543,6 +672,12 @@ namespace Browser.Common.ViewModels
                 if (MyFilesDatabase.HasMultipleProfiles(GloableProfData.PData.ProjectDir))
                 {
                     SelectProfileWindow selectProfile = new SelectProfileWindow(GloableProfData.PData.ProjectName, GloableProfData.PData.ProjectDir, lastProfileIndex, "");
+                    if(isfromMacro) selectProfile.Title ="For " + imacroName; 
+                    if (isfromMacro)
+                    {
+                        selectProfile.Topmost = true;
+                        selectProfile.Topmost = false;
+                    }
                     selectProfile.ShowDialog();
                     if (!selectProfile.OkClicked)
                     {

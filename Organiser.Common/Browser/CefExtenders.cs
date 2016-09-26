@@ -189,7 +189,23 @@ namespace Organiser.Common.Browser
 
         //    return CefReturnValue.Continue;
         //}
-        protected override bool OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request)
+        //protected override bool OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request)
+        //{
+        //    if (!BrowserSettimgs.DoNotTrackEnabled)
+        //    {
+        //        var headers = request.GetHeaderMap();
+        //        headers.Add("DNT", "1");
+        //        request.SetHeaderMap(headers);
+
+        //        frame.ExecuteJavaScript("window.navigator.__defineGetter__('doNotTrack', function () { return '1'; });", request.Url, 0);
+        //    }
+
+        //    frame.ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", browser.GetMainFrame().Url, 0);
+
+        //    return base.OnBeforeResourceLoad(browser, frame, request);
+        //}
+
+        protected override CefReturnValue OnBeforeResourceLoad(CefBrowser browser, CefFrame frame, CefRequest request, CefRequestCallback callback)
         {
             if (!BrowserSettimgs.DoNotTrackEnabled)
             {
@@ -202,7 +218,7 @@ namespace Organiser.Common.Browser
 
             frame.ExecuteJavaScript("window.__defineGetter__('MediaStreamTrack', function () { return null; });", browser.GetMainFrame().Url, 0);
 
-            return base.OnBeforeResourceLoad(browser, frame, request);
+            return base.OnBeforeResourceLoad(browser, frame, request, callback);
         }
         protected override bool GetAuthCredentials(CefBrowser browser, CefFrame frame, bool isProxy, string host, int port, string realm, string scheme, CefAuthCallback callback)
         {
@@ -387,8 +403,13 @@ namespace Organiser.Common.Browser
         //    //throw new NotImplementedException();
         //}
 
-        protected override void OnScrollOffsetChanged(CefBrowser browser)
+        //protected override void OnScrollOffsetChanged(CefBrowser browser)
+        //{
+        //}
+
+        protected override void OnScrollOffsetChanged(CefBrowser browser, double x, double y)
         {
+           // throw new NotImplementedException();
         }
     }
 }

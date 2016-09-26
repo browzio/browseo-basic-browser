@@ -16,11 +16,14 @@ using DragDropListview;
 using System.Net;
 using System.IO;
 
+//using Xilium.CefGlue.Demo.Browser;
+//using Xilium.CefGlue.Demo;
+//using CefWebBrowser = Xilium.CefGlue.Demo.CefWebBrowser;
+
 namespace Xilium.CefGlue.Client
 {
     public partial class BrowserCntrl : UserControl
     {
-
         public event Action<string> OnBrowserTitleChanged = delegate { };
         public event Action<string> OnBrowserAddressChanged = delegate { };
         public event Action<string> OnBrowserStatusChanged = delegate { };
@@ -52,20 +55,46 @@ namespace Xilium.CefGlue.Client
             CefState StateJava = javaEnabled ? CefState.Enabled : CefState.Disabled;
             CefState StateFlash = flashEnabled ? CefState.Enabled : CefState.Disabled;
 
-            CBrowser = new CefWebBrowser();
+            CBrowser = new CefWebBrowser()
+            {
+
+            };
             CBrowser.HandleWasCreated += browser_OnHandleCreated;
-            if (startUrl != "")
-                CBrowser.StartUrl = startUrl;
+            if (startUrl != "") CBrowser.StartUrl = startUrl;
             CBrowser.Width = this.Width;
             CBrowser.Height = this.Height;
             CBrowser.Dock = DockStyle.Fill;
+            CBrowser.BringToFront();
             CBrowser.BrowserSettings = new CefBrowserSettings()
             {
                 JavaScriptAccessClipboard = StateJavascript,
                 JavaScriptDomPaste = StateJavascript,
                 JavaScript = StateJavascript,
-                Java = StateJava,
+                //Java = StateJava,
+
                 Plugins = StateFlash,
+
+                //WebGL = CefState.Disabled,
+
+                DefaultFixedFontSize = BrowserSettimgs.DefaultFontSize,
+                DefaultFontSize = BrowserSettimgs.DefaultFontSize,
+                MinimumFontSize = BrowserSettimgs.MnimumFontSize,
+                MinimumLogicalFontSize = BrowserSettimgs.MnimumFontSize,
+                StandardFontFamily = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontStandard],
+                SerifFontFamily = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontSerif],
+                SansSerifFontFamily = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontSansSerif],
+                FixedFontFamily = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontFixedWidth],
+                DefaultEncoding = BrowserSettimgs.AvailableEncodeings[BrowserSettimgs.SIFontEncodings],
+                WebGL = BrowserSettimgs.WebGLEnabled ? CefState.Enabled : CefState.Disabled,
+                // RemoteFonts = CefState.Disabled, 
+ 
+                //ApplicationCache = CefState.Disabled,
+                //Databases = CefState.Disabled,
+                //ImageLoading = CefState.Disabled,
+                //ImageShrinkStandaloneToFit = CefState.Disabled,
+                //WindowlessFrameRate = 60,
+                //RemoteFonts = CefState.Disabled,
+                //LocalStorage = CefState.Disabled,
             };
             CBrowser.BringToFront();
 
@@ -99,7 +128,7 @@ namespace Xilium.CefGlue.Client
 
         void CBrowser_BeforePopup(object sender, BeforePopupEventArgs e)
         {
-            e.Handled = true; 
+            e.Handled = true;
 
             isWindowPopUp = true;
             if (e.TargetUrl != null)
@@ -110,7 +139,7 @@ namespace Xilium.CefGlue.Client
         void CBrowser_StatusMessage(object sender, StatusMessageEventArgs e)
         {
             if (isWindowPopUp)
-                return; 
+                return;
             OnBrowserStatusChanged(e.Value);
         }
 
@@ -119,9 +148,11 @@ namespace Xilium.CefGlue.Client
             if (isWindowPopUp)
                 return;
 
-            CurrAddress = CBrowser.Address;  
+            CurrAddress = CBrowser.Address;
             OnBrowserAddressChanged(CBrowser.Address);
         }
+
+
 
         void CBrowser_TitleChanged(object sender, TitleChangedEventArgs e)
         {
@@ -138,6 +169,20 @@ namespace Xilium.CefGlue.Client
             }
         }
 
+        public CefFrame GetTheMainFrame()
+        {
+            return CBrowser.Browser.GetMainFrame();
+           //  return CBrowser.WebBrowser.CefBrowser.GetMainFrame();
+           // return null;
+        }
+
+        public CefBrowser GetBrowser()
+        {
+            return CBrowser.Browser;
+            //return CBrowser.WebBrowser.CefBrowser;
+            //return null;
+        }
+
         void CBrowser_ConsoleMessage(object sender, ConsoleMessageEventArgs e)
         {
             if (isWindowPopUp)
@@ -150,8 +195,8 @@ namespace Xilium.CefGlue.Client
         {
             if (isWindowPopUp)
                 return;
-           // CBrowser.Browser.GetMainFrame().ExecuteJavaScript("alert(window.MediaStreamTrack);", CBrowser.Browser.GetMainFrame().Url, 0);
-          //  CBrowser.Browser.GetMainFrame().ExecuteJavaScript("alert(window.MediaStreamTrack);", CBrowser.Browser.GetMainFrame().Url, 0);
+            // CBrowser.Browser.GetMainFrame().ExecuteJavaScript("alert(window.MediaStreamTrack);", CBrowser.Browser.GetMainFrame().Url, 0);
+            //  CBrowser.Browser.GetMainFrame().ExecuteJavaScript("alert(window.MediaStreamTrack);", CBrowser.Browser.GetMainFrame().Url, 0);
             OnBrowserLoadingChanged(e.IsLoading);
             //if(!e.IsLoading)//
             //    CBrowser.Browser.GetMainFrame().ExecuteJavaScript("for (property in navigator) { alert(property + ' ' + navigator[property]); }", CBrowser.Browser.GetMainFrame().Url, 0);
@@ -184,7 +229,7 @@ namespace Xilium.CefGlue.Client
                     string linkb = url;
                     linkb = url.Replace(' ', '+');
                     linkb = String.Format(@"http://google.com/search?v=1.0&q={0}", linkb);
-                    CBrowser.Browser.GetMainFrame().LoadUrl(linkb);
+                    GetTheMainFrame().LoadUrl(linkb);
                 }
                 else
                 {
@@ -199,10 +244,20 @@ namespace Xilium.CefGlue.Client
                     //request.SetHeaderMap(headers);
                     //request.Url = url;
                     //CBrowser.Browser.GetMainFrame().LoadRequest(request);
-                    CBrowser.Browser.GetMainFrame().LoadUrl(url);
-                    MyFilesDatabase.AppendToSavedSites(url);
+                    if (GetTheMainFrame().Url == url)
+                    {
+                        Reload();
+                    }
+                    else
+                    {
+                        GetTheMainFrame().LoadUrl(url);
+                        MyFilesDatabase.AppendToSavedSites(url);
+                    }
                 }
-            }catch { }
+            }
+            catch { }
+
+
         }
         
         public void Reload()
@@ -238,7 +293,11 @@ namespace Xilium.CefGlue.Client
 
         public void DisposeBrowserComponents()
         {
-            Dispose(true);
+            try
+            {
+                Dispose(true);
+            }
+            catch { }
         }
         protected override void Dispose(bool disposing)
         {

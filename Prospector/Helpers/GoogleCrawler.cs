@@ -163,7 +163,7 @@ namespace Prospector.Helpers
                         Link = link,
                         Title = title,
                         Description=description,
-                        Position = "" + linkPos,
+                        Position = linkPos,
                         SearchEngine = searchEngine
                     };
                     LinkWasAddedToList(sr, false);

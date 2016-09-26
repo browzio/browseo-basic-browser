@@ -1,0 +1,19 @@
+﻿<Window x:Class="Organiser.Common.Windows.MacroPromptWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Organiser.Common.Windows"
+        mc:Ignorable="d"
+        Title="IMacro Prompt" SizeToContent="WidthAndHeight" MinWidth="300" MaxWidth="600" WindowStartupLocation="CenterScreen" SnapsToDevicePixels="True" Icon="/Organiser.Common;component/Image/browseo (1).ico">
+    <Grid Margin="3">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBox x:FieldModifier="public" Name="tbInfo" TextWrapping="Wrap" Margin="7" HorizontalAlignment="Center" BorderThickness="0" Background="Transparent" />
+        <TextBox x:FieldModifier="public" Name="tbInput" MinWidth="200" Margin="3" Grid.Row="1" />
+        <Button Content="Ok" Click="Button_Click" Grid.Row="2" Margin="3" />
+    </Grid>
+</Window>

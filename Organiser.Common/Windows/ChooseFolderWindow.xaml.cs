@@ -39,5 +39,10 @@ namespace Organiser.Common.Windows
             LoadAllClicked = true;
             this.Close();
         }
+
+        private void Image_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
     }
 }

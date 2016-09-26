@@ -17,6 +17,6 @@
 
     <Grid>
         <browserCommonViews:BrowserHostCntrl Name="browserHost" x:FieldModifier="public"
-                                             OnCloseTab="browserHost_OnCloseTab"  OnOpenNewTab="browserHost_OnOpenNewTab"  OnContentRenderd="browserHost_OnContentRenderd" />
+                                             OnCloseTab="browserHost_OnCloseTab"  OnOpenNewTab="browserHost_OnOpenNewTab" OnContentRenderd="browserHost_OnContentRenderd" />
     </Grid>
 </UserControl>

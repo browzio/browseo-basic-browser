@@ -1,5 +1,6 @@
 ﻿using Organiser.Common;
 using Organiser.Common.Classes;
+using Organiser.Common.ViewModels;
 using Organiser.Common.Windows;
 using RssReader.Helpers;
 using RssReader.Models;
@@ -65,32 +66,64 @@ namespace RssReader.Controlls
             ImportBookmarks();
         }
 
-        public void ImportBookmarks()
+        public async void ImportBookmarks()
         {
             try
             {
-                SelectProfileWindow spw = new SelectProfileWindow();
-                spw.Title = "Select Project";
-                spw.ShowDialog();
-                if (spw.OkClicked)
-                {
-                    AvailrssesForImports.Clear();
-                    foreach (string tabTitle in MyFilesDatabase.GetRssFeedLinksTabsTitlesByName(spw.SelectedProjectName))
-                    {
-                        AvailrssesForImports.Add(new AvailableTabsAndLinks() { Name = tabTitle });
-                    }
+                //SelectProfileWindow spw = new SelectProfileWindow();
+                //spw.Title = "Select Project";
+                //spw.ShowDialog();
+                //if (spw.OkClicked)
+                //{
+                //    AvailrssesForImports.Clear();
+                //    foreach (string tabTitle in MyFilesDatabase.GetRssFeedLinksTabsTitlesByName(spw.SelectedProjectName))
+                //    {
+                //        AvailrssesForImports.Add(new AvailableTabsAndLinks() { Name = tabTitle });
+                //    }
 
-                    ChooseFolderWindow cfw = new ChooseFolderWindow();
-                    cfw.DataContext = this;
-                    cfw.lstItems.ItemsSource = AvailrssesForImports;
-                    cfw.ShowDialog();
-                    if (cfw.OkClicked)
+                //    ChooseFolderWindow cfw = new ChooseFolderWindow();
+                //    cfw.DataContext = this;
+                //    cfw.lstItems.ItemsSource = AvailrssesForImports;
+                //    cfw.ShowDialog();
+                //    if (cfw.OkClicked)
+                //    {
+                //        foreach (AvailableTabsAndLinks availTabs in AvailrssesForImports)
+                //        {
+                //            if (availTabs.IsChecked)
+                //            {
+                //                OnImportedTab(availTabs.Name, MyFilesDatabase.GetRssFeedLinks(spw.SelectedProjectName, availTabs.Name));
+                //            }
+                //        }
+                //    }
+                //}
+
+                ChooseProjectsVM cpvm = new ChooseProjectsVM();
+                await cpvm.InitProjectsWindowList();
+                if (cpvm.ShowListWindowDialog())
+                {
+                    foreach (var sp in cpvm.SavedProjectsListAdded)
                     {
-                        foreach (AvailableTabsAndLinks availTabs in AvailrssesForImports)
+                        if (!sp.IsChecked || sp.IsFolder) continue;
+                        var listNeeded = await Task.Run(()=> { return MyFilesDatabase.GetRssFeedLinksTabsTitlesByName(sp.Name); });
+                        AvailrssesForImports.Clear();
+                        foreach (string tabTitle in listNeeded)
                         {
-                            if (availTabs.IsChecked)
+                            AvailrssesForImports.Add(new AvailableTabsAndLinks() { Name = tabTitle });
+                        }
+
+                        ChooseFolderWindow cfw = new ChooseFolderWindow();
+                        cfw.DataContext = this;
+                        cfw.lstItems.ItemsSource = AvailrssesForImports;
+                        cfw.ShowDialog();
+                        if (cfw.OkClicked)
+                        {
+                            foreach (AvailableTabsAndLinks availTabs in AvailrssesForImports)
                             {
-                                OnImportedTab(availTabs.Name, MyFilesDatabase.GetRssFeedLinks(spw.SelectedProjectName, availTabs.Name));
+                                if (availTabs.IsChecked)
+                                {
+                                    var feeds = await Task.Run(() => { return MyFilesDatabase.GetRssFeedLinks(sp.Name, availTabs.Name); });
+                                    OnImportedTab(availTabs.Name, feeds);
+                                }
                             }
                         }
                     }

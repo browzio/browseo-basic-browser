@@ -1,5 +1,4 @@
-﻿using Organiser.Common.Classes;
-using PData.FilesReader;
+﻿using LocalHelpers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,6 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -175,7 +175,7 @@ namespace Indexer
 
         public IndexerVM()
         {
-            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_OpenedIndeser + "");
+           // Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_OpenedIndeser + "");
 
             BtnOkClicked = new RelayCommand(OnBtnOkClicked);
 
@@ -333,7 +333,7 @@ namespace Indexer
                     }
                     client.Dispose();
 
-                    Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_IndexedLinks + " " + InputedLinks + " Response: " + Response);
+                    //Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_IndexedLinks + " " + InputedLinks + " Response: " + Response);
 
                     BtnOkEnabled = true;
                     ResponseVisible = Visibility.Visible;
@@ -353,10 +353,10 @@ namespace Indexer
 
         private void saveApiKeys()
         {
-            string apiDirs = Path.Combine(MyFilesDatabase.GetBaseDir(), "IndexerApi");
+            string apiDirs = Path.Combine(GetBaseDir(), "IndexerApi");
             if (!Directory.Exists(apiDirs)) Directory.CreateDirectory(apiDirs);
 
-            string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "IndexerApi", "keys.ini");
+            string filePath = Path.Combine(GetBaseDir(), "IndexerApi", "keys.ini");
             try
             {
                 IniFile fileWrighter = new IniFile(filePath);
@@ -370,7 +370,7 @@ namespace Indexer
 
         private void getApiKeys()
         {
-            string filePath = Path.Combine(MyFilesDatabase.GetBaseDir(), "IndexerApi", "keys.ini");
+            string filePath = Path.Combine(GetBaseDir(), "IndexerApi", "keys.ini");
             if (File.Exists(filePath))
             {
                     IniFile ini = new IniFile(filePath);
@@ -385,6 +385,96 @@ namespace Indexer
             }
         }
 
+        private string GetBaseDir()
+        {
+            return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\RAWSocialOrganizer";
+        }
+
+        private class IniFile
+        {
+            public string path;
+
+            [DllImport("kernel32")]
+            private static extern long WritePrivateProfileString(string section, string key, string val, string filePath);
+            [DllImport("kernel32")]
+            private static extern int GetPrivateProfileString(string section, string key, string def, StringBuilder retVal, int size, string filePath);
+
+            /// <summary>
+            /// INIFile Constructor.
+            /// </summary>
+            /// <param name="INIPath"></param>
+            public IniFile(string INIPath)
+            {
+                path = INIPath;
+            }
+            /// <summary>
+            /// Write Data to the INI File
+            /// </summary>
+            /// <param name="Section"></param>
+            /// Section name
+            /// <param name="Key"></param>
+            /// Key Name
+            /// <param name="Value"></param>
+            /// Value Name
+            public void IniWriteValue(string Section, string Key, string Value)
+            {
+                var vals = WritePrivateProfileString(Section, Key, Value, this.path);
+                if (vals == 0)
+                {
+                    if (!File.Exists(this.path))
+                    {
+                        File.AppendAllText(path, "[" + Section + "]" + Environment.NewLine);
+                    }
+                    string fileText = File.ReadAllText(this.path);
+                    if (!fileText.Contains(Key))
+                    {
+                        File.AppendAllText(path, Key + "=" + Value + Environment.NewLine);
+                    }
+                    else
+                    {
+                        string[] lines = fileText.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var user in lines)
+                        {
+                            string fline = user;
+                            if (fline.Split(new string[] { "=" }, StringSplitOptions.None)[0].Trim() == Key.Trim())
+                            {
+                                fileText = fileText.Replace(fline, Key + "=" + Value);
+                                File.WriteAllText(this.path, fileText);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Read Data Value From the Ini File
+            /// </summary>
+            /// <param name="Section"></param>
+            /// <param name="Key"></param>
+            /// <param name="Path"></param>
+            /// <returns></returns>
+            public string IniReadValue(string Section, string Key)
+            {
+                StringBuilder temp = new StringBuilder(255);
+                int i = GetPrivateProfileString(Section, Key, "", temp, 255, this.path);
+                if (i == 0)
+                {
+                    foreach (var line in File.ReadAllLines(this.path))
+                    {
+                        if (!line.Contains("=")) continue;
+                        string[] keyvale = line.Split('=');
+                        string sectionVal = keyvale[1], sectionkey = keyvale[0];
+                        if (sectionkey == Key)
+                        {
+                            return sectionVal;
+                        }
+                    }
+                }
+                return temp.ToString();
+
+            }
+        }
         public event PropertyChangedEventHandler PropertyChanged;
     }
 }
