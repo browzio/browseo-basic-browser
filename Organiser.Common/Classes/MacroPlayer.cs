@@ -498,6 +498,12 @@ namespace Organiser.Common.Classes
             get { return tooltipType; }
             set { tooltipType = value; RaisePropertyChanged("TooltipType"); }
         }
+        private string tooltipText;
+        public string TooltipText
+        {
+            get { return tooltipText; }
+            set { tooltipText = value; RaisePropertyChanged("TooltipText"); }
+        }
 
         private bool isFolder;
         public bool IsFolder
@@ -598,8 +604,10 @@ namespace Organiser.Common.Classes
                             foreach (string file in addMacroFiles.FileNames)
                             {
                                 FileInfo fi = new FileInfo(file);
-                              //  if (fi.Extension != ".iim" && fi.Extension != ".js") continue;
-                                await Task.Run(() => fi.CopyTo(FilePath + "\\" + fi.Name));
+                                string topath = FilePath + "\\" + fi.Name;
+                                if (File.Exists(topath)) continue;
+
+                                await Task.Run(() => fi.CopyTo(topath, true));
 
                                 MacroFile macrofile = new MacroFile()
                                 {
@@ -807,7 +815,7 @@ namespace Organiser.Common.Classes
                                     FileName = file.Name,
                                     ParentMacro = macroDir,
                                 };
-                                macrofile.TooltipType = GetTooltipType(file.Name);
+                                macrofile.TooltipType = GetTooltipType(file.Name, macrofile);
                                 macrofile.OnRunThisMacro += OnRunThisMacro;
                                 macroDir.ThreadSafeAddMacro(macrofile);
                             }
@@ -831,7 +839,7 @@ namespace Organiser.Common.Classes
                             FileName = file.Name,
                             ParentMacro = this,
                         };
-                        macrofile.TooltipType = GetTooltipType(file.Name);
+                        macrofile.TooltipType = GetTooltipType(file.Name, macrofile);
                         macrofile.OnRunThisMacro += OnRunThisMacro;
                         ThreadSafeAddMacro(macrofile);
                     }
@@ -840,7 +848,7 @@ namespace Organiser.Common.Classes
             catch { }
         }
 
-        private string GetTooltipType(string name)
+        private string GetTooltipType(string name, MacroFile mfile)
         {
             if (name.Contains(".")) name = name.Remove(name.IndexOf("."));
             switch (name)
@@ -864,6 +872,9 @@ namespace Organiser.Common.Classes
                 case "FB Join Goups By KW":
                 case "Twitter Retweet By Kw":
                 case "Twitter Like By Kw":
+                case "Tumblr Follow Top":
+                case "Tumblr Follow":
+                case "Tumblr Like":
                     return "pack://application:,,,/Organiser.Common;component/Image/tooltipKeywords.png";
 
                 case "Reddit Subreddit Scrape":
@@ -911,6 +922,14 @@ namespace Organiser.Common.Classes
                 case "Twitter":
                 case "Wordpress":
                     return "pack://application:,,,/Organiser.Common;component/Image/tooltipiftt.png";
+
+                case "FB Photo Upload & Description":
+                    mfile.TooltipText = @"C:\full\path\to\file.png,description";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Tumblr Reblog":
+                    mfile.TooltipText = "keyword,comment,tag1 tag2 tag3 ...";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
                 default:
                     return "";
             }
@@ -977,6 +996,7 @@ namespace Organiser.Common.Classes
                 IsPlayEnabled = !isRunning;
                 if (!isRunning)
                 {
+                    StopRequested = false;
                     UpdateText = "";
                     ContentForPaused = "Pause";
                 }
@@ -1009,6 +1029,7 @@ namespace Organiser.Common.Classes
                 if (value)
                 {
                     Paused = false;
+                   // IsRunning = false;
                     OnStopRequested();
                 }
                 RaisePropertyChanged("StopRequested");
@@ -1045,19 +1066,12 @@ namespace Organiser.Common.Classes
         {
             try
             {
-                StopRequested = false;
-
                 string param = obj as string;
                 if (param == null) return;
                 switch (param)
                 {
                     case "MacroPlayChecked":
                     case "MacroPlayLoopChecked":
-                        //if (!Paused && (IsRunning || StopRequested))
-                        //{
-                        //    "Please wait for the currently running macro to finish.".Show();
-                        //    return;
-                        //}
                         var checkedMAcros = new List<MacroFile>();
                         GetCheckedMAcros(MacroFilesBase, checkedMAcros);
                         foreach (var mac in checkedMAcros)
@@ -1071,16 +1085,12 @@ namespace Organiser.Common.Classes
 
                     case "MacroPlay":
                     case "MacroPlayLoop":
-                        //if (!Paused && (IsRunning || StopRequested))
-                        //{
-                        //    "Please wait for the currently running macro to finish.".Show();
-                        //    return;
-                        //}
                         var selectedMacro = await GetSelectedMacro(MacroFilesBase,"");
                         if (selectedMacro != null)
                         {
                             await semaphoreSlim.WaitAsync();
 
+                            
                             if (!File.Exists(selectedMacro.FilePath))
                             {
                                 "Selected file not found".Show();
@@ -1114,11 +1124,7 @@ namespace Organiser.Common.Classes
 
                             await semaphoreSlim.WaitAsync();
                             OnMacroDone();
-                            try
-                            {
-                                semaphoreSlim.Release();
-                            }
-                            catch { }
+                            SafeReleaseSemephore();
                         }
                         break;
 
@@ -1151,13 +1157,18 @@ namespace Organiser.Common.Classes
             {
                 if(ex.Message != "The semaphore has been disposed.")ex.Message.Show();
                 StopRequested = true;
-                try
-                {
-                    semaphoreSlim.Release();
-                }
-                catch { }
+                SafeReleaseSemephore();
                 OnMacroDone();
             }
+        }
+
+        public void SafeReleaseSemephore()
+        {
+            try
+            {
+                semaphoreSlim.Release();
+            }
+            catch { }
         }
 
         public void GetCheckedMAcros(ObservableCollection<MacroFile> macroFilesBase, List<MacroFile> checkedMAcros)

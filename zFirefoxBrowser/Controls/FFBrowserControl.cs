@@ -142,7 +142,7 @@ namespace zFirefoxBrowser.Controls
             Browser = new GeckoWebBrowser();
             Browser.Dock = DockStyle.Fill;
 
-            
+
             Browser.Navigate(url);
 
 
@@ -181,7 +181,7 @@ namespace zFirefoxBrowser.Controls
             //Browser.Retargeted += (s, ee) =>
             //{
             //    var ch = ee.Request as Gecko.Net.Channel;
-                
+
             //    // ch.Cancel(1);
             //   // ch.Resume();
             //    return;
@@ -192,20 +192,20 @@ namespace zFirefoxBrowser.Controls
             {
                 OnBrowserLoadingChanged(false);
                 OnBrowserAddressChanged(ee.Uri.ToString());
-               // Console.WriteLine("DocumentCompleted: url: " + ee.Uri + ", top: " + ee.IsTopLevel);
+                // Console.WriteLine("DocumentCompleted: url: " + ee.Uri + ", top: " + ee.IsTopLevel);
             };
 
 
             Browser.DocumentTitleChanged += (s, e) =>
             {
-                if(Browser.DocumentTitle == "Page Load Error")
+                if (Browser.DocumentTitle == "Page Load Error")
                 {
                     if (SetLoadingFalse != null) SetLoadingFalse();
                 }
                 OnBrowserTitleChanged(Browser.DocumentTitle);
             };
 
-            Browser.StatusTextChanged += (s,e)=>
+            Browser.StatusTextChanged += (s, e) =>
             {
                 OnBrowserStatusChanged(Browser.StatusText);
             };
@@ -257,7 +257,7 @@ namespace zFirefoxBrowser.Controls
                 ci.Click += Tse_Click;
                 e.ContextMenu.MenuItems.Add(ci);
 
-                if (Browser.Url!=null && 
+                if (Browser.Url != null &&
                 Browser.Url.ToString().ToLower().Contains("www.facebook.com/search") || Browser.Url.ToString().ToLower().Contains("facebook.com/groups/?category=membership"))
                 {
                     e.ContextMenu.MenuItems.Add("-");
@@ -290,6 +290,7 @@ namespace zFirefoxBrowser.Controls
                 string target = ee.Uri.ToLower();
                 if (Browser.Url.AbsoluteUri.Contains("https://mail.google.com") || (!target.Contains("microsoft") &&
                     !target.Contains("facebook") &&
+                    !target.Contains("zapier.com") &&
                     !target.Contains("twitter") &&
                     !target.Contains("gplus") &&
                     !target.Contains("session/") &&

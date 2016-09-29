@@ -173,7 +173,10 @@
                         </Image>
                         <TextBlock Text="{Binding FileName}" MinWidth="145" MaxWidth="300" VerticalAlignment="Center">
                             <TextBlock.ToolTip>
-                                <Image Source="{Binding TooltipType}" />
+                                <StackPanel>
+                                    <Image Source="{Binding TooltipType}" />
+                                    <TextBlock Text="{Binding TooltipText}" FontSize="12" Margin="8,-105,0,0" />
+                                </StackPanel>
                                 <!--<Image>
                                     <Image.Style>
                                         <Style TargetType="{x:Type Image}">

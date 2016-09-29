@@ -58,7 +58,7 @@ namespace zFirefoxBrowser.Helpers
         public nsIFilePicker fp { get; set; }
         public nsIFilePickerShownCallback aFilePickerShownCallback { get; set; }
         public string FilePath { get; set; }
-       public  nsIDOMWindowUtils utils;
+        public  nsIDOMWindowUtils utils;
 
         //public bool RunningInMacroMode { get; set; }
 
@@ -177,6 +177,7 @@ namespace zFirefoxBrowser.Helpers
             // fp.Show();
             //this.Show();
             //aFilePickerShownCallback.Done(nsIFilePickerConsts.returnOK);
+        
             this.aFilePickerShownCallback = aFilePickerShownCallback;
             if (!MacroManger.AnyRunning) fp.Open(aFilePickerShownCallback);
         }

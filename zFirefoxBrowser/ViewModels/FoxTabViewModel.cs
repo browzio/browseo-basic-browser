@@ -945,6 +945,25 @@ namespace zFirefoxBrowser.ViewModels
         //    }
         //}
 
+        //public class MacrosComClassFactory : nsIFactory
+        //{
+        //    public IntPtr CreateInstance(nsISupports aOuter, ref Guid iid)
+        //    {
+        //        var obj = new MacroCommandExecutions();
+        //        return Marshal.GetIUnknownForObject(obj);
+        //    }
+
+        //    public void LockFactory(bool @lock)
+        //    {
+
+        //    }
+        //}
+
+        // if you want you use a custom com interface one has to register it with firefox
+        // see interfaces in https://developer.mozilla.org/en/Chrome_Registration#manifest
+        // to produce a xpt file one has to convert a idl file to xpt.
+
+
         #region from jsAddon
         private void OnAfterSandboxEval(string obj)
         {
@@ -955,7 +974,7 @@ namespace zFirefoxBrowser.ViewModels
 
         private void OnIIMSet(string values)
         {
-            if (macroPlayer == null || macroPlayer.StopRequested) return;
+            if (macroPlayer == null || macroPlayer.StopRequested || !macroPlayer.IsRunning) return;
 
             string[] vals = values.Split(new string[] { "{[|!1001!|]}" }, StringSplitOptions.None);
             if (macVals[vals[0]] == null) macVals.MacroVariablesValues.Add(vals[0].ToUpper(), "");
@@ -964,12 +983,13 @@ namespace zFirefoxBrowser.ViewModels
 
         private void OniIImGetVal(string variable)
         {
-            if (macroPlayer == null || macroPlayer.StopRequested) return;
+            if (macroPlayer == null || macroPlayer.StopRequested || !macroPlayer.IsRunning) return;
 
             if (!variable.StartsWith("{{")) variable = "{{" + variable;
-            if (!variable.EndsWith("}}")) variable =  variable + "}}";
+            if (!variable.EndsWith("}}")) variable = variable + "}}";
 
-            JSMacroPlayer.setVariableMessage("iimGetVal", GetMacroVariableAfterDynamicCheck(variable, macVals));
+            string valueReturned = GetMacroVariableAfterDynamicCheck(variable, macVals);
+            JSMacroPlayer.setVariableMessage("iimGetVal", valueReturned != null ? valueReturned : "undefined");
         }
 
         private void MacVals_OnSetExtract()
@@ -985,7 +1005,7 @@ namespace zFirefoxBrowser.ViewModels
         {
             await Application.Current.Dispatcher.Invoke(async () =>
             {
-                if (macroPlayer == null || macroPlayer.StopRequested) return;
+                if (macroPlayer == null || macroPlayer.StopRequested || !macroPlayer.IsRunning) return;
 
                 string codeOrPath = code;
                 if (codeOrPath.StartsWith("CODE:"))
@@ -1012,7 +1032,7 @@ namespace zFirefoxBrowser.ViewModels
                 macroPlayer.MacroPlayer.InitMacroCommandsList(codeOrPath);
                 await RunMacro(macroPlayer, IIMPlayType.macroFromjs, 1, macVals);
 
-                if (macroPlayer.StopRequested) return;
+                if (macroPlayer.StopRequested || !macroPlayer.IsRunning) return;
 
                 bool timeout = await CheckBrowserBusyTillTimeOut(macVals, WebBrowser.Browser);
                 if (!timeout)
@@ -1025,13 +1045,13 @@ namespace zFirefoxBrowser.ViewModels
 
         private async Task OnIIMPlayCode(string code)
         {
-           await Application.Current.Dispatcher.Invoke(async () =>
+            await Application.Current.Dispatcher.Invoke(async () =>
             {
-                if (macroPlayer == null || macroPlayer.StopRequested) return;
+                if (macroPlayer == null || macroPlayer.StopRequested || !macroPlayer.IsRunning) return;
                 macroPlayer.MacroPlayer.InitMacroCommandsList(code);
                 await RunMacro(macroPlayer, IIMPlayType.macroFromjs, 1, macVals);
 
-                if (macroPlayer.StopRequested) return;
+                if (macroPlayer.StopRequested || !macroPlayer.IsRunning) return;
 
                 bool timeout = await CheckBrowserBusyTillTimeOut(macVals, WebBrowser.Browser);
                 if (!timeout)
@@ -1042,25 +1062,6 @@ namespace zFirefoxBrowser.ViewModels
             });
         }
         #endregion
-
-        //public class MacrosComClassFactory : nsIFactory
-        //{
-        //    public IntPtr CreateInstance(nsISupports aOuter, ref Guid iid)
-        //    {
-        //        var obj = new MacroCommandExecutions();
-        //        return Marshal.GetIUnknownForObject(obj);
-        //    }
-
-        //    public void LockFactory(bool @lock)
-        //    {
-
-        //    }
-        //}
-
-        // if you want you use a custom com interface one has to register it with firefox
-        // see interfaces in https://developer.mozilla.org/en/Chrome_Registration#manifest
-        // to produce a xpt file one has to convert a idl file to xpt.
-
         public class MacroCommandExecutions : nsICommandHandler
         {
             public FoxTabViewModel ParentVM { get; set; }
@@ -1341,6 +1342,23 @@ namespace zFirefoxBrowser.ViewModels
                 WebBrowser.InMacroPlaying = value;
             }
         }
+        public bool InStopRequest
+        {
+            get
+            {
+                if (macroPlayer == null || macroPlayer.StopRequested || !macroPlayer.IsRunning)
+                {
+                    if (runningInJsMode && JSMacroPlayer != null) JSMacroPlayer.macroDone(WebBrowser.Browser.Window.DomWindow, WebBrowser.Browser.DomDocument.NativeDomDocument);
+                    if (!runningInJsMode || macroPlayer.StopRequested || !macroPlayer.IsRunning)
+                    {
+                        macroPlayer.IsRunning = false;
+                        if (macroPlayer.StopRequested) runningInJsMode = false;
+                    }
+                    return true;
+                }
+                return false;
+            }
+        }
 
         //nsIXULWindow ffpopupMacrosXulWindow;
         //GeckoWebBrowser ffpopupMacrosBrowser;
@@ -1501,11 +1519,7 @@ namespace zFirefoxBrowser.ViewModels
                 for (int dataCourceLine = 0; dataCourceLine < totalDataSourceLines; dataCourceLine++)
                 {
                     await Task.Run(() => { while (mPlayer.Paused) { Thread.Sleep(500); } });
-                    if (mPlayer.StopRequested)
-                    {
-                        if (runningInJsMode) JSMacroPlayer.macroDone(WebBrowser.Browser.Window.DomWindow, WebBrowser.Browser.DomDocument.NativeDomDocument);
-                        break;
-                    }
+                    if (InStopRequest) return;
 
                     for (int i = 0; i < times; i++)
                     {
@@ -1514,11 +1528,7 @@ namespace zFirefoxBrowser.ViewModels
                           if(JSMacroPlayer!=null) JSMacroPlayer.setVariableMessage("iimReturnVal", "1");
                         }
                         await Task.Run(() => { while (mPlayer.Paused) { Thread.Sleep(500); } });
-                        if (mPlayer.StopRequested)
-                        {
-                            if (runningInJsMode) JSMacroPlayer.macroDone(WebBrowser.Browser.Window.DomWindow, WebBrowser.Browser.DomDocument.NativeDomDocument);
-                            break;
-                        }
+                        if (InStopRequest) return;
 
                         macVals[MacroVariables.LOOP] = !runningInJsMode ? (i + 1).ToString().ToString() : (mPlayer.JSLoopPos + 1).ToString();
 
@@ -1540,11 +1550,7 @@ namespace zFirefoxBrowser.ViewModels
                         {
                             if (macVals[MacroVariables.SINGLESTEP].ToUpper() == "YES") mPlayer.OnCommandFromView_Raised("MacroPause");
                             await Task.Run(() => { while (mPlayer.Paused) { Thread.Sleep(500); } });
-                            if (mPlayer.StopRequested)
-                            {
-                                if (runningInJsMode) JSMacroPlayer.macroDone(WebBrowser.Browser.Window.DomWindow, WebBrowser.Browser.DomDocument.NativeDomDocument);
-                                break;
-                            }
+                            if (InStopRequest) return;
 
                             mPlayer.MacroPlayer.SIMacroCommand = macroIndex;
                             Macro mac = mPlayer.MacroPlayer.Macros[macroIndex];
@@ -1556,18 +1562,23 @@ namespace zFirefoxBrowser.ViewModels
                                 if (CheckTimeOutMax(macVals)) { mPlayer.MacroPlayer.Macros.Clear(); break; }
                                 switch (macVals[MacroVariables.REPLAYSPEED])
                                 {
-                                    case "MEDIUM": await Task.Delay(1000);break;// await Task.Run(() => Thread.Sleep(1000)); break;
-                                    case "SLOW": await Task.Delay(1000);break;// await Task.Run(() => Thread.Sleep(2000)); break;
+                                    case "MEDIUM":
+                                        if (await QuitableDelay(10)) return;
+                                        break;// await Task.Run(() => Thread.Sleep(1000)); break;
+                                    case "SLOW":
+                                        if (await QuitableDelay(20)) return;
+                                        break;// await Task.Run(() => Thread.Sleep(2000)); break;
                                     default: break;
                                 }
                                 //await Task.Run(() => Thread.Sleep(1000));
-                                if (await CheckBrowserBusyTillTimeOut(macVals, WebBrowser.Browser) == false)
-                                {
-                                    // mPlayer.MacroPlayer.Macros.Clear();
-                                    //return;
-                                    WebBrowser.Browser.Stop();
-                                }
-                                while (WebBrowser.Browser.Document == null && !CheckTimeOutMax(macVals)) { await Task.Delay(250); }// await Task.Run(() => Thread.Sleep(250)); }
+                                if (await CheckBrowserBusyTillTimeOut(macVals, WebBrowser.Browser) == false) WebBrowser.Browser.Stop();
+
+                                if (InStopRequest) return;
+
+                                while (WebBrowser.Browser.Document == null && !CheckTimeOutMax(macVals) && !InStopRequest) { await Task.Delay(100); }// await Task.Run(() => Thread.Sleep(250)); }
+
+                                if (InStopRequest) return;
+
                                 if (CheckTimeOutMax(macVals)) { mPlayer.MacroPlayer.Macros.Clear(); break; }
 
                                 if (setfromframe &&
@@ -1630,8 +1641,8 @@ namespace zFirefoxBrowser.ViewModels
                                     #region BACK
                                     case MacroCommands.BACK:
                                         if (WebBrowser.Browser.CanGoBack) WebBrowser.Browser.GoBack();
-                                        await Task.Delay(500);
-                                       // await Task.Run(() => Thread.Sleep(500));
+                                        if (await QuitableDelay(5)) return;
+                                        // await Task.Run(() => Thread.Sleep(500));
                                         break;
                                     #endregion
 
@@ -1967,7 +1978,7 @@ namespace zFirefoxBrowser.ViewModels
                                     case MacroCommands.REFRESH:
                                         //WebBrowser.Browser.Navigate(WebBrowser.Browser.Url.ToString());
                                         WebBrowser.Browser.Refresh();
-                                        await Task.Delay(500);
+                                        if (await QuitableDelay(5)) return;
                                         // await Task.Run(() => Thread.Sleep(500));
                                         break;
                                     #endregion
@@ -2434,8 +2445,8 @@ namespace zFirefoxBrowser.ViewModels
                                                     }
 
                                                     timesStepped++;
-                                                    await Task.Delay(1000);
-                                                   // await Task.Run(() => Thread.Sleep(1000));
+                                                    if (await QuitableDelay(10)) return;
+                                                    // await Task.Run(() => Thread.Sleep(1000));
                                                 }
                                                 if (!found && macVals[MacroVariables.ERRORIGNORE] == "NO")
                                                 {
@@ -2656,7 +2667,7 @@ namespace zFirefoxBrowser.ViewModels
                                             }
                                         }
                                         WebBrowser.Browser.Navigate(LINK.Trim());
-                                        await Task.Delay(1000);
+                                        if (await QuitableDelay(10)) return;
                                         //await Task.Run(() => Thread.Sleep(1000));
                                         break;
                                     #endregion
@@ -2700,14 +2711,14 @@ namespace zFirefoxBrowser.ViewModels
                                         int amount = Convert.ToInt32(LENGTH.Trim());
                                         for (int waiter = 0; waiter < amount; waiter++)
                                         {
-                                            if (mPlayer.StopRequested)
+                                            if (mPlayer.StopRequested || !macroPlayer.IsRunning)
                                             {
                                                 if (runningInJsMode) JSMacroPlayer.macroDone(WebBrowser.Browser.Window.DomWindow, WebBrowser.Browser.DomDocument.NativeDomDocument);
                                                 break;
                                             }
 
-                                            await Task.Delay(1000);
-                                           // await Task.Run(() => Thread.Sleep(1000));
+                                            if (await QuitableDelay(10)) return;
+                                            // await Task.Run(() => Thread.Sleep(1000));
                                         }
                                         break;
                                     #endregion
@@ -2854,7 +2865,7 @@ namespace zFirefoxBrowser.ViewModels
                 JSMacroPlayer.setVariableMessage("iimReturnVal", "-1");
             }
 
-            if (!runningInJsMode || macroPlayer.StopRequested)
+            if (!runningInJsMode || macroPlayer.StopRequested || !macroPlayer.IsRunning)
             {
                 mPlayer.IsRunning = false;
                 if (macroPlayer.StopRequested) runningInJsMode = false;
@@ -2891,22 +2902,34 @@ namespace zFirefoxBrowser.ViewModels
             startedTimer = true;
             double runtime = 0.0;
             player.UpdateText = "0";
-            while (player.IsRunning)
+            while (player.IsRunning && !player.StopRequested)
             {
-                //await Task.Run(() => Thread.Sleep(500));
-                await Task.Delay(500);
+                if (await QuitableDelay(5)) return;
+
                 if (player.Paused) continue;
-                if (player.StopRequested || !player.IsRunning)
-                {
-                    if (runningInJsMode) JSMacroPlayer.macroDone(WebBrowser.Browser.Window.DomWindow, WebBrowser.Browser.DomDocument.NativeDomDocument);
-                    break;
-                }
+                
 
                 runtime += .5;
                 player.UpdateText = runtime.ToString();
                 macVals[MacroVariables.STOPWATCHTIME] = runtime.ToString();
             }
             startedTimer = false;
+        }
+
+        /// <summary>
+        /// delay in a loop by 100ms per run
+        /// </summary>
+        /// <param name="times"></param>
+        /// <returns></returns>
+        private async Task<bool> QuitableDelay(int times)
+        {
+            for (int i = 0; i < times; i++)
+            {
+                await Task.Delay(100);
+                if (InStopRequest) return true;
+            }
+
+            return InStopRequest;
         }
 
         private void MPlayer_OnStopRequested()
@@ -2916,8 +2939,24 @@ namespace zFirefoxBrowser.ViewModels
                 WebBrowser.InMacroPlaying = false;
                 JSMacroPlayer.setVariableMessage("iimReturnVal", "-101");
                 JSMacroPlayer.setVariableMessage("StopRequest", "");
+
+                //if (JSMacroPlayer != null)
+                //{
+                //    using (new ErrorModeContext(ErrorModes.FailCriticalErrors | ErrorModes.NoGpFaultErrorBox | ErrorModes.SEM_NOGPFAULTERRORBOX))
+                //    {
+                //        IntPtr pUnk = Marshal.GetIUnknownForObject(JSMacroPlayer);
+                //        Marshal.Release(pUnk);
+                //    }
+                //}
             }
-            catch { }
+            catch
+            { }
+            //JSMacroPlayer = null;
+            GC.Collect();
+
+
+            macroPlayer.OnStopRequested -= MPlayer_OnStopRequested;
+            macroPlayer.OnStopRequested += MPlayer_OnStopRequested;
         }
 
         private async Task<bool> CheckBrowserBusyTillTimeOut(MacroVariables macVals, GeckoWebBrowser browserToCheck)
@@ -2925,10 +2964,10 @@ namespace zFirefoxBrowser.ViewModels
             double sleepduringbusy = 0.0;
             while (browserToCheck.IsBusy || browserToCheck.IsAjaxBusy)
             {
-                if (macroPlayer.StopRequested) break;
+                if (macroPlayer.StopRequested || !macroPlayer.IsRunning) break;
 
                 // await Task.Run(() => Thread.Sleep(350));
-                await Task.Delay(350);
+                if (await QuitableDelay(3)) return false;
                 sleepduringbusy += .25;
                 if (macVals[MacroVariables.TIMEOUT_PAGE] != "")
                 {
@@ -3737,8 +3776,11 @@ namespace zFirefoxBrowser.ViewModels
                 if (timeoutstep >= timesStepped)
                 {
                     timesStepped++;
-                    await Task.Delay(1000);
-                    //await Task.Run(() => Thread.Sleep(1000));
+                    for (int td = 0;td < 10; td++)
+                    {
+                        await Task.Delay(100);
+                        if (InStopRequest) return;
+                    }
                     await EventsCommand(value, mPlayer, macVals, currentContentDocument, currentContentDocumentIframe, currentContentDocumentFrame, i, timesStepped);
                     return;
                 }
@@ -4274,7 +4316,30 @@ namespace zFirefoxBrowser.ViewModels
 
                                     MacroManger.AnyRunning = true;
                                     MacroFilePicker.Instance.FilePath = CONTENT;
+                                    //if (MacroFilePicker.Instance.utils != null || MacroFilePicker.Instance.aFilePickerShownCallback != null)
+                                    //{
+                                    //    try
+                                    //    {
+                                    //        using (new ErrorModeContext(ErrorModes.FailCriticalErrors | ErrorModes.NoGpFaultErrorBox | ErrorModes.SEM_NOGPFAULTERRORBOX))
+                                    //        {
+                                    //            if (MacroFilePicker.Instance.utils != null)
+                                    //            {
+                                    //                IntPtr pUnk = Marshal.GetIUnknownForObject(MacroFilePicker.Instance.utils);
+                                    //                Marshal.Release(pUnk);
+                                    //            }
+                                    //            else
+                                    //            {
+                                    //                IntPtr pUnk2 = Marshal.GetIUnknownForObject(MacroFilePicker.Instance.aFilePickerShownCallback);
+                                    //                Marshal.Release(pUnk2);
+                                    //            }
+                                    //            GC.Collect();
+                                    //        }
+                                    //    }
+                                    //    catch { }
+                                    //}
                                     MacroFilePicker.Instance.utils = Xpcom.QueryInterface<nsIDOMWindowUtils>(WebBrowser.Browser.Window.DomWindow);
+                                    MacroFilePicker.Instance.aFilePickerShownCallback.Done(nsIFilePickerConsts.returnOK);
+                                    if (await QuitableDelay(5) == false) 
                                     MacroFilePicker.Instance.aFilePickerShownCallback.Done(nsIFilePickerConsts.returnOK);
                                 }
                                 else
@@ -4562,8 +4627,8 @@ namespace zFirefoxBrowser.ViewModels
                 if (timeoutstep > 0 && timeoutstep >= timesStepped)
                 {
                     timesStepped++;
-                    await Task.Delay(1000);
-                    if(timesStepped - timeoutstep == 0)
+                    if (await QuitableDelay(10)) return previosTagElementFound;
+                    if (timesStepped - timeoutstep == 0)
                     {
                         currentContentDocument = WebBrowser.Browser.Document;
                     }
@@ -4575,8 +4640,8 @@ namespace zFirefoxBrowser.ViewModels
                 {
                     JSMacroPlayer.setVariableMessage("iimReturnVal", "-1");
                     if (!runningInJsMode) mPlayer.Macros.Clear();
-                    await Task.Delay(1000);
-                   // await Task.Run(() => Thread.Sleep(1000));
+                    if (await QuitableDelay(10)) return previosTagElementFound;
+                    // await Task.Run(() => Thread.Sleep(1000));
                 }
             }
 

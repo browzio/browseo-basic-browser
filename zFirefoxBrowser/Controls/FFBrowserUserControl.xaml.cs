@@ -338,11 +338,11 @@ namespace zFirefoxBrowser.Controls
 
 
        
-        private async void MacroManager_OnPlayMacro(MacroManger mPlayer, IIMPlayType isiim, int times)
-        {
-            if (SelectedTab == null) return;
+        //private async void MacroManager_OnPlayMacro(MacroManger mPlayer, IIMPlayType isiim, int times)
+        //{
+        //    if (SelectedTab == null) return;
 
-           await SelectedTab.RunMacro(mPlayer, isiim, times);
-        }
+        //   await SelectedTab.RunMacro(mPlayer, isiim, times);
+        //}
     }
 }

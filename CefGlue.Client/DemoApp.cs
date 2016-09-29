@@ -111,7 +111,8 @@
             //commandLine.AppendSwitch("origin-when-crossorigin", "default");
             //string[] args = commandLine.GetArguments();
             //commandLine.AppendArgument("allow-cross-origin-auth-promp");
-            //--allow-cross-origin-auth-promp
+            //--allow-cross-origin-auth-prom
+           // commandLine.AppendSwitch("proxy-server", "[2604:180:2:631:3618:969:4305:c96b]" + ":" + 54343);
             if (GloableProfData.PData != null && !string.IsNullOrEmpty(GloableProfData.PData.ProxyIP) && !string.IsNullOrWhiteSpace(GloableProfData.PData.ProxyIP))
             {
                 try

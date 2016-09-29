@@ -170,6 +170,15 @@ namespace zFirefoxBrowser.Helpers
                 GeckoPreferences.Default["general.useragent.override"] = BrowserSettimgs.UserAgentFF;
 
 
+                GeckoPreferences.Default["network.dns.disableIPv6"] = false;
+                //GeckoPreferences.User["network.proxy.type"] = 1;
+                //GeckoPreferences.User["network.proxy.share_proxy_settings"] = true;
+
+                //GeckoPreferences.User["network.proxy.http"] = "104.238.156.110";
+                //GeckoPreferences.User["network.proxy.http_port"] = 8800;
+
+                //GeckoPreferences.User["network.proxy.ssl"] = "104.238.156.110";
+                //GeckoPreferences.User["network.proxy.ssl_port"] = 8800;
 
 
 
