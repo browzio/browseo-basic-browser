@@ -42,10 +42,12 @@ namespace Browser.Common.ViewModels
         public event Action OnClickedReminders = delegate { };
         public event Action<string> OnShouldChangePropertyAddress = delegate { };
         public event Action OnRefreshSessionSettings = delegate { }; //javascriptEnabled,JavaEnabled
+
         public event Action<BrowserTabViewModel> OnRefreshTabSettings = delegate { }; //javascriptEnabled,JavaEnabled
         public event Action<string, string> OnSentForSeo = delegate { };//currenturlName,url
         public event Action<string> OnSetUserAgent = delegate { };//UserAgent
 
+        public event Action OnRevalidate = delegate { };
 
         public ICommand OpenCPCommand { get; set; }
         public ICommand FillListCommand { get; set; }
@@ -187,8 +189,12 @@ namespace Browser.Common.ViewModels
         public virtual void NavigateToSelectedSite(string text) { }
 
         public virtual Task OnPlayMacro(MacroManger manger, IIMPlayType type, int loop) { return null; }
+        public virtual void RevalidateSizes(double width, double height) { }
 
-
+        public void RaiseOnRevalidate()
+        {
+            OnRevalidate();
+        }
         public void RaiseOnAddedToGoViral(string link, string v, List<string> p)
         {
             OnAddedToGoViral(link,v,p);

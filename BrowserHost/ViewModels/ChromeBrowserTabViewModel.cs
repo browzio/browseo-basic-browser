@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Browser.Common.Windows;
 using Organiser.Common.Classes.Facebook;
+using System.Reflection;
 //using Xilium.CefGlue.WPF;
 
 namespace WpfCefDynamBrowser.ViewModels
@@ -61,7 +62,15 @@ namespace WpfCefDynamBrowser.ViewModels
                 if(base.Browser == null)
                 {
                     base.Browser = new System.Windows.Forms.UserControl();
+                   // base.Browser.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;// | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
                     base.Browser.Dock = System.Windows.Forms.DockStyle.Fill;
+                   // base.Browser.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
+                    //base.Browser.AutoScaleDimensions = new System.Drawing.SizeF(2, 2);
+                    //base.Browser.Scale(new System.Drawing.SizeF(2,2));
+                    //base.Browser.AutoSize = false;
+                    //base.Browser.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+                    //base.Browser.AutoValidate = System.Windows.Forms.AutoValidate.Disable;
+                    //base.Browser.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
                 }
                 return base.Browser;
             }
@@ -116,8 +125,12 @@ namespace WpfCefDynamBrowser.ViewModels
         public override void SetBrowser(string address)
         {
             WebBrowser = new BrowserCntrl();
+
             WebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
             WebBrowser.init(address, FlashEnabled, JavascriptEnabled, JavaEnabled);
+
+            //WebBrowser.AutoSize = true;
+            //Browser.AutoSize = true;
 
             WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
             WebBrowser.OnBrowserMessageChanged += WebBrowser_OnBrowserMessageChanged;
@@ -134,7 +147,77 @@ namespace WpfCefDynamBrowser.ViewModels
             RaisePropertyChanged("Browser");
         }
 
-        public override void ChangeAddressEditable(string address)
+        public override void RevalidateSizes(double width, double height)
+        {
+            //Browser.SuspendLayout();
+            //WebBrowser.SuspendLayout();
+            //WebBrowser.CBrowser.SuspendLayout();
+
+            //Browser.Refresh();
+            //WebBrowser.Refresh();
+            //WebBrowser.Invalidate();
+            //Browser.Invalidate();
+
+            //Browser.Width = (int)width;
+            //Browser.Height = (int)height;
+
+            //WebBrowser.Width = (int)width;
+            //WebBrowser.Height = (int)height;
+
+            //WebBrowser.CBrowser.Width = (int)width;
+            //WebBrowser.CBrowser.Height = (int)height;
+
+            //typeof(System.Windows.Forms.Control).GetMethod("OnResize", BindingFlags.Instance | BindingFlags.NonPublic).
+            //    Invoke(Browser, new object[] { EventArgs.Empty });
+            //typeof(System.Windows.Forms.Control).GetMethod("OnResize", BindingFlags.Instance | BindingFlags.NonPublic).
+            //    Invoke(WebBrowser, new object[] { EventArgs.Empty });
+            //typeof(System.Windows.Forms.Control).GetMethod("OnResize", BindingFlags.Instance | BindingFlags.NonPublic).
+            //    Invoke(WebBrowser.CBrowser, new object[] { EventArgs.Empty });
+
+            //Browser.SuspendLayout();
+            //Browser.ResumeLayout(false);
+            //Browser.PerformLayout();
+
+            //WebBrowser.SuspendLayout();
+            //WebBrowser.ResumeLayout(false);
+            //WebBrowser.PerformLayout();
+
+            ////WebBrowser.CBrowser.InvalidateSize();
+            //WebBrowser.CBrowser.SuspendLayout();
+            //WebBrowser.CBrowser.ResumeLayout(false);
+            //WebBrowser.CBrowser.PerformLayout();
+
+            RaiseOnRevalidate();
+
+            Browser.Invalidate(true);
+            Browser.Update();
+            Browser.Refresh();
+            WebBrowserHost.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Render, EmptyDelegate);
+            typeof(System.Windows.Forms.Control).GetMethod("OnResize", BindingFlags.Instance | BindingFlags.NonPublic).
+                Invoke(Browser, new object[] { EventArgs.Empty });
+
+            Browser.Invalidate(true);
+            Browser.Update();
+            Browser.Refresh();
+            typeof(System.Windows.Forms.Control).GetMethod("OnLostFocus", BindingFlags.Instance | BindingFlags.NonPublic).
+                Invoke(Browser, new object[] { EventArgs.Empty });
+
+            RaisePropertyChanged("Browser");
+
+            //Console.WriteLine(WebBrowser.CBrowser.Width);
+            //Console.WriteLine(WebBrowser.CBrowser.Height);
+            Console.WriteLine();
+            Console.WriteLine(Browser.Width);
+            Console.WriteLine(Browser.Height);
+        }
+
+        //host.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
+        //this.InvalidateVisual();
+        //this.UpdateLayout();
+        //this.Dispatcher.Invoke(EmptyDelegate, DispatcherPriority.Render);
+    private static Action EmptyDelegate = delegate () { };
+
+    public override void ChangeAddressEditable(string address)
         {
             AddressEditable = address;
         }

@@ -46,7 +46,7 @@ namespace BrowserAndFeatures
 
             if (App.browserinit)
             {
-                BrowserInit.Init();
+                BrowserInit.Init(false);
                 FoxInit.Init();
             }
 
@@ -158,7 +158,7 @@ namespace BrowserAndFeatures
                 Zip = zip,
             };
 
-            BrowserInit.Init(profile);
+            BrowserInit.Init(false, profile);
             //browser.OpenTabsFromPastSessions();
         }
 
@@ -212,7 +212,7 @@ namespace BrowserAndFeatures
             }
             catch { }  
 
-            BrowserInit.Init(profile);
+            BrowserInit.Init(false, profile);
             FoxInit.Init(profile);
             //browser.OpenTabsFromPastSessions();
         }

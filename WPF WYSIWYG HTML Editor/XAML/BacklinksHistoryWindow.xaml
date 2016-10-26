@@ -19,14 +19,15 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Horizontal" Margin="10">
+        <StackPanel Orientation="Horizontal" Margin="5">
             <TextBlock Text="Backlink Text:" Width="80" VerticalAlignment="Center" />
-            <TextBox Text="{Binding BacklinkText}" Width="150" Height="25" />
+            <TextBox Text="{Binding BacklinkText}" Width="150" VerticalAlignment="Center" />
             <TextBlock Text="Money Site Link:" Width="90" VerticalAlignment="Center" Margin="5,0,0,0" />
-            <TextBox Text="{Binding MoneySite}" Width="150" Height="25" />
+            <TextBox Text="{Binding MoneySite}" Width="150" VerticalAlignment="Center"  />
             <TextBlock Text="Site Link:" Width="60" VerticalAlignment="Center" Margin="5,0,0,0" />
-            <TextBox Text="{Binding Site}" Width="150" Height="25" />
-            <Button Content="Add To History" Width="100" Margin="20,5,5,5" Command="{Binding AddNewClick}" />
+            <TextBox Text="{Binding Site}" Width="150" VerticalAlignment="Center" />
+            <Button Content="Add To History" Width="100" Margin="20,5,5,5" Command="{Binding AddNewClick}" CommandParameter="Add" />
+            <Button Content="Import" Width="50" Margin="5,5,5,5" Command="{Binding AddNewClick}" CommandParameter="Import" />
         </StackPanel>
         <ListView IsSynchronizedWithCurrentItem="True"
                   Grid.Row="1"

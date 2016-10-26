@@ -1,4 +1,5 @@
 ﻿using Organiser.Common.Classes;
+using Organiser.Common.Windows;
 using SocialOrganizer.Models;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using WPF_WYSIWYG_HTML_Editor.Helpers;
 using WPF_WYSIWYG_HTML_Editor.Models;
@@ -77,22 +79,25 @@ namespace WPF_WYSIWYG_HTML_Editor.MVVM
         public void FillHistoryList(PersonData profile)
         {
             string historyDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "PBNVault", "BacklinksHistory", profile.ProjectName);
-            if (!Directory.Exists(historyDir)) return;
+            if (!Directory.Exists(historyDir)) Directory.CreateDirectory(historyDir);
 
             string historyFile = Path.Combine(historyDir, "log.txt");
-            if (!File.Exists(historyFile)) return;
-
-            string[] fileLines = File.ReadAllLines(historyFile);
-            foreach (var line in fileLines)
+            if (!File.Exists(historyFile)) File.Create(historyFile);
+            try
             {
-                string[] lineInfo = line.Split(',');
-                FullBaklinkHistoroy.Add(new BacklinkHistoryLine()
+                string[] fileLines = File.ReadAllLines(historyFile);
+                foreach (var line in fileLines)
                 {
-                    Site = lineInfo[0],
-                    MoneySite = lineInfo[1],
-                    BacklinkText = lineInfo[2]
-                });
+                    string[] lineInfo = line.Split(',');
+                    FullBaklinkHistoroy.Add(new BacklinkHistoryLine()
+                    {
+                        Site = lineInfo[0],
+                        MoneySite = lineInfo[1],
+                        BacklinkText = lineInfo[2]
+                    });
+                }
             }
+            catch { }
 
             thisProfData = profile;
         }
@@ -100,12 +105,45 @@ namespace WPF_WYSIWYG_HTML_Editor.MVVM
         private void OnAddNewClick(object obj)
         {
             if (thisProfData == null) return;
-            FullBaklinkHistoroy.Add(new BacklinkHistoryLine()
+            string param = obj as string;
+            if (param == null) return;
+            else
             {
-                Site = Site,
-                MoneySite = MoneySite,
-                BacklinkText = BacklinkText
-            });
+                if(param == "Import")
+                {
+                    RssFeedsLinksMultiWindow mw = new RssFeedsLinksMultiWindow();
+                    mw.Title = "One per line seperate with coma ex: Backlink,Money Site,Site";
+                    mw.ShowDialog();
+                    if (!mw.OKClicked) return;
+                    try
+                    {
+                        string[] lines = mw.tbInputedText.Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var line in lines)
+                        {
+                            string[] linkData = line.Split(',');
+                            FullBaklinkHistoroy.Add(new BacklinkHistoryLine()
+                            {
+                                Site = linkData[2],
+                                MoneySite = linkData[1],
+                                BacklinkText = linkData[0]
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Failed to import backlink history. Reason: " +ex.Message);
+                    }
+                }
+                else
+                {
+                    FullBaklinkHistoroy.Add(new BacklinkHistoryLine()
+                    {
+                        Site = Site,
+                        MoneySite = MoneySite,
+                        BacklinkText = BacklinkText
+                    });
+                }
+            }
             saveAllFromList();
         }
 

@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace Browser.Common.Views
 {
@@ -36,11 +37,37 @@ namespace Browser.Common.Views
             //DragDropMainViewModel.Instance.OnHasReminders += vm_OnHasReminders;
             //DragDropMainViewModel.Instance.GetRemindersCountAndNotify();
 
+            
+
+            host.Width = browserGrd.ActualWidth;
+            host.Height = browserGrd.ActualHeight;
+
+            Console.WriteLine(host.Width);
+            Console.WriteLine(host.Height);
+
+            Console.WriteLine();
+
+            Console.WriteLine(browserGrd.ActualWidth);
+            Console.WriteLine(browserGrd.ActualHeight);
+
+            Console.WriteLine();
+
+            Console.WriteLine(rctangle.ActualWidth);
+            Console.WriteLine(rctangle.ActualHeight);
+
             if (DataContext is BrowserTabViewModel)
             {
                 (DataContext as BrowserTabViewModel).OnShouldChangePropertyAddress += BrowserTabView_OnShouldChangePropertyAddress;
+                (DataContext as BrowserTabViewModel).RevalidateSizes(host.Width, host.Height);
             }
+
+            //host.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
+            //this.InvalidateVisual();
+            //this.UpdateLayout();
+            //this.Dispatcher.Invoke(EmptyDelegate, DispatcherPriority.Render);
         }
+        private static Action EmptyDelegate = delegate () { };
+
 
         private void openFlyout_Click(object sender, RoutedEventArgs e)
         {

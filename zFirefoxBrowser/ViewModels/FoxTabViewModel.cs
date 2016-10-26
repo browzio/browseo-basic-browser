@@ -3467,8 +3467,17 @@ namespace zFirefoxBrowser.ViewModels
                             switch (BUTTON)
                             {
                                 case "0":
-                                    windowForMouseEvent.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
-                                    windowForMouseEvent.SendMouseEvent("mouseup", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                                    if (htmlElm is GeckoOptionElement)
+                                    {
+                                        var optionElm = htmlElm as GeckoOptionElement;
+                                        optionElm.Click();
+                                        optionElm.Selected = true;
+                                    }
+                                    else
+                                    {
+                                        windowForMouseEvent.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                                        windowForMouseEvent.SendMouseEvent("mouseup", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                                    }
                                     break;
 
                                 case "1":

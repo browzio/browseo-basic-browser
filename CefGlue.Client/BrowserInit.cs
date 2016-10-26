@@ -220,7 +220,7 @@ public class BrowserInit
 
         public static CefSettings settings;
 
-        public static async void Init(PersonData data = null)
+        public static async void Init(bool limitless, PersonData data = null)
         {
             using (new ErrorModeContext(ErrorModes.FailCriticalErrors | ErrorModes.NoGpFaultErrorBox | ErrorModes.SEM_NOGPFAULTERRORBOX))
             {
@@ -270,20 +270,22 @@ public class BrowserInit
                     //    Console.WriteLine("Successfully modified proxy settings");
                     //}
                 }
-
-
+                CefRuntime.EnableHighDpiSupport();
                 try
                 {
                     CefRuntime.Load();
                 }
                 catch { }
 
+
                 var mainArgs = new CefMainArgs(new string[] { });
                 var app = new DemoApp();
                 var exitCode = CefRuntime.ExecuteProcess(mainArgs, app, IntPtr.Zero);
                 if (exitCode != -1) return;
 
-                var exePath = AppDomain.CurrentDomain.BaseDirectory + "\\BrowserAndFeatures.exe";
+                var exePath = AppDomain.CurrentDomain.BaseDirectory;
+                if(!limitless) exePath  = exePath + "\\BrowserAndFeatures.exe";
+                else exePath = exePath + "\\Browser.Adapter.exe";
                 exePath = exePath.Replace("\\\\", "\\");
 
                 await Task.Run(() => { BrowserSettimgs.UserAgentChrome = MyFilesDatabase.GeChromeAgentRealQuick(GloableProfData.PData.ProjectName); });
@@ -317,9 +319,8 @@ public class BrowserInit
                         Directory.CreateDirectory(path);
                     settings.CachePath = path;
                 }
-
+                
                 CefRuntime.Initialize(mainArgs, settings, app, IntPtr.Zero);
-
                 //RegisterSchemes();
                 //RegisterMessageRouter();
 

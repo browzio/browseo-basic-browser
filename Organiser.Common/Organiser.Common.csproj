@@ -361,16 +361,6 @@
     <Resource Include="Image\checkmark-green-dot.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
-      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
-      <Name>CefGlue.WindowsForms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
-      <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
-      <Name>CefGlue</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Image\tooltipvideoUpload.png" />
   </ItemGroup>
   <ItemGroup>
@@ -422,6 +412,16 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Image\tooltip_blank.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
+      <Name>CefGlue.WindowsForms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
+      <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
+      <Name>CefGlue</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

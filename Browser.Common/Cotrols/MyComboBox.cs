@@ -20,6 +20,7 @@ namespace Browser.Common.Cotrols
                 textbox = element as TextBox;
                 textbox.PreviewKeyDown += Textbox_PreviewKeyDown;
                 textbox.PreviewMouseDown += Textbox_PreviewMouseDown;
+                textbox.VerticalAlignment = System.Windows.VerticalAlignment.Center;
             }
         }
 

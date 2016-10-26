@@ -49,6 +49,19 @@ namespace Xilium.CefGlue.Client
 
         }
 
+        //protected override void OnResize(EventArgs e)
+        //{
+        //    if(CBrowser!=null)
+        //        CBrowser.InvalidateSize(Width,Height);
+        //    base.OnResize(e);
+        //}
+
+
+        public void Resized()
+        {
+            OnResize(EventArgs.Empty);
+        }
+
         public void init(string startUrl, bool flashEnabled, bool javascriptEnabled, bool javaEnabled)
         {
             CefState StateJavascript = javascriptEnabled ? CefState.Enabled : CefState.Disabled;
@@ -61,8 +74,8 @@ namespace Xilium.CefGlue.Client
             };
             CBrowser.HandleWasCreated += browser_OnHandleCreated;
             if (startUrl != "") CBrowser.StartUrl = startUrl;
-            CBrowser.Width = this.Width;
-            CBrowser.Height = this.Height;
+            //CBrowser.Width = this.Width;
+            //CBrowser.Height = this.Height;
             CBrowser.Dock = DockStyle.Fill;
             CBrowser.BringToFront();
             CBrowser.BrowserSettings = new CefBrowserSettings()
@@ -125,6 +138,7 @@ namespace Xilium.CefGlue.Client
 
             OnBrowserContextMenuClicked(contextMenueItemID);
         }
+
 
         void CBrowser_BeforePopup(object sender, BeforePopupEventArgs e)
         {

@@ -33,6 +33,7 @@ namespace BrowserHost
         public event Action<string, string, List<string>> OnAddedToGoViral = delegate { };//link,type,multi
         public event Action OnRefreshedSessionSettings = delegate { };
         public event Action OnClickedReminders = delegate { };
+        public event Action OnRevalidate = delegate { };
         public event Action<string, string> OnSentForSeo = delegate { };//name,url
 
         public ChromeBrowserHostControl()
@@ -110,6 +111,14 @@ namespace BrowserHost
             btvm.OnRefreshTabSettingsTab += Btvm_OnRefreshTabSettings;
             btvm.OnRefreshSessionSettings += Btvm_OnRefreshSessionSettings;
             btvm.OnSentForSeo += Btvm_OnSentForSeo;
+            btvm.OnRevalidate += Btvm_OnRevalidate;
+        }
+
+        private static Action EmptyDelegate = delegate () { };
+        private void Btvm_OnRevalidate()
+        {
+            OnRevalidate();
+            this.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Render, EmptyDelegate);
         }
 
         #region btvm events
