@@ -15,7 +15,7 @@ namespace Prospector.Helpers
         IList<string> PresentableKeywords { get; set; }
         int MaxPagesToCheck { get; set; }
 
-        string searchUrl = "https://www.google.co.il/search?q=";
+        string searchUrl = "https://www.google.com/search?q=";
         const string pageNumber = "&start=";
         const string googleSearchSplit = "class=\"r\"";
         const string searchEngine = "Google";

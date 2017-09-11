@@ -31,8 +31,8 @@ namespace RssReader
             get;
             set;
         }
-        public event Action<string, string> OnLaunchToBrowser = delegate { };//link, rsslink
-        public event Action<string> OnLaunchToTabBrowser = delegate { };//url
+        public event Action<string, string,bool> OnLaunchToBrowser = delegate { };//link, rsslink,isff
+        public event Action<string,bool> OnLaunchToTabBrowser = delegate { };//url,isff
         public event Action<string, string> OnSelectedSendToSeo = delegate { };//title,url
         public event Action<string> OnLaunchToTabMasher = delegate { };//url
         public event Action<string,string,string,string,string> OnSelectedSendToPbn = delegate { };//send to MAsher
@@ -72,6 +72,7 @@ namespace RssReader
             {
                 case "OpenRssLinksWindow":
                     RssFeedsLinksMultiWindow rsslw = new RssFeedsLinksMultiWindow();
+                    rsslw.Title = "One Feed Per Line";
                     List<string> rssFeeds = MyFilesDatabase.GetRssFeedLinks(GloableProfData.PData, TabTitle);
                     if (rssFeeds != null)
                     {
@@ -81,9 +82,9 @@ namespace RssReader
                         }
                     }
                     rsslw.ShowDialog();
-                    if (rsslw.OKClicked)
+                    if (rsslw.ButtonLeftClicked)
                     {
-                        MyFilesDatabase.SaveRssFeedsSiteLinks(rsslw.tbInputedText.Text.Trim(), GloableProfData.PData, TabTitle);
+                        MyFilesDatabase.SaveRssFeedsSiteLinks(rsslw.tbInputedText.Text.Trim().SplitAndRemoveEmpty(Environment.NewLine), GloableProfData.PData, TabTitle);
                         RefreshRssFeed(false);
                     }
                     break;
@@ -160,94 +161,99 @@ namespace RssReader
 
                         foreach (RssList rssLink in AllRssFeedsResults)
                         {
-                            try
+                            var links = rssLink.RssLink.SplitAndRemoveEmpty(",");
+                            foreach (var link in links)
                             {
-                                rssLink.PBarVis = true;
-                                rssLink.ListResultVis = false;
-                                string linkToFeed = rssLink.RssLink;
-                                if (linkToFeed.Contains("feed://"))
-                                    linkToFeed = linkToFeed.Replace("feed://", "http://");
-
-                                var req = (HttpWebRequest)WebRequest.Create(linkToFeed);
-                                req.Method = "GET";
-                                req.UserAgent = "Fiddler";
-                                var rep = req.GetResponse();
-
-                                using (XmlReader reader = XmlReader.Create(rep.GetResponseStream(), new XmlReaderSettings() { DtdProcessing = DtdProcessing.Parse }))
+                                try
                                 {
-                                    SyndicationFeed feed = SyndicationFeed.Load(reader);
-                                    foreach (SyndicationItem item in feed.Items)
+                                    rssLink.PBarVis = true;
+                                    rssLink.ListResultVis = false;
+
+                                    string linkToFeed = link;
+                                    if (linkToFeed.Contains("feed://"))
+                                        linkToFeed = linkToFeed.Replace("feed://", "http://");
+
+                                    var req = (HttpWebRequest)WebRequest.Create(linkToFeed);
+                                    req.Method = "GET";
+                                    req.UserAgent = "Fiddler";
+                                    req.Proxy = MyFilesDatabase.GetRequestsProxy();
+                                    var rep = req.GetResponse();
+
+                                    using (XmlReader reader = XmlReader.Create(rep.GetResponseStream(), new XmlReaderSettings() { DtdProcessing = DtdProcessing.Parse }))
                                     {
-                                        string title = item.Title.Text;
-                                        string link = item.Links.Count > 0 ? item.Links[item.Links.Count - 1].Uri.AbsoluteUri : "";
-                                        string date = item.PublishDate == null ? "" : item.PublishDate.ToString();
-                                        string description = "";
-                                        string imgLink = "";
-                                        try
+                                        SyndicationFeed feed = SyndicationFeed.Load(reader);
+                                        foreach (SyndicationItem item in feed.Items)
                                         {
-                                            description = item.Summary != null ? item.Summary.Text : (item.Content as TextSyndicationContent).Text;
-                                            Match imgMatch = Regex.Match(description, "<img.+?src=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase);
-                                            if (imgMatch.Groups.Count >= 2)
-                                                imgLink = imgMatch.Groups[1].Value;
-                                            description = Regex.Replace(description, "<.*?>", string.Empty);
-                                        }
-                                        catch { }
+                                            string imgLink = "";
 
-                                        if (description.Length > 600)
-                                        {
-                                            description = description.Substring(0, 599);
-                                        }
-
-                                        string fixedDescription = cleanString(description);
-                                        string fixedTitle = cleanString(title);
-                                        if (fixedTitle.Contains("<"))
-                                        {
-                                            fixedTitle = Regex.Replace(fixedTitle, "<.*?>", string.Empty);
-                                        }
-
-                                        if (tempResultsList.Count < 20)
-                                        {
-                                            RssResult result = new RssResult()
+                                            string title = cleanString(item.Title.Text);
+                                            if (title.Contains("<")) title = Regex.Replace(title, "<.*?>", string.Empty);
+                                            
+                                            string description = item.Summary != null ? item.Summary.Text : item.Content != null ? (item.Content as TextSyndicationContent).Text : "";
+                                            if (!description.IsNullOrEmpty())
                                             {
-                                                Title = fixedTitle,
-                                                Link = link,
-                                                Date = date,
-                                                Description = fixedDescription,
-                                                ImageLink = imgLink
-                                            };
-                                            if (result.ImageLink == "")
-                                                result.ImageLinkVisible = Visibility.Collapsed;
-                                            if (!result.ImageLink.Contains("http"))
-                                            {
-                                                string tempIimgLink = result.ImageLink;
-                                                result.ImageLink = "";
-                                                result.ImageLink = "https:" + tempIimgLink;
+                                                Match imgMatch = Regex.Match(description, "<img.+?src=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase);
+                                                if (imgMatch.Groups.Count >= 2)
+                                                    imgLink = imgMatch.Groups[1].Value;
+
+                                                description = Regex.Replace(description, "<.*?>", string.Empty);
+                                                description = Regex.Replace(description, @"[\n]{2,}", "\n");
+                                                if (description.Length > 600) description = description.Substring(0, 599);
+
+                                                description = cleanString(description);
                                             }
-                                            result.OnClickedSendSocialLink += result_OnClickedSendSocialLink;
-                                            tempResultsList.Add(result);
+
+                                            string linkResult = item.Links.Count > 0 ? item.Links[0].Uri.AbsoluteUri : "";
+                                            if (linkResult.Contains("https://www.google.com/url?rct=j&sa=t&url=") && linkResult.Contains("&ct="))
+                                            {
+                                                linkResult = linkResult.Replace("https://www.google.com/url?rct=j&sa=t&url=", "");
+                                                if (linkResult.Contains("&ct=")) linkResult = linkResult.Remove(linkResult.IndexOf("&ct="));
+                                            }
+
+                                            string date = item.PublishDate == null ? "" : item.PublishDate.ToString();
+                                            
+
+                                            
+                                           
+
+                                            if (tempResultsList.Count < 20)
+                                            {
+                                                RssResult result = new RssResult()
+                                                {
+                                                    Title = title,
+                                                    Link = linkResult,
+                                                    Date = date,
+                                                    Description = description,
+                                                    ImageLink = imgLink
+                                                };
+                                                result.SocialStatsReplys.GetAllStatsFor(linkResult);
+                                                
+                                                result.OnClickedSendSocialLink += result_OnClickedSendSocialLink;
+                                                tempResultsList.Add(result);
+                                            }
                                         }
                                     }
+                                    rssLink.PBarVis = false;
+                                    rssLink.ListResultVis = true;
+                                    rssLink.OnSelectedLaunchLink += rssLink_OnSelectedLaunchLink;
+                                    rssLink.OnSelectedSendToSeo += RssLink_OnSelectedSendToSeo;
+                                    rssLink.OnSelectedLaunchLinkMasher += rssLink_OnSelectedLaunchLinkMasher;
+                                    rssLink.OnSelectedSendToPbn += RssLink_OnSelectedSendToPbn; ;
+                                    rssLink.OnListItemChanged += RssLink_OnListItemChanged;
                                 }
-                                rssLink.PBarVis = false;
-                                rssLink.ListResultVis = true;
-                                rssLink.OnSelectedLaunchLink += rssLink_OnSelectedLaunchLink;
-                                rssLink.OnSelectedSendToSeo += RssLink_OnSelectedSendToSeo;
-                                rssLink.OnSelectedLaunchLinkMasher += rssLink_OnSelectedLaunchLinkMasher;
-                                rssLink.OnSelectedSendToPbn += RssLink_OnSelectedSendToPbn; ;
-                            }
-                            catch
-                            {
-                                rssLink.PBarVis = false;
-                                rssLink.ListResultVis = true;
-                                failedLinks.Add(rssLink.RssLink);
-                            }
-                            Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, (Action)delegate
-                            {
-
-                                foreach (RssResult r in tempResultsList)
+                                catch
                                 {
-                                    rssLink.ListResults.Add(r);
+                                    rssLink.PBarVis = false;
+                                    rssLink.ListResultVis = true;
+                                    failedLinks.Add(rssLink.RssLink);
                                 }
+                                Application.Current.Dispatcher.Invoke(DispatcherPriority.Background, (Action)delegate
+                                {
+
+                                    foreach (RssResult r in tempResultsList)
+                                    {
+                                        rssLink.ListResults.Add(r);
+                                    }
                                 //rssLink.ListResults.AddRange(tempResultsList);
                                 tempResultsList.Clear();
                                 // after all.. update the UI with following
@@ -255,7 +261,8 @@ namespace RssReader
                                 //rssLink.ListResults.ResetBindings(); // this forces update of entire list
                             });
 
-                            // rssLink.RaisListPropChanged();
+                                // rssLink.RaisListPropChanged();
+                            }
                         }
 
                         if (failedLinks.Count > 0 && !isCloseing)
@@ -287,6 +294,20 @@ namespace RssReader
             }
         }
 
+        private void RssLink_OnListItemChanged(RssList changedList)
+        {
+            try
+            {
+                int indexOfChangedList = AllRssFeedsResults.IndexOf(changedList);
+                AllRssFeedsResults.RemoveAt(indexOfChangedList);
+                AllRssFeedsResults.Insert(indexOfChangedList, changedList);
+            }
+            catch
+            {
+                "Couldnt update list with filtered results please try again".Show();
+            }
+        }
+
         private void RssLink_OnSelectedSendToSeo(string title, string url)
         {
             OnSelectedSendToSeo(title, url);
@@ -305,6 +326,8 @@ namespace RssReader
 
         private string cleanString(string stringToClean)
         {
+            if (stringToClean.IsNullOrEmpty()) return "";
+
             string returnstring = "";
             if (stringToClean.Contains('&'))
             {
@@ -331,18 +354,27 @@ namespace RssReader
             switch (type)
             {
                 case Social.SOCIALTYPE_fb:
+                case "ff_"+Social.SOCIALTYPE_fb:
                     fullUrl = Social.SHARELINK_facebook + link;
                     break;
 
                 case Social.SOCIALTYPE_gp:
+                case "ff_" + Social.SOCIALTYPE_gp:
                     fullUrl = Social.SHARELINK_googleplus + link;
                     break;
 
+                case Social.SOCIALTYPE_buffer:
+                case "ff_" + Social.SOCIALTYPE_buffer:
+                    fullUrl = Social.SHARELINK_buffer + link;
+                    break;
+
                 case Social.SOCIALTYPE_digg:
+                case "ff_" + Social.SOCIALTYPE_digg:
                     fullUrl = Social.SHARELINK_digg + link;
                     break;
 
                 case Social.SOCIALTYPE_pin:
+                case "ff_" + Social.SOCIALTYPE_pin:
                     if (imageLink == "")
                     {
                         MessageBox.Show("The feed needs to link to a image share to pinterest.");
@@ -352,22 +384,27 @@ namespace RssReader
                     break;
 
                 case Social.SOCIALTYPE_reddit:
+                case "ff_" + Social.SOCIALTYPE_reddit:
                     fullUrl = Social.SHARELINK_reddit + link;
                     break;
 
                 case Social.SOCIALTYPE_stumble:
+                case "ff_" + Social.SOCIALTYPE_stumble:
                     fullUrl = Social.SHARELINK_stumbleupon + link;
                     break;
 
                 case Social.SOCIALTYPE_tumblr:
+                case "ff_" + Social.SOCIALTYPE_tumblr:
                     fullUrl = Social.SHARELINK_tumblr + link;
                     break;
 
                 case Social.SOCIALTYPE_twit:
+                case "ff_" + Social.SOCIALTYPE_twit:
                     fullUrl = Social.SHARELINK_twitter + link;
                     break;
 
                 case Social.SOCIALTYPE_wp:
+                case "ff_" + Social.SOCIALTYPE_wp:
                     SetNameAndDataWindow alw = new SetNameAndDataWindow();
                     alw.tblockInfo.Text = "Enter wordpress site (browzio.wordpress.com):";
                     alw.ShowDialog();
@@ -384,13 +421,13 @@ namespace RssReader
             }
 
             Organiser.Common.Classes.UsageTracker.AddTraceCookie(type + " "+UsageTracker.Usage_Type_ShareFromRss);
-            OnLaunchToBrowser(fullUrl, link);
+            OnLaunchToBrowser(fullUrl, link, type.StartsWith("ff_"));
         }
 
-        void rssLink_OnSelectedLaunchLink(string link)
+        void rssLink_OnSelectedLaunchLink(string link,bool isff)
         {
             Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_SentToBrowserfromrss + " " + link);
-            OnLaunchToTabBrowser(link);
+            OnLaunchToTabBrowser(link, isff);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -404,7 +441,7 @@ namespace RssReader
             }
             if (toSave != "")
             {
-                MyFilesDatabase.SaveRssFeedsSiteLinks(toSave.Trim(), GloableProfData.PData, TabTitle);
+                MyFilesDatabase.SaveRssFeedsSiteLinks(linksList.ToArray(), GloableProfData.PData, TabTitle);
                 RefreshRssFeed(false);
             }
         }

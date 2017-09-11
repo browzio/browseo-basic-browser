@@ -49,9 +49,24 @@ namespace Organiser.Common.Classes
             return string.IsNullOrEmpty(str) || string.IsNullOrWhiteSpace(str);
         }
 
+        public static string[] SplitAndRemoveEmpty(this string str, string value)
+        {
+            return str.Split(new string[] { value }, StringSplitOptions.RemoveEmptyEntries);
+        }
+
         public static void Show(this string str)
         {
             System.Windows.MessageBox.Show(str);
+        }
+
+        public static string ToLinedString(this List<string> lst)
+        {
+            var lines = "";
+            foreach (var l in lst)
+            {
+                lines += l + Environment.NewLine;
+            }
+            return lines;
         }
 
         public static bool Show(this string str, bool questionbox)

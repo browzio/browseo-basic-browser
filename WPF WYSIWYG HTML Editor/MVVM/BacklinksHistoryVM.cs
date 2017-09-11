@@ -114,7 +114,7 @@ namespace WPF_WYSIWYG_HTML_Editor.MVVM
                     RssFeedsLinksMultiWindow mw = new RssFeedsLinksMultiWindow();
                     mw.Title = "One per line seperate with coma ex: Backlink,Money Site,Site";
                     mw.ShowDialog();
-                    if (!mw.OKClicked) return;
+                    if (!mw.ButtonLeftClicked) return;
                     try
                     {
                         string[] lines = mw.tbInputedText.Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);

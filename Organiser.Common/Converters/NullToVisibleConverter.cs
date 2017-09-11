@@ -13,7 +13,8 @@ namespace Organiser.Common.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (parameter as string == "NOT")
+            var param = parameter as string;
+            if (param != null && param.ToUpper() == "NOT")
                 return value != null ? Visibility.Visible : Visibility.Collapsed;
             else
                 return value == null ? Visibility.Visible : Visibility.Collapsed;

@@ -155,11 +155,11 @@ namespace WPF_WYSIWYG_HTML_Editor
 
         private void btnPublish_Click(object sender, RoutedEventArgs e)
         {
-            if (DataContext != null && DataContext is XmlRpcVM)
-            {
-                XmlRpcVM vm = DataContext as XmlRpcVM;
-                vm.OnPublishClick(webBrowserEditor.doc.body.innerHTML);
-            }
+            //if (DataContext != null && DataContext is XmlRpcVM)
+            //{
+            //    XmlRpcVM vm = DataContext as XmlRpcVM;
+            //    vm.OnPublishClick(webBrowserEditor.doc.body.innerHTML);
+            //}
         }
     }
 }

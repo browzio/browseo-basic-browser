@@ -19,7 +19,8 @@ namespace Organiser.Common.Windows
     /// </summary>
     public partial class RssFeedsLinksMultiWindow : Window
     {
-        public bool OKClicked { get; set; }
+        public bool ButtonLeftClicked { get; set; }
+        public bool ButtonRightClicked { get; set; }
 
         public RssFeedsLinksMultiWindow()
         {
@@ -28,7 +29,15 @@ namespace Organiser.Common.Windows
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            OKClicked = true;
+            ButtonLeftClicked = true;
+            this.DialogResult = true;
+            this.Close();
+        }
+
+        private void buttonRight_Click(object sender, RoutedEventArgs e)
+        {
+            ButtonRightClicked = true;
+            this.DialogResult = true;
             this.Close();
         }
     }

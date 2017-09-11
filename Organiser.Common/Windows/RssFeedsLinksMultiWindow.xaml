@@ -21,8 +21,18 @@
         </Grid.RowDefinitions>
 
         <TextBox Name="tbInputedText" AcceptsReturn="True" x:FieldModifier="public" VerticalScrollBarVisibility="Auto" FontFamily="Verdana" FontSize="15" />
-        <Button Click="Button_Click"  Style="{StaticResource FlatbtnStyle}"  Grid.Row="1">
-            <TextBlock Text="OK" HorizontalAlignment="Center" />
-        </Button>
+        <UniformGrid Grid.Row="1" Rows="1">
+            <Button Content="OK" 
+                    Click="Button_Click"
+                    x:Name="buttonLeft"
+                    x:FieldModifier="public"
+                    Style="{StaticResource FlatbtnStyle}" />
+            <Button Content="Cancel"
+                    Click="buttonRight_Click"
+                    Visibility="Collapsed"
+                    x:Name="buttonRight"
+                    x:FieldModifier="public"
+                    Style="{StaticResource FlatbtnStyle}" />
+        </UniformGrid>
     </Grid>
 </Window>

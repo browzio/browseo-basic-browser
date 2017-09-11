@@ -1,0 +1,187 @@
+﻿<UserControl x:Class="Organiser.Common.Controlls.SocialStatsUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Organiser.Common.Controlls"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="375">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+    <WrapPanel>
+        <!--<Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>-->
+
+        <Grid DataContext="{Binding FacebookReply}" Margin="3" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png" Width="24" Height="24" />
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="2,0,0,0">
+                <Run  Text="Shares: " />
+                <Run  Text="{Binding share.share_count}" />
+                <Run  Text=" Comments: " />
+                <Run  Text="{Binding share.comment_count}" />
+                <Run  Text=" Likes: " />
+                <Run  Text="{Binding og_object.likes.summary.total_count}" />
+            </TextBlock>
+        </Grid>
+
+        <Grid Grid.Column="1" DataContext="{Binding GoogleReply}" Margin="3" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/googleplus-icon.png" Width="24" Height="24" />
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="2,0,0,0">
+                <Run  Text="Plus Ones: " />
+                <Run  Text="{Binding PlusOnes}" />
+            </TextBlock>
+        </Grid>
+
+        <Grid Grid.Row="1" DataContext="{Binding PinterestReply}" Margin="3" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/Pinterest-icon.png" Width="24" Height="24" />
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="2,0,0,0">
+                <Run  Text="Pins: " />
+                <Run  Text="{Binding count}" />
+            </TextBlock>
+        </Grid>
+
+        <Grid Grid.Row="1" Grid.Column="1" DataContext="{Binding StumbleReply}" Margin="3" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png" Width="24" Height="24" />
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="2,0,0,0">
+                <Run  Text="Views: " />
+                <Run  Text="{Binding result.views}" />
+            </TextBlock>
+        </Grid>
+
+        <Grid Grid.Row="2" DataContext="{Binding LinkedInReply}" Margin="3" HorizontalAlignment="Left">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Image Source="pack://application:,,,/Organiser.Common;component/Image/linkedin-icon.png" Width="24" Height="24" />
+            <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="2,0,0,0">
+                <Run  Text="Count: " />
+                <Run  Text="{Binding count}" />
+            </TextBlock>
+        </Grid>
+
+            <Grid Grid.Row="2" Grid.Column="1" DataContext="{Binding BufferReply}" Margin="3" HorizontalAlignment="Left">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/buffer-icon.png" Width="24" Height="24" />
+                <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="2,0,0,0">
+                <Run  Text="Shares: " />
+                <Run  Text="{Binding shares}" />
+                </TextBlock>
+            </Grid>
+        
+            <Grid Grid.Row="2"
+                  Grid.Column="1"
+                  Margin="3"
+                  HorizontalAlignment="Left"
+                  Visibility="{Binding YoutubeReply, Converter={StaticResource NullToVisibleConverter}, ConverterParameter=NOT}">
+                <Grid DataContext="{Binding YoutubeReply}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Image Source="pack://application:,,,/Organiser.Common;component/Image/youtube_icon_x1.png"
+                           Width="24"
+                           Height="24" />
+                    <TextBlock Grid.Column="1"
+                               VerticalAlignment="Center"
+                               Margin="2,0,0,0">
+                        <Run  Text="Views: " />
+                        <Run  Text="{Binding statistics_views}" />
+                        <Run  Text="Ratings: " />
+                        <Run  Text="{Binding starRating_count}" />
+                        <Run  Text="Average Rating: " />
+                        <Run  Text="{Binding starRating_average}" />
+                    </TextBlock>
+                </Grid>
+            </Grid>
+        </WrapPanel>
+        
+        <Grid Grid.Row="1" DataContext="{Binding RedditReply.data}" Margin="3" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <Image HorizontalAlignment="Left" VerticalAlignment="Top" Source="pack://application:,,,/Organiser.Common;component/Image/reddit-icon.png" Width="24" Height="24" />
+            <ItemsControl Grid.Column="1" BorderThickness="0" Grid.IsSharedSizeScope="True" Margin="2,0,0,0"
+                      ItemsSource="{Binding children}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Grid.IsSharedSizeScope="True" Margin="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" SharedSizeGroup="g1" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.ColumnSpan="2" FontWeight="Medium">
+                                <Run Text="Subreddit: " />
+                                <Run Text="{Binding data.subreddit}" />
+                                <Run Text=" Author: " />
+                                <Run Text="{Binding data.author}" />
+                            </TextBlock>
+
+                            <TextBox Grid.Row="1" Grid.ColumnSpan="2" IsReadOnly="True" Background="Transparent" BorderThickness="0"
+                                     Text="{Binding data.FullUrl, Mode=OneWay}" />
+
+                            <TextBlock Grid.Row="2" Text="Comments: " />
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding data.num_comments}" />
+
+                            <TextBlock Grid.Row="3" Text="Score: " />
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding data.score}" />
+
+                            <TextBlock Grid.Row="4" Text="Ups: " />
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding data.ups}" />
+
+                            <TextBlock Grid.Row="5" Text="Downs: " />
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding data.downs}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
+    </Grid>
+</UserControl>

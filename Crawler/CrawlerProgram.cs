@@ -186,6 +186,14 @@ namespace Crawler
 
         public void NavigateToUrl(string url)
         {
+            //if (AccessToken.IsNullOrEmpty())
+            //{
+            //    await Task.Delay(2000);
+            //    if (AccessToken.IsNullOrEmpty())
+            //    {
+            //        SetAccessToken(Social.FACEBOOK_GRAPH_LINK);
+            //    }
+            //}
             try {
                 if (url.Contains("/?ref=br_rs")) url = url.Replace("/?ref=br_rs", "");
                 if (url.Contains("?ref=br_rs")) url = url.Replace("?ref=br_rs", "");
@@ -336,8 +344,8 @@ namespace Crawler
 
                     case CrawlerStates.GraphSearch_Events:
                         //v2.3 search?q=bodybuilding&type=event&limit=500&fields=description,id,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true) 
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.3/search?q=" + pageName +
-                           "&type=event&limit=500&fields=description,id,name,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true)&access_token=" + AccessToken;
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                           "&type=event&limit=500&fields=description,id,name,picture{url},date,interested.limit(0).summary(true)&access_token=" + AccessToken;
                         browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                         break;
 
@@ -356,7 +364,8 @@ namespace Crawler
                         break;
 
                     case CrawlerStates.GraphSearch_Photos:
-                        browser.GetMainFrame().LoadUrl("https://www.facebook.com/search/photos/?q=" + pageName);
+                        //System.Diagnostics.Debugger.Launch();
+                        browser.GetMainFrame().LoadUrl("https://www.facebook.com/search/str/"+ pageName + "/photos-keyword");
                         break;
 
                     case CrawlerStates.GraphSearch_Videos:
@@ -408,8 +417,14 @@ namespace Crawler
                 if (url == Social.FACEBOOK_GRAPH_LINK)
                 {
 
-                    string accessTiken = source.Split(new string[] { @"{""accessToken"":""" }, StringSplitOptions.None)[1];
-                    AccessToken = accessTiken.Remove(accessTiken.IndexOf(@""""));
+                    //string accessTiken = source.Split(new string[] { @"{""accessToken"":""" }, StringSplitOptions.None)[1];
+                    //AccessToken = accessTiken.Remove(accessTiken.IndexOf(@""""));
+
+                    string accessTiken = source.Trim().Split(new string[] { "placeholder=\"Paste in an existing Access Token or click &quot;Get User Access Token" }, StringSplitOptions.None)[1];
+                    accessTiken = accessTiken.Split(new string[] { "value=" }, StringSplitOptions.None)[1];
+                    accessTiken = accessTiken.Remove(accessTiken.IndexOf(@">"));
+                    AccessToken = accessTiken.Replace("\"", "");
+
                     if (preRegetTokenUrl == "")
                     {
                         preRegetAccessToken = AccessToken;
@@ -508,22 +523,32 @@ namespace Crawler
                     }
 
                     //result_below_fold
-                    string secondResponders = source.Substring(source.IndexOf("result_below_fold"));
-                    secondResponders = secondResponders.Remove(secondResponders.IndexOf("fbBrowseScrollingPagerContainer"));
-                    foreach (var d in FBSourceCrawler.GetIdsFromVideoScrape(secondResponders))
+                    if (source.Contains("result_below_fold"))
                     {
-                        if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
-                    }
-
-                    //fbBrowseScrollingPagerContainer
-                    List<string> afterScrolledData = source.Split(new string[] { "fbBrowseScrollingPagerContainer" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                    afterScrolledData.RemoveAt(0);
-                    foreach (var item in afterScrolledData)
-                    {
-                        foreach (var d in FBSourceCrawler.GetIdsFromVideoScrape(item))
+                        try
                         {
-                            if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
+                            string secondResponders = source.Substring(source.IndexOf("result_below_fold"));
+                            if (secondResponders.Contains("fbBrowseScrollingPagerContainer"))
+                            {
+                                secondResponders = secondResponders.Remove(secondResponders.IndexOf("fbBrowseScrollingPagerContainer"));
+                                foreach (var d in FBSourceCrawler.GetIdsFromVideoScrape(secondResponders))
+                                {
+                                    if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
+                                }
+
+                                //fbBrowseScrollingPagerContainer
+                                List<string> afterScrolledData = source.Split(new string[] { "fbBrowseScrollingPagerContainer" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                                afterScrolledData.RemoveAt(0);
+                                foreach (var item in afterScrolledData)
+                                {
+                                    foreach (var d in FBSourceCrawler.GetIdsFromVideoScrape(item))
+                                    {
+                                        if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
+                                    }
+                                }
+                            }
                         }
+                        catch { }
                     }
                 }
 
@@ -603,22 +628,32 @@ namespace Crawler
                 }
 
                 //result_below_fold
-                string secondResponders = source.Substring(source.IndexOf("result_below_fold"));
-                secondResponders = secondResponders.Remove(secondResponders.IndexOf("fbBrowseScrollingPagerContainer"));
-                foreach (var d in getDataFromEditedPhotoScrapeSource(secondResponders))
+                if (source.Contains("result_below_fold"))
                 {
-                    resultToReply.data.Add(d);
-                }
-
-                //fbBrowseScrollingPagerContainer
-                List<string> afterScrolledData = source.Split(new string[] { "fbBrowseScrollingPagerContainer" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                afterScrolledData.RemoveAt(0);
-                foreach (var item in afterScrolledData)
-                {
-                    foreach (var d in getDataFromEditedPhotoScrapeSource(item))
+                    try
                     {
-                        resultToReply.data.Add(d);
+                        string secondResponders = source.Substring(source.IndexOf("result_below_fold"));
+                        if (secondResponders.Contains("fbBrowseScrollingPagerContainer"))
+                        {
+                            secondResponders = secondResponders.Remove(secondResponders.IndexOf("fbBrowseScrollingPagerContainer"));
+                            foreach (var d in getDataFromEditedPhotoScrapeSource(secondResponders))
+                            {
+                                resultToReply.data.Add(d);
+                            }
+
+                            //fbBrowseScrollingPagerContainer
+                            List<string> afterScrolledData = source.Split(new string[] { "fbBrowseScrollingPagerContainer" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                            afterScrolledData.RemoveAt(0);
+                            foreach (var item in afterScrolledData)
+                            {
+                                foreach (var d in getDataFromEditedPhotoScrapeSource(item))
+                                {
+                                    resultToReply.data.Add(d);
+                                }
+                            }
+                        }
                     }
+                    catch { }
                 }
 
                 OnReportSerializedResult(resultToReply.XmlSerializeToString());

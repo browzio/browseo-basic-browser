@@ -12,8 +12,9 @@
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate x:Key="dtvaultList">
-                <StackPanel Orientation="Horizontal">
-                    <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <CheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Center" />
                     <StackPanel Visibility="{Binding AuthorityVisible}" VerticalAlignment="Center">
                         <TextBlock Text="{Binding DomainAuthority}" Margin="2" />
                         <TextBlock Text="{Binding PageAuthority}" Margin="2" />
@@ -22,6 +23,8 @@
                         <TextBlock Text="{Binding Name}" Margin="4" FontSize="16" MinWidth="140" VerticalAlignment="Center"  />
                         <TextBlock Text="{Binding ProjectName}" Margin="6,1,1,1" FontSize="11" MinWidth="140" VerticalAlignment="Center" FontStyle="Italic"  />
                     </StackPanel>
+                    </StackPanel>
+                    <TextBlock Text="{Binding IndexCheckText}" VerticalAlignment="Center" Margin="1"/>
                 </StackPanel>
             </DataTemplate>
 
@@ -50,6 +53,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -62,25 +66,31 @@
         </Button>
         
         <TextBlock Grid.Column="0" Text="PBN Vault" Margin="4" FontSize="15"  VerticalAlignment="Center" HorizontalAlignment="Center" Grid.ColumnSpan="3"  />
-        
+
         <Button Grid.Column="2" Command="{Binding RefreshPBNVault}" CommandParameter="Refresh" IsEnabled="{Binding EnableBtns}"  Height="25" Width="25" HorizontalAlignment="Right">
             <Image Source="pack://application:,,,/Organiser.Common;component/Image/refresh.png"  
                    ToolTip="Refresh" SnapsToDevicePixels="True" Stretch="Uniform" />
         </Button>
 
-        <Button Content="New Folder" 
+        <UniformGrid Rows="1" Grid.Row="1" Grid.ColumnSpan="3" Margin="3">
+            <Button Content="New Folder" 
                 IsEnabled="{Binding EnableBtns}"  
                 Command="{Binding RefreshPBNVault}" CommandParameter="NEWFolderPBN"
-               Grid.Row="1" Grid.Column="0" Margin="3" />
+                 Margin="1" />
 
-        <Button Content="Save" 
+            <Button Content="Save" 
                 IsEnabled="{Binding EnableBtns}"  
                 Command="{Binding RefreshPBNVault}" CommandParameter="Save"
-                Grid.Column="2" Grid.Row="1" Margin="3" />
+                 Margin="1" />
+        </UniformGrid>
+        <Button Content="Index Check Checked" 
+                IsEnabled="{Binding EnableBtns}"  
+                Command="{Binding RefreshPBNVault}" CommandParameter="InexCheckPBN"
+                Grid.Row="2" Grid.ColumnSpan="3"  Margin="4" />
 
         <ScrollViewer Name="sv"
                       HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto"
-                      Grid.ColumnSpan="3" Grid.Row="2">
+                      Grid.ColumnSpan="3" Grid.Row="3">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

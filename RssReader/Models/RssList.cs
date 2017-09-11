@@ -1,4 +1,6 @@
 ﻿using Organiser.Common.Classes;
+using Organiser.Common.Classes.SocialHelpers;
+using Organiser.Common.Windows;
 using RssReader.Helpers;
 using System;
 using System.Collections.Generic;
@@ -14,10 +16,11 @@ namespace RssReader.Models
 {
     public class RssList : INotifyPropertyChanged
     {
-        public event Action<string> OnSelectedLaunchLink = delegate { };//send to browser
+        public event Action<string,bool> OnSelectedLaunchLink = delegate { };//send to browser| url,isff
         public event Action<string,string> OnSelectedSendToSeo = delegate { };//title,url
         public event Action<string> OnSelectedLaunchLinkMasher = delegate { };//send to MAsher
         public event Action<string,string,string,string,string> OnSelectedSendToPbn = delegate { };//send to MAsher
+        public event Action<RssList> OnListItemChanged = delegate { };
 
         public ICommand SendToBrowser { get; set; }
 
@@ -29,10 +32,40 @@ namespace RssReader.Models
 
         private void OnSendToBrowser(object obj)
         {
-            switch ((string)obj)
+            var param = (string)obj;
+            switch (param)
             {
                 case "Browser":
-                    OnSelectedLaunchLink(ListResults[SIListResults].Link);
+                case "BrowserFF":
+                    OnSelectedLaunchLink(ListResults[SIListResults].Link,param== "BrowserFF");
+                    break;
+
+                case "ORDERBY_FBSHARES":
+                case "ORDERBY_FBLIKES":
+                case "ORDERBY_FBCOMMENTS":
+                case "ORDERBY_GPLUSONES":
+                case "ORDERBY_PINTERESTPINS":
+                case "ORDERBY_STUMBLEVIEWS":
+                case "ORDERBY_LINKEDINCOUNT":
+                case "ORDERBY_BUFFERSHARES":
+                case "ORDERBY_REDDITUPS":
+                case "ORDERBY_REDDITSCORE":
+                    var resulstsList = SocialStatsFunctions.OrderStatsBy(ListResults.ToList(), param);
+                    if (resulstsList == null || resulstsList.Count() == 0) return;
+
+                    ListResults.Clear();
+                    foreach (var r in resulstsList) ListResults.Add(r as RssResult);
+                    OnListItemChanged(this);
+                    break;
+
+                case "GrabAllLinks":
+                    var textWindow = new RssFeedsLinksMultiWindow();
+                    textWindow.Title = RssLink;
+                    foreach (var result in ListResults)
+                    {
+                        textWindow.tbInputedText.Text += result.Link + Environment.NewLine;
+                    }
+                    textWindow.Show();
                     break;
 
                 case "Masher":
@@ -130,7 +163,7 @@ namespace RssReader.Models
 
         public void RaisListPropChanged()
         {
-            PropertyChanged(this, new PropertyChangedEventArgs("ListResults"));
+            if (PropertyChanged != null) PropertyChanged(this, new PropertyChangedEventArgs("ListResults"));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

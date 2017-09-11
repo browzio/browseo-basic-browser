@@ -6,11 +6,13 @@
              xmlns:browser="clr-namespace:BrowserHost;assembly=BrowserHost"
              xmlns:prospector="clr-namespace:Prospector.Controls;assembly=Prospector"
              xmlns:rssReaders="clr-namespace:RssReader.Controlls;assembly=RssReader"
+             xmlns:rss="clr-namespace:RssReader.Views;assembly=RssReader"
              xmlns:goVival="clr-namespace:GoViral.Controls;assembly=GoViral"
              xmlns:instagram="clr-namespace:GoViral.Instagram.InstControls;assembly=GoViral"
              xmlns:commonControlls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
              xmlns:wisi="clr-namespace:WPF_WYSIWYG_HTML_Editor.XAML;assembly=WYSIWYG"
              xmlns:ffbrowser="clr-namespace:zFirefoxBrowser.Controls;assembly=zFirefoxBrowser"
+             xmlns:ffXulBrowser="clr-namespace:zFirefoxXulBrowser.Controls;assembly=MozillaFx"
              xmlns:imacrosRunner="clr-namespace:IMacroMultyLayout.Controls;assembly=IMacroMultyLayout"
              mc:Ignorable="d" 
              d:DesignHeight="600" d:DesignWidth="1100">
@@ -78,7 +80,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <Grid>
-        <commonControlls:NonReloadingTabControl Name="tbControl" BorderThickness="0" Padding="0" SelectionChanged="tbControl_SelectionChanged" Background="Transparent">
+        <commonControlls:NonReloadingTabControl Name="tbControl" BorderThickness="0" Padding="0" PreviewMouseLeftButtonDown="tbControl_PreviewMouseLeftButtonDown" SelectionChanged="tbControl_SelectionChanged" Background="Transparent">
             <TabControl.Style>
                 <Style TargetType="{x:Type TabControl}">
                     <Setter Property="Template">
@@ -141,7 +143,12 @@
                     </Setter>
                 </Style>
             </TabControl.Style>
-            <TabItem Header="Firefox"  Style="{StaticResource gmailTabStyle90}">
+            <TabItem Header="FirefoxXul"
+                     Style="{StaticResource gmailTabStyle90}">
+                <ffXulBrowser:FFXulBrowserUserControl Name="ffXulBrowser" />
+            </TabItem>
+            <TabItem Header="Firefox"
+                     Style="{StaticResource gmailTabStyle90}">
                 <ffbrowser:FFBrowserUserControl Name="ffBrowser" />
             </TabItem>
             <TabItem Header="Chrome"  Style="{StaticResource gmailTabStyle90}">
@@ -152,7 +159,8 @@
                 <!--<nichCntrol:NichResearchControl />-->
             </TabItem>
             <TabItem Header="RSS"  Style="{StaticResource gmailTabStyle90}" Name="tabrssControl">
-                <rssReaders:RssTabbedControl Name="rssControl" />
+                <!--<rssReaders:RssTabbedControl Name="rssControl" />-->
+                <rss:RSSMainWorkspaceView Name="rssMainControl" />
             </TabItem>
             <TabItem Header="PublisHUB"  Style="{StaticResource gmailTabStyle90}" Name="tabrsswisi">
                 <wisi:WysiwigControl Name="wisi" />

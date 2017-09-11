@@ -98,6 +98,7 @@ namespace Xilium.CefGlue.Client
                 SansSerifFontFamily = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontSansSerif],
                 FixedFontFamily = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontFixedWidth],
                 DefaultEncoding = BrowserSettimgs.AvailableEncodeings[BrowserSettimgs.SIFontEncodings],
+                AcceptLanguageList = BrowserSettimgs.AcceptLanguage,
                 WebGL = BrowserSettimgs.WebGLEnabled ? CefState.Enabled : CefState.Disabled,
                 // RemoteFonts = CefState.Disabled, 
  
@@ -185,6 +186,10 @@ namespace Xilium.CefGlue.Client
 
         public CefFrame GetTheMainFrame()
         {
+            if (CBrowser == null)
+            {
+                init(MyFilesDatabase.GetDefultHomePage(), BrowserSettimgs.FlashEnabled, BrowserSettimgs.JavascriptEnabled, BrowserSettimgs.JavaEnabled);
+            }
             return CBrowser.Browser.GetMainFrame();
            //  return CBrowser.WebBrowser.CefBrowser.GetMainFrame();
            // return null;

@@ -18,7 +18,7 @@ namespace GoViral.Converters
                 if (values.Length == 5)
                 {
                     string pageurl = values[0] as string;
-
+                    if(pageurl == null) return "Search For More...";
                     if (pageurl.Contains(Social.FACEBOOK_EVENTS_DEFAULT_URL))
                     {
                         return "";
@@ -33,15 +33,20 @@ namespace GoViral.Converters
                     }
                     else
                     {
-                        System.Collections.ObjectModel.ObservableCollection<Organiser.Common.Classes.Photos.Photo> photoArr = values[1] as System.Collections.ObjectModel.ObservableCollection<Organiser.Common.Classes.Photos.Photo>;
-                        System.Collections.ObjectModel.ObservableCollection<Organiser.Common.Classes.Videos.Video> VidArr = values[1] as System.Collections.ObjectModel.ObservableCollection<Organiser.Common.Classes.Videos.Video>;
-                        int count = System.Convert.ToInt32(values[2]);
-                        Organiser.Common.Classes.Paging paging = values[3] as Organiser.Common.Classes.Paging;
+                        if (values[2] != System.Windows.DependencyProperty.UnsetValue)
+                        {
+                            System.Collections.ObjectModel.ObservableCollection<Organiser.Common.Classes.Photos.Photo> photoArr = values[1] as System.Collections.ObjectModel.ObservableCollection<Organiser.Common.Classes.Photos.Photo>;
+                            System.Collections.ObjectModel.ObservableCollection<Organiser.Common.Classes.Videos.Video> VidArr = values[1] as System.Collections.ObjectModel.ObservableCollection<Organiser.Common.Classes.Videos.Video>;
 
-                        if (photoArr != null && count > 0 && paging != null)
-                            return "Load All...";
-                        if (VidArr != null && count > 0 && paging != null)
-                            return "Load All...";
+                            int count = System.Convert.ToInt32(values[2]);
+
+                            Organiser.Common.Classes.Paging paging = values[3] as Organiser.Common.Classes.Paging;
+
+                            if (photoArr != null && count > 0 && paging != null)
+                                return "Load All...";
+                            if (VidArr != null && count > 0 && paging != null)
+                                return "Load All...";
+                        }
                     }
                 }
             }

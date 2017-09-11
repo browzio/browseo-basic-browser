@@ -100,6 +100,7 @@ namespace Browser.Common.ViewModels
 
         public void SetUpChromeAgents()
         {
+            UserAgentList.Add(new UserAgent() { Version = "Chrome 56 win10", Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36" });
             UserAgentList.Add(new UserAgent() { Version = "Chrome 51 win10", Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36" });
             UserAgentList.Add(new UserAgent() { Version = "Chrome 51 win7", Agent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36" });
             UserAgentList.Add(new UserAgent() { Version = "Chrome 49.0", Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.87 Safari/537.36" });

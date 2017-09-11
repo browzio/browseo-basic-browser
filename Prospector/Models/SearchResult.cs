@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Organiser.Common.Classes;
+using Organiser.Common.Classes.SocialHelpers;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -9,7 +11,7 @@ using System.Windows.Controls;
 
 namespace Prospector.Models
 {
-    public class SearchResult : INotifyPropertyChanged
+    public class SearchResult : ViewModelBase, IHaveSocialStats
     {
 
         private string keyword;
@@ -18,9 +20,7 @@ namespace Prospector.Models
             get { return keyword; }
             set
             {
-                keyword = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Keyword"));
+                keyword = value; RaisePropertyChanged("Keyword");
             }
         }
 
@@ -30,9 +30,7 @@ namespace Prospector.Models
             get { return domainScore; }
             set
             {
-                domainScore = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("DomainScore"));
+                domainScore = value; RaisePropertyChanged("DomainScore");
             }
         }
 
@@ -42,9 +40,7 @@ namespace Prospector.Models
             get { return link; }
             set
             {
-                link = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Link"));
+                link = value; RaisePropertyChanged("Link");
             }
         }
 
@@ -54,9 +50,7 @@ namespace Prospector.Models
             get { return searchEngine; }
             set
             {
-                searchEngine = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("SearchEngine"));
+                searchEngine = value; RaisePropertyChanged("SearchEngine");
             }
         }
 
@@ -66,11 +60,20 @@ namespace Prospector.Models
             get { return position; }
             set
             {
-                position = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Position"));
+                position = value; RaisePropertyChanged("Position");
             }
         }
+
+        private int timesKwFound;
+        public int TimesKwFound
+        {
+            get { return timesKwFound; }
+            set
+            {
+                timesKwFound = value; RaisePropertyChanged("TimesKwFound");
+            }
+        }
+
 
         private string title;
         public string Title
@@ -78,9 +81,7 @@ namespace Prospector.Models
             get { return title; }
             set
             {
-                title = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Title"));
+                title = value; RaisePropertyChanged("Title");
             }
         }
 
@@ -90,9 +91,7 @@ namespace Prospector.Models
             get { return description; }
             set
             {
-                description = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Description"));
+                description = value; RaisePropertyChanged("Description");
             }
         }
 
@@ -102,9 +101,7 @@ namespace Prospector.Models
             get { return published; }
             set
             {
-                published = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Published"));
+                published = value; RaisePropertyChanged("Published");
             }
         }
         private string lang;
@@ -113,9 +110,7 @@ namespace Prospector.Models
             get { return lang; }
             set
             {
-                lang = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Lang"));
+                lang = value; RaisePropertyChanged("Lang");
             }
         }
         private string pnum;
@@ -124,9 +119,7 @@ namespace Prospector.Models
             get { return pnum; }
             set
             {
-                pnum = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Pnum"));
+                pnum = value; RaisePropertyChanged("Pnum");
             }
         }//Ptotal
         private string ptotal;
@@ -135,9 +128,7 @@ namespace Prospector.Models
             get { return ptotal; }
             set
             {
-                ptotal = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Ptotal"));
+                ptotal = value; RaisePropertyChanged("Ptotal");
             }
         }
         //PerformanceScore
@@ -147,9 +138,7 @@ namespace Prospector.Models
             get { return performanceScore; }
             set
             {
-                performanceScore = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("PerformanceScore"));
+                performanceScore = value; RaisePropertyChanged("PerformanceScore");
             }
         }
         private string country;
@@ -158,9 +147,7 @@ namespace Prospector.Models
             get { return country; }
             set
             {
-                country = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Country"));
+                country = value; RaisePropertyChanged("Country");
             }
         }
         private string type;
@@ -169,9 +156,7 @@ namespace Prospector.Models
             get { return type; }
             set
             {
-                type = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Type"));
+                type = value; RaisePropertyChanged("Type");
             }
         }
         //Spamscore
@@ -181,9 +166,7 @@ namespace Prospector.Models
             get { return spamscore; }
             set
             {
-                spamscore = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Spamscore"));
+                spamscore = value; RaisePropertyChanged("Spamscore");
             }
         }
 
@@ -193,9 +176,7 @@ namespace Prospector.Models
             get { return pageAuthority; }
             set
             {
-                pageAuthority = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("PageAuthority"));
+                pageAuthority = value; RaisePropertyChanged("PageAuthority");
             }
         }
 
@@ -205,9 +186,7 @@ namespace Prospector.Models
             get { return domainAuthority; }
             set
             {
-                domainAuthority = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("DomainAuthority"));
+                domainAuthority = value; RaisePropertyChanged("DomainAuthority");
             }
         }
 
@@ -217,9 +196,7 @@ namespace Prospector.Models
             get { return authorityVisible; }
             set
             {
-                authorityVisible = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("AuthorityVisible"));
+                authorityVisible = value; RaisePropertyChanged("AuthorityVisible");
             }
         }
 
@@ -229,12 +206,15 @@ namespace Prospector.Models
             get { return webhoseExtraVisible; }
             set
             {
-                webhoseExtraVisible = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("WebhoseExtraVisible"));
+                webhoseExtraVisible = value; RaisePropertyChanged("WebhoseExtraVisible");
             }
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        private SocialStatsReplys socialStatsReplys;
+        public SocialStatsReplys SocialStatsReplys
+        {
+            get { return socialStatsReplys; }
+            set { socialStatsReplys = value; RaisePropertyChanged("SocialStatsReplys"); }
+        }
     }
 }

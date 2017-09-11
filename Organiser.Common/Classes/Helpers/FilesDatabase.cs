@@ -191,6 +191,7 @@ namespace Organiser.Common.Classes
             BrowserSettimgs.DefaultFontSize = 16;
             BrowserSettimgs.MnimumFontSize = 0;
             BrowserSettimgs.SIFontEncodings = BrowserSettimgs.AvailableEncodeings.IndexOf("Windows-1252");
+            AcceptLanguage = "en-US, en";
         }
         public static bool JavaEnabled = true;
         public static bool JavascriptEnabled = true;
@@ -201,7 +202,8 @@ namespace Organiser.Common.Classes
         public static bool WebGLEnabled = true;
 
         public static string UserAgentFF = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0";
-        public static string UserAgentChrome = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.106 Safari/537.36";
+        public static string UserAgentChrome = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+        public static string AcceptLanguage = "en-US, en";
 
         private static List<string> timeZoneList;
         public static List<string> AvailableTimeZones
@@ -524,6 +526,7 @@ namespace Organiser.Common.Classes
         {
             return Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\RAWSocialOrganizer";
         }
+
         public static string GetBaseProjectsDir()
         {
             return GetBaseDir() + "\\Projects";
@@ -700,7 +703,36 @@ namespace Organiser.Common.Classes
             return "";
         }
 
+        public static string GetFaviconIfExists(string authority)
+        {
+            string dir = Path.Combine(GetBaseDir(), "FaviconsShared");
+            if (!Directory.Exists(dir)) return "";
 
+            string file = Path.Combine(dir, authority + ".ico");
+            if (!File.Exists(file)) return "";
+
+            return file;
+        }
+
+        public static string SaveImageFromBytes(byte[] bytes, string authority)
+        {
+            string dir = Path.Combine(GetBaseDir(), "FaviconsShared");
+            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+            string file = Path.Combine(dir, authority + ".ico");
+            if (File.Exists(file)) return file;
+
+            try
+            {
+                using (System.Drawing.Image image = System.Drawing.Image.FromStream(new System.IO.MemoryStream(bytes)))
+                {
+                    image.Save(file);
+                }
+            }
+            catch { return ""; }
+
+            return file;
+        }
 
         public static bool HasMultipleProfiles(string path)
         {
@@ -802,6 +834,11 @@ namespace Organiser.Common.Classes
                 }
                 catch
                 { }
+                try
+                {
+                    profile.BIADefault = Convert.ToBoolean(ini.IniReadValue("Data", "BIADefault"));
+                }
+                catch { }
             }
             catch { }
             return profile;
@@ -920,7 +957,8 @@ namespace Organiser.Common.Classes
                 "," + BrowserSettimgs.MnimumFontSize +
                 "," + BrowserSettimgs.SIFontEncodings +
                 "," + BrowserSettimgs.WebGLEnabled +
-                "," + BrowserSettimgs.HideFonts);
+                "," + BrowserSettimgs.HideFonts+
+                "," + BrowserSettimgs.AcceptLanguage.Replace(",", MyFilesDatabase.SPLITTER));
 
             string directory = Path.Combine(GetBaseDir(), "SavedSessions", projectName);
             if(isff) directory = Path.Combine(GetBaseDir(), "FFSavedSessions", projectName);
@@ -1019,6 +1057,10 @@ namespace Organiser.Common.Classes
                         {
                             BrowserSettimgs.HideFonts = Convert.ToBoolean(browserSettings[17]);
                         }
+                        if(browserSettings.Length > 18)
+                        {
+                            BrowserSettimgs.AcceptLanguage = browserSettings[18].Replace(MyFilesDatabase.SPLITTER, ",");
+                        }
                         if (BrowserSettimgs.SetSysDateEnabled)
                         {
                             TimeHelper.StartSetTimeAndZoneProcess(new DateAndTimeZone() { TimeZone = TimeZoneInfo.GetSystemTimeZones()[BrowserSettimgs.SITimeZone] });
@@ -1036,7 +1078,7 @@ namespace Organiser.Common.Classes
                 if (fileLines.Count > 0)
                 {
                     string lastLine = fileLines[fileLines.Count - 1];
-                    if (lastLine.Contains(",")) fileLines.RemoveAt(fileLines.Count - 1);
+                    if (lastLine.Contains(",") && !lastLine.Contains(".")) fileLines.RemoveAt(fileLines.Count - 1);
                 }
             }
             catch { }
@@ -1233,24 +1275,28 @@ namespace Organiser.Common.Classes
         #endregion
 
         #region rss
+        static string rssFilename = "rssLinks.txt";
 
-        public static void SaveRssFeedsSiteLinks(string links, PersonData profile, string tabTitle)
+        public static void SaveRssFeedsSiteLinks(string[] links, PersonData profile, string tabTitle)
         {
             string directoryPath = Path.Combine(GetBaseDir(), "SavedRssLinks", profile.ProjectName, tabTitle);
-            string filePath = Path.Combine(directoryPath, "rssLinks.txt");
+            string filePath = Path.Combine(directoryPath, rssFilename);
 
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
 
-            if (File.Exists(filePath))
-                File.Delete(filePath);
+            File.WriteAllLines(filePath, links);
 
-            string[] splitLinks = links.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
-            foreach (string link in splitLinks)
-            {
-                File.AppendAllText(filePath, link + Environment.NewLine);    
-            }
+            //File.WriteAllText(filePath, loadFeedsGrouped + Environment.NewLine);
+
+            ////string[] splitLinks = links.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+            //foreach (string link in links)
+            //{
+            //    File.AppendAllText(filePath, link + Environment.NewLine);    
+            //}
         }
+
+
 
         public static List<string> GetRssFeedLinks(PersonData profile, string tabTitle)
         {
@@ -1262,7 +1308,7 @@ namespace Organiser.Common.Classes
             List<string> returnedList = new List<string>();
 
             string directoryPath = Path.Combine(GetBaseDir(), "SavedRssLinks", projectname, tabTitle);
-            string filePath = Path.Combine(directoryPath, "rssLinks.txt");
+            string filePath = Path.Combine(directoryPath, rssFilename);
 
             if (!Directory.Exists(directoryPath)) return returnedList;
 
@@ -1275,6 +1321,8 @@ namespace Organiser.Common.Classes
 
             return returnedList;
         }
+
+
 
         public static List<string> GetRssFeedLinksTabsTitle(PersonData profile)
         {
@@ -1297,6 +1345,8 @@ namespace Organiser.Common.Classes
 
             return returnedList;
         }
+
+
 
         public static void RemoveDeleteRssTab(PersonData profile, string tabTitle)
         {
@@ -1338,18 +1388,22 @@ namespace Organiser.Common.Classes
             return null;
         }
 
-        public static void DownloadImage(string url)
+        public static string DownloadImage(string url,string filepath="")
         {
-            string saveFileFilename = "";
-            Application.Current.Dispatcher.Invoke((Action)delegate
+            string saveFileFilename = filepath;
+            bool openFile = saveFileFilename == "";
+            if (openFile)
             {
-                SaveFileDialog sfd = new SaveFileDialog();
-                sfd.Filter = "Png files (*.png)|*.png|JPeg files (*.jpg)|*.jpg|All files (*.*)|*.*";
-                sfd.FilterIndex = 0;
-                sfd.RestoreDirectory = true;
-                if (sfd.ShowDialog() != true) return;
-                saveFileFilename = sfd.FileName;
-            });
+                Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    SaveFileDialog sfd = new SaveFileDialog();
+                    sfd.Filter = "Png files (*.png)|*.png|JPeg files (*.jpg)|*.jpg|All files (*.*)|*.*";
+                    sfd.FilterIndex = 0;
+                    sfd.RestoreDirectory = true;
+                    if (sfd.ShowDialog() != true) return;
+                    saveFileFilename = sfd.FileName;
+                });
+            }
             try
             {
                 using (WebClient webClient = new WebClient())
@@ -1370,13 +1424,16 @@ namespace Organiser.Common.Classes
                 try
                 {
                     FileInfo fileInfo = new FileInfo(saveFileFilename);
-                    System.Diagnostics.Process.Start(fileInfo.DirectoryName);
+                    if(openFile) System.Diagnostics.Process.Start(fileInfo.DirectoryName);
                 }
                 catch { }
+
+                return "";
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Failed to save image. " + ex.Message);
+               if(openFile) MessageBox.Show("Failed to save image. " + ex.Message);
+                return "Failed to save image. " + ex.Message;
             }
         }
 
@@ -1458,7 +1515,10 @@ namespace Organiser.Common.Classes
                 string filePathForHomePage = Path.Combine(GetBaseDir(), "DefaultHomePage", "homePage.txt");
                 if (File.Exists(filePathForHomePage))
                 {
-                    return File.ReadAllText(filePathForHomePage);
+                    var lines = File.ReadAllLines(filePathForHomePage);
+                    if (lines == null) return "";
+                    var line = new Random().Next(0, lines.Length - 1);
+                    return lines.Length > 0 && line <= lines.Length - 1 ? lines[line] : "";
                 }
             }
             return "";

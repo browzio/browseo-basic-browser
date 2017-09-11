@@ -38,26 +38,27 @@ namespace Organiser.Common.Classes
 
         public static void AddTraceCookie(string traceType)
         {
-            try
-            {
-                if (UsageList == null)
-                    UsageList = new List<KeyValuePair<string, string>>();
+            new Thread(() =>
+                       {
+                           try
+                           {
+                               if (UsageList == null)
+                                   UsageList = new List<KeyValuePair<string, string>>();
 
-                UsageList.Add(new KeyValuePair<string, string>(traceType, DateTime.Now.ToString()));
-                if (UsageList.Count > 5)
-                {
-                    new Thread(() =>
-                    {
-                        try
-                        {
-                            SaveAllTrackedDataList();
-                            UsageList.Clear();
-                        }
-                        catch { }
-                    }).Start();
-                }
-            }
-            catch { }
+                               UsageList.Add(new KeyValuePair<string, string>(traceType, DateTime.Now.ToString()));
+                               if (UsageList.Count > 5)
+                               {
+
+                                   try
+                                   {
+                                       SaveAllTrackedDataList();
+                                       UsageList.Clear();
+                                   }
+                                   catch { }
+                               }
+                           }
+                           catch { }
+                       }).Start();
         }
 
         public static void SaveAllTrackedDataList()

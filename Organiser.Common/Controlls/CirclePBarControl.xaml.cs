@@ -14,7 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace RssReader.Controlls
+namespace Organiser.Common.Controlls
 {
     /// <summary>
     /// Interaction logic for CirclePBarControl.xaml

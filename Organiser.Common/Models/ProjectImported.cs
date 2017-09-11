@@ -16,6 +16,7 @@ namespace Organiser.Common.Models
     {
         public event Action<ProjectImported, bool> OnCheckedFolder = delegate { };
         public event Action<ProjectImported, bool> OnClickedExpand = delegate { };
+        public event Action<ProjectImported, bool> OnCheckedChanged = delegate { };
 
         [XmlIgnore]
         public ICommand OnCommandFromView { get; set; }
@@ -68,6 +69,10 @@ namespace Organiser.Common.Models
                 if (VisibleHasNext == Visibility.Visible && RaiseChecked && IsFolder)
                 {
                     OnCheckedFolder(this, value);
+                }
+                if (!IsFolder)
+                {
+                    OnCheckedChanged(this, value);
                 }
                 if (value)
                 {

@@ -41,18 +41,21 @@ namespace GoViral.ViewModels
             set { sISavedProjectsList = value; RaisePropertyChanged("SISavedProjectsList"); }
         }
 
-        private object mLock = new object();  
+        private object mLock = new object();
 
         public SyncedProjectsVM(string type)
         {
             OnBtnClick = new RelayCommand(OnBtnClick_Clicked);
 
+            SelectFolderSelect_Click = new RelayCommand(SelectFolderSelect_BtnClick);
+
             SavedProjectsList = new ObservableCollection<SavedSyncProject>();
-                                   
+
             new Thread(LoadSyncedProjectsList).Start();
 
             typeOfSyncerPath = type;
         }
+
         #endregion
 
         internal void SetCorrectSI(SyncedProjectData data)
@@ -82,7 +85,7 @@ namespace GoViral.ViewModels
             lock (mLock)
             {
                 try
-                { 
+                {
                     string saveToDir = Path.Combine(MyFilesDatabase.GetBaseDir(), typeOfSyncerPath, GloableProfData.PData.ProjectName);
                     if (Directory.Exists(saveToDir))
                     {
@@ -95,7 +98,7 @@ namespace GoViral.ViewModels
                                 p.TypeOfSync = typeOfSyncerPath;
                                 Application.Current.Dispatcher.Invoke(new Action<int, SavedSyncProject>(addToSavedProjectsList), DispatcherPriority.Normal, -1, p);
                             }
-                        }   
+                        }
 
                         if (SavedProjectsList.Count == 0 || !SavedProjectsList.Any(p => p.Name == GloableProfData.PData.ProjectName))
                         {
@@ -106,7 +109,7 @@ namespace GoViral.ViewModels
                                     ProjectName = GloableProfData.PData.ProjectName,
                                     SISyndicatedPostsList = 0,
                                     TypeOfSync = typeOfSyncerPath
-                        }); 
+                                });
                         }
 
                         foreach (FileInfo fi in new DirectoryInfo(saveToDir).GetFiles())
@@ -118,7 +121,7 @@ namespace GoViral.ViewModels
                             {
                                 if (SavedProjectsList[0].SyndicatedPostsList.Any(spd => spd.Url == d.Url)) continue;
 
-                                Application.Current.Dispatcher.Invoke(new Action<int, SyncedProjectData>(addSyndicatedPostToSavedProjectsList), DispatcherPriority.Normal, 0, d);    
+                                Application.Current.Dispatcher.Invoke(new Action<int, SyncedProjectData>(addSyndicatedPostToSavedProjectsList), DispatcherPriority.Normal, 0, d);
                             }
 
                             fi.Delete();
@@ -128,10 +131,10 @@ namespace GoViral.ViewModels
                         if (Directory.Exists(deleteLinksDir))
                         {
                             foreach (FileInfo fi in new DirectoryInfo(deleteLinksDir).GetFiles())
-                            { 
+                            {
                                 SavedSyncProject project = File.ReadAllText(fi.FullName).XmlDeserializeFromString<SavedSyncProject>();
                                 SavedSyncProject projectToRemoveFrom = SavedProjectsList.FirstOrDefault(p => p.Name == fi.Name);
-                                if(projectToRemoveFrom!= null)
+                                if (projectToRemoveFrom != null)
                                 {
                                     Application.Current.Dispatcher.Invoke(new Action<SavedSyncProject, SavedSyncProject>(removeDeletedLinks), DispatcherPriority.Normal, project, projectToRemoveFrom);
                                 }
@@ -141,11 +144,11 @@ namespace GoViral.ViewModels
                         }
 
                         new Thread(Saved).Start();
-                    }   
+                    }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                   
+
                 }
             }
         }
@@ -155,7 +158,7 @@ namespace GoViral.ViewModels
             foreach (var data in project.SyndicatedPostsList)
             {
                 SyncedProjectData dataToRemove = projectToRemoveFrom.SyndicatedPostsList.FirstOrDefault(d => d.Url == data.Url);
-                if(dataToRemove != null)
+                if (dataToRemove != null)
                 {
                     projectToRemoveFrom.SyndicatedPostsList.Remove(dataToRemove);
                 }
@@ -183,11 +186,11 @@ namespace GoViral.ViewModels
         }
 
         private void Saved(object param)
-        { 
+        {
             lock (mLock)
             {
                 try
-                {  
+                {
                     foreach (SavedSyncProject project in SavedProjectsList)
                     {
                         if (project.ProjectName == GloableProfData.PData.ProjectName) continue;
@@ -204,7 +207,7 @@ namespace GoViral.ViewModels
                     File.WriteAllText(Path.Combine(saveToDir, "Sorter"), SavedProjectsList.XmlSerializeToString());
 
                     Dictionary<string, SavedSyncProject> dictionaryForDelete = param as Dictionary<string, SavedSyncProject>;
-                    if(dictionaryForDelete != null)
+                    if (dictionaryForDelete != null)
                     {
                         foreach (var kv in dictionaryForDelete)
                         {
@@ -235,6 +238,14 @@ namespace GoViral.ViewModels
 
                 switch ((string)obj)
                 {
+                    case "ClearLinksAllProjects":
+                        if (!"Are you sure you want to clear all the links in the projects?".Show(true)) return;
+                        foreach (var p in SavedProjectsList)
+                        {
+                            p.SyndicatedPostsList.Clear();
+                        }
+                        break;
+
                     case "AddProject":
                         await AddProjects("", "");
                         break;
@@ -304,7 +315,7 @@ namespace GoViral.ViewModels
                             linksWindow.tbInputedText.Text = links;
                             linksWindow.Title = "Name , Url";
                             linksWindow.ShowDialog();
-                            if (linksWindow.OKClicked)
+                            if (linksWindow.ButtonLeftClicked)
                             {
                                 //if (string.IsNullOrEmpty(linksWindow.tbInputedText.Text) && string.IsNullOrWhiteSpace(linksWindow.tbInputedText.Text))
                                 //{
@@ -403,7 +414,7 @@ namespace GoViral.ViewModels
                         {
                             SavedProjectsList[SISavedProjectsList].SyndicatedPostsList.Clear();
                         }
-                            break;
+                        break;
                     #endregion
 
                     default:
@@ -419,7 +430,7 @@ namespace GoViral.ViewModels
         {
             RssFeedsLinksMultiWindow win = sender as RssFeedsLinksMultiWindow;
 
-            if (win.OKClicked)
+            if (win.ButtonLeftClicked)
             {
                 AddUrlToSavedProjectList("", "", win.tbInputedText.Text);
             }
@@ -441,7 +452,7 @@ namespace GoViral.ViewModels
                     ProjectName = sp.Name,
                     SISyndicatedPostsList = 0,
                     TypeOfSync = typeOfSyncerPath,
-                }; 
+                };
                 var projExists = SavedProjectsList.FirstOrDefault(p => p.ProjectName.Trim().ToLower() == sp.Name.Trim().ToLower());
                 if (projExists != null) projtoaddTo = projExists;
 
@@ -490,9 +501,9 @@ namespace GoViral.ViewModels
                 else
                 {
                     murl = link;
-                    name = link.Replace("http://","");
-                    name = name.Replace("https://","");
-                    name = name.Replace("www.","");
+                    name = link.Replace("http://", "");
+                    name = name.Replace("https://", "");
+                    name = name.Replace("www.", "");
                     if (name.Contains("."))
                     {
                         name = name.Remove(name.IndexOf("."));
@@ -509,8 +520,9 @@ namespace GoViral.ViewModels
             return new SyncedProjectData() { PageName = pageName, Url = url, FromProject = projectName };
         }
 
+
         public void AddUrlToSavedProjectList(string pageName, string url, string multilinks)
-        {  
+        {
             ChooseFolderWindow cfw = new ChooseFolderWindow();
             cfw.DataContext = this;
             cfw.lstItems.ItemsSource = SavedProjectsList;
@@ -534,8 +546,17 @@ namespace GoViral.ViewModels
                 addToProj(pageName, url, multilinks, proj);
             }
 
-            if(needsSave)
+            if (needsSave)
                 new Thread(Saved).Start();
+        }
+
+
+        private void SelectFolderSelect_BtnClick(object param)
+        {
+            foreach (var folder in SavedProjectsList)
+            {
+                folder.IsChecked = (string)param == "All";
+            }
         }
     }
 }

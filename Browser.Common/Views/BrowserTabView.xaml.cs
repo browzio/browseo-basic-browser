@@ -39,35 +39,71 @@ namespace Browser.Common.Views
 
             
 
-            host.Width = browserGrd.ActualWidth;
-            host.Height = browserGrd.ActualHeight;
+            //host.Width = browserGrd.ActualWidth;
+            //host.Height = browserGrd.ActualHeight;
 
-            Console.WriteLine(host.Width);
-            Console.WriteLine(host.Height);
+            //Console.WriteLine(host.Width);
+            //Console.WriteLine(host.Height);
 
-            Console.WriteLine();
+            //Console.WriteLine();
 
-            Console.WriteLine(browserGrd.ActualWidth);
-            Console.WriteLine(browserGrd.ActualHeight);
+            //Console.WriteLine(browserGrd.ActualWidth);
+            //Console.WriteLine(browserGrd.ActualHeight);
 
-            Console.WriteLine();
+            //Console.WriteLine();
 
-            Console.WriteLine(rctangle.ActualWidth);
-            Console.WriteLine(rctangle.ActualHeight);
+            //Console.WriteLine(rctangle.ActualWidth);
+            //Console.WriteLine(rctangle.ActualHeight);
 
             if (DataContext is BrowserTabViewModel)
             {
                 (DataContext as BrowserTabViewModel).OnShouldChangePropertyAddress += BrowserTabView_OnShouldChangePropertyAddress;
-                (DataContext as BrowserTabViewModel).RevalidateSizes(host.Width, host.Height);
+                (DataContext as BrowserTabViewModel).OnInitializeMacrosRequest += BrowserTabView_OnInitializeMacrosRequest;
+               (DataContext as BrowserTabViewModel).RevalidateSizes(host.Width, host.Height);
+                (DataContext as BrowserTabViewModel).RaiseOnViewLoaded();
             }
 
-            //host.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
-            //this.InvalidateVisual();
-            //this.UpdateLayout();
-            //this.Dispatcher.Invoke(EmptyDelegate, DispatcherPriority.Render);
-        }
-        private static Action EmptyDelegate = delegate () { };
 
+        //private static Action EmptyDelegate = delegate () { };
+        //host.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
+        //this.InvalidateVisual();
+        //this.UpdateLayout();
+        //this.Dispatcher.Invoke(EmptyDelegate, DispatcherPriority.Render);
+    }
+
+        private void SocialCrawl_Click(object sender, RoutedEventArgs e)
+        {
+            SocialStatsExpander.Expanded -= SocialCrawl_Click;
+
+            if (!SocialStatsExpander.IsExpanded)
+            {
+                SocialStatsExpander.Visibility = Visibility.Visible;
+                SocialStatsExpander.IsExpanded = true;
+                host.Height = browserGrd.ActualHeight - 300;
+                host.VerticalAlignment = VerticalAlignment.Bottom;
+            }
+            else
+            {
+                collapseExpander();
+            }
+
+            SocialStatsExpander.Expanded += SocialCrawl_Click;
+        }
+
+        private void SocialStatsExpander_Collapsed(object sender, RoutedEventArgs e)
+        {
+            SocialStatsExpander.Collapsed -= SocialStatsExpander_Collapsed;
+            collapseExpander();
+            SocialStatsExpander.Collapsed += SocialStatsExpander_Collapsed;
+        }
+
+        void collapseExpander()
+        {
+            SocialStatsExpander.Visibility = Visibility.Collapsed;
+            SocialStatsExpander.IsExpanded = false;
+            host.Height = browserGrd.ActualHeight + 300;
+            host.VerticalAlignment = VerticalAlignment.Stretch;
+        }
 
         private void openFlyout_Click(object sender, RoutedEventArgs e)
         {
@@ -93,6 +129,7 @@ namespace Browser.Common.Views
         public event Action OnInitializedMacros = delegate { };
         public async void openMacros_Click(object sender, RoutedEventArgs e)
         {
+            //System.Diagnostics.Debugger.Launch();
             if (!MacroflyOut.IsExpanded)
             {
                 host.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
@@ -118,9 +155,17 @@ namespace Browser.Common.Views
                     catch { "Failed To Load Macro List".Show(); }
 
                     OnInitializedMacros();
+                   
                 }
                 MacroflyOut.Cursor = this.Cursor;
             }
+
+            // (DataContext as BrowserTabViewModel).RaiseOnInitializedMacrosFromView(MacroflyOut.DataContext as MacroManger);
+        }
+
+        private void BrowserTabView_OnInitializeMacrosRequest()
+        {
+            openMacros_Click(null,null);
         }
 
         private async void ManagerForTab_OnPlayMacro(MacroManger manger, IIMPlayType type, int loop)
@@ -150,6 +195,11 @@ namespace Browser.Common.Views
             else if (flyOut.IsExpanded && MacroflyOut.IsExpanded)
             {
                 host.Width = browserGrd.ActualWidth - 660;
+            }
+
+            if (SocialStatsExpander.IsExpanded && browserGrd.ActualHeight > 350)
+            {
+                host.Height = browserGrd.ActualHeight - 300;
             }
         }
 

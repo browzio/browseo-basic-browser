@@ -20,6 +20,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using zFirefoxBrowser.Helpers;
 using zFirefoxBrowser.ViewModels;
+using System.Linq;
 
 namespace zFirefoxBrowser.Controls
 {
@@ -57,14 +58,20 @@ namespace zFirefoxBrowser.Controls
                     var originalSource = (FrameworkElement)e.OriginalSource;
 
                     FoxTabViewModel browserViewModel = (FoxTabViewModel)originalSource.DataContext;
+                    
+
                     BrowserTabs.Remove(browserViewModel);
                     browserViewModel.Dispose();
 
                     if (BrowserTabs.Count > 0)
                         BrowserTabs[0].TabMargin = new Thickness(-3, 0, 0, 0);
+
+                    removeBTVMEvents(browserViewModel);
+                    browserViewModel = null;
+                    GC.Collect();
                 }
             }
-            catch { }
+            catch(Exception ex) { }
         }
         public void CloseAllTabs()
         {
@@ -79,7 +86,7 @@ namespace zFirefoxBrowser.Controls
         {
             CreateNewTab("");
         }
-        private void CreateNewTab(string url)
+        private void CreateNewTab(string url,bool switchTo = true)
         {
             MyFilesDatabase.CheckRamUsage();
 
@@ -95,7 +102,7 @@ namespace zFirefoxBrowser.Controls
                     btvm.TabMargin = new Thickness(-3, 0, 0, 0);
                 BrowserTabs.Add(btvm);
 
-                browserHost.TabControl.SelectedIndex = browserHost.TabControl.Items.Count - 1;
+                if(switchTo) browserHost.TabControl.SelectedIndex = browserHost.TabControl.Items.Count - 1;
             });
 
             //Application.Current.Dispatcher.Invoke((Action)delegate
@@ -138,6 +145,31 @@ namespace zFirefoxBrowser.Controls
             btvm.OnSentForSeo += Btvm_OnSentForSeo;
             btvm.OnRequestedWindowLocation += Btvm_OnRequestedWindowLocation;
             btvm.AnyPlaingJS += Btvm_AnyPlaingJS;
+            btvm.OnOpenNewTabToUrl += Btvm_OnOpenNewTabToUrl;
+            //btvm.OnOpenNewTab += Btvm_OnOpenNewTab;
+            //btvm.OnChangeTabContext += Btvm_OnChangeTabContext;
+            btvm.OnCloseTab += Btvm_OnCloseTab;
+        }
+
+        private void removeBTVMEvents(FoxTabViewModel btvm)
+        {
+            btvm.OnCreateNewTab -= btvm_OnCreateNewTab;
+            btvm.OnCurateToPBN -= Btvm_OnCurateToPBN;
+            btvm.OnAddedToGoViral -= Btvm_OnAddedToGoViral;
+            btvm.OnClickedSaveSession -= Btvm_OnClickedSaveSession;
+            btvm.OnSetUserAgent -= Btvm_OnSetUserAgent;
+            btvm.OnClickedDeleteSession -= Btvm_OnClickedDeleteSession;
+            btvm.OnClickedSaveSessionToBookmarks -= Btvm_OnClickedSaveSessionToBookmarks;
+            btvm.OnClickedReminders -= Btvm_OnClickedReminders;
+            //btvm.OnRefreshTabSettingsTab += Btvm_OnRefreshTabSettings;
+            btvm.OnRefreshSessionSettings -= Btvm_OnRefreshSessionSettings;
+            btvm.OnSentForSeo -= Btvm_OnSentForSeo;
+            btvm.OnRequestedWindowLocation -= Btvm_OnRequestedWindowLocation;
+            btvm.AnyPlaingJS -= Btvm_AnyPlaingJS;
+            btvm.OnOpenNewTabToUrl -= Btvm_OnOpenNewTabToUrl;
+            //btvm.OnOpenNewTab -= Btvm_OnOpenNewTab;
+            //btvm.OnChangeTabContext -= Btvm_OnChangeTabContext;
+            btvm.OnCloseTab -= Btvm_OnCloseTab;
         }
 
         private bool Btvm_AnyPlaingJS()
@@ -152,6 +184,116 @@ namespace zFirefoxBrowser.Controls
 
 
         #region btvm events
+        private void Btvm_OnCloseTab(bool allOthers, FoxTabViewModel tab)
+        {
+            if (allOthers)
+            {
+                for (int i = BrowserTabs.Count - 1; i >= 0; i--)
+                {
+                    var thatTab = BrowserTabs[i];
+                    if (thatTab == tab) continue;
+
+                    removeBTVMEvents(thatTab);
+                    thatTab.Dispose();
+                    BrowserTabs.Remove(thatTab);
+                }
+            }
+            else
+            {
+                removeBTVMEvents(tab);
+                tab.Dispose();
+                BrowserTabs.Remove(tab);
+
+                if (BrowserTabs.Count > 0)
+                {
+                    BrowserTabs[0].TabMargin = new Thickness(-3, 0, 0, 0);
+                    //ChangeToExistingContext(BrowserTabs.Count, tab);
+                }
+
+                tab = null;
+            }
+
+            GC.Collect();
+        }
+
+        //FoxTabViewModel switchedTab = null;
+        //FoxTabViewModel tab = null;
+        //private void ChangeToExistingContext(int index, FoxTabViewModel ttab)
+        //{
+        //    try
+        //    {
+        //        ttab.macroPlayer.StopRequested = true;
+        //        browserHost.TabControl.SelectedIndex = index - 1;
+        //        switchedTab = BrowserTabs[browserHost.TabControl.SelectedIndex];
+        //        tab = ttab;
+        //        tab.macroIndex += 1;
+        //        switchedTab.macroPlayer.StopRequested = false;
+
+        //        if (switchedTab.macroPlayer == null)
+        //        {
+        //            switchedTab.OnViewLoaded -= SwitchedTab_OnViewLoaded;
+        //            switchedTab.OnViewLoaded += SwitchedTab_OnViewLoaded;
+        //        }
+        //        else
+        //        {
+        //            SwitchedTab_OnViewLoaded();
+        //        }
+        //    }
+        //    catch { }
+        //}
+
+        //private void SwitchedTab_OnViewLoaded()
+        //{
+        //    switchedTab.OnInitializedMacrosFromView -= SwitchedTab_OnInitializedMacrosFromView;
+        //    switchedTab.OnInitializedMacrosFromView += SwitchedTab_OnInitializedMacrosFromView;
+        //    switchedTab.RaiseInitializeMacrosRequest();
+        //}
+
+        //private async void SwitchedTab_OnInitializedMacrosFromView(MacroManger m)
+        //{
+        //    switchedTab.macroPlayer = m;
+        //    switchedTab.macroPlayer.CurrentLoopPos = tab.macroPlayer.CurrentLoopPos;
+        //    switchedTab.macroPlayer.CurrentJSDatasourceLoopPos = tab.macroPlayer.CurrentJSDatasourceLoopPos;
+        //    switchedTab.macroPlayer.MaxLoop = tab.macroPlayer.MaxLoop;
+        //    switchedTab.isSettingFromTab = true;
+        //    switchedTab.dataCourceLine = tab.dataCourceLine;
+        //    switchedTab.iTimesToRun = tab.iTimesToRun;
+        //    switchedTab.macroIndex = tab.macroIndex;
+        //    switchedTab.macVals = tab.macVals;
+        //    switchedTab.macroWaitingFor = tab.macroWaitingFor;
+        //    string path = tab.macroPlayer.SelectedMacroPlayingFilePath;
+        //    await switchedTab.macroPlayer.SetMacroActiveByPaths(new string[] { path }.ToList());
+        //}
+
+        //private void Btvm_OnChangeTabContext(int index, FoxTabViewModel ttab)
+        //{
+        //    try
+        //    {
+        //        if (browserHost.TabControl.SelectedIndex == index - 1) return;
+
+        //        ttab.macroPlayer.StopRequested = true;
+        //        browserHost.TabControl.SelectedIndex = index - 1;
+        //        switchedTab = BrowserTabs[browserHost.TabControl.SelectedIndex];
+        //        tab = ttab;
+
+        //        if (switchedTab.macroPlayer == null)
+        //        {
+        //            switchedTab.OnViewLoaded -= SwitchedTab_OnViewLoaded;
+        //            switchedTab.OnViewLoaded += SwitchedTab_OnViewLoaded;
+        //        }
+        //        else
+        //        {
+        //            SwitchedTab_OnViewLoaded();
+        //        }
+        //    }
+        //    catch { }
+        //}
+
+        //private void Btvm_OnOpenNewTab()
+        //{
+        //    CreateNewTab("", false);
+        //}
+
         private void Btvm_OnRefreshTabSettings(FoxTabViewModel tab)
         {
             BrowserTabs.Remove(tab);
@@ -250,6 +392,12 @@ namespace zFirefoxBrowser.Controls
             CreateNewTab(webSite);
         }
 
+
+        private void Btvm_OnOpenNewTabToUrl(string webSite)
+        {
+            CreateNewTab(webSite);
+        }
+
         private void Btvm_OnCurateToPBN(string content, string link)
         {
             OnCurateToPBN(content, link);
@@ -290,7 +438,7 @@ namespace zFirefoxBrowser.Controls
         {
             foreach (string site in sites)
             {
-                if (site.Contains(",")) continue;
+                if (site.Contains(",") && !site.Contains(".")) continue;
                 CreateNewTab(site);
                 if (!GloableProfData.PData.ProxyIP.IsNullOrEmpty())
                 {
@@ -335,9 +483,30 @@ namespace zFirefoxBrowser.Controls
             }
         }
 
+        public void SearchFor(string query)
+        {
+            CreateNewTab(query);
+            browserHost.TabControl.SelectedIndex = browserHost.TabControl.Items.Count - 1;
+        }
+
+        public void LaunchNewWindow(string link, string rssLink)
+        {
+            GeckoWebBrowser ffpopupMacrosBrowser = new GeckoWebBrowser();
+            ffpopupMacrosBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            ffpopupMacrosBrowser.Navigate(link);
+
+            FFBrowserPopup ffpopupMacros = new FFBrowserPopup();
+            ffpopupMacros.Text = rssLink;
+            ffpopupMacros.SuspendLayout();
+            ffpopupMacros.Controls.Add(ffpopupMacrosBrowser);
+            ffpopupMacros.ResumeLayout(false);
+            ffpopupMacros.PerformLayout();
+            ffpopupMacros.Show();
+        }
 
 
-       
+
+
         //private async void MacroManager_OnPlayMacro(MacroManger mPlayer, IIMPlayType isiim, int times)
         //{
         //    if (SelectedTab == null) return;

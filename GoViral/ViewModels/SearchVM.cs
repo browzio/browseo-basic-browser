@@ -463,7 +463,7 @@ namespace GoViral.ViewModels
                 }
             }
             window.ShowDialog();
-            if (window.OKClicked)
+            if (window.ButtonLeftClicked)
             {
                 string inputedText = window.tbInputedText.Text;
                 if (string.IsNullOrEmpty(inputedText) || string.IsNullOrWhiteSpace(inputedText)) return;

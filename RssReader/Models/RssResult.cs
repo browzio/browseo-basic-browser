@@ -1,4 +1,5 @@
 ﻿using Organiser.Common.Classes;
+using Organiser.Common.Classes.SocialHelpers;
 using RssReader.Helpers;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Windows.Input;
 
 namespace RssReader.Models
 {
-    public class RssResult : INotifyPropertyChanged
+    public class RssResult : ViewModelBase ,IHaveSocialStats
     {
         public event Action<string, string,string> OnClickedSendSocialLink = delegate { }; //socialType , link, imgLink
 
@@ -20,6 +21,7 @@ namespace RssReader.Models
         public RssResult()
         {
             SendToBrowserSocial = new RelayCommand(SendToBrowserSocialClick);
+            SocialStatsReplys = new Organiser.Common.Classes.SocialHelpers.SocialStatsReplys();
         }
 
         private void SendToBrowserSocialClick(object param)
@@ -34,8 +36,7 @@ namespace RssReader.Models
             set
             {
                 title = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Title"));
+                RaisePropertyChanged("Title");
             }
         }
 
@@ -46,8 +47,7 @@ namespace RssReader.Models
             set
             {
                 link = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Link"));
+                RaisePropertyChanged("Link");
             }
         }
 
@@ -58,8 +58,7 @@ namespace RssReader.Models
             set
             {
                 description = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Description"));
+                RaisePropertyChanged("Description");
             }
         }
 
@@ -70,8 +69,12 @@ namespace RssReader.Models
             set
             {
                 imageLink = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("ImageLink"));
+                if (imageLink == "") ImageLinkVisible = Visibility.Collapsed;
+                else if (imageLink != "" && !imageLink.StartsWith("http"))
+                {
+                    imageLink = "http:" + imageLink;
+                }
+                RaisePropertyChanged("ImageLink");
             }
         }
 
@@ -82,8 +85,7 @@ namespace RssReader.Models
             set
             {
                 imageLinkVisible = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("ImageLinkVisible"));
+                RaisePropertyChanged("ImageLinkVisible");
             }
         }
 
@@ -94,9 +96,15 @@ namespace RssReader.Models
             set
             {
                 date = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Date"));
+                RaisePropertyChanged("Date");
             }
+        }
+
+        private SocialStatsReplys socialStatsReplys;
+        public SocialStatsReplys SocialStatsReplys
+        {
+            get { return socialStatsReplys; }
+            set { socialStatsReplys = value; RaisePropertyChanged("SocialStatsReplys"); }
         }
 
 

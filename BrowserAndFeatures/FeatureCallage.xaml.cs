@@ -5,6 +5,7 @@ using Organiser.Common.Classes;
 using PData.FilesReader;
 using Prospector.ViewModels;
 using RssReader.Mvvm;
+using RssReader.ViewModels;
 using RssReader.Windows;
 using SocialOrganizer.Models;
 using System;
@@ -56,12 +57,6 @@ namespace BrowserAndFeatures
             (prospector.DataContext as FootPrintsOptionsVM).OnClickedSearch += FeatureCallage_OnClickedSearch;
             (prospector.DataContext as FootPrintsOptionsVM).OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
 
-            rssControl.OnLaunchToBrowser += RssControl_OnLaunchToBrowser; ;
-            rssControl.OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;
-            rssControl.OnSelectedSendToSeo += RssControl_OnSelectedSendToSeo;
-            rssControl.OnLaunchToMasher += rssControl_OnLaunchToMasher;
-            rssControl.OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
-
             browser.OnCurateToPBN += Browser_OnCurateToPBN;
             browser.Loaded += Browser_Loaded;
             browser.OnRefreshedSessionSettings += Browser_OnRefreshedSessionSettings;
@@ -74,7 +69,6 @@ namespace BrowserAndFeatures
             ffBrowser.OnSentForSeo += Browser_OnSentForSeo;
             ffBrowser.OnClickedReminders += Browser_OnClickedReminders;
             ffBrowser.OnRequestedWindowLocation += FfBrowser_OnRequestedWindowLocation;
-
 
 
 
@@ -108,6 +102,7 @@ namespace BrowserAndFeatures
             //    System.Windows.Forms.Application.Run();
             //}), null);
         }
+        
 
         #region setup data
         public void SetPermissions(bool allowProspector, bool allowRSS, bool allowPBN, bool allowFeedMash, bool allowIndexer, bool allowYoutube, bool canSeeProxys, bool hasKK)
@@ -243,10 +238,10 @@ namespace BrowserAndFeatures
                 instadmVM.DisposeBrowser();
             instadmVM = null;
 
-            if (wisi.DataContext != null)
-            {
-                wisi.webBrowserEditor.webBrowser.Dispose();
-            }
+            //if (wisi.DataContext != null)
+            //{
+            //    wisi.webBrowserEditor.webBrowser.Dispose();
+            //}
 
             browser.CloseAllTabs();
             BrowserInit.Shutdown();
@@ -266,6 +261,7 @@ namespace BrowserAndFeatures
         InstaDominateVM instadmVM;
         LinksToRssVM feedMasherVM;
         static bool wtfman = false;
+        int curIndex = -1;
 
         private void tbControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -302,93 +298,173 @@ namespace BrowserAndFeatures
             }
 #endif
 
+            try
+            {
+                if (curIndex == tbControl.SelectedIndex) return;
 
-            //if (previndex != tbControl.SelectedIndex && tbControl.SelectedIndex<tbControl.Items.Count-2)
-            //{
-            if (tbControl.SelectedIndex == 0)
-            {
-                browser.SetBookmarksEvents(false);
-                ffBrowser.SetBookmarksEvents(true);
-            }
-            else if (tbControl.SelectedIndex == 1)
-            {
-                browser.SetBookmarksEvents(true);
-                ffBrowser.SetBookmarksEvents(false);
-            }
-            else if (tbControl.SelectedIndex == 3 && rssControl.UserRssTabs.Count <= 0)
-            {
-                rssControl.InitTabs();
-            }
-            else if (tbControl.SelectedIndex == 4)
-            {
+                curIndex = tbControl.SelectedIndex;
 
-                if (wisi.DataContext == null)
+
+                //if (previndex != tbControl.SelectedIndex && tbControl.SelectedIndex<tbControl.Items.Count-2)
+                //{
+                if (tbControl.SelectedIndex == 0)
                 {
-                    setwisi();
+                    browser.SetBookmarksEvents(false);
+                    ffBrowser.SetBookmarksEvents(true);
+                }
+                else if (tbControl.SelectedIndex == 1)
+                {
+                    browser.SetBookmarksEvents(true);
+                    ffBrowser.SetBookmarksEvents(false);
+                }
+                else if (tbControl.SelectedIndex == 3)
+                {
+                    return;
+                }
+                else if (tbControl.SelectedIndex == 4)
+                {
+                    if (wisi.DataContext == null)
+                    {
+                        setwisi();
+                    }
+                }
+                else if (tbControl.SelectedIndex == 5)
+                {
+                    crreateFeedMAsherContext();
+                }
+                else if (tbControl.SelectedIndex == 8)
+                {
+                    if (macroRunner.DataContext == null || macroRunner.DataContext.GetType() != typeof(MultyMacroVm))
+                    {
+                        MultyMacroVm vm = new MultyMacroVm();
+                        macroRunner.DataContext = vm;
+                    }
+                }
+                //else if (tbControl.SelectedIndex == 8)
+                //{
+                //    previndex = tbControl.SelectedIndex;
+                //    if (ucInstagram.cntrlSorter.ViewModel == null)
+                //    {
+                //        ucInstagram.cntrlSorter.ViewModel = new SyncedProjectsVM(SyncedProjectsVM.TypeOfInsteo);
+                //        ucInstagram.cntrlSorter.DataContext = ucInstagram.cntrlSorter.ViewModel;
+                //    }
+
+                //    if (instadmVM == null)
+                //    {
+                //        instadmVM = new InstaDominateVM();
+                //        ucInstagram.cntrlDominator.DataContext = instadmVM;
+                //        instadmVM.OnSendContentToSorter += (content) =>
+                //        {
+                //            ucInstagram.cntrlSorter.ViewModel.AddUrlToSavedProjectList("", "", content);
+                //        };
+                //    }
+                //}
+                //else
+                //    {
+                //        previndex = tbControl.SelectedIndex;
+                //    }
+                //}
+                //else
+                //{
+                //    if (tbControl.SelectedIndex == tbControl.Items.Count - 2)
+                //    {
+                //        tbControl.SelectedIndex = previndex;
+                //        if (imw == null)
+                //        {
+                //            imw = new Indexer.MainWindow();
+                //            imw.Title = "Indexer - One Link On A Line keep http://";
+                //            imw.Topmost = true;
+                //            imw.Closed += ltrw_Closed;
+                //            imw.Show();
+                //        }
+                //    }
+                //    else if (tbControl.SelectedIndex == tbControl.Items.Count - 1)
+                //    {
+                //        tbControl.SelectedIndex = previndex;
+                //        if (ytmw == null)
+                //        {
+                //            ytmw = new Youtuber.MainWindow();
+                //            ytmw.Topmost = true;
+                //            ytmw.Closed += ltrw_Closed;
+                //            ytmw.Show();
+                //        }
+                //    }
+                //}
+            }
+            catch { }
+        }
+
+        private void tbControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.Source is TabItem && (e.Source as TabItem).Header.ToString() == "RSS")
+            {
+                e.Handled = true;
+
+                if (rssMainControl.DataContext is RSSMainWorkspaceViewModel)
+                {
+                    //await RSSMainWorkspaceViewModel.Instance.MakeInvis();
+
+                    tbControl.SelectedIndex = 3;
+
+                    //RSSMainWorkspaceViewModel.Instance.MakeVisible();
+                }
+                else
+                {
+                    tbControl.SelectedIndex = 3;
+
+                    RSSMainWorkspaceViewModel.Instance.OnRSSMainWorkspaceViewModelMessage += OnRSSMainWorkspaceViewModelMessage;
+
+                    rssMainControl.DataContext = RSSMainWorkspaceViewModel.Instance;
+                    RSSMainWorkspaceViewModel.Instance.LoadFeedTabs();
                 }
             }
-            else if (tbControl.SelectedIndex == 5)
-            {
-                crreateFeedMAsherContext();
-            }
-            else if (tbControl.SelectedIndex == 8)
-            {
-                if(macroRunner.DataContext == null || macroRunner.DataContext.GetType() != typeof(MultyMacroVm))
-                {
-                    MultyMacroVm vm = new MultyMacroVm();
-                    macroRunner.DataContext = vm;
-                }
-            }
-            //else if (tbControl.SelectedIndex == 8)
-            //{
-            //    previndex = tbControl.SelectedIndex;
-            //    if (ucInstagram.cntrlSorter.ViewModel == null)
-            //    {
-            //        ucInstagram.cntrlSorter.ViewModel = new SyncedProjectsVM(SyncedProjectsVM.TypeOfInsteo);
-            //        ucInstagram.cntrlSorter.DataContext = ucInstagram.cntrlSorter.ViewModel;
-            //    }
+        }
 
-            //    if (instadmVM == null)
-            //    {
-            //        instadmVM = new InstaDominateVM();
-            //        ucInstagram.cntrlDominator.DataContext = instadmVM;
-            //        instadmVM.OnSendContentToSorter += (content) =>
-            //        {
-            //            ucInstagram.cntrlSorter.ViewModel.AddUrlToSavedProjectList("", "", content);
-            //        };
-            //    }
-            //}
-            //else
-            //    {
-            //        previndex = tbControl.SelectedIndex;
-            //    }
-            //}
-            //else
-            //{
-            //    if (tbControl.SelectedIndex == tbControl.Items.Count - 2)
-            //    {
-            //        tbControl.SelectedIndex = previndex;
-            //        if (imw == null)
-            //        {
-            //            imw = new Indexer.MainWindow();
-            //            imw.Title = "Indexer - One Link On A Line keep http://";
-            //            imw.Topmost = true;
-            //            imw.Closed += ltrw_Closed;
-            //            imw.Show();
-            //        }
-            //    }
-            //    else if (tbControl.SelectedIndex == tbControl.Items.Count - 1)
-            //    {
-            //        tbControl.SelectedIndex = previndex;
-            //        if (ytmw == null)
-            //        {
-            //            ytmw = new Youtuber.MainWindow();
-            //            ytmw.Topmost = true;
-            //            ytmw.Closed += ltrw_Closed;
-            //            ytmw.Show();
-            //        }
-            //    }
-            //}
+        private void OnRSSMainWorkspaceViewModelMessage(RSSMainWorkspaceViewModelMessage message)
+        {
+            //rssControl.OnLaunchToBrowser += RssControl_OnLaunchToBrowser; ;
+            //rssControl.OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;
+            //rssControl.OnSelectedSendToSeo += RssControl_OnSelectedSendToSeo;
+            //rssControl.OnLaunchToMasher += rssControl_OnLaunchToMasher;
+            //rssControl.OnSelectedSendToPbn += RssControl_OnSelectedSendToPbn;
+
+            switch (message.MessageType)
+            {
+                case "OnSelectedSendToSeo":
+                    RssControl_OnSelectedSendToSeo(
+                        message.Parameters[0] as string,
+                        message.Parameters[1] as string);
+                    break;
+
+                case "OnSelectedSendToPbn":
+                    RssControl_OnSelectedSendToPbn(
+                        message.Parameters[0] as string, 
+                        message.Parameters[1] as string,
+                        message.Parameters[2] as string, 
+                        message.Parameters[3] as string, 
+                        message.Parameters[4] as string);
+                    break;
+
+                case "OnSelectedLaunchLinkMasher":
+                    rssControl_OnLaunchToMasher(message.Parameters[0] as string);
+                    break;
+
+                case "OnSelectedLaunchLink":
+                    FeatureCallage_OnClickedSearch(
+                        message.Parameters[0] as string, 
+                        Convert.ToBoolean(message.Parameters[1]));
+                    break;
+
+                case "OnClickedOpenSocialShareLink":
+                    RssControl_OnLaunchToBrowser(
+                        message.Parameters[0] as string,
+                        message.Parameters[1] as string,
+                        Convert.ToBoolean(message.Parameters[2]));
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private void crreateFeedMAsherContext()
@@ -429,15 +505,24 @@ namespace BrowserAndFeatures
             //browser.CheckAndSetOpenTabs();
 
             browser.OnAddedToGoViral -= Browser_OnAddedToGoViral;
-            //ffBrowser.OnAddedToGoViral -= Browser_OnAddedToGoViral;
+            ffBrowser.OnAddedToGoViral -= Browser_OnAddedToGoViral;
 
             browser.OnAddedToGoViral += Browser_OnAddedToGoViral;
-            //ffBrowser.OnAddedToGoViral += Browser_OnAddedToGoViral;
+            ffBrowser.OnAddedToGoViral += Browser_OnAddedToGoViral;
 
             if (goViralVM == null) goViralVM = ucGoViral.DataContext as GoViralVM;
+            goViralVM.OnSentForSeo += Browser_OnSentForSeo;
+            goViralVM.OnCurateToPBN += Browser_OnCurateToPBN;
+            goViralVM.OnCreateNewTab += GoViralVM_OnCreateNewTab;
 
             browser.Loaded -= Browser_Loaded;
             //ffBrowser.Loaded -= Browser_Loaded;
+        }
+
+        private void GoViralVM_OnCreateNewTab(string url)
+        {
+            if (url == null) return;
+            browser.CreateNewTab(url);
         }
 
         private void Browser_OnAddedToGoViral(string link,string type, List<string> multiLinks)
@@ -463,15 +548,24 @@ namespace BrowserAndFeatures
         }
         #endregion
 
-        void FeatureCallage_OnClickedSearch(string query)
+        void FeatureCallage_OnClickedSearch(string query,bool isFF)
         {
-            browser.SearchFor(query);
-            tbControl.SelectedIndex = 1;
+            if (isFF)
+            {
+                ffBrowser.SearchFor(query);
+                tbControl.SelectedIndex = 0;
+            }
+            else
+            {
+                browser.SearchFor(query);
+                tbControl.SelectedIndex = 1;
+            }
         }
 
-        private void RssControl_OnLaunchToBrowser(string link, string rssLink)
+        private void RssControl_OnLaunchToBrowser(string link, string rssLink,bool ff)
         {
-            browser.LaunchNewWindowToLink(link, rssLink);
+            if (ff)ffBrowser.LaunchNewWindow(link,rssLink);
+            else browser.LaunchNewWindowToLink(link, rssLink);
         }
 
         private void setwisi()

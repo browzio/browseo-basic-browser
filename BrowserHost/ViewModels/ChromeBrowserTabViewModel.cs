@@ -28,6 +28,9 @@ using System.Linq;
 using Browser.Common.Windows;
 using Organiser.Common.Classes.Facebook;
 using System.Reflection;
+using Browser.Common.Models;
+using Organiser.Common.Classes.SocialHelpers;
+using BrowserHost.Helpers;
 //using Xilium.CefGlue.WPF;
 
 namespace WpfCefDynamBrowser.ViewModels
@@ -206,9 +209,6 @@ namespace WpfCefDynamBrowser.ViewModels
 
             //Console.WriteLine(WebBrowser.CBrowser.Width);
             //Console.WriteLine(WebBrowser.CBrowser.Height);
-            Console.WriteLine();
-            Console.WriteLine(Browser.Width);
-            Console.WriteLine(Browser.Height);
         }
 
         //host.Dispatcher.Invoke(DispatcherPriority.Render, EmptyDelegate);
@@ -345,7 +345,7 @@ namespace WpfCefDynamBrowser.ViewModels
                         {
                             string url = WebBrowser.GetTheMainFrame().Url;
 
-                            imgUrl = getImageUrl(url);
+                            imgUrl = ChromeBrowserHostControl.GetImageUrl(url);
                         }
 
                         if (imgUrl == "")
@@ -382,7 +382,7 @@ namespace WpfCefDynamBrowser.ViewModels
                                 {
                                     url = url.Replace("%20", " ");
                                 }
-                                imgUrl = getImageUrl(url);
+                                imgUrl = ChromeBrowserHostControl.GetImageUrl(url);
                             }
                         }
 
@@ -610,27 +610,6 @@ namespace WpfCefDynamBrowser.ViewModels
             return link;
         }
 
-        private string getImageUrl(string url)
-        {
-            try
-            {
-                var req = (HttpWebRequest)HttpWebRequest.Create(url);
-                req.Method = "HEAD";
-                req.Proxy = MyFilesDatabase.GetRequestsProxy();
-                using (var resp = req.GetResponse())
-                {
-                    if (!resp.ContentType.ToLower(CultureInfo.InvariantCulture).StartsWith("image/"))
-                    {
-                        url = "";
-                    }
-                }
-
-                return url;
-            }
-            catch { }
-            return "";
-        }
-
         void WebBrowser_OnBrowserStatusChanged(string oMessage)
         {
             if (oMessage == null) return;
@@ -666,6 +645,7 @@ namespace WpfCefDynamBrowser.ViewModels
             Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_AddressChange + " " + address);
         }
 
+
         void WebBrowser_OnBrowserTitleChanged(string ttl)
         {
             Title = ttl;
@@ -678,6 +658,7 @@ namespace WpfCefDynamBrowser.ViewModels
 
         void WebBrowser_OnBrowserLoadingChanged(bool loading)
         {
+            FaviconPath = "";
             IsLoading = loading;
             if (loading)
             {
@@ -686,7 +667,127 @@ namespace WpfCefDynamBrowser.ViewModels
             else
             {
                 StatusMessage = "Done";
+                SocialStatsCrawl();
+                inGetFavicon = false;
+                if (!inGetFavicon) GetFavicon();
             }
+        }
+
+        bool inGetFavicon;
+        private async void GetFavicon()
+        {
+            inGetFavicon = true;
+            if (WebBrowser.GetTheMainFrame() == null)
+            {
+                inGetFavicon = false;
+                return;
+            }
+            try
+            {
+                string authority = WebBrowser.GetTheMainFrame().Url;
+                authority = authority.Substring(authority.IndexOf("://") + 3);
+                authority = authority.Remove(authority.IndexOf("/"));
+
+                string favUrl = "http://" + authority + "/favicon.ico";
+
+                string favFileName = favUrl.Replace(":", ".").Replace("/", ".");
+                string favLocal = await Task.Run(() => { return MyFilesDatabase.GetFaviconIfExists(favFileName); });
+                if (favLocal.IsNullOrEmpty())
+                {
+                    var downloadCallback = new ImageDownloadCallback();
+                    downloadCallback.OnDownloadImageFinishedEvent2 += async (image, pngBinary) =>
+                    {
+                        //image
+
+                        if (image != null && !image.IsEmpty)
+                        {
+                            try
+                            {
+                                byte[] bytes = new byte[pngBinary.Size];
+                                pngBinary.GetData(bytes, bytes.Length, 0);
+                                pngBinary.Dispose();
+                                favLocal = await Task.Run(() => { return MyFilesDatabase.SaveImageFromBytes(bytes, favFileName); });
+                                FaviconPath = favLocal;
+                            }
+                            catch (Exception e) { }
+
+                        }
+                        inGetFavicon = false;
+
+                    };
+                    WebBrowser.GetBrowser().GetHost().DownloadImage(favUrl, true, uint.MaxValue, false, downloadCallback);
+                }
+                else
+                {
+                    FaviconPath = favLocal;
+                    inGetFavicon = false;
+                }
+            }
+            catch { inGetFavicon = false; }
+        }
+
+        public override async void SocialStatsCrawl()
+        {
+            if (!SocialStatsCrawlActive || WebBrowser.GetTheMainFrame() == null || WebBrowser.GetTheMainFrame().Browser == null || WebBrowser.GetTheMainFrame().Browser.IsLoading || IsLoading) return;
+            if (previusStatsCrawlUrl == WebBrowser.GetTheMainFrame().Url) CrawledLinksOnPage.Clear();
+
+            previusStatsCrawlUrl = WebBrowser.GetTheMainFrame().Url;
+            IsLoadingStatsVisible = Visibility.Visible;
+            try
+            {
+                if (!CrawledLinksOnPage.Any(l => l.Url == WebBrowser.GetTheMainFrame().Url))
+                {
+                    var linkOfPage = new LinkOnPage()
+                    {
+                        Url = WebBrowser.GetTheMainFrame().Url,
+                        SocialStatsReplys = new SocialStatsReplys()
+                    };
+                    CrawledLinksOnPage.Add(linkOfPage);
+                    await linkOfPage.SocialStatsReplys.AsyncGetAllStatsFor(linkOfPage.Url);
+                }
+
+                if (IsCrawlAllActive)
+                {
+                    WebBrowser.GetTheMainFrame().GetSource(new SourceVisitor(async(htmlSource) =>
+                    {
+                        try
+                        {
+                            // 1.
+                            // Find all matches in file.
+                            MatchCollection m1 = Regex.Matches(htmlSource, @"(<a.*?>.*?</a>)",
+                                RegexOptions.Singleline);
+
+                            // 2.
+                            // Loop over each match.
+                            foreach (Match m in m1)
+                            {
+                                string value = m.Groups[1].Value;
+                                var linkOnPage = new LinkOnPage() { SocialStatsReplys = new SocialStatsReplys() };
+
+                                // 3.
+                                // Get href attribute.
+                                Match m2 = Regex.Match(value, @"href=\""(.*?)\""",
+                                RegexOptions.Singleline);
+                                if (m2.Success)
+                                {
+                                    linkOnPage.Url = m2.Groups[1].Value;
+                                    await linkOnPage.SocialStatsReplys.AsyncGetAllStatsFor(linkOnPage.Url);
+                                    CrawledLinksOnPage.Add(linkOnPage);
+                                }
+
+                                // 4.
+                                // Remove inner tags from text.
+                                //string t = Regex.Replace(value, @"\s*<.*?>\s*", "",
+                                //RegexOptions.Singleline);
+                                //i.Text = t;
+                            }
+                        }
+                        catch { }
+                    }));
+                }
+            }
+            catch { }
+            IsLoadingStatsVisible = Visibility.Collapsed;
         }
 
         private void Go()

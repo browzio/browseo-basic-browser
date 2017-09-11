@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -17,7 +18,7 @@ namespace Organiser.Common.Classes
         public static bool IsScrollWhenFoundChecked = true, IsHighlightWhenFoundChecked = false,
                            IsReplaySpeedFastChecked = false, IsReplaySpeedMediumChecked = true, IsReplaySpeedSlowChecked = false;
         public static int TimeoutLimit = 60;
-        public static string DefaulFoldertMacros = "", DefaulFoldertDataSources = "", DefaultFolderDownloads = "";
+        public static string DefaulFoldertMacros = "", DefaulFoldertDataSources = "", DefaultFolderDownloads = "", TwoCaptchaKey="";
 
         public static async Task InitMacrosSettings()
         {
@@ -34,7 +35,7 @@ namespace Organiser.Common.Classes
                     if (File.Exists(settingsFile))
                     {
                         string[] fileLines = File.ReadAllText(settingsFile).Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-                        if (fileLines != null && fileLines.Length == 9)
+                        if (fileLines != null && fileLines.Length >= 9)
                         {
                             IsReplaySpeedFastChecked = Convert.ToBoolean(fileLines[0]);
                             IsReplaySpeedMediumChecked = Convert.ToBoolean(fileLines[1]);
@@ -49,10 +50,38 @@ namespace Organiser.Common.Classes
                             DefaulFoldertDataSources = fileLines[7];
                             DefaultFolderDownloads = fileLines[8];
                         }
+                        if (fileLines.Length == 10)
+                        {
+                            TwoCaptchaKey = fileLines[9];
+                        }
                     }
                 }
                 catch { "Failed to read settings file".Show(); }
             });
+        }
+
+        public static string GetBuitInMacrosBaseDir()
+        {
+            return AppDomain.CurrentDomain.BaseDirectory + "\\BrowSEO IA Scripts";
+        }
+
+        public static bool IsIgnorableDirectoryOrFile(string pathToDirectory)
+        {
+            string bdir = MacroSettings.GetBuitInMacrosBaseDir();
+            bdir = bdir.Replace("\\\\", "\\");
+
+            return pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "Common") ||
+                   pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "IFTTT Connect", "IIM") ||
+                   pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "BitLy.js") ||
+                   pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "Blogger.js") ||
+                   pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "Delicious.js") ||
+                   pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "Diigo.js") ||
+                   pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "Facebook.js") ||
+                   pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "LinkedIn.js") ||
+                   pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "Medium.js") ||
+                   pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "Tumblr.js") ||
+                   pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "Twitter.js") ||
+                   pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "Wordpress.js");
         }
     }
     public class MacroOnDownload
@@ -142,7 +171,10 @@ namespace Organiser.Common.Classes
             //{{!COL_NOTES}}  
             //{{!COL_BIRTHDAYFULL}}
         }
+        public const string PHONENUMBER = "!PHONENUMBER";
         public const string CLIPBOARD = "!CLIPBOARD";
+        public const string CLOSEONERROR = "!CLOSEONERROR";
+
         public const string DATASOURCE = "!DATASOURCE";
         public const string DATASOURCE_COLUMNS = "!DATASOURCE_COLUMNS";
         public const string DATASOURCE_DELIMITER = "!DATASOURCE_DELIMITER";
@@ -205,6 +237,7 @@ namespace Organiser.Common.Classes
         public MacroVariables()
         {
             MacroVariablesValues.Add("!CLIPBOARD", "");
+            MacroVariablesValues.Add("!CLOSEONERROR", "YES");
             // MacroVariablesValues.Add("!COLn", "");
             MacroVariablesValues.Add("!DATASOURCE", "");
             MacroVariablesValues.Add("!DATASOURCE_COLUMNS", "");
@@ -364,6 +397,10 @@ namespace Organiser.Common.Classes
         public const string URL = "URL";
         public const string VERSION = "VERSION";
         public const string WAIT = "WAIT";
+        public const string PASTE = "RAISEPASTE";
+        public const string OPENFILE = "OPENFILE";
+
+        public const string SOLVE = "SOLVE";
     }
 
     public enum IIMPlayType
@@ -448,7 +485,10 @@ namespace Organiser.Common.Classes
                 {
                     //string[] macro = line.Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries);
                     string command = line.Remove(line.IndexOf(' '));
-                    string value = line.Replace(command, "").Trim();
+                    string value = line.Substring(line.IndexOf(' ') + 1);
+                    //var regex = new Regex(Regex.Escape(line));
+                    //string value = regex.Replace(line, command, 1);
+                    //string value = line.Replace(command, "").Trim();
                     Macros.Add(new Macro() { Command = command, Value = value, Line = macroLine });
                 }
                 else
@@ -766,7 +806,7 @@ namespace Organiser.Common.Classes
                 if (basedirmacros.Exists) LoadAllChildMacros(basedirmacros);
             });
         }
-        internal void LoadAllChildMacros(DirectoryInfo basedirmacros)
+        internal void LoadAllChildMacros(DirectoryInfo basedirmacros, bool isBrowseoIA = false)
         {
             try
             {
@@ -775,11 +815,12 @@ namespace Organiser.Common.Classes
                 {
                     foreach (var dir in bases)
                     {
+                        if (MacroSettings.IsIgnorableDirectoryOrFile(dir.FullName)) continue;
                         MacroFile macroDir = new MacroFile()
                         {
                             IsFolder = true,
                             FilePath = dir.FullName,
-                            FileName = dir.Name,
+                            FileName = dir.Name == "IFTT"?"IFTTT":dir.Name,
                             ParentMacro = this,
                         };
                         macroDir.OnRunThisMacro += OnRunThisMacro;
@@ -790,6 +831,8 @@ namespace Organiser.Common.Classes
                         {
                             foreach (var ddir in bases2)
                             {
+
+                                if (MacroSettings.IsIgnorableDirectoryOrFile(ddir.FullName)) continue;
                                 MacroFile macronextDir = new MacroFile()
                                 {
                                     IsFolder = true,
@@ -808,6 +851,7 @@ namespace Organiser.Common.Classes
                         {
                             foreach (var file in files)
                             {
+                                if (MacroSettings.IsIgnorableDirectoryOrFile(file.FullName)) continue;
                                 MacroFile macrofile = new MacroFile()
                                 {
                                     IsFolder = false,
@@ -832,6 +876,7 @@ namespace Organiser.Common.Classes
                 {
                     foreach (var file in files1)
                     {
+                        if (MacroSettings.IsIgnorableDirectoryOrFile(file.FullName)) continue;
                         MacroFile macrofile = new MacroFile()
                         {
                             IsFolder = false,
@@ -911,17 +956,103 @@ namespace Organiser.Common.Classes
                 case "Google+ Post With URL":
                     return "pack://application:,,,/Organiser.Common;component/Image/tooltipPosttextURL.png";
 
-                case "BitLy":
+                //case "Diigo_via_Gmail":
+                //    mfile.TooltipText = "email";
+                //    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Youtube like video after wait":
+                    mfile.TooltipText = "x time to wait,video url";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Youtube subscribe by KW":
+                    mfile.TooltipText = "keywords...";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "FB Page Cover Upload":
+                    mfile.TooltipText = @"facebook.com/pagename,C:\filepath\to\image";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "FB Profile Cover Upload":
+                case "Pinterest Change Image":
+                    mfile.TooltipText = @"C:\filepath\to\image";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Buffer Connect G+ Page":
+                    mfile.TooltipText = "Page Name";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+                    
+                case "URL Shortener":
+                    mfile.TooltipText = "URLs";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Pinterest Edit Url":
+                    mfile.TooltipText = "URL";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "LinkedIn Join Groups By KW":
+                    mfile.TooltipText = "Keywords";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Pinterest Edit Description":
+                    mfile.TooltipText = "Description";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "LinkedIn Share Post By KW then comment":
+                    mfile.TooltipText = "Keyword,comment";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Google Webmasters Indexer":
+                    mfile.TooltipText = "url";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Tumblr Upload Image [FILE]":
+                case "Tumblr Upload Video [FILE]":
+                    mfile.TooltipText = "filepath,post text,tags";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Tumblr Upload Image [URL]":
+                case "Tumblr Upload Video [URL]":
+                    mfile.TooltipText = "url,post text,tags";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+
+                case "Bit":
+                case "Blog":
                 case "Blogger":
+                case "Bufferapp":
                 case "Delicious":
                 case "Diigo":
-                case "Facebook":
-                case "LinkedIn":
+                case "Diigo_via_Gmail":
+                case "Evernote":
+                case "Facebook_Page":
+                case "G_Drive":
+                case "GetPocket":
+                case "Instapaper":
                 case "Medium":
+                case "OneNote":
+                case "Pinboard":
                 case "Tumblr":
                 case "Twitter":
-                case "Wordpress":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltipiftt.png";
+                case "RSS-to-Blogger-T2":
+                case "RSS-to-Medium-T2":
+                case "RSS-to-Tumblr-T2":
+                case "RSS-to-WP-T2":
+                    if (mfile.FilePath.Contains("Video Recipe URL") || mfile.FilePath.Contains("YouTube Like Recipes")) return "";
+
+                    mfile.TooltipText = "RSS feed Url...";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Blogger-editable":
+                case "Drive-editable":
+                case "Evernote-editable":
+                case "OneNote-editable":
+                case "WordPress-editable":
+                case "Delicious-editable":
+                case "Diigo-editable":
+                case "Twitter-editable":
+                case "Tumblr-editable":
+                    mfile.TooltipText = "Copy, Paste & Edit from first line in file...";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 case "FB Photo Upload & Description":
                     mfile.TooltipText = @"C:\full\path\to\file.png,description";
@@ -929,6 +1060,48 @@ namespace Organiser.Common.Classes
 
                 case "Tumblr Reblog":
                     mfile.TooltipText = "keyword,comment,tag1 tag2 tag3 ...";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Bing Crawl":
+                case "Google Crawl":
+                case "Youtube Crawl":
+                    mfile.TooltipText = "# of pages,keyword";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+                case "Bing Image Crawl":
+                case "Google Image Crawl":
+                case "Bing Image Crawl and Download":
+                case "Bing Image Downloader":
+                case "Google Image Crawl and Download":
+                case "Google Image Downloader":
+                    mfile.TooltipText = "# of images,keyword";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Instagram Hashtag":
+                    mfile.TooltipText = "# of posts,keyword";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Follow From Follow Window":
+                    mfile.TooltipText = "# of people to follow";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Invite From Liked Window":
+                    mfile.TooltipText = "# of people to invite";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Follow From Suggestions (Auto)":
+                    mfile.TooltipText = "# of times to scroll,page url";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Follow And Like From Link":
+                case "Follow From Link":
+                case "Like From Link":
+                    mfile.TooltipText = "url of post";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "Hashtag Search Follow And Like":
+                case "Hashtag Search Follow":
+                case "Hashtag Search Like":
+                    mfile.TooltipText = "# of times, keyword";
                     return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
                 default:
                     return "";
@@ -996,7 +1169,7 @@ namespace Organiser.Common.Classes
                 IsPlayEnabled = !isRunning;
                 if (!isRunning)
                 {
-                    StopRequested = false;
+                    //StopRequested = false;
                     UpdateText = "";
                     ContentForPaused = "Pause";
                 }
@@ -1035,6 +1208,7 @@ namespace Organiser.Common.Classes
                 RaisePropertyChanged("StopRequested");
             }
         }
+        public bool Skipped { get; set; }
 
         private string dataSourceSlideoutText;
         public string DataSourceSlideoutText
@@ -1047,7 +1221,8 @@ namespace Organiser.Common.Classes
         public int CurrentJSDatasourceLoopPos { get; set; }
         public int DatasourceMaxLoop { get; set; }
         public int JSLoopPos { get; set; }
-        public string SelectedMAcroPlayingFileName { get; set; }
+        public string SelectedMacroPlayingFileName { get; set; }
+        public string SelectedMacroPlayingFilePath { get; set; }
         //Instantiate a Singleton of the Semaphore with a value of 1. This means that only 1 thread can be granted access at a time.
         public SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
@@ -1062,35 +1237,34 @@ namespace Organiser.Common.Classes
             DataSourceSlideoutText = "";
         }
 
-        public async void OnCommandFromView_Raised(object obj)
+        public async Task recursivePlaymacro(string param)
         {
-            try
+            switch (param)
             {
-                string param = obj as string;
-                if (param == null) return;
-                switch (param)
-                {
-                    case "MacroPlayChecked":
-                    case "MacroPlayLoopChecked":
-                        var checkedMAcros = new List<MacroFile>();
-                        GetCheckedMAcros(MacroFilesBase, checkedMAcros);
-                        foreach (var mac in checkedMAcros)
-                        {
-                            if (StopRequested) break;
-                            mac.IsSelected = true;
-                            OnCommandFromView_Raised(param == "MacroPlayChecked" ? "MacroPlay" : "MacroPlayLoop");
-                            mac.IsSelected = false;
-                        }
-                        break;
+                case "MacroPlayChecked":
+                case "MacroPlayLoopChecked":
+                    var checkedMAcros = new List<MacroFile>();
+                    GetCheckedMAcros(MacroFilesBase, checkedMAcros);
+                    foreach (var mac in checkedMAcros)
+                    {
+                        if (StopRequested && !Skipped) break;
+                        else if (Skipped && StopRequested) StopRequested = Skipped = false;
+                        mac.IsSelected = true;
+                        await recursivePlaymacro(param == "MacroPlayChecked" ? "MacroPlay" : "MacroPlayLoop");
+                        //OnCommandFromView_Raised(type == "MacroPlayChecked" ? "MacroPlay" : "MacroPlayLoop");
+                        mac.IsSelected = false;
+                    }
+                    break;
 
-                    case "MacroPlay":
-                    case "MacroPlayLoop":
-                        var selectedMacro = await GetSelectedMacro(MacroFilesBase,"");
-                        if (selectedMacro != null)
-                        {
-                            await semaphoreSlim.WaitAsync();
+                case "MacroPlay":
+                case "MacroPlayLoop":
+                    var selectedMacro = await GetSelectedMacro(MacroFilesBase, "");
+                    if (selectedMacro != null)
+                    {
+                        await semaphoreSlim.WaitAsync();
 
-                            
+                        if (!StopRequested)
+                        {
                             if (!File.Exists(selectedMacro.FilePath))
                             {
                                 "Selected file not found".Show();
@@ -1100,7 +1274,8 @@ namespace Organiser.Common.Classes
                             FileText = File.ReadAllText(selectedMacro.FilePath);
                             var fi = new FileInfo(selectedMacro.FilePath);
                             FileDirectory = fi.Directory.FullName;
-                            SelectedMAcroPlayingFileName = selectedMacro.FileName;
+                            SelectedMacroPlayingFileName = selectedMacro.FileName;
+                            SelectedMacroPlayingFilePath = selectedMacro.FilePath;
                             IIMPlayType iimOrJs = fi.Extension == ".iim" ? IIMPlayType.macro : IIMPlayType.js;
                             //MacroPlayer.InitMacroCommandsList();
                             if (iimOrJs == IIMPlayType.macro)
@@ -1113,6 +1288,7 @@ namespace Organiser.Common.Classes
                                 DatasourceMaxLoop = 1;
                                 for (CurrentJSDatasourceLoopPos = 0; CurrentJSDatasourceLoopPos < DatasourceMaxLoop; CurrentJSDatasourceLoopPos++)
                                 {
+                                    if (StopRequested) break;
                                     for (JSLoopPos = 0; JSLoopPos < MaxLoop; JSLoopPos++)
                                     {
                                         if (StopRequested) break;
@@ -1121,11 +1297,36 @@ namespace Organiser.Common.Classes
                                     }
                                 }
                             }
-
-                            await semaphoreSlim.WaitAsync();
-                            OnMacroDone();
-                            SafeReleaseSemephore();
                         }
+
+                        await semaphoreSlim.WaitAsync();
+                        OnMacroDone();
+                        SafeReleaseSemephore();
+                    }
+                    break;
+
+                default: break;
+            }
+        }
+
+        public async void OnCommandFromView_Raised(object obj)
+        {
+            try
+            {
+                string param = obj as string;
+                if (param == null) return;
+                switch (param)
+                {
+                    case "MacroPlay":
+                    case "MacroPlayLoop":
+                    case "MacroPlayChecked":
+                    case "MacroPlayLoopChecked":
+                        DataSourceSlideoutText = DataSourceSlideoutText.Trim();
+                        StopRequested = false;
+                        Skipped = false;
+                        SafeReleaseSemephore();
+                        await recursivePlaymacro(param);
+                        IsRunning = false;
                         break;
 
                     case "MacroPause":
@@ -1148,6 +1349,10 @@ namespace Organiser.Common.Classes
 
                     case "MacroStop":
                         StopRequested = true;
+                        break;
+
+                    case "MacroSkip":
+                        StopRequested = Skipped = true;
                         break;
 
                     default: break;
@@ -1241,7 +1446,7 @@ namespace Organiser.Common.Classes
 
             await Task.Run(() =>
             {
-                string bdir = AppDomain.CurrentDomain.BaseDirectory + "\\BrowSEO IA Scripts";
+                string bdir = MacroSettings.GetBuitInMacrosBaseDir();
                 bdir = bdir.Replace("\\\\", "\\");
                 var baseDirMain = new DirectoryInfo(bdir);
                 MacroFile baseMacroDir1 = new MacroFile()
@@ -1266,7 +1471,7 @@ namespace Organiser.Common.Classes
                 };
                 baseMacroDir.OnRunThisMacro += BaseMacroDir_OnRunThisMacro;
                 Application.Current.Dispatcher.Invoke(() => { MacroFilesBase.Add(baseMacroDir); });
-                baseMacroDir.LoadAllChildMacros(basedirmacros);
+                baseMacroDir.LoadAllChildMacros(basedirmacros,true);
             });
         }
 
@@ -1288,6 +1493,7 @@ namespace Organiser.Common.Classes
 
         public async Task SetMacroActiveByPaths(List<string> paths)
         {
+            uncheckAll(MacroFilesBase);
             foreach (var path in paths)
             {
                 var toSelectedMacro = await GetSelectedMacro(MacroFilesBase, path);
@@ -1298,6 +1504,19 @@ namespace Organiser.Common.Classes
             }
 
             OnCommandFromView_Raised("MacroPlayLoopChecked");
+        }
+
+        private void uncheckAll(ObservableCollection<MacroFile> macFiles)
+        {
+            foreach (var mac in macFiles)
+            {
+                mac.IsMacroChecked = false;
+
+                if (mac.NextMacros != null)
+                {
+                    uncheckAll(mac.NextMacros);
+                }
+            }
         }
     }
 }

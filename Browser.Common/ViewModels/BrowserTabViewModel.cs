@@ -26,6 +26,8 @@ using Xilium.CefGlue.Client;
 using System.Collections.Generic;
 using System.Linq;
 using Browser.Common.Windows;
+using Browser.Common.Models;
+using Organiser.Common.Classes.SocialHelpers;
 
 namespace Browser.Common.ViewModels
 {
@@ -42,10 +44,14 @@ namespace Browser.Common.ViewModels
         public event Action OnClickedReminders = delegate { };
         public event Action<string> OnShouldChangePropertyAddress = delegate { };
         public event Action OnRefreshSessionSettings = delegate { }; //javascriptEnabled,JavaEnabled
+        public event Action OnInitializeMacrosRequest = delegate { };
+        public event Action OnViewLoaded = delegate { };
+        public event Action<MacroManger> OnInitializedMacrosFromView = delegate { };
 
         public event Action<BrowserTabViewModel> OnRefreshTabSettings = delegate { }; //javascriptEnabled,JavaEnabled
         public event Action<string, string> OnSentForSeo = delegate { };//currenturlName,url
         public event Action<string> OnSetUserAgent = delegate { };//UserAgent
+
 
         public event Action OnRevalidate = delegate { };
 
@@ -57,7 +63,7 @@ namespace Browser.Common.ViewModels
         public ICommand SettingsCTClick { get; set; }
         public ICommand BoockmarksCommand { get; set; }
         public ICommand OpenMacrosCommand { get; set; }
-
+        public ICommand OnCommandFromView { get; set; }
         #endregion
         private System.Windows.Forms.UserControl webBrowser;
         public virtual System.Windows.Forms.UserControl Browser
@@ -131,6 +137,53 @@ namespace Browser.Common.ViewModels
         }
         #endregion
 
+        public ObservableCollection<LinkOnPage> CrawledLinksOnPage { get; set; }
+        private bool socialStatsCrawlActive;
+        public bool SocialStatsCrawlActive
+        {
+            get { return socialStatsCrawlActive; }
+            set
+            {
+                socialStatsCrawlActive = value;
+                if (value) SocialStatsCrawl();
+                RaisePropertyChanged("SocialStatsCrawlActive");
+            }
+        }
+        private bool isCralAllActive;
+        public bool IsCrawlAllActive
+        {
+            get { return isCralAllActive; }
+            set
+            {
+                isCralAllActive = value;
+                if (value) SocialStatsCrawl();
+                RaisePropertyChanged("IsCrawlAllActive");
+            }
+        }
+        private string linksToStatCheck;
+        public string LinksToStatCheck
+        {
+            get { return linksToStatCheck; }
+            set { linksToStatCheck = value; RaisePropertyChanged("LinksToStatCheck"); }
+        }
+
+        private string favicon;
+        public string FaviconPath
+        {
+            get { return favicon; }
+            set { favicon = value; RaisePropertyChanged("FaviconPath"); }
+        }
+
+
+        private Visibility isLoadingStatsVisible = Visibility.Visible;
+        public Visibility IsLoadingStatsVisible
+        {
+            get { return isLoadingStatsVisible; }
+            set { isLoadingStatsVisible = value; RaisePropertyChanged("IsLoadingStatsVisible"); }
+        }
+        public string previusStatsCrawlUrl = "";
+
+
         private Thickness tabMargin;
         public Thickness TabMargin
         {
@@ -157,44 +210,121 @@ namespace Browser.Common.ViewModels
                 SetBrowser(address);
             }
 
-            AddressEditable = address;
-
-            //GoCommand = new DelegateCommand(Go);
-            //BackCommand = new DelegateCommand(Back);
-            //ForwardCommand = new DelegateCommand(Forward);
-            //ReloadCommand = new DelegateCommand(Reload);
-            //InjectCommand = new DelegateCommand(Inject);
-            //SendToBrowserSocial = new RelayCommand(SendToSocialBrowserPopUp);
-
             OpenCPCommand = new DelegateCommand(OpenCP);
             SaveSession = new DelegateCommand(SaveSessionClicked);
             DeleteSession = new DelegateCommand(DeleteSessionClicked);
             SaveSessionToBMs = new DelegateCommand(SaveSessionToBMsClicked);
             SettingsCTClick = new RelayCommand(OnSettingsCTButtonClick);
             BoockmarksCommand = new RelayCommand(OnBoockmarksCommand_Raised);
+            OnCommandFromView = new RelayCommand(OnCommandFromView_Raised);
 
-            var version = "Brow·SEO";
-            OutputMessage = version;
+            CrawledLinksOnPage = new ObservableCollection<LinkOnPage>();
 
+            AddressEditable = address;
+            OutputMessage = "Brow·SEO";
             Title = "New Tab";
             VisibleDtPbar = Visibility.Collapsed;
+        }
+
+        private void OnCommandFromView_Raised(object obj)
+        {
+            string param = obj as string;
+            if (param == null) return;
+
+            //try
+            //{
+                switch (param)
+                {
+                    case "ClearSocialStats":
+                        CrawledLinksOnPage.Clear();
+                        previusStatsCrawlUrl = "";
+                        IsLoadingStatsVisible = Visibility.Collapsed;
+                        break;
+
+                    case "CheckTheseLinks":
+                        if (LinksToStatCheck.IsNullOrEmpty()) return;
+                        var links = LinksToStatCheck.SplitAndRemoveEmpty(Environment.NewLine);
+                        if (links == null) return;
+                        foreach (var link in links)
+                        {
+                            var linkOnPage = new LinkOnPage() { Url = link };
+                            linkOnPage.SocialStatsReplys.GetAllStatsFor(linkOnPage.Url);
+                            CrawledLinksOnPage.Add(linkOnPage);
+                        }
+                        break;
+
+                    case "ORDERBY_FBSHARES":
+                    case "ORDERBY_FBLIKES":
+                    case "ORDERBY_FBCOMMENTS":
+                    case "ORDERBY_GPLUSONES":
+                    case "ORDERBY_PINTERESTPINS":
+                    case "ORDERBY_STUMBLEVIEWS":
+                    case "ORDERBY_LINKEDINCOUNT":
+                    case "ORDERBY_BUFFERSHARES":
+                    case "ORDERBY_REDDITUPS":
+                    case "ORDERBY_REDDITSCORE":
+                        var resulstsList = SocialStatsFunctions.OrderStatsBy(CrawledLinksOnPage.ToList(), param);
+                        if (resulstsList == null || resulstsList.Count() == 0) return;
+
+                        CrawledLinksOnPage.Clear();
+                        foreach (var r in resulstsList) CrawledLinksOnPage.Add(r as LinkOnPage);
+                        break;
+
+                    default:
+                        break;
+                }
+            //}
+            //catch (Exception ex)
+            //{
+            //    if (ex != null) ex.Message.Show();
+            //}
         }
 
         public virtual void SetBrowser(string addressEditable) { }
 
         public virtual void Dispose() { }
+        public void ClearAllEvents()
+        {
+            OnCreateNewTab = null;
+            OnCurateToPBN = null;//content,lin
+            OnAddedToGoViral = null;
+            OnClickedSaveSession = null;
+            OnClickedDeleteSession = null;
+            OnClickedSaveSessionToBookmarks = null;
+            OnClickedReminders = null;
+            OnShouldChangePropertyAddress = null;
+            OnRefreshSessionSettings = null; //javascriptEnabl
+            OnRefreshTabSettings = null;
+            OnSentForSeo = null;//currenturlNa
+            OnSetUserAgent = null;//UserAgent
+            OnRevalidate = null;
+            OpenCPCommand = null;
+            FillListCommand = null;
+            SaveSession = null;
+            DeleteSession = null;
+            SaveSessionToBMs = null;
+            SettingsCTClick = null;
+            BoockmarksCommand = null;
+            OpenMacrosCommand = null;
+            OnCommandFromView = null;
+            FaviconPath = null;
+        }
+
+        public virtual void SocialStatsCrawl() { }
 
         public virtual void ChangeAddressEditable(string addy) { }
 
         public virtual void NavigateToSelectedSite(string text) { }
 
         public virtual Task OnPlayMacro(MacroManger manger, IIMPlayType type, int loop) { return null; }
+
         public virtual void RevalidateSizes(double width, double height) { }
 
         public void RaiseOnRevalidate()
         {
             OnRevalidate();
         }
+
         public void RaiseOnAddedToGoViral(string link, string v, List<string> p)
         {
             OnAddedToGoViral(link,v,p);
@@ -220,8 +350,21 @@ namespace Browser.Common.ViewModels
             OnShouldChangePropertyAddress(address);
         }
 
+        public void RaiseInitializeMacrosRequest()
+        {
+            OnInitializeMacrosRequest();
+        }
+
+        public void RaiseOnInitializedMacrosFromView(MacroManger m)
+        {
+            OnInitializedMacrosFromView(m);
+        }
 
 
+        internal void RaiseOnViewLoaded()
+        {
+            OnViewLoaded();
+        }
         #region save open session tabs
         private void SaveSessionToBMsClicked()
         {
@@ -305,6 +448,12 @@ namespace Browser.Common.ViewModels
         {
             get { return BrowserSettimgs.MnimumFontSize; }
             set { BrowserSettimgs.MnimumFontSize = value; RaisePropertyChanged("MnimumFontSize"); }
+        }
+
+        public string AcceptLanguage
+        {
+            get { return BrowserSettimgs.AcceptLanguage; }
+            set { BrowserSettimgs.AcceptLanguage = value; RaisePropertyChanged("AcceptLanguage"); }
         }
 
         public List<string> AvailableEncodeings
@@ -464,6 +613,7 @@ namespace Browser.Common.ViewModels
 
         bool oldJavaCript, oldJava, oldFlash, oldSysDate, oldDnt, oldwebrtc, oldWebGL;
         int oldTZSI = 0, oldSIFontStandard = 0, oldSIFontSerif = 0, oldSIFontSansSerif = 0, oldSIFontFixedWidth = 0, oldDefaultFontSize = 0, oldMnimumFontSize = 0, oldSIFontEncodings = 0;
+        string oldAcceptLanguage;
         bool saved = false;
         internal void SettingsMenuOpen()
         {
@@ -483,6 +633,7 @@ namespace Browser.Common.ViewModels
             oldMnimumFontSize = MnimumFontSize;
             oldSIFontEncodings = SIFontEncodings;
             oldWebGL = WebGLEnabled;
+            oldAcceptLanguage = AcceptLanguage;
         }
 
         internal void SettingsMenuClosed()
@@ -504,6 +655,7 @@ namespace Browser.Common.ViewModels
             MnimumFontSize= oldMnimumFontSize;
             SIFontEncodings= oldSIFontEncodings;
             WebGLEnabled = oldWebGL;
+            AcceptLanguage = oldAcceptLanguage;
         }
 
         private void OnSettingsCTButtonClick(object param)
@@ -678,7 +830,8 @@ namespace Browser.Common.ViewModels
                 if (MyFilesDatabase.HasMultipleProfiles(GloableProfData.PData.ProjectDir))
                 {
                     SelectProfileWindow selectProfile = new SelectProfileWindow(GloableProfData.PData.ProjectName, GloableProfData.PData.ProjectDir, lastProfileIndex, "");
-                    if(isfromMacro) selectProfile.Title ="For " + imacroName; 
+                    selectProfile.FromMacro = isfromMacro;
+                    if (isfromMacro) selectProfile.Title ="For " + imacroName; 
                     if (isfromMacro)
                     {
                         selectProfile.Topmost = true;

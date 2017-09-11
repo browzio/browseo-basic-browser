@@ -68,6 +68,9 @@ namespace BrowserHost
 
                     if (BrowserTabs.Count > 0)
                         BrowserTabs[0].TabMargin = new Thickness(-3, 0, 0, 0);
+                   
+                    browserViewModel = null;
+                    GC.Collect();
                 }
             }
             catch { }
@@ -78,7 +81,7 @@ namespace BrowserHost
             CreateNewTab("");
         }
 
-        private void CreateNewTab(string url)
+        public void CreateNewTab(string url)
         {
             MyFilesDatabase.CheckRamUsage();
 
@@ -96,6 +99,27 @@ namespace BrowserHost
 
                 
             });
+        }
+
+        public static string GetImageUrl(string url)
+        {
+            try
+            {
+                var req = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(url);
+                req.Method = "HEAD";
+                req.Proxy = MyFilesDatabase.GetRequestsProxy();
+                using (var resp = req.GetResponse())
+                {
+                    if (!resp.ContentType.ToLower(System.Globalization.CultureInfo.InvariantCulture).StartsWith("image/"))
+                    {
+                        url = "";
+                    }
+                }
+
+                return url;
+            }
+            catch { }
+            return "";
         }
 
         private void setBTVMEvents(ChromeBrowserTabViewModel btvm)

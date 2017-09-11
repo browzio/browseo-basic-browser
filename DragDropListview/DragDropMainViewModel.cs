@@ -358,7 +358,7 @@ namespace DragDropListview
                     RssFeedsLinksMultiWindow muliwindow = new RssFeedsLinksMultiWindow();
                     muliwindow.ShowDialog();
 
-                    if (muliwindow.OKClicked)
+                    if (muliwindow.ButtonLeftClicked)
                     {
 
                         string[] links = muliwindow.tbInputedText.Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);

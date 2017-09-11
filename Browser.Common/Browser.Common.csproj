@@ -67,6 +67,7 @@
     <Compile Include="Convertrs\ReminersCountToVisibleConverter.cs" />
     <Compile Include="Convertrs\RichToTextConverter.cs" />
     <Compile Include="Cotrols\MyComboBox.cs" />
+    <Compile Include="Models\LinkOnPage.cs" />
     <Compile Include="Models\Reminder.cs" />
     <Compile Include="Models\UserAgent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -137,6 +138,10 @@
     </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

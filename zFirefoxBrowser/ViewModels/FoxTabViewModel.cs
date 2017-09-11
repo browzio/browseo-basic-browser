@@ -24,6 +24,10 @@ using Gecko.Interop;
 using Gecko.Cache;
 using static zFirefoxBrowser.Helpers.FoxInit;
 using BrowserHost.ViewModels;
+using Browser.Common.Models;
+using Organiser.Common.Classes.SocialHelpers;
+using System.Runtime.ExceptionServices;
+using System.Diagnostics;
 
 namespace zFirefoxBrowser.ViewModels
 {
@@ -40,7 +44,12 @@ namespace zFirefoxBrowser.ViewModels
 
         #endregion
 
+        #region broser
         public event Action OnRequestedWindowLocation = delegate { };
+        public event Action OnOpenNewTab = delegate { };
+        public event Action<string> OnOpenNewTabToUrl = delegate { };//string
+        public event Action<bool, FoxTabViewModel> OnCloseTab = delegate { }; //allOthers
+        public event Action<int, FoxTabViewModel> OnChangeTabContext = delegate { };
 
         private FFBrowserControl webBrowser;
         public FFBrowserControl WebBrowser
@@ -65,6 +74,7 @@ namespace zFirefoxBrowser.ViewModels
                 return base.Browser;
             }
         }
+
 
         public FoxTabViewModel(string address, bool setTheBrowser = true) : base(address, setTheBrowser)
         {
@@ -112,8 +122,22 @@ namespace zFirefoxBrowser.ViewModels
             {
                 PinterestImagePickerVM pinterestImagePicker = new PinterestImagePickerVM();
                 pinterestImagePicker.OnLaunchSharePopup += launchSharePopUP;
-                pinterestImagePicker.VisitSource(AddressEditable,true, getSource());
+                pinterestImagePicker.VisitSource(AddressEditable,true, getImageLinks());
             }
+        }
+
+        private string getImageLinks()
+        {
+            string returnedImages = "";
+            foreach (var img in WebBrowser.Browser.Document.Images)
+            {
+                var thisimg = img as GeckoImageElement;
+                if (thisimg == null) continue;
+
+                returnedImages += thisimg.Src + Environment.NewLine;
+            }
+
+            return returnedImages;
         }
 
         private void launchSharePopUP(string fullUrl)
@@ -292,6 +316,7 @@ namespace zFirefoxBrowser.ViewModels
                     if (input == null) continue;
                     if (input.Type != null && input.Type.ToLower() == "radio")
                     {
+                        if (WebBrowser.Browser.Url.AbsoluteUri.Contains("twitter.com")) continue;
                         bool male = profile.CmbSelectedIndexSex == 0;
                         if (male && input.Id.ToLower().Contains("ma") || input.Id.ToLower().Contains("u_0_f") || input.Name.ToLower().Contains("ma"))
                         {
@@ -321,14 +346,81 @@ namespace zFirefoxBrowser.ViewModels
                             }
                             continue;
                         }
-
+                        else if (WebBrowser.Browser.Url.AbsoluteUri.Contains("https://twitter.com/login") || WebBrowser.Browser.Url.AbsoluteUri == "https://twitter.com/")
+                        {
+                            if (input.Name == "session[username_or_email]")
+                            {
+                                await setNodeValue(input, profile.Email);
+                            }
+                            else if (input.Name == "session[password]")
+                            {
+                                await setNodeValue(input, profile.Password);
+                            }
+                            continue;
+                        }
+                        else if (WebBrowser.Browser.Url.AbsoluteUri.Contains("https://login.yahoo.com/account/create"))
+                        {
+                            if (input.Id == "usernamereg-email")
+                            {
+                                 await setNodeValue(input, profile.Email);
+                            }
+                            else if (input.Id == "usernamereg-password")
+                            {
+                                 await setNodeValue(input, profile.Password);
+                            }
+                            else if (input.Id == "usernamereg-freeformGender")
+                            {
+                                await setNodeValue(input, profile.CmbSelectedIndexSex == 0 ? "Male" : "Female");
+                            }
+                            else if (input.Id == "usernamereg-freeformGender")
+                            {
+                                await setNodeValue(input, profile.CmbSelectedIndexSex == 0 ? "Male" : "Female");
+                            }
+                            continue;
+                        }
+                        else if (WebBrowser.Browser.Url.AbsoluteUri.Contains("https://www.linkedin.com/"))
+                        {
+                            if (input.Id == "login-email" || input.Id == "reg-email")
+                            {
+                                await setNodeValue(input, profile.Email);
+                            }
+                            else if (input.Id == "login-password" || input.Id == "reg-password")
+                            {
+                                await setNodeValue(input, profile.Password);
+                            }
+                            else if (input.Id == "reg-firstname")
+                            {
+                                await setNodeValue(input, profile.FirstName);
+                            }
+                            else if (input.Id == "reg-lastname")
+                            {
+                                await setNodeValue(input, profile.LastName);
+                            }
+                            continue;
+                        }
+                        else if (WebBrowser.Browser.Url.AbsoluteUri == ("https://www.reddit.com/"))
+                        {
+                            if (input.Id == "user_reg")
+                            {
+                                await setNodeValue(input, profile.Username);
+                            }
+                            else if (input.Id == "passwd_reg" || input.Id == "passwd2_reg")
+                            {
+                                await setNodeValue(input, profile.Password);
+                            }
+                            else if (input.Id == "email_reg")
+                            {
+                                await setNodeValue(input, profile.Email);
+                            }
+                            continue;
+                        }
                         if (input.Type.ToLower() == "password" && isInputOf(input, "password") || isInputOf(input, "pass"))
                         {
                             await setNodeValue(input, profile.Password);
                         }
                         if (input.Type.ToLower() == "hidden" || input.Type.ToLower() == "password") continue;
 
-                        if (isInputOf(input, "first") || isInputOf(input, "name_f"))
+                        if (!isInputOf(input, "lastname") && (isInputOf(input, "first") || isInputOf(input, "name_f")))
                         {
                             await setNodeValue(input, profile.FirstName);
                         }
@@ -340,8 +432,8 @@ namespace zFirefoxBrowser.ViewModels
                         {
                             await setNodeValue(input, profile.FirstName + " " + profile.LastName);
                         }
-                        else if ((isInputOf(input, "mail") && !isInputOf(input, "name")) ||
-                            isInputOf(input, "session_key"))
+                        else if (input.Type.ToLower() == "email" || ((isInputOf(input, "mail") && !isInputOf(input, "name")) ||
+                            isInputOf(input, "session_key") ))
                         {
                             await setNodeValue(input, profile.Email);
                         }
@@ -486,10 +578,54 @@ namespace zFirefoxBrowser.ViewModels
             WebBrowser.Navigate(AddressEditable);
         }
 
+        private void ChromeBrowserTabViewModel_OnRefreshTabSettings(BrowserTabViewModel obj)
+        {
+        }
+
+        /// <summary>
+        /// initializes the browser with events and url
+        /// </summary>
+        /// <param name="address"></param>
+        public override void SetBrowser(string address)
+        {
+            try
+            {
+                if (address.IsNullOrEmpty()) address = "about:blank";
+                WebBrowser = new FFBrowserControl();
+                WebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+                WebBrowser.initBrowser(address, () => { IsLoading = false;}, ()=> 
+                {
+                    WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
+                    WebBrowser.OnBrowserMessageChanged += WebBrowser_OnBrowserMessageChanged;
+                    WebBrowser.OnBrowserTitleChanged += WebBrowser_OnBrowserTitleChanged;
+                    WebBrowser.OnBrowserAddressChanged += WebBrowser_OnBrowserAddressChanged;
+                    WebBrowser.OnBrowserStatusChanged += WebBrowser_OnBrowserStatusChanged;
+                    WebBrowser.OnCreateNewTab += WebBrowser_OnCreateNewTab;
+                    WebBrowser.OnBrowserContextMenuClicked += WebBrowser_OnBrowserContextMenuClicked;
+
+                    Browser.SuspendLayout();
+                    Browser.Controls.Add(WebBrowser);
+                    Browser.ResumeLayout(false);
+                    Browser.PerformLayout();
+                    RaisePropertyChanged("Browser");
+
+                    //WebBrowser.Browser.AddMessageEventListener("iimPlayCode", OnIIMPlayCode);
+                    //WebBrowser.Browser.AddMessageEventListener("iimPlay", OnIIMPlay);
+                    WebBrowser.Browser.AddMessageEventListener("iimSet", OnIIMSet);
+                    WebBrowser.Browser.AddMessageEventListener("iimGetVal", OniIImGetVal);
+                    WebBrowser.Browser.AddMessageEventListener("iimDisplay", WebBrowser_OnBrowserMessageChanged);
+                    WebBrowser.Browser.AddMessageEventListener("afterSandboxEval", OnAfterSandboxEval);
+                    WebBrowser.Browser.CreateWindow -= Browser_CreateWindow;
+                    WebBrowser.Browser.CreateWindow += Browser_CreateWindow;
+                });
+            }
+            catch { }
+        }
+
         void WebBrowser_OnBrowserStatusChanged(string oMessage)
         {
-            if(!oMessage.IsNullOrEmpty())
-            HuverLink = oMessage;
+            if (!oMessage.IsNullOrEmpty())
+                HuverLink = oMessage;
         }
 
         void WebBrowser_OnCreateNewTab(string url)
@@ -519,12 +655,14 @@ namespace zFirefoxBrowser.ViewModels
             //}
 
             //AddressEditable = address;
+            RaiseOnShouldChangePropertyAddress(address);
             UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_AddressChange + " " + address);
         }
 
         void WebBrowser_OnBrowserTitleChanged(string ttl)
         {
             Title = ttl;
+            SocialStatsCrawl();
         }
 
         void WebBrowser_OnBrowserMessageChanged(string oMessage)
@@ -536,6 +674,7 @@ namespace zFirefoxBrowser.ViewModels
         void WebBrowser_OnBrowserLoadingChanged(bool loading)
         {
             IsLoading = loading;
+            FaviconPath = "";
             if (loading)
             {
                 StatusMessage = "Loading...";
@@ -543,11 +682,127 @@ namespace zFirefoxBrowser.ViewModels
             else
             {
                 StatusMessage = "Done";
+                SocialStatsCrawl();
+                if(!inGetFavicon) GetFavicon();
+            }
+        }
 
-                if (WebBrowser.Browser != null && WebBrowser.Browser.Url != null)
-                    RaiseOnShouldChangePropertyAddress(WebBrowser.Browser.Url.ToString());
+        bool inGetFavicon;
+        private async void GetFavicon()
+        {
+            inGetFavicon = true;
+
+            if (WebBrowser.Browser.Document == null || WebBrowser.Browser.Document.Head == null)
+            {
+                inGetFavicon = false;
+                return;
+            }
+            string authority = WebBrowser.Browser.Document.Url.Authority;
+
+
+            var links = WebBrowser.Browser.Document.Head.GetElementsByTagName("link");
+            var favUrl = "";
+            foreach (var l in links)
+            {
+                if (l.HasAttribute("rel") && l.HasAttribute("href") && (l.GetAttribute("rel") == "shortcut icon" || l.GetAttribute("rel") == "icon"))
+                {
+                    favUrl = l.GetAttribute("href");
+                    if (!favUrl.StartsWith("http://") && !favUrl.StartsWith("https://"))
+                    {
+                        if (favUrl.StartsWith("//"))
+                        {
+                            favUrl = "http:" + favUrl;
+                        }
+                        else
+                        {
+                            favUrl = WebBrowser.Browser.Document.Url.Scheme + "://" + authority + favUrl;
+                        }
+                    }
+                    break;
+                }
             }
 
+            if (favUrl == "") favUrl = WebBrowser.Browser.Document.Url.Host + "/favicon.ico";
+            if (!favUrl.StartsWith("http://") && !favUrl.StartsWith("https://") && !favUrl.StartsWith("//")) favUrl = WebBrowser.Browser.Document.Url.Scheme + "://" + favUrl;
+
+            string favFileName = favUrl.Replace(":", ".").Replace("/", ".");
+            string favLocal = await Task.Run(() => { return MyFilesDatabase.GetFaviconIfExists(favFileName); });
+            if (favLocal.IsNullOrEmpty())
+            {
+                try
+                {
+                    var channel = IOService.NewChannelFromUri(IOService.CreateNsIUri(favUrl));
+                    var li = new StreamListnerToBytes();
+                    li.OnstremFinished += async (bytes) =>
+                    {
+                        favLocal = await Task.Run(() => { return MyFilesDatabase.SaveImageFromBytes(bytes, favFileName); });
+                        inGetFavicon = false;
+                        try
+                        {
+                            Marshal.ReleaseComObject(channel);
+                        }
+                        catch { }
+                        if (!favLocal.IsNullOrEmpty()) FaviconPath = favLocal;
+                    };
+                    channel.AsyncOpen(li, null);
+                }
+                catch { inGetFavicon = false; }
+            }
+            else
+            {
+                FaviconPath = favLocal;
+                inGetFavicon = false;
+            }
+        }
+
+        public override async void SocialStatsCrawl()
+        {
+            if (!SocialStatsCrawlActive || WebBrowser.Browser.IsBusy || WebBrowser.Browser.IsAjaxBusy || IsLoading) return;
+            if (previusStatsCrawlUrl == WebBrowser.Browser.Url.AbsoluteUri) CrawledLinksOnPage.Clear(); 
+
+             previusStatsCrawlUrl = WebBrowser.Browser.Url.AbsoluteUri;
+            IsLoadingStatsVisible = Visibility.Visible;
+            try
+            {
+                if (!CrawledLinksOnPage.Any(l => l.Url == WebBrowser.Browser.Url.AbsoluteUri))
+                {
+                    var linkOfPage = new LinkOnPage()
+                    {
+                        Url = WebBrowser.Browser.Url.AbsoluteUri,
+                        SocialStatsReplys = new SocialStatsReplys()
+                    };
+                    CrawledLinksOnPage.Add(linkOfPage);
+                    await linkOfPage.SocialStatsReplys.AsyncGetAllStatsFor(linkOfPage.Url);
+                }
+
+                if (IsCrawlAllActive)
+                {
+                    var ahrefs = WebBrowser.Browser.Document.GetElementsByTagName("A");
+                    if (ahrefs == null || ahrefs.Count() == 0) return;
+
+                    var ahrefsList = ahrefs.ToList();
+                    foreach (var element in ahrefsList)
+                    {
+                        if (IsLoadingStatsVisible == Visibility.Collapsed) return;
+
+                        var link = element as GeckoAnchorElement;
+                        if (link == null || link.Href.IsNullOrEmpty() ||
+                            link.Href.ToLower().Contains("login") || link.Href.ToLower().Contains("sign up") || link.Href.ToLower().Contains("void(0)") || link.Href.ToLower().Contains("javascript:;") || link.Href.ToLower().Contains("javascript ") ||
+                            (WebBrowser.Browser.Url.AbsoluteUri.Contains("google") && WebBrowser.Browser.Url.AbsoluteUri.Contains("search") && link.Href.ToLower().Contains("google")) ||
+                            CrawledLinksOnPage.Any(l => l.Url == link.Href)) continue;
+
+                        var linkOnPage = new LinkOnPage()
+                        {
+                            Url = link.Href,
+                            SocialStatsReplys = new SocialStatsReplys()
+                        };
+                        await linkOnPage.SocialStatsReplys.AsyncGetAllStatsFor(linkOnPage.Url);
+                        CrawledLinksOnPage.Add(linkOnPage);
+                    }
+                }
+            }
+            catch { }
+            IsLoadingStatsVisible = Visibility.Collapsed;
         }
 
         private void WebBrowser_OnBrowserContextMenuClicked(string param)
@@ -716,6 +971,31 @@ namespace zFirefoxBrowser.ViewModels
                         }
                         break;
 
+                    case "2":
+                        var aTags = WebBrowser.Browser.Document.GetElementsByTagName("A");
+                        if(aTags != null)
+                        {
+                            List<string> linksToReturn = new List<string>();
+                            foreach (var tag in aTags)
+                            {
+                                GeckoAnchorElement aTag = tag as GeckoAnchorElement;
+                                if (aTag == null || aTag.ClassName.IsNullOrEmpty() || aTag.ClassName != "_5afe" || !aTag.Href.Contains("/groups/")) continue;
+                                
+                                var name = aTag.GetAttribute("title");
+
+
+                                var groupid = aTag.GetAttribute("data-gt").Trim();
+                                groupid = groupid.Remove(groupid.IndexOf(","));
+                                groupid = groupid.Substring(groupid.IndexOf(":")+1);
+                                groupid = groupid.Replace("\"", "");
+
+                                linksToReturn.Add(Social.FACEBOOK_GROUPS_DEFAULT_URL + name + "-" + groupid);
+                            }
+
+                           if(linksToReturn.Count > 0) RaiseOnAddedToGoViral(null, "", linksToReturn);
+                        }
+                        break;
+
                     default: break;
                 }
             }
@@ -775,52 +1055,6 @@ namespace zFirefoxBrowser.ViewModels
             return link;
         }
 
-
-
-        private void ChromeBrowserTabViewModel_OnRefreshTabSettings(BrowserTabViewModel obj)
-        {
-        }
-
-        /// <summary>
-        /// initializes the browser with events and url
-        /// </summary>
-        /// <param name="address"></param>
-        public override void SetBrowser(string address)
-        {
-            try
-            {
-                WebBrowser = new FFBrowserControl();
-                WebBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-                WebBrowser.initBrowser(address, () =>
-                {
-                    IsLoading = false;
-                });
-
-                WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
-                WebBrowser.OnBrowserMessageChanged += WebBrowser_OnBrowserMessageChanged;
-                WebBrowser.OnBrowserTitleChanged += WebBrowser_OnBrowserTitleChanged;
-                WebBrowser.OnBrowserAddressChanged += WebBrowser_OnBrowserAddressChanged;
-                WebBrowser.OnBrowserStatusChanged += WebBrowser_OnBrowserStatusChanged;
-                WebBrowser.OnCreateNewTab += WebBrowser_OnCreateNewTab;
-                WebBrowser.OnBrowserContextMenuClicked += WebBrowser_OnBrowserContextMenuClicked;
-
-                Browser.SuspendLayout();
-                Browser.Controls.Add(WebBrowser);
-                Browser.ResumeLayout(false);
-                Browser.PerformLayout();
-                RaisePropertyChanged("Browser");
-
-                //WebBrowser.Browser.AddMessageEventListener("iimPlayCode", OnIIMPlayCode);
-                //WebBrowser.Browser.AddMessageEventListener("iimPlay", OnIIMPlay);
-                WebBrowser.Browser.AddMessageEventListener("iimSet", OnIIMSet);
-                WebBrowser.Browser.AddMessageEventListener("iimGetVal", OniIImGetVal);
-                WebBrowser.Browser.AddMessageEventListener("iimDisplay", WebBrowser_OnBrowserMessageChanged);
-                WebBrowser.Browser.AddMessageEventListener("afterSandboxEval", OnAfterSandboxEval);
-                WebBrowser.Browser.CreateWindow += Browser_CreateWindow;
-            }
-            catch { }
-        }
-
         public override void ChangeAddressEditable(string address)
         {
             AddressEditable = address;
@@ -839,6 +1073,14 @@ namespace zFirefoxBrowser.ViewModels
             {
                 try
                 {
+                    GoCommand = null;
+                    BackCommand = null;
+                    ForwardCommand = null;
+                    ReloadCommand = null;
+                    InjectCommand = null;
+                    SendToBrowserSocial = null;
+                    OnRequestedWindowLocation = null;
+                    ClearAllEvents();
                     if (macroPlayer != null)
                     {
                         if (macroPlayer.IsRunning)
@@ -878,13 +1120,17 @@ namespace zFirefoxBrowser.ViewModels
                 {
                     WebBrowserHost.Dispose();
                 }
+
+                //Xpcom.DisposeObject((ref _request);
+                //GC.SuppressFinalize(this);
             }
             catch
             { }
         }
-
+        #endregion
 
         #region macros
+
         //public class MacroPlayerClassFactory : nsIFactory
         //{
         //    MacroPlayerClass thisClass;
@@ -1034,7 +1280,7 @@ namespace zFirefoxBrowser.ViewModels
 
                 if (macroPlayer.StopRequested || !macroPlayer.IsRunning) return;
 
-                bool timeout = await CheckBrowserBusyTillTimeOut(macVals, WebBrowser.Browser);
+                bool timeout = await CheckBrowserBusyTillTimeOut(macVals);
                 if (!timeout)
                 {
                     WebBrowser.Browser.Stop();
@@ -1053,7 +1299,7 @@ namespace zFirefoxBrowser.ViewModels
 
                 if (macroPlayer.StopRequested || !macroPlayer.IsRunning) return;
 
-                bool timeout = await CheckBrowserBusyTillTimeOut(macVals, WebBrowser.Browser);
+                bool timeout = await CheckBrowserBusyTillTimeOut(macVals);
                 if (!timeout)
                 {
                     WebBrowser.Browser.Stop();
@@ -1323,14 +1569,72 @@ namespace zFirefoxBrowser.ViewModels
             }
         }
 
+        public class TabCommandNavigation
+        {
+            public event Action<TabCommandNavigation> OnClosedWindow = delegate { };
+            public FFBrowserPopup ControlWindow { get; set; }
+            public GeckoWebBrowser BrowserControl { get; set; }
+
+            public TabCommandNavigation(string tabcount)
+            {
+                BrowserControl = new GeckoWebBrowser();
+                BrowserControl.Dock = System.Windows.Forms.DockStyle.Fill;
+
+                ControlWindow = new FFBrowserPopup();
+                ControlWindow.Text = tabcount;
+                ControlWindow.SuspendLayout();
+                ControlWindow.Controls.Add(BrowserControl);
+                ControlWindow.ResumeLayout(false);
+                ControlWindow.PerformLayout();
+                ControlWindow.Show();
+                ControlWindow.TopMost = true;
+                ControlWindow.TopMost = false;
+
+                ControlWindow.Focus();
+                BrowserControl.Focus();
+            }
+
+            public async Task WaitForComplete()
+            {
+                bool docComplete = false;
+                BrowserControl.DocumentCompleted += (s, ee) => { docComplete = true; };
+                int awaitedComplete = 0;
+                while (!docComplete)
+                {
+                    await Task.Delay(500);
+                    if (awaitedComplete++ >= 25) break;
+                }
+
+                BrowserControl.WebBrowserFocus.Activate();
+                while (BrowserControl == null || BrowserControl.Document == null) await Task.Delay(500);
+
+                ControlWindow.FormClosed += (s, ee) => { OnClosedWindow(this); };
+            }
+
+            public void CloseAndDispose()
+            {
+                ControlWindow.Close();
+                BrowserControl.Dispose();
+                ControlWindow.Dispose();
+
+                BrowserControl = null;
+                ControlWindow = null;
+                ControlWindow = null;
+            }
+        }
+        
         nsIMacroPlayer JSMacroPlayer;
         MacroCommandExecutions JSMacroCommandCallbacks;
         List<EventHandler<LauncherDialogEvent>> handlers = new List<EventHandler<LauncherDialogEvent>>();
-        MacroManger macroPlayer;
-        MacroVariables macVals = new MacroVariables();
-        FFBrowserPopup ffpopupMacros;
-        GeckoWebBrowser ffpopupMacrosBrowser;
-        bool startedTimer = false, setfromframe = false, setfromwindow = false,wasSetFromWindow = false;
+        public MacroManger macroPlayer;
+        public MacroVariables macVals = new MacroVariables();
+        List<TabCommandNavigation> tabsWindows = new List<TabCommandNavigation>();
+
+        public event Action OnBringToFrontForPaste = delegate { };
+        string hadSaveAsFilePath = ""; 
+
+        bool startedTimer = false, setfromframe = false, setfromwindow = false, wasSetFromWindow = false, setFromTabsWindows = false;
+        int windowIndexToSet = -1;
         public bool isrunningiimInJsMode;
         private bool isrunningInJsMode;
         public bool runningInJsMode
@@ -1339,7 +1643,6 @@ namespace zFirefoxBrowser.ViewModels
             set
             {
                 isrunningInJsMode = value;
-                WebBrowser.InMacroPlaying = value;
             }
         }
         public bool InStopRequest
@@ -1359,77 +1662,567 @@ namespace zFirefoxBrowser.ViewModels
                 return false;
             }
         }
+        GeckoWebBrowser CurrentlyActiveBrowser
+        {
+            get
+            {
+                if (setfromwindow && ffpopupMacrosBrowser != null)
+                {
+                    return ffpopupMacrosBrowser;
+                }
+                else if ((setfromwindow && ffpopupMacrosBrowser == null || !setfromwindow) && !setFromTabsWindows && (windowIndexToSet <= -1 || windowIndexToSet >= tabsWindows.Count))
+                {
+                    return WebBrowser.Browser;
+                }
+                else
+                {
+                    return tabsWindows[windowIndexToSet].BrowserControl;
+                }
+            }
+        }
+        //public bool isSettingFromTab = false;
+        //public int dataCourceLine = 0;
+        //public int iTimesToRun;
+        //public int macroIndex = 0;
+        //public string macroWaitingFor = "";
 
         //nsIXULWindow ffpopupMacrosXulWindow;
         //GeckoWebBrowser ffpopupMacrosBrowser;
         //nsIWebBrowserChrome ffpopupMacrosChromeBrowser;
-        private async void Browser_CreateWindow(object sender,  GeckoCreateWindowEventArgs e)
+        FFBrowserPopup ffpopupMacros;
+        GeckoWebBrowser ffpopupMacrosBrowser;
+        public bool IsFromIA { get; set; }
+        string prevopened = "";
+        protected virtual IEnumerable<string> DefaultEvents
         {
-            if (!WebBrowser.InMacroPlaying) return;
+            get
+            {
+                yield return "submit";
+                yield return "keydown";
+                yield return "keyup";
+                yield return "keypress";
+                yield return "mousemove";
+                yield return "mouseover";
+                yield return "mouseout";
+                yield return "mousedown";
+                yield return "mouseup";
+                yield return "click";
+                yield return "dblclick";
+                yield return "compositionstart";
+                yield return "compositionend";
+                yield return "contextmenu";
+                yield return "DOMMouseScroll";
+                yield return "focus";
+                yield return "blur";
+                // Load event added here rather than DOMDocument as DOMDocument recreated when navigating
+                // ths losing attached listener.
+                yield return "load";
+                yield return "DOMContentLoaded";
+                yield return "readystatechange";
+                yield return "change";
+                yield return "hashchange";
+                yield return "dragstart";
+                yield return "dragleave";
+                yield return "drag";
+                yield return "drop";
+                yield return "dragend";
+                yield return "mozfullscreenchange"; //TODO: change to "fullscreenchange" after prefix removed
+                yield return "input";
+            }
+        }
+
+        public sealed class TabbedBrowserCreator : nsIWindowCreator2
+        {
+            private FFBrowserPopup m_Parent;
+            private GeckoWebBrowser m_browser;
+
+            public TabbedBrowserCreator(FFBrowserPopup p_Parent, GeckoWebBrowser p_browser)
+            {
+                m_Parent = p_Parent;
+                m_browser = p_browser;
+            }
+
+            public nsIWebBrowserChrome CreateChromeWindow2(nsIWebBrowserChrome parent, uint chromeFlags, uint contextFlags, nsIURI uri, nsITabParent aOpeningTab, ref bool cancel)
+            {
+                return CreateWindow(parent, chromeFlags, contextFlags, uri, ref cancel);
+            }
+
+            public void SetScreenId(uint aScreenId)
+            {
+
+            }
+
+            nsIWebBrowserChrome nsIWindowCreator2.CreateChromeWindow(nsIWebBrowserChrome parent, uint chromeFlags)
+            {
+                bool bCancel = false;
+                return CreateWindow(parent, chromeFlags, 0, null, ref bCancel);
+            }
+
+            //nsIWebBrowserChrome nsIWindowCreator2.CreateChromeWindow2(nsIWebBrowserChrome parent, uint chromeFlags, uint contextFlags, nsIURI uri, ref bool cancel)
+            //{
+            //    return CreateWindow(parent, chromeFlags, contextFlags, uri, ref cancel);
+            //}
+
+            nsIWebBrowserChrome nsIWindowCreator.CreateChromeWindow(nsIWebBrowserChrome parent, uint chromeFlags)
+            {
+
+                bool cancel = false;
+                return CreateWindow(parent, chromeFlags, 0, null, ref cancel);
+            }
+
+            private nsIWebBrowserChrome CreateWindow(nsIWebBrowserChrome parent, uint chromeFlags, uint contextFlags, nsIURI uri, ref bool cancel)
+            {
+                GeckoWindowFlags flags = (GeckoWindowFlags)chromeFlags;
+
+                if ((flags & GeckoWindowFlags.OpenAsChrome) != 0)
+                {
+                    // create the child window
+                    nsIXULWindow xulChild = AppShellService.CreateTopLevelWindow(null, null, chromeFlags, -1, -1);
+
+                    // this little gem allows the GeckoWebBrowser to be properly activated when it gains the focus again
+                    if (parent is GeckoWebBrowser && (flags & GeckoWindowFlags.OpenAsDialog) != 0)
+                    {
+                        EventHandler gotFocus = null;
+                        gotFocus = delegate (object sender, EventArgs e)
+                        {
+                            var br = (sender as GeckoWebBrowser);
+                            if (br != null)
+                            {
+                                br.GotFocus -= gotFocus;
+                                br.WebBrowserFocus.Activate();
+                            }
+
+                        };
+                        var parBr = parent as GeckoWebBrowser;
+                        parBr.GotFocus += gotFocus;
+                    }
+
+                    // return the chrome
+                    return Xpcom.QueryInterface<nsIWebBrowserChrome>(xulChild);
+                }
+
+                
+                nsIWebBrowserChrome oBrowser = m_browser;
+                oBrowser.SetChromeFlagsAttribute(chromeFlags);
+                return oBrowser;
+            }
+        }
+
+        MacroPromptService popupService;
+        private async void Browser_CreateWindow(object sender, GeckoCreateWindowEventArgs e)
+        {
+            //return;
             if (e.Uri.Contains("about:blank"))
             {
                 e.Cancel = true;
                 return;
             }
-            GeckoPreferences.Default["allow_scripts_to_close_windows"] = true;
 
-            macroPlayer.Paused = true;
+           
 
-            ffpopupMacrosBrowser = new GeckoWebBrowser();
-            e.WebBrowser = ffpopupMacrosBrowser;
-            ffpopupMacrosBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
-            ffpopupMacrosBrowser.Navigate(e.Uri);
-
-            ffpopupMacros = new FFBrowserPopup();
-            ffpopupMacros.SuspendLayout();
-            ffpopupMacros.Controls.Add(ffpopupMacrosBrowser);
-            ffpopupMacros.ResumeLayout(false);
-            ffpopupMacros.PerformLayout();
-            ffpopupMacros.Show();
-            ffpopupMacros.TopMost = true;
-            await Task.Delay(300);
-            //await Task.Run(() => Thread.Sleep(300));
-            ffpopupMacros.TopMost = false;
-
-            ffpopupMacros.Focus();
-            ffpopupMacrosBrowser.Focus();
-
-            bool docComplete = false;
-            ffpopupMacrosBrowser.DocumentCompleted += (s, ee) => { docComplete = true; };
-            int awaitedComplete = 0;
-            while (!docComplete)
+            if (macroPlayer == null || !macroPlayer.IsRunning)
             {
-                await Task.Delay(500);
-                //await Task.Run(() => Thread.Sleep(500));
-                if (awaitedComplete++ >= 25) break;
+                GeckoPreferences.Default["dom.allow_scripts_to_close_windows"] = true;
+                GeckoPreferences.Default["allow_scripts_to_close_windows"] = true;
+
+                string target = e.Uri.ToLower();
+                if (target.Contains("https://accounts.google.com/signup?service=mail&continue=https://mail.google.com/mail/"))
+                {
+                    WebBrowser.Navigate(e.Uri);
+                    e.Cancel = true;
+                    return;
+                }
+                if (target.Contains("https://hootsuite.com/linkedin/authenticate")) return;
+                if (!WebBrowser.Browser.Url.AbsoluteUri.Contains("https://mail.google.com") &&
+                    !WebBrowser.Browser.Url.AbsoluteUri.Contains("https://search.yahoo.com") &&
+                    !WebBrowser.Browser.Url.AbsoluteUri.Contains("https://plus.google.com") && 
+                    !target.Contains("accounts.google.com/signin/oauth") &&
+                    !target.Contains("https://hootsuite.com/") &&
+                    !target.Contains("google/authenticate"))
+                {
+                    if (target.Contains("microsoft") ||
+                        target.Contains("facebook") ||
+                        target.Contains("share") ||
+                        target.Contains("twitter") ||
+                        target.Contains("gplus") ||
+                        target.Contains("yahoo") ||
+                        target.Contains("login") ||
+                        target.Contains("connect") ||
+                        target.Contains("oauth") ||
+                        target.Contains("signup") ||
+                        target.Contains("accounts.google.com/signin/oauth") ||
+                        target.Contains("https://www.diigo.com/account/thirdparty/google") ||
+                        target.Contains("hootsuite.com") ||
+                        target.Contains("session/") ||
+                        target.Contains("zapier.com")) return;
+                }
+                if (target.Contains("accounts.google.com/signin/oauth") || 
+                    target.Contains("google/authenticate") ||
+                    target.Contains("https://hootsuite.com/"))
+                {
+                    // //var wa = System.Windows.Forms.Screen.GetWorkingArea(WebBrowser);
+                    // //e.InitialWidth = wa.Width;
+                    // //e.InitialHeight = wa.Height;
+
+                    // //return;
+                    // //var idlWindow = new Gecko.WebIDL.Window(WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance, (nsISupports)WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance);
+
+
+                    var formWindow = new FFBrowserPopup();
+
+                    var mBrowser = new GeckoWebBrowser();
+                    mBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+                    mBrowser.DocumentCompleted += (ss, ee) =>
+                    {
+                        if ((ee.Uri.AbsolutePath == "/youtube/youtube-auth-confirm" || ee.Uri.AbsolutePath == "/linkedin/linkedin-auth-confirm" || ee.Uri.AbsolutePath == "/google/google-auth-confirm") && ee.Uri.Authority == "hootsuite.com")
+                        {
+                            string window_opener, source, authBundle, options, options_authFailed, options_socialNetworkId;
+                            using (var context = new AutoJSContext(ee.Window))
+                            {
+                                context.EvaluateScript(@"triggerData.source", out source);
+                                context.EvaluateScript(@"triggerData.authBundle", out authBundle);
+                                context.EvaluateScript(@"triggerData.options", out options);
+                                context.EvaluateScript(@"triggerData.options.authFailed", out options_authFailed);
+                                context.EvaluateScript(@"triggerData.options.socialNetworkId", out options_socialNetworkId);
+                                using (var openerContext = new AutoJSContext(WebBrowser.Browser.Window))
+                                {
+                                    openerContext.EvaluateScript(@"
+var triggerData = {
+    ""source"": """ + source + @""",
+    ""authBundle"": " + authBundle + @",
+    ""options"": {
+         ""authFailed"": " + options_authFailed + @",
+        ""socialNetworkId"": " + options_socialNetworkId + @"
+    }
+};
+hs.externalAuthComplete(triggerData.source, triggerData.authBundle, triggerData.options);
+                                ", out source);
+                                }
+                            }
+                            formWindow.Close();
+                        }
+                    };
+
+                    mBrowser.Navigating += (ss, ee) =>
+                    {
+                        //if (ee.Uri.AbsolutePath == "/google/google-auth-confirm" || ee.Uri.AbsolutePath == "/signin/oauth/consent")
+                        //{
+                            if (popupService == null)
+                            {
+                                popupService = new MacroPromptService();
+                                popupService.showAny = false;
+                                PromptFactory.PromptServiceCreator = () => popupService;
+                            }
+                            else
+                            {
+                                popupService.showAny = false;
+                            }
+                        //}
+                    };
+
+                    mBrowser.Navigated += (ss, ee) =>
+                    {
+                        if (ee.Uri.ToString().Contains("twitter") || ee.Uri.ToString().Contains("facebook"))
+                        {
+                            formWindow.Close();
+                            var jsWindow = new Gecko.WebIDL.Window(WebBrowser.Browser.Window.DomWindow, (nsISupports)WebBrowser.Browser.Window.DomWindow);
+                            jsWindow.Open(ee.Uri.ToString());
+                        }
+                        string window_opener;
+                        using (var context = new AutoJSContext(ee.DomWindow))
+                        {
+                            context.EvaluateScript(@"window", out window_opener);
+
+                            string opener = @" {
+                                ""closed"": ""undefined""
+                            };";
+                            context.EvaluateScript(@"window.__defineGetter__('opener', function () { return "+ opener + "; });", out window_opener);
+                        }
+                    };
+
+                    mBrowser.NavigationError += (ss, eee) =>
+                    {
+                    };
+                    mBrowser.Retargeted += (ss, eee) =>
+                    {
+                    };
+
+                    mBrowser.Navigate(e.Uri);
+
+                    //mBrowser.WebBrowserFocus.Activate();
+                    //e.WebBrowser = mBrowser;
+                    if(target.Contains("https://hootsuite.com/network/network-popup-preloader"))
+                        e.WebBrowser = mBrowser;
+                    else
+                        e.CreateDummy = true;
+
+                   
+                    formWindow.SuspendLayout();
+                    formWindow.Controls.Add(mBrowser);
+                    formWindow.ResumeLayout(false);
+                    formWindow.PerformLayout();
+                    formWindow.Show();
+                    formWindow.TopMost = true;
+                    formWindow.TopMost = false;
+                    formWindow.Show();
+
+                    formWindow.FormClosed += (ss, ee) => { if (popupService != null) popupService.showAny = true; };
+                    return;
+                    
+                    // //Gecko.Services.WindowWatcher.WindowCreator = new TabbedBrowserCreator(formWindow, mBrowser);
+                    // //Gecko.Services.WindowWatcher.LockWindowCreator();
+                    //// formWindow.Show();
+                    // //return;
+
+
+                    // mBrowser.HandleCreated += (ss, ee) =>
+                    // {
+
+                    // };
+
+                    // mBrowser.Navigating += (ss, ee) =>
+                    // {
+                    //     return;
+                    //     if (ee.Uri.AbsolutePath == "/google/google-auth-confirm")
+                    //     {
+                    //         ee.Cancel = true;
+                    //         mBrowser.Navigate(ee.Uri.ToString() + WebBrowser.Browser.Url);
+                    //     }
+                    // };
+
+                    // mBrowser.DocumentCompleted += (ss, ee) => 
+                    // {
+
+                    // };
+
+                    //e.WebBrowser = mBrowser;
+                    //mBrowser.Navigate(e.Uri);
+
+                    // return;
+                    // //e.Cancel = true;
+                    // //Task.Run(async()=> 
+                    // //{
+                    // //    await Task.Delay(3000);
+                    // //    Application.Current.Dispatcher.Invoke(()=> 
+                    // //    {
+                    // nsIXULWindow xulChild = AppShellService.CreateTopLevelWindow(WebBrowser.Browser, null, (uint)e.Flags, 500, 700);
+                    //         var browser = Xpcom.QueryInterface<nsIWebBrowserChrome>(xulChild);
+                    //         xulChild.ShowModal();
+                    //         browser.ShowAsModal();
+                    // //        return;
+                    // //    });
+                    // //});
+                    // //Gecko.Services.WindowWatcher.ActiveWindow
+                    // //var domWindow = WebBrowser.Browser.GetContentDOMWindowAttribute();
+                    // // WebBrowser.Browser.CreateWindow -= Browser_CreateWindow;
+                    // //var jsWindow = new Gecko.WebIDL.Window(WebBrowser.Browser.Window.DomWindow, (nsISupports)WebBrowser.Browser.Window.DomWindow);
+                    // //jsWindow.CaptureEvents();
+                    // //var openedWindow = jsWindow.OpenDialog(e.Uri);
+                    // //var openedWindowjsWindow = new Gecko.WebIDL.Window(openedWindow, (nsISupports)openedWindow);
+                    // //openedWindowjsWindow.OpenDialog()
+                    // //var EventTarget = jsWindow.PrivateRoot as nsIDOMEventTarget;
+
+                    // //var window = jsWindow.Open(e.Uri, "about:blank", "width=500,height=700");//.CallMethod<nsIDOMWindow>("open", e.Uri, "_blank", "PopUp", randomnumber, "scrollbars=1,menubar=0,resizable=1,width=850,height=500");
+
+                    // //foreach (string sEventName in this.DefaultEvents)
+                    // //{
+                    // //    using (var eventType = new nsAString(sEventName))
+                    // //        EventTarget.AddEventListener(eventType, jsWindow.Confirm(), true, true, 2);
+                    // //}
+
+
+
+                    // //.Open(e.Uri,"popup", "width=500,height=700");
+                    // //return;
+                    // //network.http.referer.XOriginPolicy
+                    // //network.http.referer.XOriginTrimmingPolicy
+                    // //GeckoPreferences.Default["network.http.referer.XOriginPolicy"] = 0;
+                    // //GeckoPreferences.Default["network.http.referer.XOriginTrimmingPolicy"] = 0;
+                    // //GeckoPreferences.Default["accessibility.blockautorefresh"] = false;
+
+
+                    // //e.Cancel = false;
+                    // // e.WebBrowser = this.WebBrowser.Browser;
+                    // //return;
+
+
+                    // //formWindow = new FFBrowserPopup();
+                    // ////formWindow.Focus();
+
+                    // //mBrowser = new GeckoWebBrowser();
+
+
+                    // //mBrowser.Focus();
+                    // //e.WebBrowser = mBrowser;
+
+                    // //mBrowser.WindowClosed += (ss, ee) =>
+                    // //{
+
+                    // //};
+                    // mBrowser.Navigating += (ss, ee) =>
+                    // {
+                    //     //var widno = new Gecko.WebIDL.Window(mBrowser.Window.DomWindow, (nsISupports)mBrowser.Window.DomWindow);
+                    //     ////wino.Confirm();
+                    //     //widno.Opener = new Gecko.WebIDL.Window(WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance,
+                    //     //        (nsISupports)WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance).Opener;
+
+                    //     var opnerWindow = new Gecko.WebIDL.Window(ee.DomWindow.DomWindow, (nsISupports)ee.DomWindow.DomWindow);
+                    //     //opnerWindow.Opener = WebBrowser.Browser.Window;
+                    //     new Gecko.WebIDL.Window(ee.DomWindow.DomWindow, (nsISupports)ee.DomWindow.DomWindow).Opener = new Gecko.WebIDL.Window(WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance, (nsISupports)WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance);
+
+                    //     var browserIDLwindow = new Gecko.WebIDL.Window(WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance, (nsISupports)WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance);
+                    //     dynamic hs = browserIDLwindow.GetProperty<object>("hs");
+                    //     var tzn = hs.timezoneName;
+                    //     //var opner2 = new Gecko.WebIDL.Window(WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance,
+                    //     //      (nsISupports)WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance).Opener;
+                    //     if (ee.Uri.AbsolutePath == "/google/google-auth-confirm")
+                    //     {
+                    //         var opner2 = new Gecko.WebIDL.Window(ee.DomWindow.DomWindow, (nsISupports)ee.DomWindow.DomWindow).Opener;
+                    //         //var opner = new Gecko.WebIDL.Window(WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance, 
+                    //         //    (nsISupports)WebBrowser.Browser.Window.DomWindow.AsComPtr().Instance).Opener;
+                    //         //var wino = new Gecko.WebIDL.Window(mBrowser.Window.DomWindow, (nsISupports)mBrowser.Window.DomWindow);
+                    //         ////wino.Confirm();
+                    //         //wino.Opener = WebBrowser.Browser;
+                    //         //ee.Cancel = false;
+                    //         ////wino.Frames.
+                    //         //var mm = new GeckoWebBrowser();
+
+                    //         //ee.Cancel = true;
+                    //         //mm.Navigate(ee.Uri.ToString());
+                    //         ////mBrowser.Parent.
+                    //         //return;
+                    //         //ee.Cancel = true;
+
+                    //         //WebBrowser.Navigate(ee.Uri.ToString());
+                    //     }
+
+                    // };
+
+                    // mBrowser.Redirecting += (ss, ee)=>
+                    // {
+
+                    // };
+                    // //mBrowser.Retargeted += (ss, ee) => 
+                    // //{
+
+                    // //};
+                    // formWindow.SuspendLayout();
+                    // formWindow.Controls.Add(mBrowser);
+                    // formWindow.Text = e.Uri;
+                    // formWindow.ResumeLayout(false);
+                    // formWindow.PerformLayout();
+                    // formWindow.Show();
+                    // formWindow.TopMost = true;
+                    // formWindow.TopMost = false;
+
+                    // formWindow.FormClosing += (ss, ee) =>
+                    // {
+
+                    // };
+
+
+                    //mBrowser.Navigate(e.Uri);
+
+                }
+                else
+                {
+                    if (prevopened != e.Uri || !prevopened.Contains("youtube.com/watch"))
+                    {
+                        if (IsFromIA)
+                        {
+                            WebBrowser.Navigate(e.Uri);
+                        }
+                        else
+                        {
+                            OnOpenNewTabToUrl(e.Uri);
+                        }
+                        prevopened = e.Uri;
+                    }
+                    else
+                    {
+                        prevopened = "";
+                    }
+
+                    e.Cancel = true;
+                }
             }
-
-            ffpopupMacrosBrowser.WebBrowserFocus.Activate();
-            while (ffpopupMacrosBrowser == null || ffpopupMacrosBrowser.Document == null) await Task.Delay(500);// await Task.Run(() => Thread.Sleep(500));
-            bool timeout = await CheckBrowserBusyTillTimeOut(macVals, ffpopupMacrosBrowser);
-            if (!timeout)
+            else
             {
-                ffpopupMacrosBrowser.Stop();
-            }
-            setfromframe = setfromwindow = true;
-
-            ffpopupMacrosBrowser.WindowClosed += (s, ee) =>
-            {
-                GeckoPreferences.Default["allow_scripts_to_close_windows"] = false;
-                macroPlayer.Paused = true;
                 try
                 {
-                    wasSetFromWindow = true;
-                    setfromframe = setfromwindow = false;
-                    ffpopupMacrosBrowser.Dispose();
-                    ffpopupMacros.Dispose();
-                    ffpopupMacros = null;
-                    ffpopupMacrosBrowser = null;
-                }
-                catch { }
-                macroPlayer.Paused = false;
-            };
+                    GeckoPreferences.Default["allow_scripts_to_close_windows"] = true;
 
+                    macroPlayer.Paused = true;
+
+                    ffpopupMacrosBrowser = new GeckoWebBrowser();
+                    e.WebBrowser = ffpopupMacrosBrowser;
+                    ffpopupMacrosBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+                    ffpopupMacrosBrowser.Navigate(e.Uri);
+
+                    ffpopupMacros = new FFBrowserPopup();
+                    ffpopupMacros.SuspendLayout();
+                    ffpopupMacros.Controls.Add(ffpopupMacrosBrowser);
+                    ffpopupMacros.Text = e.Uri;
+                    ffpopupMacros.ResumeLayout(false);
+                    ffpopupMacros.PerformLayout();
+                    ffpopupMacros.Show();
+                    ffpopupMacros.TopMost = true;
+                    await Task.Delay(300);
+                    ffpopupMacros.TopMost = false;
+
+                    ffpopupMacros.Focus();
+                    ffpopupMacrosBrowser.Focus();
+
+                    bool docComplete = false;
+                    ffpopupMacrosBrowser.DocumentCompleted += (s, ee) => { docComplete = true; };
+                    int awaitedComplete = 0;
+                    while (!docComplete)
+                    {
+                        await Task.Delay(500);
+                        if (awaitedComplete++ >= 25) break;
+                    }
+
+                    ffpopupMacrosBrowser.WebBrowserFocus.Activate();
+                    while (ffpopupMacrosBrowser == null || ffpopupMacrosBrowser.Document == null) await Task.Delay(500);// await Task.Run(() => Thread.Sleep(500));
+                    bool timeout = await CheckBrowserBusyTillTimeOut(macVals);
+                    if (!timeout)
+                    {
+                        ffpopupMacrosBrowser.Stop();
+                    }
+                    setfromframe = setfromwindow = true;
+
+                    ffpopupMacrosBrowser.WindowClosed += FfpopupMacrosBrowser_WindowClosed;
+                    ffpopupMacros.FormClosed += FfpopupMacros_FormClosed;
+
+
+                    macroPlayer.Paused = false;
+                }
+                catch { FfpopupMacros_FormClosed(null, null); }
+            }
+        }
+
+        private void FfpopupMacrosBrowser_WindowClosed(object sender, EventArgs e)
+        {
+            FfpopupMacros_FormClosed(null, null);
+        }
+
+        private void FfpopupMacros_FormClosed(object sender, System.Windows.Forms.FormClosedEventArgs e)
+        {
+            if(ffpopupMacrosBrowser != null) ffpopupMacrosBrowser.WindowClosed -= FfpopupMacrosBrowser_WindowClosed;
+            if(ffpopupMacros != null) ffpopupMacros.FormClosed -= FfpopupMacros_FormClosed;
+
+            GeckoPreferences.Default["allow_scripts_to_close_windows"] = false;
+            macroPlayer.Paused = true;
+            try
+            {
+                wasSetFromWindow = true;
+                setfromframe = setfromwindow = false;
+                ffpopupMacrosBrowser.Dispose();
+                ffpopupMacros.Dispose();
+                ffpopupMacros = null;
+                ffpopupMacrosBrowser = null;
+            }
+            catch { }
             macroPlayer.Paused = false;
         }
 
@@ -1448,7 +2241,7 @@ namespace zFirefoxBrowser.ViewModels
                     return;
                 }
             }
-            
+            setfromwindow = false;
             await RunMacro(manger, type, loop);
             try
             {
@@ -1458,6 +2251,7 @@ namespace zFirefoxBrowser.ViewModels
         }
 
         MacroPromptService macropromt;
+        [HandleProcessCorruptedStateExceptions]
         internal async Task RunMacro(MacroManger mPlayer, IIMPlayType isiim, int times, MacroVariables variablescontinuefromjs = null)
         {
             try
@@ -1478,15 +2272,15 @@ namespace zFirefoxBrowser.ViewModels
                     PromptFactory.PromptServiceCreator = () => macropromt;
                 }
                 int totalDataSourceLines = 1;
-                if (isiim != IIMPlayType.macroFromjs || macVals == null)
+                if (!setfromwindow && (isiim != IIMPlayType.macroFromjs || macVals == null))
                 {
                     macVals = new MacroVariables();
                     macVals.OnSetExtract += MacVals_OnSetExtract;
                 }
+
                 if (!setfromwindow)
                 {
-                    WebBrowser.Focus();
-                    WebBrowser.Browser.Focus();
+                    CurrentlyActiveBrowser.Focus();
                 }
                 else
                 {
@@ -1511,17 +2305,56 @@ namespace zFirefoxBrowser.ViewModels
                         JSMacroPlayer.playMacro(WebBrowser.Browser.Window.DomWindow, WebBrowser.Browser.DomDocument.NativeDomDocument, mPlayer.FileText);
                         OnAfterSandboxEval("");
                     }
+                    catch (AccessViolationException)
+                    {
+                        try
+                        {
+                            if (ffpopupMacros != null) ffpopupMacros.Close();
+                        }
+                        catch { }
+                        macroPlayer.StopRequested = true;
+                        try
+                        {
+                            if (tabsWindows.Count > 0)
+                            {
+                                foreach (var tw in tabsWindows)
+                                {
+                                    tw.OnClosedWindow -= Tcn_OnClosedWindow;
+                                    tw.CloseAndDispose();
+                                }
+                                tabsWindows.Clear();
+
+                                setFromTabsWindows = false;
+                                windowIndexToSet = -1;
+                            }
+                        }
+                        catch { }
+
+                        OnCloseTab(false, this);
+                        
+                        "Stopped macro and closed tab because of an unexpected page process you can reopen a new one and try the macro again".Show();
+                        return;
+                    }
                     return;
                 }
 
                 if (isiim == IIMPlayType.macroFromjs) isrunningiimInJsMode = true;
 
+                //if (!isSettingFromTab)
+                //{
+                //    dataCourceLine = 0;
+                //}
                 for (int dataCourceLine = 0; dataCourceLine < totalDataSourceLines; dataCourceLine++)
                 {
+                    if (isiim == IIMPlayType.macro) macVals[MacroVariables.EXTRACT] = "NULL";
                     await Task.Run(() => { while (mPlayer.Paused) { Thread.Sleep(500); } });
                     if (InStopRequest) return;
 
-                    for (int i = 0; i < times; i++)
+                    //if (!isSettingFromTab)
+                    //{
+                    //    iTimesToRun = 0;
+                    //}
+                    for (int iTimesToRun = 0; iTimesToRun < times; iTimesToRun++)
                     {
                         if (runningInJsMode)
                         {
@@ -1530,13 +2363,13 @@ namespace zFirefoxBrowser.ViewModels
                         await Task.Run(() => { while (mPlayer.Paused) { Thread.Sleep(500); } });
                         if (InStopRequest) return;
 
-                        macVals[MacroVariables.LOOP] = !runningInJsMode ? (i + 1).ToString().ToString() : (mPlayer.JSLoopPos + 1).ToString();
+                        macVals[MacroVariables.LOOP] = !runningInJsMode ? (iTimesToRun + 1).ToString().ToString() : (mPlayer.JSLoopPos + 1).ToString();
 
                         mPlayer.CurrentLoopPos = macVals[MacroVariables.LOOP];
 
 
                         GeckoDomDocument currentMacroContentDocument;
-                        if (!setfromwindow) currentMacroContentDocument = WebBrowser.Browser.Document;
+                        if (!setfromwindow) currentMacroContentDocument = CurrentlyActiveBrowser.Document;
                         else currentMacroContentDocument = ffpopupMacrosBrowser.Document;
                         GeckoIFrameElement currentContentDocumentIframe = null;
                         GeckoFrameElement currentContentDocumentFrame = null;
@@ -1546,8 +2379,30 @@ namespace zFirefoxBrowser.ViewModels
 
                         #region play macro
                         int retrystep = 0;
+                        //if (!isSettingFromTab)
+                        //{
+                        //     macroIndex = 0;
+                        //}
                         for (int macroIndex = 0; macroIndex < mPlayer.MacroPlayer.Macros.Count; macroIndex++)
                         {
+                            //bool foundlinecommand = false;
+                            //if (isSettingFromTab)
+                            //{
+                            //    if(mPlayer.MacroPlayer.Macros.Count - 1 > macroIndex)
+                            //    {
+                            //        var macfinding = mPlayer.MacroPlayer.Macros[macroIndex-1];
+                            //        if(macroWaitingFor == macfinding.Command + macfinding.Line + macfinding.Value)
+                            //        {
+                            //            foundlinecommand = true;
+                            //            isSettingFromTab = false;
+                            //        }
+                            //    }
+                            //    else
+                            //    {
+                            //        break;
+                            //    }
+                            //    if (!foundlinecommand) break;
+                            //}
                             if (macVals[MacroVariables.SINGLESTEP].ToUpper() == "YES") mPlayer.OnCommandFromView_Raised("MacroPause");
                             await Task.Run(() => { while (mPlayer.Paused) { Thread.Sleep(500); } });
                             if (InStopRequest) return;
@@ -1571,11 +2426,11 @@ namespace zFirefoxBrowser.ViewModels
                                     default: break;
                                 }
                                 //await Task.Run(() => Thread.Sleep(1000));
-                                if (await CheckBrowserBusyTillTimeOut(macVals, WebBrowser.Browser) == false) WebBrowser.Browser.Stop();
+                                if (await CheckBrowserBusyTillTimeOut(macVals) == false) CurrentlyActiveBrowser.Stop();
 
                                 if (InStopRequest) return;
 
-                                while (WebBrowser.Browser.Document == null && !CheckTimeOutMax(macVals) && !InStopRequest) { await Task.Delay(100); }// await Task.Run(() => Thread.Sleep(250)); }
+                                while (CurrentlyActiveBrowser.Document == null && !CheckTimeOutMax(macVals) && !InStopRequest) { await Task.Delay(100); }// await Task.Run(() => Thread.Sleep(250)); }
 
                                 if (InStopRequest) return;
 
@@ -1586,7 +2441,17 @@ namespace zFirefoxBrowser.ViewModels
                                     currentMacroContentDocument != null &&
                                     currentMacroContentDocument.Location != null &&
                                     currentMacroContentDocument.Location.Href != null) macVals[MacroVariables.URLCURRENT] = currentMacroContentDocument.Location.Href;
-                                else macVals[MacroVariables.URLCURRENT] = WebBrowser.Browser.Document.Location.Href;
+                                else
+                                {
+                                    if(CurrentlyActiveBrowser.Document.Location.Href == "" || CurrentlyActiveBrowser.Document.Location.Href == "about:blank")
+                                    {
+                                        if(WebBrowser.Browser.Document.Location.Href != "") macVals[MacroVariables.URLCURRENT] = WebBrowser.Browser.Document.Location.Href;
+                                    }
+                                    else
+                                    {
+                                        macVals[MacroVariables.URLCURRENT] = CurrentlyActiveBrowser.Document.Location.Href;
+                                    }
+                                }
 
                                 if ((string)GeckoPreferences.User["general.useragent.override"] != macVals[MacroVariables.USERAGENT])
                                 {
@@ -1640,7 +2505,7 @@ namespace zFirefoxBrowser.ViewModels
 
                                     #region BACK
                                     case MacroCommands.BACK:
-                                        if (WebBrowser.Browser.CanGoBack) WebBrowser.Browser.GoBack();
+                                        if (CurrentlyActiveBrowser.CanGoBack) CurrentlyActiveBrowser.GoBack();
                                         if (await QuitableDelay(5)) return;
                                         // await Task.Run(() => Thread.Sleep(500));
                                         break;
@@ -1648,7 +2513,7 @@ namespace zFirefoxBrowser.ViewModels
 
                                     #region CLEAR
                                     case MacroCommands.CLEAR:
-                                        WebBrowser.Browser.Stop();
+                                        CurrentlyActiveBrowser.Stop();
                                         await Task.Delay(500);
                                         //await Task.Run(() => Thread.Sleep(500));
                                         //Clears the browsers cache and all cookies. Can be useful, for example, 
@@ -1692,8 +2557,8 @@ namespace zFirefoxBrowser.ViewModels
                                             }
                                         }
 
-                                        WebBrowser.Browser.Window.WindowUtils.SendMouseEvent("mousedown", xx, yy, GeckoMouseButton.Left, 1, 0, true, 0, 0);
-                                        WebBrowser.Browser.Window.WindowUtils.SendMouseEvent("mouseup", xx, yy, GeckoMouseButton.Left, 2, 0, true, 0, 0);
+                                        CurrentlyActiveBrowser.Window.WindowUtils.SendMouseEvent("mousedown", xx, yy, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                                        CurrentlyActiveBrowser.Window.WindowUtils.SendMouseEvent("mouseup", xx, yy, GeckoMouseButton.Left, 2, 0, true, 0, 0);
                                         break;
                                     #endregion
 
@@ -1701,7 +2566,7 @@ namespace zFirefoxBrowser.ViewModels
                                     case MacroCommands.EVENT:
                                     case MacroCommands.EVENTS:
                                         //EVENT TYPE=type [SELECTOR|XPATH]=localizer [BUTTON|POINT|CHAR|KEY]=[button|point|char|key] [MODIFIERS=modifiers]
-                                        await EventsCommand(mac.Value, mPlayer.MacroPlayer, macVals, (setfromframe && currentMacroContentDocument != null) ? currentMacroContentDocument : WebBrowser.Browser.Document, currentContentDocumentIframe, currentContentDocumentFrame, i);
+                                        await EventsCommand(mac.Value, mPlayer.MacroPlayer, macVals, (setfromframe && currentMacroContentDocument != null) ? currentMacroContentDocument : CurrentlyActiveBrowser.Document, currentContentDocumentIframe, currentContentDocumentFrame, iTimesToRun);
                                         break;
                                     #endregion
 
@@ -1751,15 +2616,18 @@ namespace zFirefoxBrowser.ViewModels
 
                                     #region FRAME
                                     case MacroCommands.FRAME:
-                                        currentMacroContentDocument = WebBrowser.Browser.Document;
+                                        currentMacroContentDocument = CurrentlyActiveBrowser.Document;
                                         setfromframe = false;
                                         currentContentDocumentIframe = null;
                                         currentContentDocumentFrame = null;
-                                        GeckoDomDocument d = FrameCommandRecursive(mac.Value, macVals, currentMacroContentDocument, 0, ref currentContentDocumentIframe, ref currentContentDocumentFrame);
-                                        if (d != null)
+                                        if (mac.Value.ToLower() != "f=0")
                                         {
-                                            currentMacroContentDocument = d;
-                                            setfromframe = true;
+                                            GeckoDomDocument d = FrameCommandRecursive(mac.Value, macVals, currentMacroContentDocument, 0, ref currentContentDocumentIframe, ref currentContentDocumentFrame);
+                                            if (d != null)
+                                            {
+                                                currentMacroContentDocument = d;
+                                                setfromframe = true;
+                                            }
                                         }
                                         break;
                                     #endregion
@@ -1922,7 +2790,7 @@ namespace zFirefoxBrowser.ViewModels
 
                                     #region PAUSE
                                     case MacroCommands.PAUSE:
-                                        mPlayer.Paused = true;
+                                        mPlayer.OnCommandFromView_Raised("MacroPause");
                                         break;
                                     #endregion
 
@@ -1976,8 +2844,9 @@ namespace zFirefoxBrowser.ViewModels
 
                                     #region REFRESH
                                     case MacroCommands.REFRESH:
-                                        //WebBrowser.Browser.Navigate(WebBrowser.Browser.Url.ToString());
-                                        WebBrowser.Browser.Refresh();
+                                        //CurrentlyActiveBrowser.Navigate(CurrentlyActiveBrowser.Url.ToString());
+                                        CurrentlyActiveBrowser.Refresh();
+                                        CurrentlyActiveBrowser.Reload();
                                         if (await QuitableDelay(5)) return;
                                         // await Task.Run(() => Thread.Sleep(500));
                                         break;
@@ -1989,7 +2858,7 @@ namespace zFirefoxBrowser.ViewModels
                                         {
                                             //SAVEAS TYPE=(CPL|MHT|HTM|TXT|EXTRACT|BMP|PNG|JPEG) FOLDER=folder_name FILE=file_name
                                             //no support for SAVEAS TYPE=EXTRACT FOLDER="C:\\My Macros\\Downloads FILE=*" format
-                                            string SAVEASTYPE = "", SAVEASFOLDER = "", SAVEASFILE = "", saveasFilepath = "";
+                                            string SAVEASTYPE = "", SAVEASFOLDER = "", SAVEASFILE = "", SAVEASURL="",SAVEASTEXT="", saveasFilepath = "";
                                             await Task.Run(() =>
                                             {
                                                 foreach (var macval in GetRegexMacroCommands(mac.Value))
@@ -2009,6 +2878,14 @@ namespace zFirefoxBrowser.ViewModels
 
                                                         case "FILE":
                                                             SAVEASFILE = macVariableValue;
+                                                            break;
+
+                                                        case "URL":
+                                                            SAVEASURL = macVariableValue;
+                                                            break; 
+
+                                                        case "TEXT":
+                                                            SAVEASTEXT = macVariableValue;
                                                             break;
                                                         default: break;
                                                     }
@@ -2042,11 +2919,27 @@ namespace zFirefoxBrowser.ViewModels
                                             });
                                             switch (SAVEASTYPE.ToUpper())
                                             {
+                                                case "STRING":
+                                                    await Task.Run(() => { File.AppendAllText(saveasFilepath, SAVEASTEXT + Environment.NewLine); });
+                                                    break;
+                                                     
+                                                case "DOWNLOADIMAGEURL":
+                                                    await Task.Run(()=>
+                                                    {
+                                                        string imagename = SAVEASURL;
+                                                        if (imagename.Contains("/"))
+                                                        {
+                                                            imagename = imagename.Substring(imagename.LastIndexOf("/")+1);
+                                                        }
+                                                        MyFilesDatabase.DownloadImage(SAVEASURL, saveasFilepath+ imagename);
+                                                    });
+                                                    break;
+
                                                 case "BMP":
                                                 case "PNG":
                                                 case "JPEG":
-                                                    ImageCreator creator = new ImageCreator(WebBrowser.Browser);
-                                                    byte[] mBytes = creator.CanvasGetPngImage((uint)0, (uint)0, (uint)WebBrowser.Browser.Width, (uint)WebBrowser.Browser.Height);
+                                                    ImageCreator creator = new ImageCreator(CurrentlyActiveBrowser);
+                                                    byte[] mBytes = creator.CanvasGetPngImage((uint)0, (uint)0, (uint)CurrentlyActiveBrowser.Width, (uint)CurrentlyActiveBrowser.Height);
                                                     using (System.Drawing.Image image = System.Drawing.Image.FromStream(new System.IO.MemoryStream(mBytes)))
                                                     {
                                                         image.Save(saveasFilepath);
@@ -2054,7 +2947,16 @@ namespace zFirefoxBrowser.ViewModels
                                                     break;
 
                                                 case "EXTRACT":
-                                                    await Task.Run(()=> { File.AppendAllText(saveasFilepath.Replace("extract", "txt"), macVals[MacroVariables.EXTRACT]); });
+                                                    var extract = macVals[MacroVariables.EXTRACT];
+                                                    if (saveasFilepath.Contains("ShortenedURLs"))
+                                                    {
+                                                        extract = extract.Replace("content_copyCopy", "");
+                                                        extract = extract.Replace("short", "");
+                                                        extract = extract.Replace("URL", "");
+                                                        extract = extract.Trim();
+                                                    }
+                                                    hadSaveAsFilePath = saveasFilepath.Replace("extract", "txt");
+                                                    await Task.Run(()=> { File.AppendAllText(hadSaveAsFilePath, isiim == IIMPlayType.macroFromjs? extract :extract+Environment.NewLine); });
                                                     break;
 
                                                 case "CPL":
@@ -2138,7 +3040,7 @@ namespace zFirefoxBrowser.ViewModels
                                                                                 if (!string.IsNullOrEmpty(document.Url.Query) || !string.IsNullOrWhiteSpace(document.Url.Query)) daters = daters.Replace(document.Url.Query, "");
                                                                                 if (!string.IsNullOrEmpty(document.Url.Query) || !string.IsNullOrWhiteSpace(document.Url.Query)) daters = daters.Replace(document.Url.Query, "");
                                                                                 string data;
-                                                                                using (var context = new AutoJSContext(WebBrowser.Browser.Window))
+                                                                                using (var context = new AutoJSContext(CurrentlyActiveBrowser.Window))
                                                                                 {
                                                                                     context.EvaluateScript(@"
                                                                                         function getBase64Image() 
@@ -2267,7 +3169,7 @@ namespace zFirefoxBrowser.ViewModels
                                                     GeckoHtmlElement element = null;
                                                     GeckoElement geckoDomElement;
                                                     if (currentMacroContentDocument != null && setfromframe) geckoDomElement = currentMacroContentDocument.DocumentElement;
-                                                    else geckoDomElement = WebBrowser.Browser.Document.DocumentElement;
+                                                    else geckoDomElement = CurrentlyActiveBrowser.Document.DocumentElement;
                                                     if (geckoDomElement is GeckoHtmlElement)
                                                     {
                                                         element = (GeckoHtmlElement)geckoDomElement;
@@ -2295,7 +3197,7 @@ namespace zFirefoxBrowser.ViewModels
                                                     GeckoHtmlElement elementtxt = null;
                                                     GeckoElement geckoDomElementtxt;
                                                     if (currentMacroContentDocument != null && setfromframe) geckoDomElementtxt = currentMacroContentDocument.DocumentElement;
-                                                    else geckoDomElementtxt = WebBrowser.Browser.Document.DocumentElement;
+                                                    else geckoDomElementtxt = CurrentlyActiveBrowser.Document.DocumentElement;
                                                     if (geckoDomElementtxt is GeckoHtmlElement)
                                                     {
                                                         elementtxt = (GeckoHtmlElement)geckoDomElementtxt;
@@ -2355,8 +3257,8 @@ namespace zFirefoxBrowser.ViewModels
                                         });
                                         if (SCREENSHOTTYPE.ToUpper() == "PAGE")
                                         {
-                                            ImageCreator creator = new ImageCreator(WebBrowser.Browser);
-                                            byte[] mBytes = creator.CanvasGetPngImage((uint)0, (uint)0, (uint)WebBrowser.Browser.Width, (uint)WebBrowser.Browser.Height);
+                                            ImageCreator creator = new ImageCreator(CurrentlyActiveBrowser);
+                                            byte[] mBytes = creator.CanvasGetPngImage((uint)0, (uint)0, (uint)CurrentlyActiveBrowser.Width, (uint)CurrentlyActiveBrowser.Height);
                                             using (System.Drawing.Image image = System.Drawing.Image.FromStream(new System.IO.MemoryStream(mBytes)))
                                             {
                                                 image.Save(filepath);
@@ -2420,7 +3322,7 @@ namespace zFirefoxBrowser.ViewModels
                                                     GeckoHtmlElement elementtxt = null;
                                                     GeckoElement geckoDomElementtxt;
                                                     if (currentMacroContentDocument != null && setfromframe) geckoDomElementtxt = currentMacroContentDocument.DocumentElement;
-                                                    else geckoDomElementtxt = WebBrowser.Browser.Document.DocumentElement;
+                                                    else geckoDomElementtxt = CurrentlyActiveBrowser.Document.DocumentElement;
                                                     if (geckoDomElementtxt is GeckoHtmlElement)
                                                     {
                                                         elementtxt = (GeckoHtmlElement)geckoDomElementtxt;
@@ -2522,7 +3424,7 @@ namespace zFirefoxBrowser.ViewModels
                                                             pdataSource = GloableProfData.PData;
                                                             break;
                                                         case MacroVariables.MacroDatasourceValues.DATASOURCE_SELECTPROFILE:
-                                                            pdataSource = await getSelectedProfile(true, mPlayer.SelectedMAcroPlayingFileName);
+                                                            pdataSource = await getSelectedProfile(true, mPlayer.SelectedMacroPlayingFileName);
                                                             break;
 
                                                         default:
@@ -2624,7 +3526,7 @@ namespace zFirefoxBrowser.ViewModels
                                                     cuuLoop = cuuLoop - 1;
                                                     if (cuuLoop > 0)
                                                     {
-                                                        i = cuuLoop;
+                                                        iTimesToRun = cuuLoop;
                                                         break;
                                                     }
                                                     break;
@@ -2639,13 +3541,13 @@ namespace zFirefoxBrowser.ViewModels
 
                                     #region TAG
                                     case MacroCommands.TAG:
-                                        //currentContentDocument = WebBrowser.Browser.Document;
+                                        //currentContentDocument = CurrentlyActiveBrowser.Document;
                                         previosTagElementFound = await TagCommand
                                             (
                                                 mac.Value, mPlayer.MacroPlayer, macVals,
-                                                (setfromframe && currentMacroContentDocument != null) ? currentMacroContentDocument : WebBrowser.Browser.Document, currentContentDocumentIframe, currentContentDocumentFrame,
+                                                (setfromframe && currentMacroContentDocument != null) ? currentMacroContentDocument : CurrentlyActiveBrowser.Document, currentContentDocumentIframe, currentContentDocumentFrame,
                                                 previosTagElementFound,
-                                                i
+                                                iTimesToRun
                                             );
                                         break;
                                     #endregion
@@ -2653,20 +3555,27 @@ namespace zFirefoxBrowser.ViewModels
                                     #region URL
                                     case MacroCommands.URL:
                                         string LINK = "";
-                                        foreach (var macval in GetRegexMacroCommands(mac.Value))
+                                        if (mac.Value.StartsWith("GOTO=javascript:((") && mac.Value.EndsWith("();"))
                                         {
-                                            if (!macval.Contains("=")) continue;
-                                            var macVariable = macval.Remove(macval.IndexOf('='));
-                                            var macVariableValue = GetMacroVariableAfterDynamicCheck(macval.Substring(macval.IndexOf('=') + 1), macVals);
-                                            switch (macVariable.ToUpper())
+                                            LINK = mac.Value.Replace("GOTO=", "");
+                                        }
+                                        else
+                                        {
+                                            foreach (var macval in GetRegexMacroCommands(mac.Value))
                                             {
-                                                case "GOTO":
-                                                    LINK = macVariableValue;
-                                                    break;
-                                                default: break;
+                                                if (!macval.Contains("=")) continue;
+                                                var macVariable = macval.Remove(macval.IndexOf('='));
+                                                var macVariableValue = GetMacroVariableAfterDynamicCheck(macval.Substring(macval.IndexOf('=') + 1), macVals);
+                                                switch (macVariable.ToUpper())
+                                                {
+                                                    case "GOTO":
+                                                        LINK = macVariableValue;
+                                                        break;
+                                                    default: break;
+                                                }
                                             }
                                         }
-                                        WebBrowser.Browser.Navigate(LINK.Trim());
+                                        CurrentlyActiveBrowser.Navigate(LINK.Trim());
                                         if (await QuitableDelay(10)) return;
                                         //await Task.Run(() => Thread.Sleep(1000));
                                         break;
@@ -2713,7 +3622,7 @@ namespace zFirefoxBrowser.ViewModels
                                         {
                                             if (mPlayer.StopRequested || !macroPlayer.IsRunning)
                                             {
-                                                if (runningInJsMode) JSMacroPlayer.macroDone(WebBrowser.Browser.Window.DomWindow, WebBrowser.Browser.DomDocument.NativeDomDocument);
+                                                if (runningInJsMode) JSMacroPlayer.macroDone(CurrentlyActiveBrowser.Window.DomWindow, CurrentlyActiveBrowser.DomDocument.NativeDomDocument);
                                                 break;
                                             }
 
@@ -2746,25 +3655,57 @@ namespace zFirefoxBrowser.ViewModels
                                                 TAB_ACTION = GetMacroVariableAfterDynamicCheck(macval, macVals);
                                             }
                                         }
+                                        //macroWaitingFor = mac.Command + mac.Line + mac.Value;
                                         if (!TAB_ACTION.IsNullOrEmpty())
                                         {
                                             switch (TAB_ACTION.ToUpper())
                                             {
                                                 case "OPEN":
+                                                    TabCommandNavigation tcn = new TabCommandNavigation((tabsWindows.Count + 2).ToString());
+                                                    tcn.OnClosedWindow += Tcn_OnClosedWindow;
+                                                    await tcn.WaitForComplete();
+                                                    tabsWindows.Add(tcn);
+                                                    //OnOpenNewTab();
                                                     break;
 
                                                 case "CLOSE":
-                                                    //try
-                                                    //{
-                                                    //    if (ffpopupMacros != null)
-                                                    //    {
-                                                    //        ffpopupMacros.Close();
-                                                    //    }
-                                                    //}
-                                                    //catch { }
+                                                    if (!setFromTabsWindows)
+                                                    {
+                                                        macroPlayer.StopRequested = true;
+                                                        OnCloseTab(false, this);
+                                                    }
+                                                    else
+                                                    {
+                                                        if(windowIndexToSet >=0 && setFromTabsWindows && tabsWindows.Count - 1 >= windowIndexToSet)
+                                                        {
+                                                            tabsWindows[windowIndexToSet].OnClosedWindow -= Tcn_OnClosedWindow;
+                                                            tabsWindows[windowIndexToSet].CloseAndDispose();
+                                                            tabsWindows.RemoveAt(windowIndexToSet);
+                                                            windowIndexToSet-=1;
+                                                            setFromTabsWindows = false;
+
+                                                            if (tabsWindows.Count > 0 && windowIndexToSet >= 0)
+                                                            {
+                                                                setFromTabsWindows = true;
+                                                            }
+                                                        }
+                                                    }
                                                     break;
 
                                                 case "CLOSEALLOTHERS":
+                                                    //OnCloseTab(true,this);
+                                                    if(tabsWindows.Count > 0)
+                                                    {
+                                                        foreach (var tw in tabsWindows)
+                                                        {
+                                                            tw.OnClosedWindow -= Tcn_OnClosedWindow;
+                                                            tw.CloseAndDispose();
+                                                        }
+                                                        tabsWindows.Clear();
+
+                                                        setFromTabsWindows = false;
+                                                        windowIndexToSet = -1;
+                                                    }
                                                     break;
 
                                                 default:
@@ -2777,11 +3718,125 @@ namespace zFirefoxBrowser.ViewModels
                                             int.TryParse(TAB_T, out tabToSet);
                                             if (tabToSet != -1)
                                             {
-
+                                                if(tabToSet == 1 || (tabToSet > 1 && tabsWindows.Count < tabToSet - 1))
+                                                {
+                                                    setFromTabsWindows = false;
+                                                    windowIndexToSet = -1;
+                                                }
+                                                else
+                                                {
+                                                    setFromTabsWindows = true;
+                                                    windowIndexToSet = tabToSet-2;
+                                                }
+                                                //OnChangeTabContext(tabToSet,this);
                                             }
                                         }
                                         break;
                                     #endregion
+
+                                    #region CAPTCHA
+                                    case MacroCommands.SOLVE:
+                                        if (MacroSettings.TwoCaptchaKey.IsNullOrEmpty()) continue;
+                                        try
+                                        {
+                                            string TYPE = "", KEY="";
+                                            foreach (var macval in GetRegexMacroCommands(mac.Value))
+                                            {
+                                                if (!macval.Contains("=")) continue;
+                                                var macVariable = macval.Remove(macval.IndexOf('='));
+                                                var macVariableValue = GetMacroVariableAfterDynamicCheck(macval.Substring(macval.IndexOf('=') + 1), macVals);
+                                                switch (macVariable.ToUpper())
+                                                {
+                                                    case "TYPE":
+                                                        TYPE = macVariableValue.Trim();
+                                                        break;
+
+                                                    case "KEY":
+                                                        KEY = macVariableValue.Trim();
+                                                        break;
+                                                    default: break;
+                                                }
+                                            }
+                                            //CAPTCHAv2
+                                            string result = string.Empty;
+                                            using (var context = new AutoJSContext(CurrentlyActiveBrowser.Window))
+                                            {
+                                                bool success = context.EvaluateScript("var a=window.content.document.getElementsByTagName('iframe');  var k='';  for(var x=0;x<a.length;x++)  {   if(a[x].src.includes('https://www.google.com/recaptcha/api2/anchor?k'))   {    k=a[x].src.split('?k=')[1].split('&')[0];    a[x].setAttribute(\"name\",\"I0_myownid\");    window.content.document.getElementById('g-recaptcha-response').style.display='';    break;   }  }  window.content.document.getElementById('g-recaptcha-response').textContent=k;", out result);
+                                            }
+
+                                            if (!result.IsNullOrEmpty())
+                                            {
+                                                Organiser.Common.Classes.Helpers.TwoCaptchaClient client = new Organiser.Common.Classes.Helpers.TwoCaptchaClient(MacroSettings.TwoCaptchaKey);
+                                                string captchaResult = "", proxy = "", currenturl = CurrentlyActiveBrowser.Document.Location.Href;
+                                                if (!GloableProfData.PData.ProxyPassword.IsNullOrEmpty())
+                                                {
+                                                    proxy = GloableProfData.PData.ProxyUsername + ":" + GloableProfData.PData.ProxyPassword + "@" + GloableProfData.PData.ProxyIP + ":" + GloableProfData.PData.ProxyPort;
+                                                }
+                                                bool succeeded = await Task.Run(()=> { return client.SolveRecaptchaV2(result, currenturl, proxy, Organiser.Common.Classes.Helpers.ProxyType.HTTP, out captchaResult); } );
+                                                if (succeeded)
+                                                {
+                                                    var textArea = CurrentlyActiveBrowser.Document.GetElementById("g-recaptcha-response") as GeckoTextAreaElement;
+                                                    textArea.Style.SetPropertyValue("display", "");
+                                                    textArea.Value = captchaResult;
+                                                }
+                                            }
+                                        }
+                                        catch(Exception exxxxx)
+                                        {
+                                        }
+                
+                                        break;
+                                    #endregion
+
+                                    case MacroCommands.PASTE:
+                                       var focusedElement = CurrentlyActiveBrowser.Document.ActiveElement;
+                                        //      OnBringToFrontForPaste();
+                                        //      await Task.Delay(200);
+                                        //      //focusedElement.Focus();
+                                        //      //focusedElement.Click();
+                                        //      //focusedElement.DOMHtmlElement.SetCapture(true);
+                                        //      
+                                        //      //System.Drawing.Rectangle rect = focusedElement.GetBoundingClientRect();
+                                        //      //float rectx = (rect.Left + rect.Right) / 2;
+                                        //      //float recty = (rect.Top + rect.Bottom) / 2;
+                                        //      //CurrentlyActiveBrowser.Window.WindowUtils.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                                        //      //CurrentlyActiveBrowser.Window.WindowUtils.SendMouseEvent("mouseup", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                                        //      
+                                        //      //await Task.Delay(1500);
+                                        //      System.Windows.Forms.SendKeys.SendWait("^V");
+
+                                        DomEventArgs ev = CurrentlyActiveBrowser.Document.CreateEvent("Event");
+                                        var webEvent = new Gecko.WebIDL.Event(CurrentlyActiveBrowser.Window.DomWindow, ev.DomEvent as nsISupports);
+                                        webEvent.InitEvent("paste", true, true);
+                                        focusedElement.GetEventTarget().DispatchEvent(ev);
+                                        break;
+
+                                    case MacroCommands.OPENFILE:
+                                        string OPENFILE_FOLDER = "", OPENFILE_FILE = "";
+                                        foreach (var macval in GetRegexMacroCommands(mac.Value))
+                                        {
+                                            if (!macval.Contains("=")) continue;
+                                            var macVariable = macval.Remove(macval.IndexOf('='));
+                                            var macVariableValue = GetMacroVariableAfterDynamicCheck(macval.Substring(macval.IndexOf('=') + 1), macVals);
+                                            switch (macVariable.ToUpper())
+                                            {
+                                                case "FOLDER":
+                                                    OPENFILE_FOLDER = macVariableValue;
+                                                    break;
+
+                                                case "FILE":
+                                                    OPENFILE_FILE = macVariableValue;
+                                                    break;
+
+                                                default: break;
+                                            }
+                                        }
+
+                                        if (OPENFILE_FOLDER.Contains("*")) OPENFILE_FOLDER = MacroSettings.DefaultFolderDownloads;
+
+                                        string filePath = Path.Combine(OPENFILE_FOLDER, OPENFILE_FILE);
+                                        if(File.Exists(filePath)) Process.Start(filePath);
+                                        break;
 
                                     case MacroCommands.PROXY:
                                         break;
@@ -2840,7 +3895,7 @@ namespace zFirefoxBrowser.ViewModels
                                         if (!setfromwindow)
                                         {
                                             WebBrowser.Focus();
-                                            WebBrowser.Browser.Focus();
+                                            CurrentlyActiveBrowser.Focus();
                                         }
                                         else
                                         {
@@ -2869,6 +3924,11 @@ namespace zFirefoxBrowser.ViewModels
             {
                 mPlayer.IsRunning = false;
                 if (macroPlayer.StopRequested) runningInJsMode = false;
+                if (!hadSaveAsFilePath.IsNullOrEmpty())
+                {
+                    Process.Start(hadSaveAsFilePath);
+                    hadSaveAsFilePath = "";
+                }
             }
 
             if (isiim == IIMPlayType.macroFromjs)
@@ -2894,6 +3954,21 @@ namespace zFirefoxBrowser.ViewModels
             }
         }
 
+        private void Tcn_OnClosedWindow(TabCommandNavigation tw)
+        {
+            tw.OnClosedWindow -= Tcn_OnClosedWindow;
+            tw.CloseAndDispose();
+            tabsWindows.Remove(tw);
+
+            windowIndexToSet -= 1;
+            setFromTabsWindows = false;
+
+            if (tabsWindows.Count > 0 && windowIndexToSet >= 0)
+            {
+                setFromTabsWindows = true;
+            }
+        }
+
         #region timers timeouts and timeout checkers
         private async void StartTimer(MacroVariables macVals, MacroManger player)
         {
@@ -2904,9 +3979,9 @@ namespace zFirefoxBrowser.ViewModels
             player.UpdateText = "0";
             while (player.IsRunning && !player.StopRequested)
             {
-                if (await QuitableDelay(5)) return;
+                if (await QuitableDelay(5)) break;
 
-                if (player.Paused) continue;
+                //if (player.Paused) continue;
                 
 
                 runtime += .5;
@@ -2919,7 +3994,7 @@ namespace zFirefoxBrowser.ViewModels
         /// <summary>
         /// delay in a loop by 100ms per run
         /// </summary>
-        /// <param name="times"></param>
+        /// <param name="times">amount of times to wait 100ms</param>
         /// <returns></returns>
         private async Task<bool> QuitableDelay(int times)
         {
@@ -2936,7 +4011,6 @@ namespace zFirefoxBrowser.ViewModels
         {
             try
             {
-                WebBrowser.InMacroPlaying = false;
                 JSMacroPlayer.setVariableMessage("iimReturnVal", "-101");
                 JSMacroPlayer.setVariableMessage("StopRequest", "");
 
@@ -2959,10 +4033,10 @@ namespace zFirefoxBrowser.ViewModels
             macroPlayer.OnStopRequested += MPlayer_OnStopRequested;
         }
 
-        private async Task<bool> CheckBrowserBusyTillTimeOut(MacroVariables macVals, GeckoWebBrowser browserToCheck)
+        private async Task<bool> CheckBrowserBusyTillTimeOut(MacroVariables macVals)
         {
             double sleepduringbusy = 0.0;
-            while (browserToCheck.IsBusy || browserToCheck.IsAjaxBusy)
+            while (CurrentlyActiveBrowser.IsBusy || CurrentlyActiveBrowser.IsAjaxBusy)
             {
                 if (macroPlayer.StopRequested || !macroPlayer.IsRunning) break;
 
@@ -3219,29 +4293,35 @@ namespace zFirefoxBrowser.ViewModels
             }
 
             string preClean = macVariableValue;
+
             macVariableValue = macVariableValue.Trim().Replace("<SP>", " ");
+            if (macVariableValue.StartsWith("\"")) macVariableValue = macVariableValue.Substring(1);
+            if (macVariableValue.EndsWith("\"")) macVariableValue = macVariableValue.Remove(macVariableValue.Length - 1);
+
             if (macVariableValue.Contains("\\\""))
             {
-                if (macVariableValue.StartsWith("\"")) macVariableValue = macVariableValue.Substring(1);
-                if (macVariableValue.EndsWith("\"")) macVariableValue = macVariableValue.Remove(macVariableValue.Length - 1);
                 macVariableValue = macVariableValue.Replace(":\"", ":");
                 macVariableValue = macVariableValue.Replace("&&\"", "&&");
                 macVariableValue = macVariableValue.Replace("\\\"", "\"");
             }
             else
             {
-                macVariableValue = macVariableValue.Replace("\"", "");
+                if (!macVariableValue.StartsWith("EVAL(")) macVariableValue = macVariableValue.Replace("\"", "");
             }
 
 
             if (macVariableValue.StartsWith("EVAL(") && macVariableValue.EndsWith(")"))
             {
-                macVariableValue = macVariableValue.Replace("\"", "");
-                using (var context = new AutoJSContext(WebBrowser.Browser.Window))
+                //macVariableValue = macVariableValue.Replace("\"", "");
+                using (var context = new AutoJSContext(CurrentlyActiveBrowser.Window))
                 {
                     string result = string.Empty;
+                    macVariableValue = macVariableValue.Replace("\r" ,"");
+                    macVariableValue = macVariableValue.Replace("\n" ,"");
                     string javascript = macVariableValue.Substring(macVariableValue.IndexOf("EVAL(") + "EVAL(".Length);
                     javascript = javascript.Remove(javascript.Length - 1);
+                    if (javascript.StartsWith("\"")) javascript = javascript.Substring(1);
+                    if (javascript.EndsWith("\"")) javascript = javascript.Remove(javascript.Length - 1);
                     bool success = context.EvaluateScript(javascript, out result);
                     if (success) macVariableValue = result;
                 }
@@ -3353,7 +4433,7 @@ namespace zFirefoxBrowser.ViewModels
             catch (System.Runtime.InteropServices.InvalidComObjectException rex)
             {
                 if (setfromwindow && ffpopupMacrosBrowser.Document != null) currentContentDocument = ffpopupMacrosBrowser.Document;
-                else currentContentDocument = WebBrowser.Browser.Document;
+                else currentContentDocument = CurrentlyActiveBrowser.Document;
 
                 currentContentDocumentIframe = null;
                 currentContentDocumentFrame = null;
@@ -3445,19 +4525,23 @@ namespace zFirefoxBrowser.ViewModels
                     haderror = false;
                     var htmlElm = elemnt as GeckoHtmlElement;
                     //if (htmlElm != null) htmlElm.Focus();
-                    if (htmlElm != null) htmlElm.DOMHtmlElement.SetCapture(true);
+                    if (htmlElm != null)
+                    {
+                        await ScrolToAndHighlight(htmlElm, currentContentDocument);
+                        htmlElm.DOMHtmlElement.SetCapture(true);
+                    }
 
                     System.Drawing.Rectangle rect = elemnt.GetBoundingClientRect();
                     float rectx = (rect.Left + rect.Right) / 2;
                     float recty = (rect.Top + rect.Bottom) / 2;
 
-                    WindowUtils windowForMouseEvent = WebBrowser.Browser.Window.WindowUtils;
+                    WindowUtils windowForMouseEvent = CurrentlyActiveBrowser.Window.WindowUtils;
                     try
                     {
                         if (currentContentDocumentIframe != null) windowForMouseEvent = currentContentDocumentIframe.ContentWindow.WindowUtils;
                         if (currentContentDocumentFrame != null) windowForMouseEvent = currentContentDocumentFrame.ContentWindow.WindowUtils;
                     }
-                    catch { windowForMouseEvent = WebBrowser.Browser.Window.WindowUtils; }
+                    catch { windowForMouseEvent = CurrentlyActiveBrowser.Window.WindowUtils; }
 
                     #region events
                     switch (ETYPE.ToUpper())
@@ -3531,23 +4615,53 @@ namespace zFirefoxBrowser.ViewModels
                             break;
 
                         case MacroEventTypes.MOUSEDOWN:
-                            switch (BUTTON)
+                            
+                            if (POINT != "")
                             {
-                                case "0":
-                                    windowForMouseEvent.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
-                                    break;
+                                string thisPoint = POINT.Replace(")", "").Replace("(", "");
+                                if (thisPoint.Contains(","))
+                                {
+                                    float x = -10000;
+                                    float.TryParse(thisPoint.Split(',')[0], out x);
+                                    float y = -10000;
+                                    float.TryParse(thisPoint.Split(',')[1], out y);
+                                    if (y != -10000 && x != -10000)
+                                    {
+                                        windowForMouseEvent.SendMouseEvent("mouseover", x, y, GeckoMouseButton.None, 1, 0, true, 0, 0);
 
-                                case "1":
-                                    windowForMouseEvent.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Middle, 1, 0, true, 0, 0);
-                                    break;
-
-                                case "2":
-                                    windowForMouseEvent.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Right, 1, 0, true, 0, 0);
-                                    break;
-
-                                default:
-                                    break;
+                                        windowForMouseEvent.SendMouseEvent("mousedown", x, y, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                                    }
+                                }
                             }
+                            else
+                            {
+                                switch (BUTTON)
+                                {
+                                    case "0":
+                                        windowForMouseEvent.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                                        break;
+
+                                    case "1":
+                                        windowForMouseEvent.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Middle, 1, 0, true, 0, 0);
+                                        break;
+
+                                    case "2":
+                                        windowForMouseEvent.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Right, 1, 0, true, 0, 0);
+                                        break;
+
+                                    default:
+                                        windowForMouseEvent.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                                        break;
+                                }
+                            }
+                            try
+                            {
+                                DomEventArgs ev = CurrentlyActiveBrowser.Document.CreateEvent("Event");
+                                var webEvent = new Gecko.WebIDL.Event(CurrentlyActiveBrowser.Window.DomWindow, ev.DomEvent as nsISupports);
+                                webEvent.InitEvent("change", true, true);
+                                htmlElm.GetEventTarget().DispatchEvent(ev);
+                            }
+                            catch { }
                             break;
 
                         case MacroEventTypes.MOUSEMOVE:
@@ -3557,10 +4671,10 @@ namespace zFirefoxBrowser.ViewModels
                                 {
                                     string thisPoint = point.Replace(")", "").Replace("(", "");
                                     if (!thisPoint.Contains(",")) return;
-                                    int x = -10000;
-                                    int.TryParse(thisPoint.Split(',')[0], out x);
-                                    int y = -10000;
-                                    int.TryParse(thisPoint.Split(',')[1], out y);
+                                    float x = -10000;
+                                    float.TryParse(thisPoint.Split(',')[0], out x);
+                                    float y = -10000;
+                                    float.TryParse(thisPoint.Split(',')[1], out y);
                                     if (y != -10000 && x != -10000)
                                     {
                                         windowForMouseEvent.SendMouseEvent("mousemove", x, y, GeckoMouseButton.Left, 1, 0, true, 0, 0);
@@ -3593,10 +4707,10 @@ namespace zFirefoxBrowser.ViewModels
                                 string thisPoint = POINT.Replace(")", "").Replace("(", "");
                                 if (thisPoint.Contains(","))
                                 {
-                                    int x = -10000;
-                                    int.TryParse(thisPoint.Split(',')[0], out x);
-                                    int y = -10000;
-                                    int.TryParse(thisPoint.Split(',')[1], out y);
+                                    float x = -10000;
+                                    float.TryParse(thisPoint.Split(',')[0], out x);
+                                    float y = -10000;
+                                    float.TryParse(thisPoint.Split(',')[1], out y);
                                     if (y != -10000 && x != -10000)
                                     {
                                         windowForMouseEvent.SendMouseEvent("mouseup", x, y, GeckoMouseButton.Left, 1, 0, true, 0, 0);
@@ -3754,7 +4868,7 @@ namespace zFirefoxBrowser.ViewModels
                 haderror = true;
                 setFromException = true;
                 if (setfromwindow && ffpopupMacrosBrowser.Document != null) currentContentDocument = ffpopupMacrosBrowser.Document;
-                else currentContentDocument = WebBrowser.Browser.Document;
+                else currentContentDocument = CurrentlyActiveBrowser.Document;
 
                 currentContentDocumentIframe = null;
                 currentContentDocumentFrame = null;
@@ -3776,7 +4890,7 @@ namespace zFirefoxBrowser.ViewModels
 
                     if (wasSetFromWindow)
                     {
-                        currentContentDocument = WebBrowser.Browser.Document;
+                        currentContentDocument = CurrentlyActiveBrowser.Document;
                         wasSetFromWindow = false;
                     }
                 }
@@ -3907,13 +5021,13 @@ namespace zFirefoxBrowser.ViewModels
             catch (System.Runtime.InteropServices.InvalidComObjectException)
             {
                 if (setfromwindow && ffpopupMacrosBrowser.Document != null) currentContentDocument = ffpopupMacrosBrowser.Document;
-                else currentContentDocument = WebBrowser.Browser.Document;
+                else currentContentDocument = CurrentlyActiveBrowser.Document;
                 currentContentDocumentIframe = null;
                 currentContentDocumentFrame = null;
             }
             if (macroPlayer.StopRequested)
             {
-                if (runningInJsMode) JSMacroPlayer.macroDone(WebBrowser.Browser.Window.DomWindow, WebBrowser.Browser.DomDocument.NativeDomDocument);
+                if (runningInJsMode) JSMacroPlayer.macroDone(CurrentlyActiveBrowser.Window.DomWindow, CurrentlyActiveBrowser.DomDocument.NativeDomDocument);
                 return previosTagElementFound;
             }
             #region initialize what to do
@@ -3984,11 +5098,61 @@ namespace zFirefoxBrowser.ViewModels
             bool setFromException = false;
             try
             {
-                GeckoHtmlElement elementFound = null;
+                GeckoHtmlElement htmlElementFound = null;
+                GeckoElement elementFound = null;
                 if (XPATH == "" && SELECTOR == "")
                 {
-                    #region Find by classic search
-                    var elements = currentContentDocument.GetElementsByTagName(typeCmd).ToList();
+                    #region Find by classic search                    
+                    var htmlElements = new List<GeckoHtmlElement>();
+                    var elements = new List<GeckoElement>();
+                    var elmsNumerable = currentContentDocument.GetElementsByTagName(typeCmd);
+                    if (elmsNumerable == null || elmsNumerable.Count() == 0)
+                    {
+                        elmsNumerable = currentContentDocument.GetElementsByTagName(typeCmd.ToLower());
+
+                        for (int k = 0; k < elmsNumerable.AsComPtr().Instance.Length; k++)
+                        {
+                            //var node = elmsNumerable.ElementAt(k);
+                            //if (node == null) continue;
+
+                            //nsIDOMHTMLElement htmlElement = Xpcom.QueryInterface<nsIDOMHTMLElement>(node);
+                            //if (htmlElement != null)
+                            //{
+                            //    GeckoHtmlElement htmlelementToAdd = htmlElement as GeckoHtmlElement;
+                            //    //htmlelementToAdd = new GeckoHtmlElement(htmlElement);
+                            //    if (htmlelementToAdd != null) htmlElements.Add(htmlelementToAdd);
+                            //    continue;
+                            //}
+
+
+
+
+                            //uncommentthis
+                            var node = elmsNumerable.List.Item((uint)k);
+                            if (node == null) continue;
+
+                            nsIDOMHTMLElement htmlElement = Xpcom.QueryInterface<nsIDOMHTMLElement>(node);
+                            if (htmlElement != null)
+                            {
+                                GeckoHtmlElement htmlelementToAdd = null;
+                                htmlelementToAdd = new GeckoHtmlElement(htmlElement);
+                                if (htmlelementToAdd != null) htmlElements.Add(htmlelementToAdd);
+                                continue;
+                            }
+
+                            nsIDOMElement element = Xpcom.QueryInterface<nsIDOMElement>(node);
+                            if (element != null)
+                            {
+                                GeckoElement elementToAdd = null;
+                                elementToAdd = GeckoElement.CreateDomElementWrapper(element);
+                                if (elementToAdd != null) elements.Add(elementToAdd);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        htmlElements = elmsNumerable.ToList();
+                    }
                     if (POS.Contains("R") && previosTagElementFound != null)
                     {
                         do
@@ -4006,103 +5170,191 @@ namespace zFirefoxBrowser.ViewModels
                             }
                             else
                             {
-                                if (elements != null) elements.Clear();
-                                else elements = new List<GeckoHtmlElement>();
+                                if (htmlElements != null) htmlElements.Clear();
+                                else htmlElements = new List<GeckoHtmlElement>();
                                 foreach (var elm in elementscc)
                                 {
                                     var htmElm = elm as GeckoHtmlElement;
                                     if (htmElm == null) continue;
-                                    elements.Add(htmElm);
+                                    htmlElements.Add(htmElm);
                                 }
                                 break;
                             }
                         } while (true);
                     }
 
-                    int foundCount = 0;
-                    foreach (var matchedTagElement in elements)
+                    if (htmlElements.Count > 0)
                     {
-                        if (formAttrDlist.Count > 0 && !FORM.Contains("NoFormName"))
+                        #region findhtmlElement
+                        int foundCount = 0;
+                        foreach (var matchedTagElement in htmlElements)
                         {
-                            bool? isIt = null;
-                            recursiveFindForm(matchedTagElement.Parent, formAttrDlist, ref isIt);
-                            if (isIt == false) continue;
-                        }
-
-                        bool foundIt = false;
-                        int foundCountAttributes = 0;
-
-                        if (attrDlist.Any(kv => kv.Key == "txt"))
-                        {
-                            string textContent = CleanText(matchedTagElement.TextContent).ToLower();
-                            if (attrDlist["txt"].ToLower() == textContent || attrDlist["txt"] == "*") foundCountAttributes++;
-                            else if (attrDlist["txt"].Contains("*") && attrDlist["txt"] != "*")
+                            if (formAttrDlist.Count > 0 && !FORM.Contains("NoFormName"))
                             {
-                                List<string> starvals = attrDlist["txt"].Split('*').ToList();
-                                if (starvals.Count(sv => textContent.Contains(sv.ToLower())) == starvals.Count) foundCountAttributes++;
+                                bool? isIt = null;
+                                recursiveFindForm(matchedTagElement.Parent, formAttrDlist, ref isIt);
+                                if (isIt == false) continue;
                             }
 
-                            if (foundCountAttributes == attrDlist.Count) foundCount++;
-                            foundIt = foundCount == posint || (foundCount >= posint && posint <= 1) || (posint <= 0 && foundCount > 0);
-                        }
+                            bool foundIt = false;
+                            int foundCountAttributes = 0;
 
-                        if (!foundIt && matchedTagElement.Attributes != null && matchedTagElement.Attributes.Length > 0)
-                        {
-                            bool matchedTypsOnce = false;
-                            foreach (var elementAtribute in matchedTagElement.Attributes)
+                            if (attrDlist.Any(kv => kv.Key == "txt"))
                             {
-                                string nodeName = elementAtribute.NodeName.ToLower().Trim();
-                                bool setForattribCheck = nodeName == "src" && attrDlist.Any(kv => kv.Key.ToLower() == "href") && !attrDlist.Any(kv => kv.Key.ToLower() == "src");
-                                if (setForattribCheck) nodeName = "href";
-                                string nodeVal = elementAtribute.NodeValue.ToLower().Trim();
-                                if (!matchedTypsOnce)
+                                string textContent = CleanText(matchedTagElement.TextContent).ToLower();
+                                if (attrDlist["txt"].ToLower() == textContent.ToLower() || attrDlist["txt"] == "*") foundCountAttributes++;
+                                else if (attrDlist["txt"].Contains("*") && attrDlist["txt"] != "*")
                                 {
-                                    if (typeVal != "" && typeVal.ToLower().Trim() != nodeVal && (nodeName.ToLower() == "type" || typeVal == "submit")) continue;
-                                }
-                                matchedTypsOnce = true;
-
-                                if (setForattribCheck && nodeName == "href" && !nodeVal.Contains(currentContentDocument.Location.Protocol) && !nodeVal.Contains(currentContentDocument.Location.Host))
-                                {
-                                    nodeVal = GetUrlFromElement(elementFound, currentContentDocument);
+                                    List<string> starvals = attrDlist["txt"].Split('*').ToList();
+                                    if (starvals.Count(sv => textContent.Contains(sv.ToLower())) == starvals.Count) foundCountAttributes++;
                                 }
 
-                                foreach (var kv in attrDlist)
+                                if (foundCountAttributes == attrDlist.Count) foundCount++;
+                                foundIt = foundCount == posint || (foundCount >= posint && posint <= 1) || (posint <= 0 && foundCount > 0);
+                            }
+
+                            if (!foundIt && matchedTagElement.Attributes != null && matchedTagElement.Attributes.Length > 0)
+                            {
+                                bool matchedTypsOnce = false;
+                                foreach (var elementAtribute in matchedTagElement.Attributes)
                                 {
-                                    if (kv.Key != "*" && kv.Key != "anyatt" && kv.Key.ToLower() != nodeName && kv.Value != "null") continue;
-                                    else if (kv.Value == "null" && !matchedTagElement.Attributes.Any(mte => mte.NodeName.ToLower().Trim() == kv.Key.ToLower().Trim()))
+                                    string nodeName = elementAtribute.NodeName.ToLower().Trim();
+                                    bool setForattribCheck = nodeName == "src" && attrDlist.Any(kv => kv.Key.ToLower() == "href") && !attrDlist.Any(kv => kv.Key.ToLower() == "src");
+                                    if (setForattribCheck) nodeName = "href";
+                                    string nodeVal = elementAtribute.NodeValue.ToLower().Trim();
+                                    if (!matchedTypsOnce)
                                     {
-                                        foundCountAttributes++;
-                                        continue;
+                                        if (typeVal != "" && typeVal.ToLower().Trim() != nodeVal && (nodeName.ToLower() == "type" || typeVal == "submit")) continue;
+                                    }
+                                    matchedTypsOnce = true;
+
+                                    if (setForattribCheck && nodeName == "href" && !nodeVal.Contains(currentContentDocument.Location.Protocol) && !nodeVal.Contains(currentContentDocument.Location.Host))
+                                    {
+                                        nodeVal = GetUrlFromElement(htmlElementFound, currentContentDocument);
                                     }
 
-                                    bool containsall = false;
-                                    if (kv.Value.Contains("*") && kv.Value != "*")
+                                    foreach (var kv in attrDlist)
                                     {
-                                        List<string> starvals = kv.Value.Split('*').ToList();
-                                        containsall = starvals.Count(sv => nodeVal.Contains(sv.ToLower())) == starvals.Count;
+                                        if (kv.Key != "*" && kv.Key != "anyatt" && kv.Key.ToLower() != nodeName && kv.Value != "null") continue;
+                                        else if (kv.Value == "null" && !matchedTagElement.Attributes.Any(mte => mte.NodeName.ToLower().Trim() == kv.Key.ToLower().Trim()))
+                                        {
+                                            foundCountAttributes++;
+                                            continue;
+                                        }
+
+                                        bool containsall = false;
+                                        if (kv.Value.Contains("*") && kv.Value != "*")
+                                        {
+                                            List<string> starvals = kv.Value.Split('*').ToList();
+                                            containsall = starvals.Count(sv => nodeVal.Contains(sv.ToLower())) == starvals.Count;
+                                        }
+
+                                        if (containsall || kv.Value == "*" ||
+                                            (kv.Value.ToLower().Trim() == nodeVal.Trim()) ||
+                                            (kv.Value.Contains("*") && kv.Value != "*" && nodeVal.Trim().Contains(kv.Value.Replace("*", "").Trim())))
+                                        {
+                                            foundCountAttributes++;
+                                            if (foundCountAttributes == attrDlist.Count) foundCount++;
+                                            foundIt = foundCount == posint || (foundCount >= posint && posint <= 1) || (posint <= 0 && foundCount > 0);
+                                            if (foundIt) break;
+                                        }
                                     }
 
-                                    if (containsall || kv.Value == "*" ||
-                                        (kv.Value.ToLower().Trim() == nodeVal.Trim()) || 
-                                        (kv.Value.Contains("*") && kv.Value != "*" && nodeVal.Trim().Contains(kv.Value.Replace("*", "").Trim())))
-                                    {
-                                        foundCountAttributes++;
-                                        if (foundCountAttributes == attrDlist.Count) foundCount++;
-                                        foundIt = foundCount == posint || (foundCount >= posint && posint <= 1) || (posint <= 0 && foundCount > 0);
-                                        if (foundIt) break;
-                                    }
+                                    if (foundIt) break;
                                 }
+                            }
 
-                                if (foundIt) break;
+                            if (foundIt)
+                            {
+                                htmlElementFound = matchedTagElement;
+                                break;
                             }
                         }
-
-                        if (foundIt)
-                        {
-                            elementFound = matchedTagElement;
-                            break;
-                        }
+                        #endregion
                     }
+                    else if (elements.Count > 0)
+                    {
+                        #region findElement
+                        int foundCount = 0;
+                        foreach (var matchedTagElement in elements)
+                        {
+                            bool foundIt = false;
+                            int foundCountAttributes = 0;
+
+                            if (attrDlist.Any(kv => kv.Key == "txt"))
+                            {
+                                string textContent = CleanText(matchedTagElement.TextContent).ToLower();
+                                if (attrDlist["txt"].ToLower() == textContent || attrDlist["txt"] == "*") foundCountAttributes++;
+                                else if (attrDlist["txt"].Contains("*") && attrDlist["txt"] != "*")
+                                {
+                                    List<string> starvals = attrDlist["txt"].Split('*').ToList();
+                                    if (starvals.Count(sv => textContent.Contains(sv.ToLower())) == starvals.Count) foundCountAttributes++;
+                                }
+
+                                if (foundCountAttributes == attrDlist.Count) foundCount++;
+                                foundIt = foundCount == posint || (foundCount >= posint && posint <= 1) || (posint <= 0 && foundCount > 0);
+                            }
+
+                            if (!foundIt && matchedTagElement.Attributes != null && matchedTagElement.Attributes.Length > 0)
+                            {
+                                bool matchedTypsOnce = false;
+                                foreach (var elementAtribute in matchedTagElement.Attributes)
+                                {
+                                    string nodeName = elementAtribute.NodeName.ToLower().Trim();
+                                    bool setForattribCheck = nodeName == "src" && attrDlist.Any(kv => kv.Key.ToLower() == "href") && !attrDlist.Any(kv => kv.Key.ToLower() == "src");
+                                    if (setForattribCheck) nodeName = "href";
+                                    string nodeVal = elementAtribute.NodeValue.ToLower().Trim();
+                                    if (!matchedTypsOnce)
+                                    {
+                                        if (typeVal != "" && typeVal.ToLower().Trim() != nodeVal && (nodeName.ToLower() == "type" || typeVal == "submit")) continue;
+                                    }
+                                    matchedTypsOnce = true;
+
+                                    if (setForattribCheck && nodeName == "href" && !nodeVal.Contains(currentContentDocument.Location.Protocol) && !nodeVal.Contains(currentContentDocument.Location.Host))
+                                    {
+                                        nodeVal = GetUrlFromElement(htmlElementFound, currentContentDocument);
+                                    }
+
+                                    foreach (var kv in attrDlist)
+                                    {
+                                        if (kv.Key != "*" && kv.Key != "anyatt" && kv.Key.ToLower() != nodeName && kv.Value != "null") continue;
+                                        else if (kv.Value == "null" && !matchedTagElement.Attributes.Any(mte => mte.NodeName.ToLower().Trim() == kv.Key.ToLower().Trim()))
+                                        {
+                                            foundCountAttributes++;
+                                            continue;
+                                        }
+
+                                        bool containsall = false;
+                                        if (kv.Value.Contains("*") && kv.Value != "*")
+                                        {
+                                            List<string> starvals = kv.Value.Split('*').ToList();
+                                            containsall = starvals.Count(sv => nodeVal.Contains(sv.ToLower())) == starvals.Count;
+                                        }
+
+                                        if (containsall || kv.Value == "*" ||
+                                            (kv.Value.ToLower().Trim() == nodeVal.Trim()) ||
+                                            (kv.Value.Contains("*") && kv.Value != "*" && nodeVal.Trim().Contains(kv.Value.Replace("*", "").Trim())))
+                                        {
+                                            foundCountAttributes++;
+                                            if (foundCountAttributes == attrDlist.Count) foundCount++;
+                                            foundIt = foundCount == posint || (foundCount >= posint && posint <= 1) || (posint <= 0 && foundCount > 0);
+                                            if (foundIt) break;
+                                        }
+                                    }
+
+                                    if (foundIt) break;
+                                }
+                            }
+
+                            if (foundIt)
+                            {
+                                elementFound = matchedTagElement;
+                                break;
+                            }
+                        }
+                        #endregion
+                    }
+
                     #endregion
                 }
                 else
@@ -4116,30 +5368,66 @@ namespace zFirefoxBrowser.ViewModels
                         {
                             GeckoElement elmfirst = elements[0];
                             if (SELECTOR.StartsWith("HTML>")) SELECTOR = SELECTOR.Replace("HTML>", "");
-                            elementFound = elmfirst.QuerySelector(SELECTOR) as GeckoHtmlElement;
+                            htmlElementFound = elmfirst.QuerySelector(SELECTOR) as GeckoHtmlElement;
                         }
                     }
                     else
                     {
                         GeckoNode pathressult = currentContentDocument.EvaluateXPath(XPATH).GetSingleNodeValue();
-                        if (pathressult != null) elementFound = pathressult as GeckoHtmlElement;
+                        if (pathressult != null) htmlElementFound = pathressult as GeckoHtmlElement;
                     }
                     #endregion
                 }
 
+                #region Element
                 if (elementFound != null)
                 {
-                    haderror = false;
-                    previosTagElementFound = elementFound;
-                    if (MacroSettings.IsHighlightWhenFoundChecked)
-                    {
-                        try
-                        {
-                            elementFound.Style.SetPropertyValue("outline", "1px solid blue");
-                        }
-                        catch { }
-                    }
+                    htmlElementFound = FindElementParent(elementFound);
 
+                    //haderror = false;
+                    //if (MacroSettings.IsScrollWhenFoundChecked)
+                    //{
+                    //    try
+                    //    {
+                    //        if (currentContentDocument.DocumentElement != null && (currentContentDocument.DocumentElement.ScrollTop + CurrentlyActiveBrowser.Height) < elementFound.ScrollTop)
+                    //        {
+                    //            CurrentlyActiveBrowser.Window.ScrollTo(elementFound.ScrollLeft, elementFound.ScrollTop * 2);
+                    //            await Task.Delay(100);
+                    //            //await Task.Run(() => Thread.Sleep(100));
+                    //            CurrentlyActiveBrowser.Window.ScrollTo(elementFound.ScrollLeft, (elementFound.ScrollTop - (CurrentlyActiveBrowser.Height / 2)));
+                    //            await Task.Delay(100);
+                    //            //await Task.Run(() => Thread.Sleep(100));
+                    //        }
+                    //        await Task.Delay(100);
+                    //        // await Task.Run(() => Thread.Sleep(100));
+                    //    }
+                    //    catch { }
+                    //}
+
+                    //System.Drawing.Rectangle rect = elementFound.GetBoundingClientRect();
+                    //float rectx = (rect.Left + rect.Right) / 2;
+                    //float recty = (rect.Top + rect.Bottom) / 2;
+
+                    //WindowUtils windowForMouseEvent = CurrentlyActiveBrowser.Window.WindowUtils;
+                    //try
+                    //{
+                    //    if (currentContentDocumentIframe != null) windowForMouseEvent = currentContentDocumentIframe.ContentWindow.WindowUtils;
+                    //    if (currentContentDocumentFrame != null) windowForMouseEvent = currentContentDocumentFrame.ContentWindow.WindowUtils;
+                    //}
+                    //catch { windowForMouseEvent = CurrentlyActiveBrowser.Window.WindowUtils; }
+
+                    //windowForMouseEvent.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                    //windowForMouseEvent.SendMouseEvent("mouseup", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+
+                    Console.WriteLine("Element Tag success");
+                }
+                #endregion
+
+                #region Html Element
+                if (htmlElementFound != null)
+                {
+                    haderror = false;
+                    previosTagElementFound = htmlElementFound;
                     WindowUtils windowForMouseEvent = currentContentDocument.DefaultView.WindowUtils;
                     try
                     {
@@ -4147,29 +5435,10 @@ namespace zFirefoxBrowser.ViewModels
                         if (currentContentDocumentFrame != null) windowForMouseEvent = currentContentDocumentFrame.ContentWindow.WindowUtils;
                     }
                     catch { windowForMouseEvent = currentContentDocument.DefaultView.WindowUtils; }
-                    if (MacroSettings.IsScrollWhenFoundChecked)
-                    {
-                        try
-                        {
-                            int scrollto = GetParentOffsetsForElement(elementFound);
-                            if (currentContentDocument.DocumentElement != null && (currentContentDocument.DocumentElement.ScrollTop + WebBrowser.Browser.Height) < scrollto)
-                            {
-                                WebBrowser.Browser.Window.ScrollTo(elementFound.OffsetLeft, scrollto * 2);
-                                await Task.Delay(100);
-                                //await Task.Run(() => Thread.Sleep(100));
-                                WebBrowser.Browser.Window.ScrollTo(elementFound.OffsetLeft, (scrollto - (WebBrowser.Browser.Height / 2)));
-                                await Task.Delay(100);
-                                //await Task.Run(() => Thread.Sleep(100));
-                            }
-                            elementFound.ScrollIntoView(false);
-                            elementFound.Focus();
-                            await Task.Delay(100);
-                           // await Task.Run(() => Thread.Sleep(100));
-                        }
-                        catch { }
-                    }
 
-                    System.Drawing.Rectangle rect = elementFound.GetBoundingClientRect();
+                    await ScrolToAndHighlight(htmlElementFound, currentContentDocument);
+
+                    System.Drawing.Rectangle rect = htmlElementFound.GetBoundingClientRect();
                     float rectx = (rect.Left + rect.Right) / 2;
                     float recty = (rect.Top + rect.Bottom) / 2;
                     //await Task.Run(() => Thread.Sleep(1000));
@@ -4184,7 +5453,7 @@ namespace zFirefoxBrowser.ViewModels
                             if (arrsplit.Length > 1)
                             {
                                 eventType = arrsplit[1];
-                                string imgfilename = GetUrlFromElement(elementFound, currentContentDocument);
+                                string imgfilename = GetUrlFromElement(htmlElementFound, currentContentDocument);
                                 string file = MacroOnDownload.FILE;
                                 if (file == "*") file = RemoveSpecialCharacters(imgfilename);
                                 if (file.Contains("+") || !file.Contains("."))
@@ -4221,8 +5490,8 @@ namespace zFirefoxBrowser.ViewModels
                                     case "SAVEITEM":
                                     case "SAVE_ELEMENT_SCREENSHOT":
                                     case "SAVEPICTUREAS":
-                                        ImageCreator creator = new ImageCreator(WebBrowser.Browser);
-                                        byte[] mBytes = creator.CanvasGetPngImage((uint)elementFound.OffsetLeft, (uint)elementFound.OffsetTop, (uint)elementFound.OffsetWidth, (uint)elementFound.OffsetHeight);
+                                        ImageCreator creator = new ImageCreator(CurrentlyActiveBrowser);
+                                        byte[] mBytes = creator.CanvasGetPngImage((uint)htmlElementFound.OffsetLeft, (uint)htmlElementFound.OffsetTop, (uint)htmlElementFound.OffsetWidth, (uint)htmlElementFound.OffsetHeight);
                                         using (System.Drawing.Image image = System.Drawing.Image.FromStream(new System.IO.MemoryStream(mBytes)))
                                         {
                                             image.Save(fullpath);
@@ -4230,9 +5499,9 @@ namespace zFirefoxBrowser.ViewModels
                                         break;
 
                                     case "SAVETARGETAS":
-                                        if (elementFound.HasAttribute("href") || elementFound.HasAttribute("src"))
+                                        if (htmlElementFound.HasAttribute("href") || htmlElementFound.HasAttribute("src"))
                                         {
-                                            string link = GetUrlFromElement(elementFound, currentContentDocument);
+                                            string link = GetUrlFromElement(htmlElementFound, currentContentDocument);
 
                                             try
                                             {
@@ -4280,24 +5549,24 @@ namespace zFirefoxBrowser.ViewModels
                             CONTENT = CONTENT.Replace("\\n", Environment.NewLine);
                             CONTENT = CONTENT.Replace("\\t", "   ");
 
-                            GeckoInputElement input = elementFound as GeckoInputElement;
-                            if (input != null && typeVal.ToUpper() != "FILE" &&(input.Type == "radio" || input.Type == "checkbox"))
+                            GeckoInputElement input = htmlElementFound as GeckoInputElement;
+                            if (input != null && typeVal.ToUpper() != "FILE" && (input.Type == "radio" || input.Type == "checkbox"))
                             {
                                 if (!string.IsNullOrEmpty(CONTENT) && !string.IsNullOrWhiteSpace(CONTENT))
                                 {
                                     if ((CONTENT == "YES" && !input.Checked) || (CONTENT == "NO" && input.Checked))
-                                        elementFound.Click();
+                                        htmlElementFound.Click();
                                 }
                                 else
                                 {
-                                    elementFound.Click();
+                                    htmlElementFound.Click();
                                 }
                             }
-                            else if (elementFound.GetType() == typeof(GeckoSelectElement))
+                            else if (htmlElementFound.GetType() == typeof(GeckoSelectElement))
                             {
-                                var selec = elementFound as GeckoSelectElement;
+                                var selec = htmlElementFound as GeckoSelectElement;
                                 selec.Click();
-                                selec.Value = CONTENT.Replace("%","");
+                                selec.Value = CONTENT.Replace("%", "");
                                 if (selec.Value == "")
                                 {
                                     string contentval = CONTENT;
@@ -4315,13 +5584,18 @@ namespace zFirefoxBrowser.ViewModels
                                         }
                                     }
                                 }
+                                DomEventArgs ev = CurrentlyActiveBrowser.Document.CreateEvent("Event");
+                                var webEvent = new Gecko.WebIDL.Event(CurrentlyActiveBrowser.Window.DomWindow, ev.DomEvent as nsISupports);
+                                webEvent.InitEvent("change", true, true);
+                                selec.GetEventTarget().DispatchEvent(ev);
+
                                 selec.Blur();
                             }
                             else
                             {
                                 if (typeVal.ToUpper() == "FILE")
                                 {
-                                    elementFound.Click();
+                                    htmlElementFound.Click();
 
                                     MacroManger.AnyRunning = true;
                                     MacroFilePicker.Instance.FilePath = CONTENT;
@@ -4346,22 +5620,22 @@ namespace zFirefoxBrowser.ViewModels
                                     //    }
                                     //    catch { }
                                     //}
-                                    MacroFilePicker.Instance.utils = Xpcom.QueryInterface<nsIDOMWindowUtils>(WebBrowser.Browser.Window.DomWindow);
+                                    MacroFilePicker.Instance.utils = Xpcom.QueryInterface<nsIDOMWindowUtils>(CurrentlyActiveBrowser.Window.DomWindow);
                                     MacroFilePicker.Instance.aFilePickerShownCallback.Done(nsIFilePickerConsts.returnOK);
-                                    if (await QuitableDelay(5) == false) 
-                                    MacroFilePicker.Instance.aFilePickerShownCallback.Done(nsIFilePickerConsts.returnOK);
+                                    if (await QuitableDelay(5) == false)
+                                        MacroFilePicker.Instance.aFilePickerShownCallback.Done(nsIFilePickerConsts.returnOK);
                                 }
                                 else
                                 {
-                                    if (elementFound.GetType() == typeof(GeckoAnchorElement) &&
-                                        currentContentDocument.Location != null && currentContentDocument.Location.Href != null && 
+                                    if (htmlElementFound.GetType() == typeof(GeckoAnchorElement) &&
+                                        currentContentDocument.Location != null && currentContentDocument.Location.Href != null &&
                                         currentContentDocument.Location.Href.Contains("facebook") && !currentContentDocument.Location.Href.Contains("ifttt.com"))
                                     {
-                                        windowForMouseEvent.SendMouseEvent("mouseover", elementFound.GetBoundingClientRect().X + 2, (elementFound.GetBoundingClientRect().Y + 2), GeckoMouseButton.Left, 0, 0, false, 0, 0);
-                                        windowForMouseEvent.SendMouseEvent("mousedown", elementFound.GetBoundingClientRect().X + 2, (elementFound.GetBoundingClientRect().Y + 2), GeckoMouseButton.Left, 1, 0, true, 0, 0);
-                                        windowForMouseEvent.SendMouseEvent("mouseup", elementFound.GetBoundingClientRect().X + 2, (elementFound.GetBoundingClientRect().Y + 2), GeckoMouseButton.Left, 0, 0, false, 0, 0);
+                                        windowForMouseEvent.SendMouseEvent("mouseover", htmlElementFound.GetBoundingClientRect().X + 2, (htmlElementFound.GetBoundingClientRect().Y + 2), GeckoMouseButton.Left, 0, 0, false, 0, 0);
+                                        windowForMouseEvent.SendMouseEvent("mousedown", htmlElementFound.GetBoundingClientRect().X + 2, (htmlElementFound.GetBoundingClientRect().Y + 2), GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                                        windowForMouseEvent.SendMouseEvent("mouseup", htmlElementFound.GetBoundingClientRect().X + 2, (htmlElementFound.GetBoundingClientRect().Y + 2), GeckoMouseButton.Left, 0, 0, false, 0, 0);
                                     }
-                                    else if (elementFound.GetType() == typeof(GeckoAnchorElement) && WebBrowser.Browser.Url != null && WebBrowser.Browser.Url.AbsoluteUri.ToLower().Contains("iftt"))
+                                    else if (htmlElementFound.GetType() == typeof(GeckoAnchorElement) && CurrentlyActiveBrowser.Url != null && CurrentlyActiveBrowser.Url.AbsoluteUri.ToLower().Contains("iftt"))
                                     {
                                         //if (currentContentDocument.Location.Href.Contains("facebook"))
                                         //{
@@ -4373,13 +5647,13 @@ namespace zFirefoxBrowser.ViewModels
                                         //{
                                         try
                                         {
-                                            GeckoAnchorElement btnelm = elementFound as GeckoAnchorElement;
-                                            DomEventArgs ev = WebBrowser.Browser.Document.CreateEvent("MouseEvent");
-                                            var webEvent = new Gecko.WebIDL.Event(WebBrowser.Browser.Window.DomWindow, ev.DomEvent as nsISupports);
+                                            GeckoAnchorElement btnelm = htmlElementFound as GeckoAnchorElement;
+                                            DomEventArgs ev = CurrentlyActiveBrowser.Document.CreateEvent("MouseEvent");
+                                            var webEvent = new Gecko.WebIDL.Event(CurrentlyActiveBrowser.Window.DomWindow, ev.DomEvent as nsISupports);
                                             webEvent.InitEvent("mousedown", true, true);
                                             btnelm.GetEventTarget().DispatchEvent(ev);
                                             await Task.Delay(75);
-                                           // await Task.Run(() => Thread.Sleep(75));
+                                            // await Task.Run(() => Thread.Sleep(75));
                                             webEvent.InitEvent("mouseup", true, true);
                                             btnelm.GetEventTarget().DispatchEvent(ev);
 
@@ -4389,10 +5663,10 @@ namespace zFirefoxBrowser.ViewModels
                                         }
                                         catch
                                         {
-                                            elementFound.Click();
+                                            htmlElementFound.Click();
                                             // await Task.Run(() => Thread.Sleep(10));
                                             await Task.Delay(100);
-                                            elementFound.Click();
+                                            htmlElementFound.Click();
                                         }
                                         //}
                                     }
@@ -4404,7 +5678,7 @@ namespace zFirefoxBrowser.ViewModels
                                     //}
                                     else
                                     {
-                                       if(elementFound.GetType() != typeof(GeckoButtonElement)) elementFound.Click();
+                                        if (htmlElementFound.GetType() != typeof(GeckoButtonElement)) htmlElementFound.Click();
                                     }
                                 }
 
@@ -4412,9 +5686,38 @@ namespace zFirefoxBrowser.ViewModels
                                 {
                                     if (null == input)
                                     {
-                                        GeckoTextAreaElement textArea = elementFound as GeckoTextAreaElement;
-                                        if (null == textArea && elementFound.HasAttribute("value")) elementFound.SetAttribute("value", CONTENT);
-                                        else textArea.Value = CONTENT;
+                                        GeckoTextAreaElement textArea = htmlElementFound as GeckoTextAreaElement;
+                                        if (null == textArea && htmlElementFound.HasAttribute("value")) htmlElementFound.SetAttribute("value", CONTENT);
+                                        else
+                                        {
+                                            if (CurrentlyActiveBrowser.Url.Authority == "ifttt.com")
+                                            {
+                                                textArea.DOMHtmlElement.SetCapture(true);
+                                                textArea.Focus();
+                                                textArea.Select();
+
+                                                
+                                                windowForMouseEvent.SendMouseEvent("mousedown", rectx, recty, GeckoMouseButton.Left, 1, 0, true, 0, 0);
+                                                windowForMouseEvent.SendMouseEvent("mouseup", rectx, recty, GeckoMouseButton.Left, 2, 0, true, 0, 0);
+
+                                                textArea.SelectionStart = textArea.SelectionEnd = textArea.Value.Length;
+                                                int length = textArea.Value.Length;
+                                                for (int l = 0; l < length; l++)
+                                                {
+                                                    windowForMouseEvent.SendKeyEvent("keypress", 8, 0, 0, false);
+                                                }
+                                                windowForMouseEvent.SendKeyEvent("keypress", 8, 0, 0, false);
+
+                                                windowForMouseEvent.SendNativeKeyEvent(0, 0, 0, CONTENT, CONTENT);
+
+                                                textArea.DOMHtmlElement.SetCapture(false);
+                                                await Task.Delay(250);
+                                            }
+                                            else
+                                            {
+                                                textArea.Value = CONTENT;
+                                            }
+                                        }
                                     }
                                     else input.Value = CONTENT;
 
@@ -4422,12 +5725,12 @@ namespace zFirefoxBrowser.ViewModels
 
                                 if (input != null)
                                 {
-                                    DomEventArgs ev = WebBrowser.Browser.Document.CreateEvent("Event");
-                                    var webEvent = new Gecko.WebIDL.Event(WebBrowser.Browser.Window.DomWindow, ev.DomEvent as nsISupports);
+                                    DomEventArgs ev = CurrentlyActiveBrowser.Document.CreateEvent("Event");
+                                    var webEvent = new Gecko.WebIDL.Event(CurrentlyActiveBrowser.Window.DomWindow, ev.DomEvent as nsISupports);
                                     webEvent.InitEvent("change", true, true);
                                     input.GetEventTarget().DispatchEvent(ev);
                                 }
-                                if (elementFound.GetType() == typeof(GeckoButtonElement))
+                                if (htmlElementFound.GetType() == typeof(GeckoButtonElement))
                                 {
                                     //if (currentContentDocument.Location.Href.Contains("facebook"))
                                     //{
@@ -4437,9 +5740,9 @@ namespace zFirefoxBrowser.ViewModels
                                     //}
                                     //else
                                     //{
-                                    GeckoButtonElement btnelm = elementFound as GeckoButtonElement;
-                                    DomEventArgs ev = WebBrowser.Browser.Document.CreateEvent("MouseEvent");
-                                    var webEvent = new Gecko.WebIDL.Event(WebBrowser.Browser.Window.DomWindow, ev.DomEvent as nsISupports);
+                                    GeckoButtonElement btnelm = htmlElementFound as GeckoButtonElement;
+                                    DomEventArgs ev = CurrentlyActiveBrowser.Document.CreateEvent("MouseEvent");
+                                    var webEvent = new Gecko.WebIDL.Event(CurrentlyActiveBrowser.Window.DomWindow, ev.DomEvent as nsISupports);
                                     webEvent.InitEvent("mousedown", true, true);
                                     btnelm.GetEventTarget().DispatchEvent(ev);
                                     await Task.Delay(75);
@@ -4455,7 +5758,7 @@ namespace zFirefoxBrowser.ViewModels
 
 
                                 //elementFound.Click();
-                                elementFound.Blur();
+                                htmlElementFound.Blur();
                             }
                         }
                         #endregion
@@ -4468,11 +5771,11 @@ namespace zFirefoxBrowser.ViewModels
                         {
                             if (EXTRACT == "HTM" || EXTRACT == "HTML")
                             {
-                                extracted = elementFound.OuterHtml;
+                                extracted = htmlElementFound.OuterHtml;
                             }
                             else
                             {
-                                foreach (var item in elementFound.Attributes)
+                                foreach (var item in htmlElementFound.Attributes)
                                 {
                                     if (item.NodeName != null && item.NodeName.ToLower() == EXTRACT.ToLower())
                                     {
@@ -4484,10 +5787,10 @@ namespace zFirefoxBrowser.ViewModels
                         }
                         else if (EXTRACT == "TXT" || EXTRACT == "TXTALL")
                         {
-                            if (TYPE.ToUpper() == "TABLE" || elementFound.NodeName.ToUpper() == "TABLE")
+                            if (TYPE.ToUpper() == "TABLE" || htmlElementFound.NodeName.ToUpper() == "TABLE")
                             {
                                 extracted = "";
-                                foreach (var elementHead in elementFound.GetElementsByTagName("thead"))
+                                foreach (var elementHead in htmlElementFound.GetElementsByTagName("thead"))
                                 {
                                     if (elementHead == null) continue;
 
@@ -4510,7 +5813,7 @@ namespace zFirefoxBrowser.ViewModels
 
                                 extracted += Environment.NewLine;
 
-                                foreach (var elementBody in elementFound.GetElementsByTagName("tbody"))
+                                foreach (var elementBody in htmlElementFound.GetElementsByTagName("tbody"))
                                 {
                                     if (elementBody == null) continue;
 
@@ -4532,33 +5835,33 @@ namespace zFirefoxBrowser.ViewModels
                                 }
 
                                 if (extracted.EndsWith(",")) extracted = extracted.Remove(extracted.Length - 1);
-                                if (string.IsNullOrEmpty(extracted) || string.IsNullOrWhiteSpace(extracted)) extracted = elementFound.TextContent;
+                                if (string.IsNullOrEmpty(extracted) || string.IsNullOrWhiteSpace(extracted)) extracted = htmlElementFound.TextContent;
                             }
                             else
                             {
-                                extracted = elementFound.TextContent;
+                                extracted = htmlElementFound.TextContent;
                                 if (string.IsNullOrEmpty(extracted) || string.IsNullOrWhiteSpace(extracted))
                                 {
-                                    if (elementFound.GetType() == typeof(GeckoInputElement))
+                                    if (htmlElementFound.GetType() == typeof(GeckoInputElement))
                                     {
-                                        extracted = (elementFound as GeckoInputElement).Value;
-                                        if (extracted == "") extracted = (elementFound as GeckoInputElement).TextContent;
+                                        extracted = (htmlElementFound as GeckoInputElement).Value;
+                                        if (extracted == "") extracted = (htmlElementFound as GeckoInputElement).TextContent;
                                     }
-                                    else if (elementFound.GetType() == typeof(GeckoTextAreaElement))
+                                    else if (htmlElementFound.GetType() == typeof(GeckoTextAreaElement))
                                     {
-                                        extracted = (elementFound as GeckoTextAreaElement).Value;
-                                        if (extracted == "") extracted = (elementFound as GeckoTextAreaElement).TextContent;
+                                        extracted = (htmlElementFound as GeckoTextAreaElement).Value;
+                                        if (extracted == "") extracted = (htmlElementFound as GeckoTextAreaElement).TextContent;
                                     }
-                                    else if (elementFound.GetType() == typeof(GeckoSelectElement))
+                                    else if (htmlElementFound.GetType() == typeof(GeckoSelectElement))
                                     {
                                         if (EXTRACT == "TXT")
                                         {
-                                            extracted = (elementFound as GeckoSelectElement).Value;
-                                            if (extracted == "") extracted = (elementFound as GeckoSelectElement).TextContent;
+                                            extracted = (htmlElementFound as GeckoSelectElement).Value;
+                                            if (extracted == "") extracted = (htmlElementFound as GeckoSelectElement).TextContent;
                                         }
                                         else
                                         {
-                                            var allOptions = (elementFound as GeckoSelectElement).Options;
+                                            var allOptions = (htmlElementFound as GeckoSelectElement).Options;
                                             for (int k = 0; k < allOptions.Length; k++)
                                             {
                                                 extracted += allOptions.item((uint)k) + ",";
@@ -4569,8 +5872,8 @@ namespace zFirefoxBrowser.ViewModels
                                     }
                                     else
                                     {
-                                        if (elementFound.HasAttribute("value")) extracted = elementFound.GetAttribute("value");
-                                        else if (elementFound.HasAttribute("text")) extracted = elementFound.GetAttribute("text");
+                                        if (htmlElementFound.HasAttribute("value")) extracted = htmlElementFound.GetAttribute("value");
+                                        else if (htmlElementFound.HasAttribute("text")) extracted = htmlElementFound.GetAttribute("text");
                                     }
                                 }
                             }
@@ -4578,6 +5881,15 @@ namespace zFirefoxBrowser.ViewModels
 
                         if (extracted != null)
                         {
+
+                           if( mPlayer.Macros.Count > 1)
+                            {
+                                if(mPlayer.Macros[0].Line.Contains("TAG POS=") &&
+                                    mPlayer.Macros[0].Line.Contains("TYPE=A ATTR=HREF:/watch*&&CLASS:yt-uix-tile-link* EXTRACT=HREF"))
+                                {
+                                    extracted = "https://www.youtube.com" + extracted;
+                                }
+                            }
                             extracted = extracted + Environment.NewLine;
                             if (macVals[MacroVariables.EXTRACT] == "NULL")
                             {
@@ -4597,14 +5909,16 @@ namespace zFirefoxBrowser.ViewModels
 
                     // browser.Window.ScrollTo(elementFound.OffsetLeft, scrollto);
                     Console.WriteLine("Tag success");
+                    JSMacroPlayer.setVariableMessage("iimReturnVal", "1");
                 }
+                #endregion
             }
             catch (System.Runtime.InteropServices.InvalidComObjectException rex)
             {
                 setFromException = true;
                 haderror = true;
                 if (setfromwindow && ffpopupMacrosBrowser.Document != null) currentContentDocument = ffpopupMacrosBrowser.Document;
-                else currentContentDocument = WebBrowser.Browser.Document;
+                else currentContentDocument = CurrentlyActiveBrowser.Document;
 
                 currentContentDocumentIframe = null;
                 currentContentDocumentFrame = null;
@@ -4626,20 +5940,41 @@ namespace zFirefoxBrowser.ViewModels
 
                     if (wasSetFromWindow)
                     {
-                        currentContentDocument = WebBrowser.Browser.Document;
+                        currentContentDocument = CurrentlyActiveBrowser.Document;
                         wasSetFromWindow = false;
                     }
                 }
 
                 int timeoutstep = 6;
                 int.TryParse(macVals[MacroVariables.TIMEOUT_STEP], out timeoutstep);
-                if (timeoutstep > 0 && timeoutstep >= timesStepped)
+                if (setfromwindow || (timeoutstep > 0 && timeoutstep >= timesStepped))
                 {
+                    if (setfromwindow)
+                    {
+                        if (macVals[MacroVariables.CLOSEONERROR].ToUpper() == "YES")
+                        {
+                            try
+                            {
+                                if (ffpopupMacros != null)
+                                {
+                                    ffpopupMacros.Close();
+                                }
+                            }
+                            catch { }
+                            setfromwindow = false;
+                        }
+                        else
+                        {
+                            if (timesStepped - timeoutstep == 0 || timesStepped == timeoutstep)
+                                return previosTagElementFound;
+                        }
+                    }
+
                     timesStepped++;
                     if (await QuitableDelay(10)) return previosTagElementFound;
                     if (timesStepped - timeoutstep == 0)
                     {
-                        currentContentDocument = WebBrowser.Browser.Document;
+                        currentContentDocument = CurrentlyActiveBrowser.Document;
                     }
                     //await Task.Run(() => Thread.Sleep(1000));
                     previosTagElementFound = await TagCommand(value, mPlayer, macVals, currentContentDocument, currentContentDocumentIframe, currentContentDocumentFrame, previosTagElementFound, i, timesStepped);
@@ -4657,6 +5992,62 @@ namespace zFirefoxBrowser.ViewModels
             return previosTagElementFound;
         }
 
+        private async Task ScrolToAndHighlight(GeckoHtmlElement htmlElementFound,GeckoDomDocument currentContentDocument)
+        {
+            if (MacroSettings.IsHighlightWhenFoundChecked)
+            {
+                try
+                {
+                    htmlElementFound.Style.SetPropertyValue("outline", "1px solid blue");
+                }
+                catch { }
+            }
+
+            if (MacroSettings.IsScrollWhenFoundChecked)
+            {
+                try
+                {
+                    int scrollto = GetParentOffsetsForElement(htmlElementFound);
+                    if (currentContentDocument.DocumentElement != null && (currentContentDocument.DocumentElement.ScrollTop + CurrentlyActiveBrowser.Height) < scrollto)
+                    {
+                        CurrentlyActiveBrowser.Window.ScrollTo(htmlElementFound.OffsetLeft, scrollto * 2);
+                        await Task.Delay(100);
+                        //await Task.Run(() => Thread.Sleep(100));
+                        CurrentlyActiveBrowser.Window.ScrollTo(htmlElementFound.OffsetLeft, (scrollto - (CurrentlyActiveBrowser.Height / 2)));
+                        await Task.Delay(100);
+                        //await Task.Run(() => Thread.Sleep(100));
+                    }
+                    htmlElementFound.ScrollIntoView(false);
+                    htmlElementFound.Focus();
+                    await Task.Delay(100);
+                    // await Task.Run(() => Thread.Sleep(100));
+                }
+                catch { }
+
+                htmlElementFound.Focus();
+            }
+        }
+
+        private GeckoHtmlElement FindElementParent(GeckoElement elementFound)
+        {
+            if (elementFound.ParentElement == null) return null;
+            if (elementFound.ParentElement is GeckoHtmlElement) return elementFound.ParentElement as GeckoHtmlElement;
+
+            else return FindElementParent(elementFound.ParentElement);
+        }
+
+        private void GetAllElementRecursive(GeckoElementCollection geckoElementCollection, List<GeckoHtmlElement> nodes)
+        {
+            if (geckoElementCollection != null)
+            {
+                foreach (var element in geckoElementCollection)
+                {
+                    nodes.Add(element);
+                    GetAllElementRecursive(element.GetElementsByTagName("*") as GeckoElementCollection, nodes);
+                }
+            }
+        }
+
         private void recursiveFindForm(GeckoHtmlElement input, Dictionary<string, string> formAttrDlist, ref bool? isIt)
         {
             if (input == null) return;
@@ -4670,7 +6061,8 @@ namespace zFirefoxBrowser.ViewModels
                 {
                     foreach (var attr in frm.Attributes)
                     {
-                        if ((attr.LocalName.ToLower() == kvattr.Key.ToLower() && attr.NodeValue.ToLower() == kvattr.Value.ToLower()))
+                        if ((attr.LocalName.ToLower() == kvattr.Key.ToLower() && attr.NodeValue.ToLower() == kvattr.Value.ToLower()) ||
+                           (attr.LocalName.ToLower() == kvattr.Key.ToLower() && kvattr.Value == "*"))
                         {
                             foundCount++;
                             break;
@@ -4705,6 +6097,7 @@ namespace zFirefoxBrowser.ViewModels
 
             return offset;
         }
+        
 
         private void SaveAllHtmlPlusFrames(GeckoDomDocument currentContentDocument, List<string> contents)
         {

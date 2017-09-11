@@ -262,6 +262,8 @@ namespace zFirefoxBrowser.Helpers
         public string OnLoginRetry { get; set; }
         public int OnLoginDidRetryCount { get; set; }
 
+        public bool showAny = true;
+
         public MacroPromptService() : base()
         {
             OnErrorButton = ButtonState_YES;
@@ -273,6 +275,8 @@ namespace zFirefoxBrowser.Helpers
 
         public override void Alert(string dialogTitle, string text)
         {
+            if (!showAny) return;
+
             if (MacroManger.AnyRunning)
             {
                 POS++;

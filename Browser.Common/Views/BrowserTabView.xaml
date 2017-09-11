@@ -135,6 +135,8 @@
                                Stretch="None" 
                                Source="pack://application:,,,/Organiser.Common;component/Image/add.png" />
                     </Button>
+                    
+                    
 
                     <Button Name="Settings" 
                         DockPanel.Dock="Right"
@@ -268,6 +270,10 @@
                                             </MenuItem.Header>
                                         </MenuItem>
                                         <Separator Grid.Row="14"  Margin="-30,0,0,0" />
+                                        <DockPanel Margin="2" Grid.Row="15">
+                                            <TextBlock Text="Accept Language" Width="150" />
+                                            <TextBox Text="{Binding AcceptLanguage}"  MinWidth="50" MaxWidth="200" />
+                                        </DockPanel>
                                         <MenuItem Margin="2" Grid.Row="10"  Visibility="{Binding SetWebrtcVisible}">
                                             <MenuItem.Header>
                                                 <CheckBox Content="Hide Fonts" IsChecked="{Binding HideFonts, UpdateSourceTrigger=PropertyChanged}" />
@@ -339,6 +345,18 @@
                                 </ScrollViewer>
                             </ContextMenu>
                         </Button.ContextMenu>
+                    </Button>
+
+
+                    <Button Name="SocialCrawl" 
+                            DockPanel.Dock="Right"
+                            ToolTip="Social Stats Of Urls On Page"
+                            Click="SocialCrawl_Click"
+                            Style="{DynamicResource browser_btn}">
+                        <Image HorizontalAlignment="Center" 
+                               VerticalAlignment="Center" 
+                               Stretch="None" 
+                               Source="pack://application:,,,/Organiser.Common;component/Image/ic_assessment_black_24dp_1x.png" />
                     </Button>
 
                     <Button Name="CP" 
@@ -505,7 +523,11 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Rectangle Name="rctangle">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Rectangle Name="rctangle" Grid.RowSpan="2">
                     <Rectangle.Fill>
                         <VisualBrush TileMode="Tile"
                                      Viewport="0,0,150,150"
@@ -525,12 +547,130 @@
                         </VisualBrush>
                     </Rectangle.Fill>
                 </Rectangle>
-                
-                <ContentPresenter Content="{Binding WebBrowserHost}" Name="host" 
-                                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-                <!--<ContentControl Content="{Binding WebBrowserHost2}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />-->
 
-                <Expander Name="flyOut" 
+                <Expander Name="SocialStatsExpander" 
+                          ExpandDirection="Down"
+                          VerticalAlignment="Top"
+                          Grid.Column="0"
+                          Header="Social Stats"
+                          Height="300"
+                          Background="WhiteSmoke"
+                          Visibility="Collapsed"
+                          IsExpanded="{Binding SocialStatsCrawlActive}"
+                          Expanded="SocialCrawl_Click"
+                          Collapsed="SocialStatsExpander_Collapsed">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="1.5*" />
+                        </Grid.ColumnDefinitions>
+                        <CheckBox Content="Check All Links On Page" IsChecked="{Binding IsCrawlAllActive}" Grid.ColumnSpan="2" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="3" />
+                        <Button Content="Clear" HorizontalAlignment="Right" VerticalAlignment="Top" Style="{StaticResource FlatbtnStyle}" Width="70" Margin="3"
+                                Command="{Binding OnCommandFromView}" CommandParameter="ClearSocialStats" Grid.Column="1"/>
+
+                        <commonControls:CirclePBarControl Visibility="{Binding IsLoadingStatsVisible}" Grid.Column="1" Grid.Row="1" />
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Button Style="{StaticResource FlatbtnStyle}" Content="Check These Links" Margin="3,3,6,3"
+                                    Command="{Binding OnCommandFromView}" CommandParameter="CheckTheseLinks" />
+                            <TextBox Grid.Row="1" BorderThickness="0" Text="{Binding LinksToStatCheck}" MinWidth="225" AcceptsReturn="True" Height="215" VerticalAlignment="Center" Margin="3,3,6,3"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                        </Grid>
+
+                        <GridSplitter ResizeDirection="Columns"
+                                      Margin="1"
+                                      VerticalAlignment="Stretch"
+                                      Grid.Column="0"
+                                      Grid.Row="1"
+                                      Width="1" 
+                                      Background="DarkGray" />
+                        <ListView ItemsSource="{Binding CrawledLinksOnPage}"
+                                  Grid.Column="1"
+                                  BorderThickness="0" 
+                                  Grid.IsSharedSizeScope="True" 
+                                  Background="Transparent" 
+                                  ScrollViewer.CanContentScroll="False"
+                                  Grid.Row="1">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="3">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Url}" />
+                                        <commonControls:SocialStatsUserControl Grid.Row="1" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Facebook Order By Shares">
+                                        <MenuItem.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding OnCommandFromView}" CommandParameter="ORDERBY_FBSHARES" />
+                                        </MenuItem.InputBindings>
+                                    </MenuItem>
+                                    <MenuItem Header="Facebook Order By Likes">
+                                        <MenuItem.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding OnCommandFromView}" CommandParameter="ORDERBY_FBLIKES" />
+                                        </MenuItem.InputBindings>
+                                    </MenuItem>
+                                    <MenuItem Header="Facebook Order By Comments">
+                                        <MenuItem.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding OnCommandFromView}" CommandParameter="ORDERBY_FBCOMMENTS" />
+                                        </MenuItem.InputBindings>
+                                    </MenuItem>
+                                    <MenuItem Header="Google+ Order By Plus Ones">
+                                        <MenuItem.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding OnCommandFromView}" CommandParameter="ORDERBY_GPLUSONES" />
+                                        </MenuItem.InputBindings>
+                                    </MenuItem>
+                                    <MenuItem Header="Pinterest Order By Pins">
+                                        <MenuItem.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding OnCommandFromView}" CommandParameter="ORDERBY_PINTERESTPINS" />
+                                        </MenuItem.InputBindings>
+                                    </MenuItem>
+                                    <MenuItem Header="Stumble Order By Views">
+                                        <MenuItem.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding OnCommandFromView}" CommandParameter="ORDERBY_STUMBLEVIEWS" />
+                                        </MenuItem.InputBindings>
+                                    </MenuItem>
+                                    <MenuItem Header="LinkedIn Order By Count">
+                                        <MenuItem.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding OnCommandFromView}" CommandParameter="ORDERBY_LINKEDINCOUNT" />
+                                        </MenuItem.InputBindings>
+                                    </MenuItem>
+                                    <MenuItem Header="Buffer Order By Shares">
+                                        <MenuItem.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding OnCommandFromView}" CommandParameter="ORDERBY_BUFFERSHARES" />
+                                        </MenuItem.InputBindings>
+                                    </MenuItem>
+                                    <MenuItem Header="Reddit Order By Ups">
+                                        <MenuItem.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding OnCommandFromView}" CommandParameter="ORDERBY_REDDITUPS" />
+                                        </MenuItem.InputBindings>
+                                    </MenuItem>
+                                    <MenuItem Header="Reddit Order By Score">
+                                        <MenuItem.InputBindings>
+                                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_REDDITSCORE" />
+                                        </MenuItem.InputBindings>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </ListView.ContextMenu>
+                        </ListView>
+                    </Grid>
+                </Expander>
+                <ContentPresenter Content="{Binding WebBrowserHost}" Name="host" Grid.Row="1"
+                                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+                <Expander Name="flyOut" Grid.RowSpan="2"
                           ExpandDirection="Right"
                           Style="{StaticResource AnimatedExpanderStyle}"
                           Grid.Column="1"
@@ -572,7 +712,7 @@
                                                                 </TransformGroup.Children>
                                                             </TransformGroup>
                                                         </Grid.LayoutTransform>
-                                                        <Ellipse x:Name="circle" HorizontalAlignment="Center" Height="40" Width="40" Stroke="Black" VerticalAlignment="Center" StrokeThickness="1" />
+                                                        <Border x:Name="circle" HorizontalAlignment="Center" Height="40" Width="40" BorderBrush="Transparent" BorderThickness="1" CornerRadius="1"  VerticalAlignment="Center" />
                                                         <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5"
                                                               HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="#797878"
                                                               StrokeThickness="2" VerticalAlignment="Center" Height="11" 
@@ -581,10 +721,10 @@
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Stroke" TargetName="circle" Value="#FF787878" />
+                                                        <Setter Property="BorderBrush" TargetName="circle" Value="#FF787878" />
                                                     </Trigger>
                                                     <Trigger Property="IsPressed" Value="True">
-                                                        <Setter Property="Stroke" Value="#FF515151" TargetName="circle"/>
+                                                        <Setter Property="BorderBrush" Value="#FF515151" TargetName="circle"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -623,7 +763,7 @@
                     </Grid>
                 </Expander>
 
-                <Expander Name="MacroflyOut" 
+                <Expander Name="MacroflyOut" Grid.RowSpan="2"
                           x:FieldModifier="public"
                           ExpandDirection="Right"
                           Style="{StaticResource AnimatedExpanderStyle}"
@@ -666,7 +806,7 @@
                                                                 </TransformGroup.Children>
                                                             </TransformGroup>
                                                         </Grid.LayoutTransform>
-                                                        <Ellipse x:Name="circle" HorizontalAlignment="Center" Height="40" Width="40" Stroke="Black" VerticalAlignment="Center" StrokeThickness="1" />
+                                                        <Border x:Name="circle" HorizontalAlignment="Center" Height="40" Width="40" BorderBrush="Transparent" BorderThickness="1" CornerRadius="1"  VerticalAlignment="Center" />
                                                         <Path x:Name="arrow" Data="M 1,1.5 L 4.5,5 L 8,1.5"
                                                               HorizontalAlignment="Center" SnapsToDevicePixels="false" Stroke="#797878"
                                                               StrokeThickness="2" VerticalAlignment="Center" Height="11" 
@@ -675,10 +815,10 @@
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter Property="Stroke" TargetName="circle" Value="#FF787878" />
+                                                        <Setter Property="BorderBrush" TargetName="circle" Value="#FF787878" />
                                                     </Trigger>
                                                     <Trigger Property="IsPressed" Value="True">
-                                                        <Setter Property="Stroke" Value="#FF515151" TargetName="circle"/>
+                                                        <Setter Property="BorderBrush" Value="#FF515151" TargetName="circle"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -718,6 +858,8 @@
                                 <Button Content="Play Checked" Margin="3"  Style="{StaticResource FlatbtnStyle}" 
                                     Command="{Binding OnCommandFromView}" CommandParameter="MacroPlayChecked" ToolTip="Plays Each Checked MAcro Once"  />
                             </UniformGrid>
+                            <Button Content="Skip To Next Macro" Margin="3"  Style="{StaticResource FlatbtnStyle}" IsEnabled="{Binding IsRunning}"
+                                    Command="{Binding OnCommandFromView}" CommandParameter="MacroSkip" />
                             <Button Content="{Binding ContentForPaused}" Margin="3" Style="{StaticResource FlatbtnStyle}" IsEnabled="{Binding IsRunning}"
                                     Command="{Binding OnCommandFromView}" CommandParameter="MacroPause" />
                             <Button Content="Stop" Margin="3"  Style="{StaticResource FlatbtnStyle}" IsEnabled="{Binding IsRunning}"

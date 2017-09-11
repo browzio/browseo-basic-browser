@@ -79,7 +79,7 @@ namespace AnyProjFFProcess
         {
             using (new ErrorModeContext(ErrorModes.FailCriticalErrors | ErrorModes.NoGpFaultErrorBox | ErrorModes.SEM_NOGPFAULTERRORBOX))
             {
-                //Debugger.Launch();
+               // Debugger.Launch();
                 //set up project data
                 string projectPath = args[0];
                 MyFilesDatabase.SetUpPdaaFromPath(projectPath);
@@ -163,7 +163,14 @@ namespace AnyProjFFProcess
                 await FoxInit.AwaitforProxySet();
 
                 btvm = new FoxTabViewModel(starturl);
+                btvm.IsFromIA = true;
                 ffWindow.DataContext = btvm;
+                btvm.OnBringToFrontForPaste += () => 
+                {
+                    ffWindow.Topmost = true;
+                    ffWindow.Topmost = false;
+                    ffWindow.Activate();
+                };
             };
 
             if (isMacroInit)

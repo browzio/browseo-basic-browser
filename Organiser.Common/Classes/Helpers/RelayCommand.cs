@@ -9,10 +9,16 @@ namespace Organiser.Common.Classes
     {
         [field: NonSerialized]
         private Action<object> _action;
+        private ICommand onCommandFromView;
 
         public RelayCommand(Action<object> action)
         {
             _action = action;
+        }
+
+        public RelayCommand(ICommand onCommandFromView)
+        {
+            this.onCommandFromView = onCommandFromView;
         }
 
         #region ICommand Members

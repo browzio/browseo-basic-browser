@@ -122,7 +122,21 @@
                     </Expander>
             </Grid>
 
-        <Ribbon Name="ribon" Foreground="#333333" Background="WhiteSmoke" Margin="0,0,0,0" Grid.ColumnSpan="2" SelectionChanged="Ribbon_SelectionChanged">
+        <Ribbon Name="ribon"
+                Foreground="#333333"
+                Background="WhiteSmoke"
+                Margin="0,0,0,0"
+                Grid.ColumnSpan="2"
+                CheckedBackground="Transparent"
+                FocusedBackground="Transparent"
+                MouseOverBackground="Transparent"
+                PressedBackground="Transparent"
+                SelectionChanged="Ribbon_SelectionChanged"
+                CheckedBorderBrush="#FF358FEA"
+                FocusedBorderBrush="#FF389BFF"
+                MouseOverBorderBrush="#FF389BFF"
+                PressedBorderBrush="#FF358FEA"
+                IsSynchronizedWithCurrentItem="False">
             <Ribbon.ApplicationMenu>
                 <RibbonApplicationMenu Visibility="Collapsed" />
             </Ribbon.ApplicationMenu>
@@ -177,8 +191,35 @@
                         </StackPanel>
                     </StackPanel>
                 </RibbonGroup>
-                <RibbonGroup Header="FR">
-                    <RibbonButton  LargeImageSource="..\Images\refresh-icon.png"  Click="btnFindReplace_Click" x:Name="btnFindReplace" ToolTip="Find Replace" />
+                <RibbonGroup Header="Edit">
+                    <StackPanel Orientation="Horizontal">
+                        <Grid>
+                        <StackPanel>
+                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/ic_find_replace_black_24dp_2x.png" />
+
+                            <TextBlock Text="Find Replace"
+                                       HorizontalAlignment="Center" />
+                        </StackPanel>
+
+                            <RibbonButton  Click="btnFindReplace_Click"
+                                           x:Name="btnFindReplace"
+                                           ToolTip="Find Replace">
+                            </RibbonButton>
+                        </Grid>
+
+                        <Grid Margin="5,0,0,0">
+                            <StackPanel>
+                                <Image Source="pack://application:,,,/Organiser.Common;component/Image/ic_filter_list_black_24dp_2x.png" />
+
+                                <TextBlock Text="Clear HTML"
+                                           HorizontalAlignment="Center" />
+                            </StackPanel>
+
+                            <RibbonButton    Click="btnRemoveHtml_Click"
+                                             x:Name="btnRemoveHtml"
+                                             ToolTip="Clear HTML" />
+                        </Grid>
+                    </StackPanel>
                 </RibbonGroup>
                 <RibbonGroup Header="Spin">
                     <StackPanel Orientation="Horizontal">

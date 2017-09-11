@@ -34,7 +34,7 @@ namespace BrowserPlugin
             //fc.SetPersonData();
             //fc = new FeatureCallage(birthdayYear, children, city, cmbSelectedIndexDay, cmbSelectedIndexMonth, cmbSelectedIndexSex, country, dir, email, filePath, firstName, inMonney, inPBNVault, lastName, notes, password, phoneNumber, profileName, projectDir, projectName, proxyIP, proxyPassword, proxyPort, proxyUsername, sIPBNType, state, street, username, webAddress, zip);
             //fc.SetPersonData(birthdayYear, children, city, cmbSelectedIndexDay, cmbSelectedIndexMonth, cmbSelectedIndexSex, country, dir, email, filePath, firstName, inMonney, inPBNVault, lastName, notes, password, phoneNumber, profileName, projectDir, projectName, proxyIP, proxyPassword, proxyPort, proxyUsername, sIPBNType, state, street, username, webAddress, zip);
-
+            
             BrowserInit.SetPersonData(birthdayYear, children, city, cmbSelectedIndexDay, cmbSelectedIndexMonth, cmbSelectedIndexSex, country, dir, email, filePath, firstName, inMonney, inPBNVault, lastName, notes, password, phoneNumber, profileName, projectDir, projectName, proxyIP, proxyPassword, proxyPort, proxyUsername, sIPBNType, state, street, username, webAddress, zip);
             FoxInit.SetPersonData(birthdayYear, children, city, cmbSelectedIndexDay, cmbSelectedIndexMonth, cmbSelectedIndexSex, country, dir, email, filePath, firstName, inMonney, inPBNVault, lastName, notes, password, phoneNumber, profileName, projectDir, projectName, proxyIP, proxyPassword, proxyPort, proxyUsername, sIPBNType, state, street, username, webAddress, zip);
             fc = new FeatureCallage();
@@ -46,8 +46,6 @@ namespace BrowserPlugin
 
         public override void Dispose()
         {
-            if (fc != null)
-                fc.CloseAll();
             base.Dispose();
         }
 
@@ -58,7 +56,14 @@ namespace BrowserPlugin
 
         public override void KillAllProcesses()
         {
-            ProcessManager.Instance.DisposeAllProcess();
+            if (fc != null)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    fc.CloseAll();
+                });
+                ProcessManager.Instance.DisposeAllProcess();
+            }
         }
 
         public override void OnTabFocused()

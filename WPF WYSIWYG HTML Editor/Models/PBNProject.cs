@@ -64,7 +64,17 @@ namespace WPF_WYSIWYG_HTML_Editor.Models
             }
         }
 
-
+        private string indexCheckText = "";
+        public string IndexCheckText
+        {
+            get { return indexCheckText; }
+            set
+            {
+                indexCheckText = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("IndexCheckText"));
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
     }

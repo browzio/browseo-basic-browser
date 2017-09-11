@@ -62,11 +62,17 @@ namespace Organiser.Common.Controlls
                 case NotifyCollectionChangedAction.Remove:
                     if (e.OldItems != null)
                     {
-                        foreach (var item in e.OldItems)
+
+                        for (int i = 0; i < e.OldItems.Count; i++)
                         {
+                            var item = e.OldItems[i];
                             var cp = FindChildContentPresenter(item);
                             if (cp != null)
+                            {
                                 itemsHolderPanel.Children.Remove(cp);
+                                cp = null;
+                                GC.Collect();
+                            }
                         }
                     }
 
@@ -83,8 +89,16 @@ namespace Organiser.Common.Controlls
 
         protected override void OnSelectionChanged(SelectionChangedEventArgs e)
         {
-            base.OnSelectionChanged(e);
-            UpdateSelectedItem();
+            try
+            {
+                base.OnSelectionChanged(e);
+            }
+            catch { }
+            try
+            {
+                UpdateSelectedItem();
+            }
+            catch { }
         }
 
         private void UpdateSelectedItem()

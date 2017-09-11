@@ -1,7 +1,17 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:Organiser.Common"
+                    xmlns:extensions="clr-namespace:Organiser.Common.Extensions"
+                    xmlns:converters="clr-namespace:Organiser.Common.Converters"
                     xmlns:localControls="clr-namespace:Organiser.Common.Controlls">
+
+    <BooleanToVisibilityConverter  x:Key="BooleanToVisibilityConverter" />
+    <converters:TextEmptyToVisibleConverter x:Key="TextEmptyToVisibleConverter" />
+    <converters:NullToVisibleConverter x:Key="NullToVisibleConverter" />
+    <converters:StringTomageSourceConverter x:Key="StringTomageSourceConverter" />
+    <converters:EmptyListToVisibleConverter x:Key="EmptyListToVisibleConverter" />
+    <converters:GreaterthenToVisibleConverter x:Key="GreaterthenToVisibleConverter" />
+    <!--<extensions:Int32Extension x:Key="Int32Extension" />-->
 
     <SolidColorBrush Color="#5c5c5c" x:Key="text_fg"/>
     <SolidColorBrush x:Key="StandardBorderBrush" Color="DarkGray"></SolidColorBrush>

@@ -86,6 +86,8 @@ namespace WPF_WYSIWYG_HTML_Editor
             //if ((bool)e.NewValue == true)
             //{
             //    Dispatcher.BeginInvoke(
+
+
             //    System.Windows.Threading.DispatcherPriority.ContextIdle,
             //    new Action(delegate()
             //    {

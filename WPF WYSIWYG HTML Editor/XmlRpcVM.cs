@@ -31,6 +31,7 @@ using WordPressSharp.Constants;
 using Directory = Organiser.Common.Classes.MyFilesDatabase.Directory;
 using Path = Organiser.Common.Classes.MyFilesDatabase.Path;
 using File = Organiser.Common.Classes.MyFilesDatabase.File;
+using System.Net.Http;
 
 namespace WPF_WYSIWYG_HTML_Editor
 {
@@ -256,7 +257,6 @@ namespace WPF_WYSIWYG_HTML_Editor
         //SavedPBNProjects
         public ObservableCollection<PBNProject> SavedPBNProjects { get; set; }
         public ObservableCollection<PBNProjectsFolder> SavedPBNProjectsFolders { get; set; }
-
         //SavedMoney
         public ObservableCollection<PBNProject> SavedMoneyProjects { get; set; }
         public ObservableCollection<PBNProjectsFolder> SavedMoneyProjectsFolders { get; set; }
@@ -453,50 +453,50 @@ namespace WPF_WYSIWYG_HTML_Editor
             return didSelectSomeThing;
         }
 
-        public async void OnPublishClick(string content)
-        {
-            if (!isAnySelected())
-            {
-                MessageBox.Show("Select platforms to publish to from settings.");
-                return;
-            }
-            errorString = "";
-            successString = "";
+        //public async void OnPublishClick(string content)
+        //{
+        //    if (!isAnySelected())
+        //    {
+        //        MessageBox.Show("Select platforms to publish to from settings.");
+        //        return;
+        //    }
+        //    errorString = "";
+        //    successString = "";
 
-            if (UseSpunArticlesChecked)
-            {
-               await publishSpun(content, "", true);
+        //    if (UseSpunArticlesChecked)
+        //    {
+        //       await publishSpun(content, "", true);
 
-                foreach (SpinningVM spin in Tabs)
-                {
-                    spin.WasUsed = false;
-                }
+        //        foreach (SpinningVM spin in Tabs)
+        //        {
+        //            spin.WasUsed = false;
+        //        }
 
-                if (successString != "")
-                    MessageBox.Show(successString);
-                if (errorString != "")
-                    MessageBox.Show(errorString);
-                return;
-            }
-            if (TimesToSpin > 0 && AutoSpinChecked)
-            {
-                for (int i = 1; i < TimesToSpin; i++)
-                {
-                    string ttl = Spinner.Spin(PostTitle);
-                    if (ttl == "")
-                        ttl = " ";
-                    await publishSpun(Spinner.Spin(content), IsSpinChecked ? ttl : "");
-                }
+        //        if (successString != "")
+        //            MessageBox.Show(successString);
+        //        if (errorString != "")
+        //            MessageBox.Show(errorString);
+        //        return;
+        //    }
+        //    if (TimesToSpin > 0 && AutoSpinChecked)
+        //    {
+        //        for (int i = 1; i < TimesToSpin; i++)
+        //        {
+        //            string ttl = Spinner.Spin(PostTitle);
+        //            if (ttl == "")
+        //                ttl = " ";
+        //            await publishSpun(Spinner.Spin(content), IsSpinChecked ? ttl : "");
+        //        }
 
-                if (successString != "")
-                    MessageBox.Show(successString);
-                if (errorString != "")
-                    MessageBox.Show(errorString);
+        //        if (successString != "")
+        //            MessageBox.Show(successString);
+        //        if (errorString != "")
+        //            MessageBox.Show(errorString);
 
-                return;
-            }
-            await publishSpun(content);
-        }
+        //        return;
+        //    }
+        //    await publishSpun(content);
+        //}
 
         internal async void OnPubFromVaultClick(string content)
         {
@@ -1047,151 +1047,151 @@ namespace WPF_WYSIWYG_HTML_Editor
             return mimeType;
         }
 
-        private async Task publishSpun(string content, string title = "", bool fromtabs = false)
-        {
-            //EnableBtns = false;
-            //ProgressBarStart = true;
-            ////Application.Current.Dispatcher.Invoke((Action)delegate
-            ////{
-            ////    Mouse.OverrideCursor = Cursors.Wait;
-            ////});
+        //private async Task publishSpun(string content, string title = "", bool fromtabs = false)
+        //{
+        //    //EnableBtns = false;
+        //    //ProgressBarStart = true;
+        //    ////Application.Current.Dispatcher.Invoke((Action)delegate
+        //    ////{
+        //    ////    Mouse.OverrideCursor = Cursors.Wait;
+        //    ////});
 
-            //try
-            //{
-            //    #region --wp--
-            //    if (IsWPChecked)
-            //    {
-            //        Status = "Gathering wordpress profiles.";
+        //    //try
+        //    //{
+        //    //    #region --wp--
+        //    //    if (IsWPChecked)
+        //    //    {
+        //    //        Status = "Gathering wordpress profiles.";
 
-            //        foreach (SelectedProfile prof in CmbBoxWPList)
-            //        {
-            //            if (!prof.IsSelected) continue;
-
-
-            //            PersonData profile = MyFilesDatabase.GetSubProjectPersonData(prof.Path);
-
-            //            if (string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress))
-            //            {
-            //                MessageBox.Show("Website in profile data cannot be empty. " + profile.ProfileName);
-            //                continue;
-            //            }
-            //            Status = "Posting to " + profile.WebAddress + ".";
-            //            DateTime publishdt = DateTime.Now;
-            //            try
-            //            {
-            //                publishdt = TimeHelper.GetTimeOfProxy(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword).Date;
-            //            }
-            //            catch { publishdt = DateTime.Now; }
-            //            if (UseSpunArticlesChecked)
-            //            {
-            //                title = PostTitle;
-            //                getSpunContent(ref content, ref title);
-            //            }
-
-            //            string link = await publishToWP(content, title, profile);
-
-            //            if (!link.IsNullOrEmpty())
-            //                successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
-            //        }
-            //    }
-            //    #endregion
-
-            //    #region --drupal--
-            //    if (IsDrupalChecked)
-            //    {
-            //        Status = "Gathering drupal profiles.";
-            //        foreach (SelectedProfile prof in CmbBoxDrupalList)
-            //        {
-            //            if (!prof.IsSelected) continue;
-
-            //            PersonData profile = MyFilesDatabase.GetSubProjectPersonData(prof.Path);
-            //            if (string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress))
-            //            {
-            //                MessageBox.Show("Website in profile data cannot be empty. " + profile.ProfileName);
-            //                continue;
-            //            }
-            //            Status = "Posting to " + profile.WebAddress + ".";
-
-            //            string url = profile.WebAddress;
-            //            if (url[url.Length - 1] != '/')
-            //                url += '/';
-            //            url += "xmlrpc.php";
-
-            //            DrupalServices d = new Drupal7.Services.DrupalServices(url, profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword);
-            //            bool isin = d.Login(profile.Username, profile.Password);
-            //            if (!isin)
-            //            {
-            //                errorString += "Was unable to authenticate " + profile.WebAddress + Environment.NewLine;
-            //                continue;
-            //            }
-
-            //            if (UseSpunArticlesChecked)
-            //            {
-            //                title = PostTitle;
-            //                getSpunContent(ref content, ref title);
-            //            }
-
-            //            XmlRpcStruct postStruct = new XmlRpcStruct();
-            //            postStruct.Add("type", "article");
-            //            postStruct.Add("title", title == "" ? PostTitle : title);
-
-            //            XmlRpcStruct postBodyStructParams = new XmlRpcStruct();
-            //            postBodyStructParams.Add("format", "full_html");
-            //            postBodyStructParams.Add("value", content);
+        //    //        foreach (SelectedProfile prof in CmbBoxWPList)
+        //    //        {
+        //    //            if (!prof.IsSelected) continue;
 
 
-            //            XmlRpcStruct[] postBodyStructParamsArr = new XmlRpcStruct[1];
-            //            postBodyStructParamsArr[0] = postBodyStructParams;
+        //    //            PersonData profile = MyFilesDatabase.GetSubProjectPersonData(prof.Path);
 
-            //            XmlRpcStruct postBodyStruct = new XmlRpcStruct();
-            //            postBodyStruct.Add("und", postBodyStructParamsArr);
+        //    //            if (string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress))
+        //    //            {
+        //    //                MessageBox.Show("Website in profile data cannot be empty. " + profile.ProfileName);
+        //    //                continue;
+        //    //            }
+        //    //            Status = "Posting to " + profile.WebAddress + ".";
+        //    //            DateTime publishdt = DateTime.Now;
+        //    //            try
+        //    //            {
+        //    //                publishdt = TimeHelper.GetTimeOfProxy(profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword).Date;
+        //    //            }
+        //    //            catch { publishdt = DateTime.Now; }
+        //    //            if (UseSpunArticlesChecked)
+        //    //            {
+        //    //                title = PostTitle;
+        //    //                getSpunContent(ref content, ref title);
+        //    //            }
 
-            //            postStruct.Add("body", postBodyStruct);
+        //    //            string link = await publishToWP(content, title, profile);
 
-            //            XmlRpcStruct s = d.NodeCreate(postStruct);
-            //            if (s == null)
-            //            {
-            //                errorString += "Was Unable to post to " + profile.WebAddress + Environment.NewLine;
-            //            }
-            //            else
-            //            {
-            //                successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
-            //            }
+        //    //            if (!link.IsNullOrEmpty())
+        //    //                successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
+        //    //        }
+        //    //    }
+        //    //    #endregion
 
-            //            d.Logout();
-            //        }
-            //    }
-            //    #endregion
-            //}
-            //catch (Exception ex)
-            //{
-            //    if (!UseSpunArticlesChecked && TimesToSpin <= 0 && !AutoSpinChecked)
-            //    {
-            //        MessageBox.Show("Whoops something went wrong: " + ex.Message);
-            //    }
-            //    else
-            //    {
-            //        errorString += "Whoops something went wrong: " + ex.Message;
-            //    }
-            //}
+        //    //    #region --drupal--
+        //    //    if (IsDrupalChecked)
+        //    //    {
+        //    //        Status = "Gathering drupal profiles.";
+        //    //        foreach (SelectedProfile prof in CmbBoxDrupalList)
+        //    //        {
+        //    //            if (!prof.IsSelected) continue;
 
-            ////Application.Current.Dispatcher.Invoke((Action)delegate
-            ////{
-            ////    Mouse.OverrideCursor = null;
-            ////});
+        //    //            PersonData profile = MyFilesDatabase.GetSubProjectPersonData(prof.Path);
+        //    //            if (string.IsNullOrEmpty(profile.WebAddress) || string.IsNullOrWhiteSpace(profile.WebAddress))
+        //    //            {
+        //    //                MessageBox.Show("Website in profile data cannot be empty. " + profile.ProfileName);
+        //    //                continue;
+        //    //            }
+        //    //            Status = "Posting to " + profile.WebAddress + ".";
 
-            //if (!UseSpunArticlesChecked && TimesToSpin <= 0 && !AutoSpinChecked)
-            //{
-            //    if (successString != "")
-            //        MessageBox.Show(successString);
-            //    if (errorString != "")
-            //        MessageBox.Show(errorString);
-            //}
+        //    //            string url = profile.WebAddress;
+        //    //            if (url[url.Length - 1] != '/')
+        //    //                url += '/';
+        //    //            url += "xmlrpc.php";
 
-            //Status = "Ready to publish.";
-            //EnableBtns = true;
-            //ProgressBarStart = false;
-        }
+        //    //            DrupalServices d = new Drupal7.Services.DrupalServices(url, profile.ProxyIP, profile.ProxyPort, profile.ProxyUsername, profile.ProxyPassword);
+        //    //            bool isin = d.Login(profile.Username, profile.Password);
+        //    //            if (!isin)
+        //    //            {
+        //    //                errorString += "Was unable to authenticate " + profile.WebAddress + Environment.NewLine;
+        //    //                continue;
+        //    //            }
+
+        //    //            if (UseSpunArticlesChecked)
+        //    //            {
+        //    //                title = PostTitle;
+        //    //                getSpunContent(ref content, ref title);
+        //    //            }
+
+        //    //            XmlRpcStruct postStruct = new XmlRpcStruct();
+        //    //            postStruct.Add("type", "article");
+        //    //            postStruct.Add("title", title == "" ? PostTitle : title);
+
+        //    //            XmlRpcStruct postBodyStructParams = new XmlRpcStruct();
+        //    //            postBodyStructParams.Add("format", "full_html");
+        //    //            postBodyStructParams.Add("value", content);
+
+
+        //    //            XmlRpcStruct[] postBodyStructParamsArr = new XmlRpcStruct[1];
+        //    //            postBodyStructParamsArr[0] = postBodyStructParams;
+
+        //    //            XmlRpcStruct postBodyStruct = new XmlRpcStruct();
+        //    //            postBodyStruct.Add("und", postBodyStructParamsArr);
+
+        //    //            postStruct.Add("body", postBodyStruct);
+
+        //    //            XmlRpcStruct s = d.NodeCreate(postStruct);
+        //    //            if (s == null)
+        //    //            {
+        //    //                errorString += "Was Unable to post to " + profile.WebAddress + Environment.NewLine;
+        //    //            }
+        //    //            else
+        //    //            {
+        //    //                successString += "Post succesfull to " + profile.WebAddress + Environment.NewLine;
+        //    //            }
+
+        //    //            d.Logout();
+        //    //        }
+        //    //    }
+        //    //    #endregion
+        //    //}
+        //    //catch (Exception ex)
+        //    //{
+        //    //    if (!UseSpunArticlesChecked && TimesToSpin <= 0 && !AutoSpinChecked)
+        //    //    {
+        //    //        MessageBox.Show("Whoops something went wrong: " + ex.Message);
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        errorString += "Whoops something went wrong: " + ex.Message;
+        //    //    }
+        //    //}
+
+        //    ////Application.Current.Dispatcher.Invoke((Action)delegate
+        //    ////{
+        //    ////    Mouse.OverrideCursor = null;
+        //    ////});
+
+        //    //if (!UseSpunArticlesChecked && TimesToSpin <= 0 && !AutoSpinChecked)
+        //    //{
+        //    //    if (successString != "")
+        //    //        MessageBox.Show(successString);
+        //    //    if (errorString != "")
+        //    //        MessageBox.Show(errorString);
+        //    //}
+
+        //    //Status = "Ready to publish.";
+        //    //EnableBtns = true;
+        //    //ProgressBarStart = false;
+        //}
 
         public void getSpunContent(ref string content, ref string title)
         {
@@ -1359,6 +1359,42 @@ namespace WPF_WYSIWYG_HTML_Editor
                         }
                         break;
 
+                    case "InexCheckPBN":
+                        //SavedPBNProjectsFolders
+                        //SavedPBNProjects
+                        foreach (var pbnInFolder in SavedPBNProjectsFolders)
+                        {
+                            foreach (var pbn in pbnInFolder.PBNProjects)
+                            {
+                                if (!pbn.IsSelected) continue;
+                                pbn.IndexCheckText = await Task.Run(() => { return ChecIndexOf(pbn.FilePath); });
+                            }
+                        }
+                        foreach (var pbn in SavedPBNProjects)
+                        {
+                            if (!pbn.IsSelected) continue;
+                            pbn.IndexCheckText = await Task.Run(() => { return ChecIndexOf(pbn.FilePath); });
+                        }
+                        break;
+
+                    case "InexCheckMoney":
+                        //SavedMoneyProjects
+                        //SavedMoneyProjectsFolders
+                        foreach (var pbnInFolder in SavedMoneyProjectsFolders)
+                        {
+                            foreach (var pbn in pbnInFolder.PBNProjects)
+                            {
+                                if (!pbn.IsSelected) continue;
+                                pbn.IndexCheckText = await Task.Run(() => { return ChecIndexOf(pbn.FilePath); });
+                            }
+                        }
+                        foreach (var pbn in SavedMoneyProjects)
+                        {
+                            if (!pbn.IsSelected) continue;
+                            pbn.IndexCheckText = await Task.Run(() => { return ChecIndexOf(pbn.FilePath); });
+                        }
+                        break;
+
                     default:
                         break;
                 }
@@ -1366,6 +1402,66 @@ namespace WPF_WYSIWYG_HTML_Editor
             catch { }
 
             inmiddleofStuff = false;
+        }
+
+        private async Task<string> ChecIndexOf(string filePath)
+        {
+            string toReturn = "Not Found";
+
+            PersonData profile = MyFilesDatabase.GetSubProjectPersonData(filePath);
+            if (profile == null || profile.WebAddress.IsNullOrEmpty()) return toReturn;
+
+            //WebClient webClient = new WebClient();
+            //webClient.Encoding = System.Text.Encoding.UTF8;
+            var httpClientHandler = new HttpClientHandler();
+            if (!profile.ProxyIP.IsNullOrEmpty() && !profile.ProxyPort.IsNullOrEmpty())
+            {
+                httpClientHandler.Proxy = new WebProxy(profile.ProxyIP + ":" + profile.ProxyPort, false);
+                httpClientHandler.UseProxy = true;
+                if (!profile.ProxyUsername.IsNullOrEmpty() && !profile.ProxyPassword.IsNullOrEmpty())
+                {
+                    httpClientHandler.Proxy.Credentials = new NetworkCredential(profile.ProxyUsername, profile.ProxyPassword);
+                }
+            }
+            var client = new HttpClient(httpClientHandler);
+            try
+            {
+                //webClient.Headers.Add(HttpRequestHeader.Accept, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+                //webClient.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate");
+                //webClient.Headers.Add(HttpRequestHeader.AcceptLanguage, "en-US,en;q=0.5");
+                //webClient.Headers.Add(HttpRequestHeader.UserAgent, BrowserSettimgs.UserAgentChrome);
+                //string html = webClient.DownloadString("https://www.google.com/search?q=site:" + profile.WebAddress);
+
+                HttpResponseMessage response = await client.GetAsync("https://www.google.com/search?q=site:" + profile.WebAddress);
+                HttpContent responseContent = response.Content;
+                string html = "";
+                using (var reader = new System.IO.StreamReader(await responseContent.ReadAsStreamAsync()))
+                {
+                    html = await reader.ReadToEndAsync();
+                }
+                
+                if (html.ToLower().Contains("resultstats\">"))
+                {
+                    var shtml = html.ToLower().Split(new[] { "resultstats\">" }, StringSplitOptions.None)[1];
+                    shtml = shtml.Remove(shtml.IndexOf("<"));
+                    toReturn = shtml;
+                    toReturn = toReturn.Replace("�", "");
+                    toReturn = toReturn.Replace("-", "");
+                    toReturn = toReturn.Trim();
+                    if (toReturn.IsNullOrEmpty()) toReturn = "0 results";
+                    else if (!toReturn.Contains("results")) toReturn = toReturn + " results";
+                }
+                else if(html.Contains("To continue, please type the characters below:"))
+                {
+                    toReturn = "hit CAPTCHA";
+                }
+            }
+            catch (Exception ex){ toReturn = ex.Message; }
+            finally
+            {
+                client.Dispose();
+            }
+            return toReturn;
         }
 
         private async Task RefreshRest(string configFile, ObservableCollection<PBNProject> savedpbns, ObservableCollection<PBNProjectsFolder> savedfolders)
@@ -1459,6 +1555,15 @@ namespace WPF_WYSIWYG_HTML_Editor
                             pName = pName.Replace(")", "");
                             pName = "(" + pName + ")";
 
+                            string profname = lineInfo[0];
+                            try
+                            {
+                                string pnamefromFile = await Task.Run(() => { return MyFilesDatabase.GetSubProjectPersonData(dirPath).ProfileName; });
+                                profname = pnamefromFile;
+                            }
+                            catch
+                            { }
+
                             if (!nFolder.PBNProjects.Any(f => f.FilePath == dirPath))
                             {
                                 Application.Current.Dispatcher.Invoke(() =>
@@ -1500,11 +1605,21 @@ namespace WPF_WYSIWYG_HTML_Editor
                         pName = pName.Replace("(", "");
                         pName = pName.Replace(")", "");
                         pName = "(" + pName + ")";
+
+                        string profname = lineInfo[0];
+                        try
+                        {
+                            string pnamefromFile = await Task.Run(() => { return MyFilesDatabase.GetSubProjectPersonData(DirPath).ProfileName; });
+                            profname = pnamefromFile;
+                        }
+                        catch
+                        { }
+
                         if (!pBNProjects.Any(f => f.FilePath == DirPath))
                         {
                             Application.Current.Dispatcher.Invoke(() =>
                             {
-                                pBNProjects.Add(new PBNProject() { Name = lineInfo[0], SIType = Convert.ToInt32(lineInfo[1]), FilePath = DirPath, ProjectName = pName });
+                                pBNProjects.Add(new PBNProject() { Name = profname, SIType = Convert.ToInt32(lineInfo[1]), FilePath = DirPath, ProjectName = pName });
                             });
                         }
                     }

@@ -1,0 +1,137 @@
+﻿<UserControl x:Class="RssReader.Views.RSSTabView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:RssReader.Views"
+             xmlns:extensions="clr-namespace:Organiser.Common.Extensions;assembly=Organiser.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    
+    <Grid Background="#FFf5f5f5"
+          Margin="10"
+          PreviewMouseWheel="Grid_PreviewMouseWheel">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*"
+                           Name="grd" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        
+        <StackPanel Orientation="Horizontal"
+                    Grid.ColumnSpan="2"
+                    HorizontalAlignment="Right"
+                    Margin="0,0,0,10">
+            <Button Command="{Binding OnCommandFromView}"
+                    CommandParameter="OpenRssLinksWindow"
+                    Width="25"
+                    Height="25">
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/ic_rss_feed_black_24dp_1x.png"
+                       Margin="-4,0,-4,-2"
+                       ToolTip="Edit Rss Feeds"
+                       Stretch="Uniform" />
+            </Button>
+            <!--<Button Command="{Binding OnCommandFromView}"
+                    CommandParameter="Combine"
+                    Width="25"
+                    Height="25"
+                    Margin="10,0,0,0">
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/ic_group_work_black_24dp_1x.png"
+                       Margin="-4,0,-4,-2"
+                       ToolTip="Group Multiple Feeds"
+                       SnapsToDevicePixels="True"
+                       Stretch="Uniform" />
+            </Button>-->
+            <Button Command="{Binding OnCommandFromView}"
+                    CommandParameter="Refresh"
+                    Width="25"
+                    Height="25"
+                    Margin="10,0,0,0">
+                <Image Source="pack://application:,,,/Organiser.Common;component/Image/ic_autorenew_black_24dp_1x.png"
+                       Margin="-4,0,-4,-2"
+                       ToolTip="Refresh"
+                       SnapsToDevicePixels="True"
+                       Stretch="Uniform" />
+            </Button>
+        </StackPanel>
+
+        <ListView Grid.Row="1"
+                  Margin="10,10,0,10"
+                  Background="Transparent"
+                  BorderThickness="0"
+                  ItemContainerStyle="{DynamicResource MetroListBoxItemStyle}"
+                  Visibility="{Binding RSSFeeds.Count, Converter={StaticResource GreaterthenToVisibleConverter}, ConverterParameter={extensions:Int32 1}}"
+                  SelectedItem="{Binding SelectedRSSFeed}"
+                  ItemsSource="{Binding RSSFeeds}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding FeedUrls}"
+                               Margin="0,3,0,3"
+                               Cursor="Hand"
+                               Width="200"
+                               TextWrapping="Wrap" />
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <!--<ScrollViewer x:Name="svContent"
+                      Grid.Row="1"
+                      CanContentScroll="True"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto">-->
+        <!--<ItemsControl ItemsSource="{Binding RSSFeeds}"
+                      Grid.Row="1"
+                      VirtualizingPanel.IsVirtualizing="true"
+                      VirtualizingPanel.VirtualizationMode="Recycling">-->
+            <!--<ItemsControl.Template>
+                    <ControlTemplate>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <StackPanel>
+                                <TextBlock Text="this is a title"
+                                           FontSize="15" />
+                                <TextBlock Text="This is a description" />
+                            </StackPanel>
+                            <ScrollViewer CanContentScroll="True"
+                                      Grid.Row="1">
+                            <VirtualizingStackPanel IsItemsHost="True" />
+                            </ScrollViewer>
+                        </Grid>
+                    </ControlTemplate>
+                </ItemsControl.Template>-->
+
+                <!--<ItemsControl.Template>
+                    <ControlTemplate>
+                        <VirtualizingStackPanel IsItemsHost="True" />
+                    </ControlTemplate>
+                </ItemsControl.Template>-->
+                
+                <!--<ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <local:RSSFeedView Margin="10" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>-->
+        <Grid Grid.Row="1"
+              Grid.Column="1"
+              Visibility="{Binding SelectedRSSFeed, Converter={StaticResource NullToVisibleConverter}, ConverterParameter=NOT}">
+            <local:RSSFeedView VerticalAlignment="Top"
+                               Margin="10"
+                               DataContext="{Binding SelectedRSSFeed}">
+            </local:RSSFeedView>
+        </Grid>
+        <!--</ScrollViewer>-->
+    </Grid>
+</UserControl>

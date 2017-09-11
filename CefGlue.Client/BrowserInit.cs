@@ -270,7 +270,7 @@ public class BrowserInit
                     //    Console.WriteLine("Successfully modified proxy settings");
                     //}
                 }
-                CefRuntime.EnableHighDpiSupport();
+                //CefRuntime.EnableHighDpiSupport();
                 try
                 {
                     CefRuntime.Load();
@@ -297,7 +297,7 @@ public class BrowserInit
                     MultiThreadedMessageLoop = true,
                     PersistSessionCookies = true,
                     // LogSeverity = CefLogSeverity.ErrorReport | CefLogSeverity.Error | CefLogSeverity.Info | CefLogSeverity.Verbose | CefLogSeverity.Warning,
-                    IgnoreCertificateErrors = true,
+                    IgnoreCertificateErrors = false,
                     // UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2556.0 Safari/537.36",
                     // UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36",
                     UserAgent = BrowserSettimgs.UserAgentChrome,

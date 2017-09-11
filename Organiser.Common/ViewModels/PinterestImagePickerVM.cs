@@ -50,49 +50,67 @@ namespace BrowserHost.ViewModels
                 {
                     // Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                     // {
-                    showImagesFromSource(AddressEditable, text);
+                    showImagesFromSource(AddressEditable, text, isff);
                     //}));
                 });
             }
             else
             {
-                showImagesFromSource(AddressEditable, source);
+                showImagesFromSource(AddressEditable, source, isff);
             }
         }
 
-        private void showImagesFromSource(string AddressEditable, string text)
+        private void showImagesFromSource(string AddressEditable, string text,bool isff)
         {
             loadImgThread = new Thread(() =>
             {
                 WebPageImages.Clear();
-                try
+                if (isff)
                 {
-                    foreach (Match m in Regex.Matches(text, "<img.+?src=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase | RegexOptions.Multiline))
+                    var links = text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var link in links)
                     {
-                        // if (WebPageImages.Count > 10) break;
+                        if (link.IsNullOrEmpty()) continue;
 
-                        try
+                        WebPageImages.Add(new WebPageImg()
                         {
-                            string src = m.Groups[1].Value;
-                            if (src.ToLower().Contains(".png") || src.ToLower().Contains(".jpg") || src.ToLower().Contains(".jpeg"))
-                            {
-                                if (!src.Contains("http") && !src.Contains("https"))
-                                {
-                                    src = src.Replace("//", "");
-                                    src = "http://" + src;
-                                }
-
-                                WebPageImages.Add(new WebPageImg()
-                                {
-                                    ImgUrl = src,
-                                    WebUrl = AddressEditable
-                                });
-                            }
-                        }
-                        catch { }
+                            ImgUrl = link,
+                            WebUrl = AddressEditable
+                        });
                     }
                 }
-                catch { }
+                else
+                {
+                    try
+                    {
+
+                        foreach (Match m in Regex.Matches(text.Trim(), "<img.+?src=[\"'](.+?)[\"'].*?>", RegexOptions.IgnoreCase | RegexOptions.Multiline))
+                        {
+                            // if (WebPageImages.Count > 10) break;
+
+                            try
+                            {
+                                string src = m.Groups[1].Value;
+                                if (src.ToLower().Contains(".png") || src.ToLower().Contains(".jpg") || src.ToLower().Contains(".jpeg"))
+                                {
+                                    if (!src.Contains("http") && !src.Contains("https"))
+                                    {
+                                        src = src.Replace("//", "");
+                                        src = "http://" + src;
+                                    }
+
+                                    WebPageImages.Add(new WebPageImg()
+                                    {
+                                        ImgUrl = src,
+                                        WebUrl = AddressEditable
+                                    });
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                    catch { }
+                }
 
                 if (WebPageImages.Count > 0)
                 {

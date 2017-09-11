@@ -314,7 +314,7 @@ namespace GoViral.Controls
         {
             // OnStoreForDominationRequested(link, null); if one
             // OnStoreForDominationRequested(null, likslist); if multi
-            if (multiWindowForLinksAdd.OKClicked &&
+            if (multiWindowForLinksAdd.ButtonLeftClicked &&
                 !string.IsNullOrEmpty(multiWindowForLinksAdd.tbInputedText.Text) && !string.IsNullOrWhiteSpace(multiWindowForLinksAdd.tbInputedText.Text))
             {
                 List<string> links = multiWindowForLinksAdd.tbInputedText.Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();

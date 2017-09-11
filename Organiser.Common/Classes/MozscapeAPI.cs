@@ -11,8 +11,11 @@ namespace Organiser.Common.Classes
 {
     public class MozscapeAPI
     {
-        public static string mozId = "mozscape-b9b47cbb5f";
-        public static string mozSecret = "f56ecc50e0ccefe18b5aebe7ccd1131f";
+        public static string mozId = "";
+        public static string mozSecret = "";
+
+        //public static string mozId = "mozscape-b9b47cbb5f";
+        //public static string mozSecret = "f56ecc50e0ccefe18b5aebe7ccd1131f";
 
         /// <summary>
         /// Wrapper for the Mozscape API

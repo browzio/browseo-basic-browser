@@ -28,6 +28,7 @@ namespace SocialOrganizer.Models
                 MonthList.Add("" + i);
             }
         }
+        public bool BIADefault { get; set; }
 
         private string projectName;
         public string ProjectName

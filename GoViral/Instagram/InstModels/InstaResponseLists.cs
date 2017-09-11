@@ -386,7 +386,7 @@ namespace GoViral.Instagram.InstModels
         }
         private void MultiWindowForLinksAdd_Closed(object sender, EventArgs e)
         {
-            if (multiWindowForLinksAdd.OKClicked && !multiWindowForLinksAdd.tbInputedText.Text.IsNullOrEmpty())
+            if (multiWindowForLinksAdd.ButtonLeftClicked && !multiWindowForLinksAdd.tbInputedText.Text.IsNullOrEmpty())
             {
                 OnSendContentToSorter(multiWindowForLinksAdd.tbInputedText.Text);
             }

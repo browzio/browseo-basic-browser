@@ -1,5 +1,7 @@
 ﻿using Organiser.Common.Classes;
-using Organiser.Common.Windows;  
+using Organiser.Common.Classes.Helpers;
+using Organiser.Common.Classes.SocialHelpers;
+using Organiser.Common.Windows;
 using Prospector.Helpers;
 using Prospector.Models;
 using System;
@@ -9,6 +11,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -20,7 +23,7 @@ namespace Prospector.ViewModels
 {
     public class FootPrintsOptionsVM : INotifyPropertyChanged
     {
-        public event Action<string> OnClickedSearch = delegate { };
+        public event Action<string,bool> OnClickedSearch = delegate { };//url,isff
         public event Action<string, string, string, string, string> OnSelectedSendToPbn = delegate { };//send to MAsher(link,title,imglink,date,description)
 
         public const int Comment_Backlinks = 0;
@@ -338,6 +341,26 @@ namespace Prospector.ViewModels
                         }
                         break;
 
+                    case Saved:
+                        if (SavedFP.Count == 0)
+                        {
+                            createSavedOptions();
+                        }
+                        WebsitesForBlogs.Clear();
+                        Visible_SavedFP = true;
+                        FootPrintString = "";
+                        RBOrientation = Orientation.Vertical;
+                        Visible_Custom = false;
+                        Visible_CommentSettings = false;
+                        Visible_savebtn = false;
+                        SISavedFP = 0;
+                        ListResults.Clear();
+                        foreach (SearchResult result in l_Saved)
+                        {
+                            ListResults.Add(result);
+                        }
+                        break;
+
                     case Webhose:
                         FootPrintString = "";
                         RBOrientation = Orientation.Horizontal;
@@ -353,29 +376,10 @@ namespace Prospector.ViewModels
                             ListResults.Add(result);
                         }
                         break;
-
-                    case Saved:
-                        if (SavedFP.Count == 0)
-                        {
-                            createSavedOptions();
-                        }
-                        Visible_SavedFP = true;
-                        FootPrintString = "";
-                        RBOrientation = Orientation.Vertical;
-                        Visible_Custom = false;
-                        Visible_CommentSettings = false;
-                        Visible_savebtn = false;
-                        SISavedFP = 0;
-                        ListResults.Clear();
-                        foreach (SearchResult result in l_Saved)
-                        {
-                            ListResults.Add(result);
-                        }
-                        break;
                 }
                 createTLDsList();
                 if (TCSelectedTabIndex != Saved)
-                setFootprintText();
+                setFootprintText("");
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("TCSelectedTabIndex"));
@@ -501,8 +505,9 @@ namespace Prospector.ViewModels
             get { return keyword; }
             set
             {
+                var old = keyword;
                 keyword = value;
-                setFootprintText();
+                setFootprintText(old);
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("Keyword"));
@@ -775,9 +780,9 @@ namespace Prospector.ViewModels
             ListResults = new ObservableCollection<SearchResult>();
 
             MaxPages = new ObservableCollection<int>();
-            MaxPages.Add(1);
-            MaxPages.Add(2);
-            MaxPages.Add(3);
+            MaxPages.Add(10);
+            MaxPages.Add(20);
+            MaxPages.Add(30);
 
             Langs = new ObservableCollection<Footprint>();
             SiteTypesWebHose = new ObservableCollection<Footprint>();
@@ -1335,15 +1340,25 @@ namespace Prospector.ViewModels
         {
             if (e.PropertyName == "Checked")
             {
-                setFootprintText();
+                setFootprintText("");
             }
         }
 
         #endregion
 
-        private void setFootprintText()
+        private void setFootprintText(string old)
         {
-            FootPrintString = Keyword;
+            if(tCSelectedTabIndex != Custom && tCSelectedTabIndex != Saved) FootPrintString = Keyword;
+            else
+            {
+                if (FootPrintString.IsNullOrEmpty()) FootPrintString = Keyword;
+                else
+                {
+                    var regex = new Regex(Regex.Escape(old));
+                    FootPrintString = regex.Replace(FootPrintString, keyword, 1);
+                }
+                return;
+            }
 
             if (Checked_KeywordInUrl)
                 FootPrintString = "%22" + FootPrintString + "%22";
@@ -1516,6 +1531,15 @@ namespace Prospector.ViewModels
                                 l_Webhose.Add(sResult);
                             });
                         }
+                        Application.Current.Dispatcher.Invoke(() => { Mouse.OverrideCursor = null; });
+
+                        foreach (var result in ListResults)
+                        {
+                            if (result.SocialStatsReplys != null) continue;
+
+                            result.SocialStatsReplys = new SocialStatsReplys();
+                            result.SocialStatsReplys.GetAllStatsFor(result.Link);
+                        }
 
                         Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_KKSearch + " " + Keyword);
                         
@@ -1545,7 +1569,22 @@ namespace Prospector.ViewModels
 
                         Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorSearch + " " + Query);
 
-                        GetKeywordRankings(Query, MaxPages[CmbMaxPAgesIndex], false);
+                        GetKeywordRankings(Query, CmbMaxPAgesIndex + 1, false);
+
+                        foreach (var result in ListResults)
+                        {
+                            if (result.SocialStatsReplys != null) continue;
+
+                            result.SocialStatsReplys = new SocialStatsReplys();
+                            result.SocialStatsReplys.GetAllStatsFor(result.Link);
+                            Task.Run(async()=> 
+                            {
+                                string websitehtml = await WebRequests.AsyncDownloadStringWithProfileProxy(result.Link);
+                                websitehtml = websitehtml.ToLower();
+                                string kwToFind = Keyword.IsNullOrEmpty() ? FootPrintString.Contains(' ') ? FootPrintString.Remove(FootPrintString.IndexOf(' ')).ToLower() : FootPrintString.ToLower() : Keyword.ToLower();
+                                result.TimesKwFound = websitehtml.SplitAndRemoveEmpty(kwToFind).Length - 1;
+                            });
+                        }
                     }
                 }
                 catch(Exception ex)
@@ -1553,98 +1592,124 @@ namespace Prospector.ViewModels
                     MessageBox.Show("somthing went wrong during the serch. " +ex.Message);
                 }
                 IsNotSerching = true;
-                Application.Current.Dispatcher.Invoke((Action)delegate
-                {
-                    Mouse.OverrideCursor = null;
-                });
+                Application.Current.Dispatcher.Invoke(()=>{ Mouse.OverrideCursor = null; });
             }).Start();
         }
 
         private void sendLinkToBrowser(object obj)
         {
-            string commandParam = obj as string;
-
-            if (commandParam == "PBNPOSTER")
+            try
             {
-                try
+                string commandParam = obj as string;
+                if (commandParam == null) return;
+                switch (commandParam)
                 {
-                    OnSelectedSendToPbn(ListResults[SIListResults].Link, ListResults[SIListResults].Title, null, ListResults[SIListResults].Published, ListResults[SIListResults].Description);
-                    Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToPBne + " " + ListResults[SIListResults].Link);
-                }
-                catch
-                {
-                    try
-                    {
-                        OnSelectedSendToPbn(ListResults[SIListResults - 1].Link, ListResults[SIListResults - 1].Title, null, ListResults[SIListResults - 1].Published, ListResults[SIListResults - 1].Description);
-                        Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToPBne + " " + ListResults[SIListResults - 1].Link);
-                    }
-                    catch
-                    {
-                        MessageBox.Show("Couldnt curate link.");
-                    }
+                    case "PBNPOSTER":
+                        try
+                        {
+                            OnSelectedSendToPbn(ListResults[SIListResults].Link, ListResults[SIListResults].Title, null, ListResults[SIListResults].Published, ListResults[SIListResults].Description);
+                            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToPBne + " " + ListResults[SIListResults].Link);
+                        }
+                        catch
+                        {
+                            try
+                            {
+                                OnSelectedSendToPbn(ListResults[SIListResults - 1].Link, ListResults[SIListResults - 1].Title, null, ListResults[SIListResults - 1].Published, ListResults[SIListResults - 1].Description);
+                                Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToPBne + " " + ListResults[SIListResults - 1].Link);
+                            }
+                            catch
+                            {
+                                MessageBox.Show("Couldnt curate link.");
+                            }
+                        }
+                        break;
+
+                    case "Curaste":
+                        try
+                        {
+                            string htmlstring = "<blockquote>";
+                            if (!string.IsNullOrEmpty(ListResults[SIListResults].Title) && !string.IsNullOrWhiteSpace(ListResults[SIListResults].Title))
+                                htmlstring += "<h1>" + ListResults[SIListResults].Title + "</h1>";
+                            if (!string.IsNullOrEmpty(ListResults[SIListResults].Description) && !string.IsNullOrWhiteSpace(ListResults[SIListResults].Description))
+                                htmlstring += "<p>" + ListResults[SIListResults].Description + "</p>";
+                            if (!string.IsNullOrEmpty(ListResults[SIListResults].Link) && !string.IsNullOrWhiteSpace(ListResults[SIListResults].Link))
+                                htmlstring += "<a href=\"" + ListResults[SIListResults].Link + " \" > " + ListResults[SIListResults].Link + " </a>";
+                            htmlstring += "</blockquote>";
+
+                            MyFilesDatabase.SetClipboardText(htmlstring);
+                        }
+                        catch
+                        {
+                            try
+                            {
+                                string htmlstring = "<blockquote>";
+                                if (!string.IsNullOrEmpty(ListResults[SIListResults - 1].Title) && !string.IsNullOrWhiteSpace(ListResults[SIListResults - 1].Title))
+                                    htmlstring += "<H1>" + ListResults[SIListResults - 1].Title + "</H1>";
+                                if (!string.IsNullOrEmpty(ListResults[SIListResults - 1].Description) && !string.IsNullOrWhiteSpace(ListResults[SIListResults - 1].Description))
+                                    htmlstring += "<P>" + ListResults[SIListResults - 1].Description + "</P>";
+                                if (!string.IsNullOrEmpty(ListResults[SIListResults - 1].Link) && !string.IsNullOrWhiteSpace(ListResults[SIListResults - 1].Link))
+                                    htmlstring += "<A href=\"" + ListResults[SIListResults - 1].Link + " \" > " + ListResults[SIListResults - 1].Link + " </a>";
+                                htmlstring += "</blockquote>";
+
+                                MyFilesDatabase.SetClipboardText(htmlstring);
+                            }
+                            catch
+                            {
+                                MessageBox.Show("Failed to set clipboard curation.");
+                            }
+                        }
+                        break;
+
+                    case "ORDERBY_FBSHARES":
+                    case "ORDERBY_FBLIKES":
+                    case "ORDERBY_FBCOMMENTS":
+                    case "ORDERBY_GPLUSONES":
+                    case "ORDERBY_PINTERESTPINS":
+                    case "ORDERBY_STUMBLEVIEWS":
+                    case "ORDERBY_LINKEDINCOUNT":
+                    case "ORDERBY_BUFFERSHARES":
+                    case "ORDERBY_REDDITUPS":
+                    case "ORDERBY_REDDITSCORE":
+                        var resulstsList = SocialStatsFunctions.OrderStatsBy(ListResults.ToList(), commandParam);
+                        if (resulstsList == null || resulstsList.Count() == 0) return;
+
+                        ListResults.Clear();
+                        foreach (var r in resulstsList) ListResults.Add(r as SearchResult);
+                        break;
+
+                    case "ORDERBY_KEYWORDFOUND":
+                        var orderdTempByTimesFound = ListResults.OrderByDescending(r => r.TimesKwFound);
+                        ListResults.Clear();
+                        foreach (var r in orderdTempByTimesFound) ListResults.Add(r);
+                        break;
+
+                    default:
+                        try
+                        {
+                            OnClickedSearch(ListResults[SIListResults].Link, commandParam == "BROWSERFF");
+                            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToBrowser + " " + ListResults[SIListResults].Link);
+                        }
+                        catch
+                        {
+                            try
+                            {
+                                OnClickedSearch(ListResults[SIListResults - 1].Link, commandParam == "BROWSERFF");
+                                Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToBrowser + " " + ListResults[SIListResults - 1].Link);
+                            }
+                            catch
+                            {
+                                MessageBox.Show("Couldnt open link.");
+                            }
+                        }
+                        break;
                 }
             }
-            else if (commandParam == "Curaste")
-            {
-                try
-                {
-                    string htmlstring = "<blockquote>";
-                    if (!string.IsNullOrEmpty(ListResults[SIListResults].Title) && !string.IsNullOrWhiteSpace(ListResults[SIListResults].Title))
-                        htmlstring += "<h1>" + ListResults[SIListResults].Title + "</h1>";
-                    if (!string.IsNullOrEmpty(ListResults[SIListResults].Description) && !string.IsNullOrWhiteSpace(ListResults[SIListResults].Description))
-                        htmlstring += "<p>" + ListResults[SIListResults].Description + "</p>";
-                    if (!string.IsNullOrEmpty(ListResults[SIListResults].Link) && !string.IsNullOrWhiteSpace(ListResults[SIListResults].Link))
-                        htmlstring += "<a href=\"" + ListResults[SIListResults].Link + " \" > " + ListResults[SIListResults].Link + " </a>";
-                    htmlstring += "</blockquote>";
-
-                    MyFilesDatabase.SetClipboardText(htmlstring);
-                }
-                catch
-                {
-                    try
-                    {
-                        string htmlstring = "<blockquote>";
-                        if (!string.IsNullOrEmpty(ListResults[SIListResults - 1].Title) && !string.IsNullOrWhiteSpace(ListResults[SIListResults - 1].Title))
-                            htmlstring += "<H1>" + ListResults[SIListResults - 1].Title + "</H1>";
-                        if (!string.IsNullOrEmpty(ListResults[SIListResults - 1].Description) && !string.IsNullOrWhiteSpace(ListResults[SIListResults - 1].Description))
-                            htmlstring += "<P>" + ListResults[SIListResults - 1].Description + "</P>";
-                        if (!string.IsNullOrEmpty(ListResults[SIListResults - 1].Link) && !string.IsNullOrWhiteSpace(ListResults[SIListResults - 1].Link))
-                            htmlstring += "<A href=\"" + ListResults[SIListResults - 1].Link + " \" > " + ListResults[SIListResults - 1].Link + " </a>";
-                        htmlstring += "</blockquote>";
-
-                        MyFilesDatabase.SetClipboardText(htmlstring);
-                    }
-                    catch
-                    {
-                        MessageBox.Show("Failed to set clipboard curation.");
-                    }
-                }
-            }
-            else
-            {
-                try
-                {
-                    OnClickedSearch(ListResults[SIListResults].Link);
-                    Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToBrowser + " " + ListResults[SIListResults].Link);
-                }
-                catch
-                {
-                    try
-                    {
-                        OnClickedSearch(ListResults[SIListResults - 1].Link);
-                        Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToBrowser + " " + ListResults[SIListResults - 1].Link);
-                    }
-                    catch
-                    {
-                        MessageBox.Show("Couldnt open link.");
-                    }
-                }
-            }
+            catch { }
         }
 
         internal void SendToTheBrowser(string link)
         {
-            OnClickedSearch(link);
+            OnClickedSearch(link,false);
         }
 
         private void OnRankCheckCkicked(object param)

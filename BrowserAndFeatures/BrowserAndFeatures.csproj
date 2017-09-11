@@ -224,11 +224,19 @@
       <Project>{9f8c4c2c-6d6b-4869-abcc-3947111ead18}</Project>
       <Name>zFirefoxBrowser</Name>
     </ProjectReference>
+    <ProjectReference Include="..\zFirefoxXulBrowser\zFirefoxXulBrowser.csproj">
+      <Project>{d472a10b-8e4e-4ee9-ae75-46a4d215d818}</Project>
+      <Name>zFirefoxXulBrowser</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="browseo %281%29.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>call "$(DevEnvDir)..\tools\vsvars32.bat"
+editbin /LARGEADDRESSAWARE "C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\BrowserPlugin\bin\x86\Release\BrowserAndFeatures.exe"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

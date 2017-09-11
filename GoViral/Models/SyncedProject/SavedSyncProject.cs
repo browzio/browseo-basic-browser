@@ -87,6 +87,14 @@ namespace GoViral.Models
             set { sISyndicatedPostsList = value; RaisePropertyChanged("SISyndicatedPostsList"); }
         }
 
+        private Visibility visibleHasNext = Visibility.Hidden;
+        public Visibility VisibleHasNext
+        {
+            get { return visibleHasNext; }
+            set { visibleHasNext = value; RaisePropertyChanged("VisibleHasNext"); }
+        }
+
+
         //object mLock = new object();
 
         public SavedSyncProject()

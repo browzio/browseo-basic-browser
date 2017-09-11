@@ -122,21 +122,19 @@ namespace zFirefoxBrowser.Controls
 
         public GeckoWebBrowser Browser { get; private set; }
 
-        public bool InMacroPlaying { get; set; }
-
         public FFBrowserControl()
         {
             InitializeComponent();
         }
 
-        public async void initBrowser(string url, Action SetLoadingFalse)
+        public async void initBrowser(string url, Action SetLoadingFalse, Action Initialized)
         {
             //Debugger.Launch();
             bool setProxPass = await FoxInit.AwaitforProxySet();
             if (!setProxPass)
             {
                 MessageBox.Show("Proxy took longer then 30 seconds to respond with a 'successfull reply'. Please make sure the proxy is acting correctly before continuing.");
-                if (SetLoadingFalse != null) SetLoadingFalse();
+                SetLoadingFalse?.Invoke();
             }
 
             Browser = new GeckoWebBrowser();
@@ -191,7 +189,6 @@ namespace zFirefoxBrowser.Controls
             Browser.DocumentCompleted += (s, ee) =>
             {
                 OnBrowserLoadingChanged(false);
-                OnBrowserAddressChanged(ee.Uri.ToString());
                 // Console.WriteLine("DocumentCompleted: url: " + ee.Uri + ", top: " + ee.IsTopLevel);
             };
 
@@ -203,6 +200,7 @@ namespace zFirefoxBrowser.Controls
                     if (SetLoadingFalse != null) SetLoadingFalse();
                 }
                 OnBrowserTitleChanged(Browser.DocumentTitle);
+               if(Browser.Url != null && !Browser.Url.ToString().IsNullOrEmpty()) OnBrowserAddressChanged(Browser.Url.ToString());
             };
 
             Browser.StatusTextChanged += (s, e) =>
@@ -272,56 +270,24 @@ namespace zFirefoxBrowser.Controls
                     da.Click += Tse_Click;
                     e.ContextMenu.MenuItems.Add(da);
                 }
-            };
 
-            // Popup window management.
-            Browser.CreateWindow += (s, ee) =>
-            {
-                // A naive popup blocker, demonstrating popup cancelling.
-                //Console.WriteLine("A popup is trying to show: " + ee.Uri);
-                if (InMacroPlaying) return;
-
-                if (InMacroPlaying || ee.Uri.Contains("about:blank"))
+                if(Browser.Url != null && Browser.Url.ToString().ToLower().Contains("https://www.facebook.com/bookmarks/groups"))
                 {
-                    ee.Cancel = true;
-                    // Console.WriteLine("A popup is blocked: " + ee.Uri);
-                    return;
-                }
-                string target = ee.Uri.ToLower();
-                if (Browser.Url.AbsoluteUri.Contains("https://mail.google.com") || (!target.Contains("microsoft") &&
-                    !target.Contains("facebook") &&
-                    !target.Contains("zapier.com") &&
-                    !target.Contains("twitter") &&
-                    !target.Contains("gplus") &&
-                    !target.Contains("session/") &&
-                    !target.Contains("yahoo") &&
-                    !target.Contains("login") && !target.Contains("connect") && !target.Contains("oauth") && !target.Contains("signup")))
-                {
-                    OnCreateNewTab(ee.Uri);
-                    ee.Cancel = true;
-                    return;
-                }
-                
+                    e.ContextMenu.MenuItems.Add("-");
 
-                // For <a target="_blank"> and window.open() without specs(3rd param),
-                // e.Flags == GeckoWindowFlags.All, and we load it in a new tab;
-                // otherwise, load it in a popup window, which is maximized by default.
-                // This simulates firefox's behavior.
-                //if (ee.Flags == GeckoWindowFlags.All)
-                //    ee.WebBrowser = AddTab();
-                //else
-                //{
-                //    var wa = System.Windows.Forms.Screen.GetWorkingArea(this);
-                //    e.InitialWidth = wa.Width;
-                //    e.InitialHeight = wa.Height;
-                //}
+                    //model.AddItem(555, "Dominate");
+                    MenuItem d = new MenuItem() { Name = "2", Text = "Dominate All" };
+                    d.Click += Tse_Click;
+                    e.ContextMenu.MenuItems.Add(d);
+                }
             };
-
 
             this.SuspendLayout();
             this.Controls.Add(Browser);
             this.ResumeLayout(false);
             this.PerformLayout();
+
+            Initialized?.Invoke();
         }
 
         /// <summary>

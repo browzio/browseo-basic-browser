@@ -40,6 +40,10 @@
     <Reference Include="HtmlAgilityPack">
       <HintPath>.\HtmlAgilityPack.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -60,9 +64,6 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Controlls\CirclePBarControl.xaml.cs">
-      <DependentUpon>CirclePBarControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Controlls\LinksToRssUserControl.xaml.cs">
       <DependentUpon>LinksToRssUserControl.xaml</DependentUpon>
     </Compile>
@@ -76,15 +77,27 @@
     <Compile Include="Helpers\ArithmaticConverter.cs" />
     <Compile Include="Helpers\booleanToVisible.cs" />
     <Compile Include="Models\AvailableTabsAndLinks.cs" />
+    <Compile Include="Models\RSSFeedData.cs" />
+    <Compile Include="ViewModels\RSSFeedViewModel.cs" />
+    <Compile Include="ViewModels\RSSTabViewModel.cs" />
     <Compile Include="Models\SavedPostedFeed.cs" />
     <Compile Include="Mvvm\LinksToRssVM.cs" />
+    <Compile Include="ViewModels\RSSMainWorkspaceViewModel.cs" />
+    <Compile Include="Views\RSSFeedView.xaml.cs">
+      <DependentUpon>RSSFeedView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RSSFeedDataView.xaml.cs">
+      <DependentUpon>RSSFeedDataView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RSSMainWorkspaceView.xaml.cs">
+      <DependentUpon>RSSMainWorkspaceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RSSTabView.xaml.cs">
+      <DependentUpon>RSSTabView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\LinksToRssWindow.xaml.cs">
       <DependentUpon>LinksToRssWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="Controlls\CirclePBarControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Controlls\LinksToRssUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -111,12 +124,28 @@
     <Compile Include="Controlls\RssListsControl.xaml.cs">
       <DependentUpon>RssListsControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="MainViewModel.cs" />
+    <Compile Include="RssReaderMainViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Controlls\RssControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RSSFeedView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RSSFeedDataView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RSSMainWorkspaceView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\RSSTabView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -145,6 +174,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -174,6 +204,10 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

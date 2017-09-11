@@ -75,33 +75,40 @@
   <ItemGroup>
     <Compile Include="Browser\CefExtenders.cs" />
     <Compile Include="Classes\BacklinkHistoryLine.cs" />
-    <Compile Include="Classes\ConsoleManager.cs" />
+    <Compile Include="Classes\Helpers\ConsoleManager.cs" />
     <Compile Include="Classes\CrawlerStates.cs" />
-    <Compile Include="Classes\DelegateCommand.cs" />
-    <Compile Include="Classes\DelegateCommandT.cs" />
-    <Compile Include="Classes\ExtensionMethods.cs" />
+    <Compile Include="Classes\Helpers\DelegateCommand.cs" />
+    <Compile Include="Classes\Helpers\DelegateCommandT.cs" />
+    <Compile Include="Classes\Helpers\ExtensionMethods.cs" />
     <Compile Include="Classes\Facebook\FacebookGraphResult.cs" />
     <Compile Include="Classes\Facebook\FacebookGraphSearch.cs" />
     <Compile Include="Classes\Facebook\SourceCrawler.cs" />
-    <Compile Include="Classes\FlexibleMessageBox.cs" />
-    <Compile Include="Classes\GloableProfData.cs" />
-    <Compile Include="Classes\ImageAsyncHelper.cs" />
-    <Compile Include="Classes\Lists.cs" />
+    <Compile Include="Classes\Helpers\TwoCaptchaClient.cs" />
+    <Compile Include="Classes\Helpers\WebRequests.cs" />
+    <Compile Include="Extensions\Int32Extension.cs" />
+    <Compile Include="Controlls\FlexibleMessageBox.cs" />
+    <Compile Include="Classes\Helpers\GloableProfData.cs" />
+    <Compile Include="Classes\Helpers\ImageAsyncHelper.cs" />
+    <Compile Include="Classes\Helpers\Lists.cs" />
     <Compile Include="Classes\MacroPlayer.cs" />
     <Compile Include="Classes\MeException.cs" />
     <Compile Include="Classes\MozscapeAPI.cs" />
     <Compile Include="Classes\MozscapeResults.cs" />
-    <Compile Include="Classes\MyTreeViewHelper.cs" />
+    <Compile Include="Classes\Helpers\MyTreeViewHelper.cs" />
     <Compile Include="Classes\NativeMethods.cs" />
     <Compile Include="Classes\ObjectCopier.cs" />
     <Compile Include="Classes\ProcessManager.cs" />
-    <Compile Include="Classes\RelayCommand.cs" />
+    <Compile Include="Classes\Helpers\RelayCommand.cs" />
     <Compile Include="Classes\SetWindowPosFlags.cs" />
-    <Compile Include="Classes\TimeHelper.cs" />
+    <Compile Include="Classes\Social\SocialStats.cs" />
+    <Compile Include="Classes\Helpers\TimeHelper.cs" />
     <Compile Include="Classes\TrackedThread.cs" />
     <Compile Include="Classes\UsageTracker.cs" />
-    <Compile Include="Classes\ViewModelBase.cs" />
+    <Compile Include="Classes\Helpers\ViewModelnPropertyChangedBase.cs" />
     <Compile Include="Classes\WaitCursor.cs" />
+    <Compile Include="Controlls\CirclePBarControl.xaml.cs">
+      <DependentUpon>CirclePBarControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controlls\DateTimePicker.xaml.cs">
       <DependentUpon>DateTimePicker.xaml</DependentUpon>
     </Compile>
@@ -110,6 +117,9 @@
     <Compile Include="Controlls\SocialButtonsUserControl.xaml.cs">
       <DependentUpon>SocialButtonsUserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controlls\SocialStatsUserControl.xaml.cs">
+      <DependentUpon>SocialStatsUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controlls\TrvMacrosUserControl.xaml.cs">
       <DependentUpon>TrvMacrosUserControl.xaml</DependentUpon>
     </Compile>
@@ -117,12 +127,16 @@
     <Compile Include="Converters\ElementSizeMathConverter.cs" />
     <Compile Include="Converters\EmptyListToVisibleConverter.cs" />
     <Compile Include="Converters\EmptyTextToVisibilityConverter.cs" />
+    <Compile Include="Converters\GreaterthenToVisibleConverter.cs" />
     <Compile Include="Converters\MaxCharCountConv.cs" />
     <Compile Include="Converters\NullToVisibleConverter.cs" />
     <Compile Include="Converters\OpisiteVisibilityConverter.cs" />
+    <Compile Include="Converters\StringTomageSourceConverter.cs" />
+    <Compile Include="Converters\TextEmptyToVisibleConverter.cs" />
     <Compile Include="Models\ProjectImported.cs" />
     <Compile Include="Models\WebPageImg.cs" />
     <Compile Include="ViewModels\ChooseProjectsVM.cs" />
+    <Compile Include="ViewModels\MultiSelectionViewModel.cs" />
     <Compile Include="ViewModels\PinterestImagePickerVM.cs" />
     <Compile Include="Windows\ChoosePinterestImageWindow.xaml.cs">
       <DependentUpon>ChoosePinterestImageWindow.xaml</DependentUpon>
@@ -132,6 +146,9 @@
     </Compile>
     <Compile Include="Windows\MacroPromptWindow.xaml.cs">
       <DependentUpon>MacroPromptWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\MultiSelectionView.xaml.cs">
+      <DependentUpon>MultiSelectionView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\SetNameAndDataWindow.xaml.cs">
       <DependentUpon>SetNameAndDataWindow.xaml</DependentUpon>
@@ -151,11 +168,19 @@
     <Compile Include="Windows\ServerVerifyWindow.xaml.cs">
       <DependentUpon>ServerVerifyWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controlls\CirclePBarControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Controlls\DateTimePicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controlls\SocialButtonsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controlls\SocialStatsUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -183,15 +208,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\MultiSelectionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\SelectProfileWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Classes\FilesDatabase.cs" />
-    <Compile Include="Classes\IniFile.cs" />
+    <Compile Include="Classes\Helpers\FilesDatabase.cs" />
+    <Compile Include="Classes\Helpers\IniFile.cs" />
     <Compile Include="Classes\PersonData.cs" />
     <Compile Include="Classes\ProjectData.cs" />
-    <Compile Include="Classes\Social.cs" />
+    <Compile Include="Classes\Social\Social.cs" />
     <Compile Include="Controlls\NonReloadingTabControl.cs" />
     <Compile Include="Windows\SelectProfileWindow.xaml.cs">
       <DependentUpon>SelectProfileWindow.xaml</DependentUpon>
@@ -423,7 +452,54 @@
       <Name>CefGlue</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\linkedin-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\buffer-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ic_assessment_black_24dp_1x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ic_filter_list_black_24dp_1x.png" />
+    <Resource Include="Image\ic_filter_list_black_24dp_2x.png" />
+    <Resource Include="Image\ic_find_replace_black_24dp_1x.png" />
+    <Resource Include="Image\ic_find_replace_black_24dp_2x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ic_filter_list_black_24dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ic_find_replace_black_24dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ic_autorenew_black_24dp_1x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ic_rss_feed_black_24dp_1x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ic_input_black_24dp_1x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ic_add_black_24dp_1x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ic_group_work_black_24dp_1x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\hootsuite_normal.png" />
+    <Resource Include="Image\it_24.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\youtube_icon_x1.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

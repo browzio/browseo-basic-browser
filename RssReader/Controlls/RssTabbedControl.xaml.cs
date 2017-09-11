@@ -30,8 +30,8 @@ namespace RssReader.Controlls
     /// </summary>
     public partial class RssTabbedControl : UserControl
     {
-        public event Action<string, string> OnLaunchToBrowser = delegate { };//link, rsslink
-        public event Action<string> OnLaunchToTabBrowser = delegate { };//url
+        public event Action<string, string,bool> OnLaunchToBrowser = delegate { };//link, rsslink,ff
+        public event Action<string,bool> OnLaunchToTabBrowser = delegate { };//url,isff
         public event Action<string> OnLaunchToMasher = delegate { };//url
         public event Action<string, string> OnSelectedSendToSeo = delegate { };//title,url
         public event Action<string, string, string, string, string> OnSelectedSendToPbn = delegate { };//send to MAsher
@@ -57,6 +57,17 @@ namespace RssReader.Controlls
 
             AvailrssesForImports = new ObservableCollection<AvailableTabsAndLinks>();
             SelectFolderSelect_Click = new RelayCommand(OnSelectFolderSelect_Click);
+        }
+
+        public void InitTabs()
+        {
+            List<string> tabList = MyFilesDatabase.GetRssFeedLinksTabsTitle(GloableProfData.PData);
+            foreach (string tabTitle in tabList)
+            {
+                UserRssTabs.Add(GetNewVM(tabTitle, false));
+            }
+            if (UserRssTabs.Count > 0)
+                UserRssTabs[0].RefreshRssFeed(false);
         }
 
         #region importing
@@ -252,27 +263,14 @@ namespace RssReader.Controlls
             OnSelectedSendToSeo(title, url);
         }
 
-        public void InitTabs()
+        void vm_OnLaunchToTabBrowser(string url,bool isFF)
         {
-            List<string> tabList = MyFilesDatabase.GetRssFeedLinksTabsTitle(GloableProfData.PData);
-            foreach (string tabTitle in tabList)
-            {
-                UserRssTabs.Add(GetNewVM(tabTitle, false));
-            }
-            if (UserRssTabs.Count > 0)
-                UserRssTabs[0].RefreshRssFeed(false);
+            OnLaunchToTabBrowser(url, isFF);
         }
 
-
-
-        void vm_OnLaunchToTabBrowser(string url)
+        void vm_OnLaunchToBrowser(string link, string rssLink, bool ff)
         {
-            OnLaunchToTabBrowser(url);
-        }
-
-        void vm_OnLaunchToBrowser(string link, string rssLink)
-        {
-            OnLaunchToBrowser(link, rssLink);
+            OnLaunchToBrowser(link, rssLink,ff);
         }
 
         private void tbContrl_SelectionChanged(object sender, SelectionChangedEventArgs e)

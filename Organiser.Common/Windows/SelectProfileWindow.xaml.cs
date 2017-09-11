@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -24,8 +25,8 @@ namespace Organiser.Common
     public partial class SelectProfileWindow : Window
     {
         public bool OkClicked;
+        public bool FromMacro { get; set; }
         public string SelectedProfileFilePath;
-        public string SelectedProjectName;
 
         private  ObservableCollection<string> profilesList;
         public  ObservableCollection<string> ProfilesList
@@ -47,7 +48,7 @@ namespace Organiser.Common
             InitializeComponent();
             projectName = projName;
             projectDir = projDir;
-            lastProfileIndex = lastIndex;
+            lastProfileIndex = lastIndex < 0 ? 0 : lastIndex;
             this.webAddress = webAddress; 
             ProfilesList = new ObservableCollection<string>();
             DataContext = this;
@@ -65,31 +66,40 @@ namespace Organiser.Common
         {
             OkClicked = true;
 
-            foreach (var item in directoryValues)
+            if (cmProfiles.SelectedIndex <= -1 || cmProfiles.SelectedIndex > directoryValues.Count - 1)
             {
-                if (item.Key == cmProfiles.SelectedItem.ToString())
-                {
-                    SelectedProfileFilePath = item.Value;
-                    SelectedProjectName = item.Key;
-                    break;
-                }
+                OkClicked = false;
+                return;
             }
+            SelectedProfileFilePath = directoryValues[cmProfiles.SelectedIndex].Value;
+            //foreach (var item in directoryValues)
+            //{
+            //    if (item.Key == cmProfiles.SelectedItem.ToString())
+            //    {
+            //        SelectedProfileFilePath = item.Value;
+            //        SelectedProjectName = item.Key;
+            //        break;
+            //    }
+            //}
 
 
             System.Threading.Thread.Sleep(10);
             this.Close();
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {  
-            if (!isSelectProjWindow)
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            await Task.Run(() =>
             {
-                directoryValues = MyFilesDatabase.GetSubProjectsFolders(projectDir, projectName);
-            }
-            else
-            {
-                directoryValues = MyFilesDatabase.GetAllProjectsAndDirs(false);
-            }
+                if (!isSelectProjWindow)
+                {
+                    directoryValues = MyFilesDatabase.GetSubProjectsFolders(projectDir, projectName);
+                }
+                else
+                {
+                    directoryValues = MyFilesDatabase.GetAllProjectsAndDirs(false);
+                }
+            });
 
             foreach (var item in directoryValues)
             {  
@@ -98,8 +108,26 @@ namespace Organiser.Common
 
                 if (pname.Contains("_tier_"))
                     pname = pname.Replace("_tier_", "");
-                
-                ProfilesList.Add(pname); 
+                try
+                {
+                    PersonData pnamefromFile = await Task.Run(() => 
+                    {
+                        return MyFilesDatabase.GetSubProjectPersonData(item.Value);
+                    });
+                    if(pnamefromFile != null)
+                    {
+                        ProfilesList.Add(pnamefromFile.ProfileName);
+                        if(FromMacro && pnamefromFile.BIADefault)
+                        {
+                            OkClicked = true;
+                            SelectedProfileFilePath = item.Value;
+                            System.Threading.Thread.Sleep(10);
+                            this.Close();
+                        }
+                    }
+                }
+                catch { ProfilesList.Add(pname); }
+                 
             }
 
             if (lastProfileIndex > 0 && lastProfileIndex < cmProfiles.Items.Count)

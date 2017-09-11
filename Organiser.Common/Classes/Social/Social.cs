@@ -26,6 +26,7 @@ namespace Organiser.Common.Classes
         public const string SOCIALTYPE_tumblr = "tumblr";
         public const string SOCIALTYPE_twit = "twitter";
         public const string SOCIALTYPE_wp = "wordpress";
+        public const string SOCIALTYPE_buffer = "buffer";
 
         public const string SHARELINK_facebook = "https://www.facebook.com/sharer/sharer.php?u=";
         public const string SHARELINK_googleplus = "https://plus.google.com/share?url=";
@@ -35,6 +36,7 @@ namespace Organiser.Common.Classes
         public const string SHARELINK_stumbleupon = "http://www.stumbleupon.com/submit?url=";
         public const string SHARELINK_tumblr = "http://www.tumblr.com/share/link?url=";
         public const string SHARELINK_twitter = "https://twitter.com/home?status=";
+        public const string SHARELINK_buffer = "https://buffer.com/add?url=";
         public const string SHARELINK_wordpress = "/wp-admin/press-this.php?u=";//has to add site to beggining https://{usersInput site}
 
         public static string GetShareUrl(string shareType, string url)

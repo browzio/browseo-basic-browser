@@ -59,7 +59,7 @@ namespace GoViral.Helpers
         {
             if (Initialized == 1)
             {
-                Console.WriteLine("Initialized.");
+                //Console.WriteLine("Initialized.");
                 Initialized = 2;
                 HostToPluginContract.SetAccessToken(Social.FACEBOOK_GRAPH_LINK);
             }
@@ -71,7 +71,7 @@ namespace GoViral.Helpers
 
         public void ReportFatalError(string userMessage, string fullExceptionText)
         {
-            Console.WriteLine(userMessage + " " + fullExceptionText);
+            //Console.WriteLine(userMessage + " " + fullExceptionText);
             OnReportFatalError(userMessage, fullExceptionText);
         }
 

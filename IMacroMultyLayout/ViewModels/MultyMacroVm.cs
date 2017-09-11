@@ -22,6 +22,8 @@ namespace IMacroMultyLayout.ViewModels
 
         public ObservableCollection<ProjectImported> ImportedPrjects { get; set; }
 
+        public ObservableCollection<ProjectDataLinesSetting> CheckedProjects { get; set; }
+
         private MacroManger MacroMangerimpl;
         public MacroManger MacroMangerImpl
         {
@@ -52,6 +54,22 @@ namespace IMacroMultyLayout.ViewModels
             set { timesToPlayMax = value; RaisePropertyChanged("TimesToPlayMax"); }
         }
 
+
+        private int minWaitTimeBetweenLaunches;
+        public int MinWaitTimeBetweenLaunches
+        {
+            get { return minWaitTimeBetweenLaunches; }
+            set { minWaitTimeBetweenLaunches = value; RaisePropertyChanged("TimesToPlayMax"); }
+        }
+        
+        private int maxWaitTimeBetweenLaunches;
+        public int MaxWaitTimeBetweenLaunches
+        {
+            get { return maxWaitTimeBetweenLaunches; }
+            set { maxWaitTimeBetweenLaunches = value; RaisePropertyChanged("MaxWaitTimeBetweenLaunches"); }
+        }
+
+
         private bool closeOnComplete;
         public bool CloseOnComplete
         {
@@ -70,13 +88,51 @@ namespace IMacroMultyLayout.ViewModels
         public string DataSource
         {
             get { return dataSource; }
-            set { dataSource = value; RaisePropertyChanged("DataSource"); }
+            set
+            {
+                dataSource = value;
+                if (!value.IsNullOrEmpty()) DataLinesTotal = DataSource.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).Length; 
+                RaisePropertyChanged("DataSource");
+            }
         }
+
+        private int dataLinesTotal;
+        public int DataLinesTotal
+        {
+            get { return dataLinesTotal; }
+            set { dataLinesTotal = value; RaisePropertyChanged("DataLinesTotal"); }
+        }
+
+
+        private int datasourceSettingsStartLine;
+        public int DatasourceSettingsStartLine
+        {
+            get { return datasourceSettingsStartLine; }
+            set { datasourceSettingsStartLine = value; RaisePropertyChanged("DatasourceSettingsStartLine"); }
+        }
+
+        private int datasourceSettingsEndLine;
+        public int DatasourceSettingsEndLine
+        {
+            get { return datasourceSettingsEndLine; }
+            set { datasourceSettingsEndLine = value; RaisePropertyChanged("DatasourceSettingsEndLine"); }
+        }
+
+        private bool stopRequested = false;
+
+        private bool running;
+        public bool Running
+        {
+            get { return running; }
+            set { running = value; RaisePropertyChanged("Running"); }
+        }
+
 
         public MultyMacroVm()
         {
             OnCommandFromView = new RelayCommand(OnCommandFromView_Raised);
             ImportedPrjects = new ObservableCollection<ProjectImported>();
+            CheckedProjects = new ObservableCollection<ProjectDataLinesSetting>();
             GetSavedProjects();
             MacroMangerImpl = new MacroManger();
             TimesToPlay = TimesToPlayMax = 1;
@@ -100,7 +156,7 @@ namespace IMacroMultyLayout.ViewModels
                             ImportedPrjects.Clear();
                             foreach (var proj in imported)
                             {
-                                ImportedPrjects.Add(proj);
+                                AddImportedProject(proj);
                             }
 
                             bool anyRemoved = false;
@@ -109,17 +165,52 @@ namespace IMacroMultyLayout.ViewModels
                                 var proj = ImportedPrjects[i];
                                 if (MyFilesDatabase.File.Exists(proj.FilePath)) continue;
                                 anyRemoved = true;
-                                ImportedPrjects.RemoveAt(i);
+                                RemoveImportedProject(ImportedPrjects.ElementAt(i));
                             }
                             if (anyRemoved)
                             {
-                                "Projects that hae either been moved or deleted have been removed from the imacro runner projects list".Show();
+                                Task.Run(() => SaveImportedProjects());
+                                "Projects that have either been moved or deleted, have been removed from the imacro runner projects list".Show();
                             }
                         });
                     }
                 }
                 catch { "Failed To Load Imported Projects.".Show(); }
             });
+        }
+
+        private void AddImportedProject(ProjectImported proj)
+        {
+            proj.IsChecked = false;
+            proj.OnCheckedChanged += Proj_OnCheckedChanged;
+            ImportedPrjects.Add(proj);
+        }
+        private void RemoveImportedProject(ProjectImported proj)
+        {
+            var projChecked = CheckedProjects.FirstOrDefault(p => p.Name == proj.Name);
+            if (projChecked != null) CheckedProjects.Remove(projChecked);
+            ImportedPrjects.Remove(proj);
+        }
+
+        private void Proj_OnCheckedChanged(ProjectImported proj, bool isChecked)
+        {
+            if (isChecked)
+            {
+                if (!CheckedProjects.Any(p => p.Name == proj.Name))
+                {
+                    CheckedProjects.Add(new ProjectDataLinesSetting()
+                    {
+                        Name = proj.Name,
+                        DataSourceLinesFrom = 0,
+                        DataSourceLinesTo = 0
+                    });
+                }
+            }
+            else
+            {
+                var projChecked = CheckedProjects.FirstOrDefault(p => p.Name == proj.Name);
+                if (projChecked != null) CheckedProjects.Remove(projChecked);
+            }
         }
 
         private void SaveImportedProjects()
@@ -161,8 +252,7 @@ namespace IMacroMultyLayout.ViewModels
                                     projExists.FilePath = sp.FilePath;
                                     continue;
                                 }
-
-                                ImportedPrjects.Add(sp);
+                                AddImportedProject(sp);
                             }
 
                             await Task.Run(() => SaveImportedProjects());
@@ -175,27 +265,107 @@ namespace IMacroMultyLayout.ViewModels
                         {
                             var proj = ImportedPrjects[i];
                             if (!proj.IsChecked) continue;
-
-                            ImportedPrjects.RemoveAt(i);
+                            
+                            RemoveImportedProject(ImportedPrjects.ElementAt(i));
                         }
                         await Task.Run(() => SaveImportedProjects());
                         break;
 
+                    case "Apply":
+                        var increment = 0;
+                        foreach (var dsp in CheckedProjects)
+                        {
+                            if (increment + DatasourceSettingsEndLine > DataLinesTotal) increment = 0;
+
+                            dsp.DataSourceLinesFrom = increment == 0 ? 1 : increment+1;
+                            increment += DatasourceSettingsEndLine;
+                            dsp.DataSourceLinesTo = increment;
+                        }
+                        break;
+
+                    case "UseAll":
+                        foreach (var dsp in CheckedProjects)
+                        {
+                            dsp.DataSourceLinesFrom = 1;
+                            dsp.DataSourceLinesTo = DataLinesTotal;
+                        }
+                        break;
+
+                    case "Random":
+                        var randIncrement = DataLinesTotal > CheckedProjects.Count ? DataLinesTotal / CheckedProjects.Count : CheckedProjects.Count / DataLinesTotal;
+                        var lastRandMin = 1;
+                        var lastRandIncrementmax = new Random().Next(1, randIncrement);
+                        if (lastRandMin == lastRandIncrementmax) lastRandIncrementmax += 1;
+                        foreach (var dsp in CheckedProjects)
+                        {
+                            if(lastRandIncrementmax > DataLinesTotal)
+                            {
+                                lastRandMin = 1;
+                                lastRandIncrementmax = new Random().Next(1, randIncrement);
+                                if (lastRandMin == lastRandIncrementmax) lastRandIncrementmax += 1;
+                            }
+                            dsp.DataSourceLinesFrom = lastRandMin;
+                            dsp.DataSourceLinesTo = lastRandIncrementmax;
+
+                            //re randomize increment
+                            lastRandMin = lastRandIncrementmax + 1;
+                            lastRandIncrementmax = new Random().Next(lastRandMin + 1, lastRandMin + 1 + randIncrement);
+                        }
+                        break;
+
+                    case "SharedRandom":
+                        foreach (var dsp in CheckedProjects)
+                        {
+                            dsp.DataSourceLinesFrom = 0;
+                            dsp.DataSourceLinesTo = 0;
+                            dsp.DataSourceLinesFrom = new Random().Next(1, DataLinesTotal - 1);
+                            dsp.DataSourceLinesTo = new Random().Next(dsp.DataSourceLinesFrom + 1, DataLinesTotal);
+                            await Task.Delay(50);
+                        }
+                        break;
+
+                    case "Stop":
+                        stopRequested = true;
+                        Running = false;
+                        break;
+
                     case "Run":
+                        Running = true;
                         var checkedMAcros = new List<MacroFile>();
                         MacroMangerImpl.GetCheckedMAcros(MacroMangerImpl.MacroFilesBase, checkedMAcros);
 
                         int windowsLaunched = 1;
                         foreach (var proj in ImportedPrjects)
                         {
+                            if (stopRequested)
+                            {
+                                Running = false;
+                                stopRequested = false;
+                                return;
+                            }
                             if (!proj.IsChecked) continue;
 
                             if (TimesToPlay < 1) TimesToPlay = 1;
                             if (TimesToPlayMax < 1) TimesToPlayMax = 1;
                             if (TimesToPlayMax < TimesToPlay) TimesToPlayMax = TimesToPlay;
-                             var randTimesToPlay = new Random().Next(TimesToPlay, TimesToPlayMax);
 
+                            if (DataSource.IsNullOrEmpty()) DataSource = "";
+
+                             var randTimesToPlay = new Random().Next(TimesToPlay, TimesToPlayMax);
                             string macroPaths = "";
+
+                            var datasourceForProj = DataSource;
+                            var dsLines = datasourceForProj.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                            var projSettings = CheckedProjects.FirstOrDefault(p => p.Name == proj.Name);
+                            if (projSettings != null)
+                            {
+                                datasourceForProj = "";
+                                for (int i = 0; i < dsLines.Length; i++)
+                                {
+                                    if (i >= projSettings.DataSourceLinesFrom - 1 && i <= projSettings.DataSourceLinesTo -1)
+                                        datasourceForProj += dsLines[i] + Environment.NewLine; 
+                                }
+                            }
                             foreach (var mac in checkedMAcros)
                             {
                                 if (EachOnSeperateProcessChecked)
@@ -205,7 +375,7 @@ namespace IMacroMultyLayout.ViewModels
                                     //{
                                     var info = new ProcessStartInfo
                                     {
-                                        Arguments = "\"" + proj.FilePath + "\"" + " " + CloseOnComplete + " " + "\"" + DataSource + "\"" + " " + "\"" + mac.FilePath + "\"" + " " + windowsLaunched + " " + randTimesToPlay,
+                                        Arguments = "\"" + proj.FilePath + "\"" + " " + CloseOnComplete + " " + "\"" + datasourceForProj + "\"" + " " + "\"" + mac.FilePath + "\"" + " " + windowsLaunched + " " + randTimesToPlay,
                                         CreateNoWindow = true,
                                         UseShellExecute = false,
                                         FileName = "AnyProjFFProcess.exe"
@@ -228,7 +398,7 @@ namespace IMacroMultyLayout.ViewModels
                             {
                                 var info = new ProcessStartInfo
                                 {
-                                    Arguments = "\"" + proj.FilePath + "\"" + " " + CloseOnComplete + " " + "\"" + DataSource + "\"" + " " + "\"" + macroPaths + "\"" + " " + windowsLaunched + " " + randTimesToPlay,
+                                    Arguments = "\"" + proj.FilePath + "\"" + " " + CloseOnComplete + " " + "\"" + datasourceForProj + "\"" + " " + "\"" + macroPaths + "\"" + " " + windowsLaunched + " " + randTimesToPlay,
                                     CreateNoWindow = true,
                                     UseShellExecute = false,
                                     FileName = "AnyProjFFProcess.exe"
@@ -239,7 +409,11 @@ namespace IMacroMultyLayout.ViewModels
                                 ProcessManager.Instance.AddProcess(p);
                                 windowsLaunched++;
                             }
+
+                            int randLaunchWait =  new Random().Next(MinWaitTimeBetweenLaunches, MaxWaitTimeBetweenLaunches);
+                            await Task.Delay(randLaunchWait * 1000);
                         }
+                        Running = false;
                         break;
 
                     default:
@@ -249,6 +423,7 @@ namespace IMacroMultyLayout.ViewModels
             }
             catch (Exception ex)
             {
+                Running = false;
                 ex.Message.Show();
             }
         }

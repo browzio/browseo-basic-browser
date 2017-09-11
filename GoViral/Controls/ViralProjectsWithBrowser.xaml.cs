@@ -78,7 +78,7 @@ namespace GoViral.Controls
 
         private void NavigateToUrl(string url)
         {
-            if (tbCntrl.SelectedIndex != 0) tbCntrl.SelectedIndex = 0;
+            if (tbCntrl.SelectedIndex != 2) tbCntrl.SelectedIndex = 2;
             if (url.Contains("/?ref=br_rs")) url = url.Replace("/?ref=br_rs", "");
 
             string urltillId = url.Remove(url.LastIndexOf("/"));
@@ -134,7 +134,7 @@ namespace GoViral.Controls
 
         private void MultiWindowForLinksAdd_Closed(object sender, EventArgs e)
         {
-            if (multiWindowForLinksAdd.OKClicked)
+            if (multiWindowForLinksAdd.ButtonLeftClicked)
             {
                 ucSyncedPosts.ViewModel.AddUrlToSavedProjectList("", "", multiWindowForLinksAdd.tbInputedText.Text);
                 multiWindowForLinksAdd = null;

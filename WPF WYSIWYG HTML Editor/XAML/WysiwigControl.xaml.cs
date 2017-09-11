@@ -176,16 +176,16 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
 
         private void btnPublish_Click(object sender, RoutedEventArgs e)
         {
-            if (webBrowserEditor.doc.body == null) return;
-            try
-            {
-                if (DataContext != null && DataContext is XmlRpcVM)
-                {
-                    XmlRpcVM vm = DataContext as XmlRpcVM;
-                    vm.OnPublishClick(webBrowserEditor.doc.body.innerHTML);
-                }
-            }
-            catch { }
+            //if (webBrowserEditor.doc.body == null) return;
+            //try
+            //{
+            //    if (DataContext != null && DataContext is XmlRpcVM)
+            //    {
+            //        XmlRpcVM vm = DataContext as XmlRpcVM;
+            //        vm.OnPublishClick(webBrowserEditor.doc.body.innerHTML);
+            //    }
+            //}
+            //catch { }
         }
 
         private void pbnPubfromVault_Click(object sender, RoutedEventArgs e)
@@ -444,6 +444,7 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
                             return;
                         }
                     }
+
                     string thecontent = "<BLOCKQUOTE>" + content + "<br />";
                     if (!string.IsNullOrEmpty(link) && !string.IsNullOrWhiteSpace(link))
                         thecontent += "<A href=\"" + link + " \" > " + link + " </a>";
@@ -477,6 +478,28 @@ namespace WPF_WYSIWYG_HTML_Editor.XAML
                 }
             }
             catch { }
+        }
+
+        private void btnRemoveHtml_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (webBrowserEditor.doc.readyState != "complete") return;
+
+                string content = webBrowserEditor.doc.body.innerHTML;
+
+                string acceptable = "";
+                //string acceptable = "A|BR";
+                string stringPattern = @"</?(?(?=" + acceptable + @")notag|[a-zA-Z0-9]+)(?:\s[a-zA-Z0-9\-]+=?(?:(["",']?).*?\1?)?)*\s*/?>";
+                string content1 = System.Text.RegularExpressions.Regex.Replace(content, stringPattern, "");
+
+                //content = System.Net.WebUtility.HtmlDecode(content);
+                //content = System.Text.RegularExpressions.Regex.Replace(content, "<.*?> ", String.Empty, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                webBrowserEditor.doc.body.innerHTML = content1;
+            }
+            catch { }
+            
         }
     }
 }

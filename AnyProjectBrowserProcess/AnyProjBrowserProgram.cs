@@ -69,6 +69,8 @@ namespace AnyProjectBrowserProcess
             private static extern int SetErrorMode(int newMode);
         }
 
+        //Application: AnyProjectBrowserProcess.exe Framework Version: v4.0.30319 Description: The process was terminated due to an unhandled exception.Exception Info: System.InvalidOperationException at AnyProjectBrowserProcess.Program.Main(System.String[]) 
+
         static BrowserForSocialShare browser;
         [STAThread]
         static void Main(string[] args)

@@ -15,6 +15,11 @@ using static zFirefoxBrowser.ViewModels.FoxTabViewModel;
 
 namespace zFirefoxBrowser.Helpers
 {
+    /// <summary>
+    /// C:\Users\eli\Desktop\move\gecko downloads\geckofx-geckofx-45.0-df3822bfcfad\tip\geckofx-geckofx-45.0-e8f5556a5c02\Geckofx-Winforms\bin\Release\Geckofx-Core.dll
+    /// C:\Users\eli\Desktop\move\gecko downloads\geckofx-geckofx-45.0-df3822bfcfad\tip\geckofx-geckofx-45.0-e8f5556a5c02\Geckofx-Winforms\bin\Release\Geckofx-Winforms.dll
+    /// 
+    /// </summary>
     public class FoxInit
     {
         public static string DirForXul = "";
@@ -38,227 +43,245 @@ namespace zFirefoxBrowser.Helpers
 
         public static void Init(PersonData data = null)
         {
-           // Debugger.Launch();
-            try
+            // Debugger.Launch();
+            if (data != null)
             {
-                if (data != null)
-                {
-                    GloableProfData.PData = data;
-                }
-                // GeckoWebBrowser.UseCustomPrompt();
+                GloableProfData.PData = data;
+            }
+
+            NeedsToSetProxy = !GloableProfData.PData.ProxyIP.IsNullOrEmpty();
+            if (NeedsToSetProxy)
+            {
+               // if(MyFilesDatabase.GetRequestsProxy() != null) System.Net.WebRequest.DefaultWebProxy = MyFilesDatabase.GetRequestsProxy();
+            }
+            // GeckoWebBrowser.UseCustomPrompt();
 
 
-                Xpcom.AfterInitalization += () =>
-                {
+            Xpcom.AfterInitalization += () =>
+            {
 
-                    //RegisterChromeDir(@"C:\Users\eli\Desktop\temp\ffcopy");
-                    //nsIDirectoryService directoryService = Xpcom.GetService<nsIDirectoryService>("@mozilla.org/file/directory_service;1");
-                    //if (directoryService != null) directoryService.RegisterProvider(new DirectoryServiceProvider());
+                //RegisterChromeDir(@"C:\Users\eli\Desktop\temp\ffcopy");
+                //nsIDirectoryService directoryService = Xpcom.GetService<nsIDirectoryService>("@mozilla.org/file/directory_service;1");
+                //if (directoryService != null) directoryService.RegisterProvider(new DirectoryServiceProvider());
 
                 LauncherDialog.Download += LauncherDialog_Download;
 
-                    SetProxyIfNeeded();
+                SetProxyIfNeeded();
 
-                    Xpcom.RegisterFactory(typeof(nsIFilePicker).GUID, "MacroFilePicker", "@mozilla.org/filepicker;1", new MacroFilePickerFactory(MacroFilePicker.Instance));
-                    //const string ComponentManagerCID = "91775d60-d5dc-11d2-92fb-00e09805570f";
-                    //nsIComponentRegistrar mgr = (nsIComponentRegistrar)Xpcom.GetObjectForIUnknown((IntPtr)Xpcom.GetService(new Guid(ComponentManagerCID)));
-                    //Guid aClass = new Guid("a7139c0e-962c-44b6-bec3-aaaaaaaaaaab");
-                    //Xpcom.RegisterFactory(aClass, "MyCSharpComClass", "@geckofx/mysharpclass;1", new ViewModels.FoxTabViewModel.MyCSharpComClassFactory());
-                    //mgr.RegisterFactory(ref aClass, "Example C sharp com component", "@geckofx/mysharpclass;1", new ViewModels.FoxTabViewModel.MyCSharpComClassFactory());
+                Xpcom.RegisterFactory(typeof(nsIFilePicker).GUID, "MacroFilePicker", "@mozilla.org/filepicker;1", new MacroFilePickerFactory(MacroFilePicker.Instance));
+                //const string ComponentManagerCID = "91775d60-d5dc-11d2-92fb-00e09805570f";
+                //nsIComponentRegistrar mgr = (nsIComponentRegistrar)Xpcom.GetObjectForIUnknown((IntPtr)Xpcom.GetService(new Guid(ComponentManagerCID)));
+                //Guid aClass = new Guid("a7139c0e-962c-44b6-bec3-aaaaaaaaaaab");
+                //Xpcom.RegisterFactory(aClass, "MyCSharpComClass", "@geckofx/mysharpclass;1", new ViewModels.FoxTabViewModel.MyCSharpComClassFactory());
+                //mgr.RegisterFactory(ref aClass, "Example C sharp com component", "@geckofx/mysharpclass;1", new ViewModels.FoxTabViewModel.MyCSharpComClassFactory());
 
-                    //python C:\mozilla-build\xulrunner-41.0.2.en-US.win32.sdk\xulrunner-sdk\sdk\bin\header.py nsIMacroPlayer.idl -o nsIMacroPlayer.h -I C:\mozilla-build\xulrunner-41.0.2.en-US.win32.sdk\xulrunner-sdk\idl
-                    //python C:\mozilla-build\xulrunner-41.0.2.en-US.win32.sdk\xulrunner-sdk\sdk\bin\typelib.py nsIMacroPlayer.idl -o nsIMacroPlayer.xpt -I C:\mozilla-build\xulrunner-41.0.2.en-US.win32.sdk\xulrunner-sdk\idl
-                    var addonPathMAcros = AppDomain.CurrentDomain.BaseDirectory + "\\FFAddons\\MacrosJs";
-                    RegisterChromeDir(addonPathMAcros);
+                //python C:\mozilla-build\xulrunner-41.0.2.en-US.win32.sdk\xulrunner-sdk\sdk\bin\header.py nsIMacroPlayer.idl -o nsIMacroPlayer.h -I C:\mozilla-build\xulrunner-41.0.2.en-US.win32.sdk\xulrunner-sdk\idl
+                //python C:\mozilla-build\xulrunner-41.0.2.en-US.win32.sdk\xulrunner-sdk\sdk\bin\typelib.py nsIMacroPlayer.idl -o nsIMacroPlayer.xpt -I C:\mozilla-build\xulrunner-41.0.2.en-US.win32.sdk\xulrunner-sdk\idl
+                var addonPathMAcros = AppDomain.CurrentDomain.BaseDirectory + "\\FFAddons\\MacrosJs";
+                RegisterChromeDir(addonPathMAcros);
 
-                    //const string ComponentManagerCID = "91775d60-d5dc-11d2-92fb-00e09805570f";
-                    //nsIComponentRegistrar mgr = (nsIComponentRegistrar)Xpcom.GetObjectForIUnknown((IntPtr)Xpcom.GetService(new Guid(ComponentManagerCID)));
-                    //Guid aClass = new Guid("a7139c0e-962c-44b6-bec3-aaaaaaaaaaab");
-                    //mgr.RegisterFactory(ref aClass, "Js To Browser", "@eli.browz.io/jsToBrowser;1", new MacrosComClassFactory());
+                //const string ComponentManagerCID = "91775d60-d5dc-11d2-92fb-00e09805570f";
+                //nsIComponentRegistrar mgr = (nsIComponentRegistrar)Xpcom.GetObjectForIUnknown((IntPtr)Xpcom.GetService(new Guid(ComponentManagerCID)));
+                //Guid aClass = new Guid("a7139c0e-962c-44b6-bec3-aaaaaaaaaaab");
+                //mgr.RegisterFactory(ref aClass, "Js To Browser", "@eli.browz.io/jsToBrowser;1", new MacrosComClassFactory());
 
-                    // JSMacroPlayer = Xpcom.CreateInstance<nsIMacroPlayer>("@eli.browz.io/jsmacroaddon;1");
-                    //JSMacroPlayer = Xpcom.CreateInstance<nsIMacroPlayer>("@eli.browz.io/jsmacroaddon;1");
-                    //Xpcom.RegisterFactory(typeof(nsIMacroPlayer).GUID, "MacroPlayerClass", "@eli.browz.io/jsmacroaddon;1", new MacroPlayerClassFactory(MacroPlayerClass.Instance));
-                };
+                // JSMacroPlayer = Xpcom.CreateInstance<nsIMacroPlayer>("@eli.browz.io/jsmacroaddon;1");
+                //JSMacroPlayer = Xpcom.CreateInstance<nsIMacroPlayer>("@eli.browz.io/jsmacroaddon;1");
+                //Xpcom.RegisterFactory(typeof(nsIMacroPlayer).GUID, "MacroPlayerClass", "@eli.browz.io/jsmacroaddon;1", new MacroPlayerClassFactory(MacroPlayerClass.Instance));
+            };
 
-                //setup cache path
-                string profilepath = Path.Combine(MyFilesDatabase.GetBaseDir(), "CachesFF\\" + GloableProfData.PData.ProjectName);
-                if (!Directory.Exists(profilepath)) Directory.CreateDirectory(profilepath);
-                else
+
+            //setup cache path
+            string profilepath = Path.Combine(MyFilesDatabase.GetBaseDir(), "CachesFF\\" + GloableProfData.PData.ProjectName);
+            if (!Directory.Exists(profilepath)) Directory.CreateDirectory(profilepath);
+            else
+            {
+                try
                 {
-                    try
+                    string startupFile = Path.Combine(profilepath, "startupCache", "startupCache.4.little");
+                    FileInfo fi = new FileInfo(startupFile);
+                    if (fi.Exists)
                     {
-                        string startupFile = Path.Combine(profilepath, "startupCache", "startupCache.4.little");
-                        FileInfo fi = new FileInfo(startupFile);
-                        if (fi.Exists && fi.CreationTime <= new DateTime(2017, 9, 24,21,30,00))
-                        {
-                            fi.Delete();
-                        }
+                        fi.Delete();
                     }
-                    catch { }
                 }
-                Xpcom.ProfileDirectory = profilepath;
-
-                var xulpath = AppDomain.CurrentDomain.BaseDirectory + "\\FFLibrary\\Firefox";
-                xulpath = xulpath.Replace("\\\\", "\\");
-                Xpcom.Initialize(xulpath);
-                DirForXul = xulpath;
-                //Xpcom.Initialize(@"C:\Users\eli\Desktop\temp\ff");
-                //DirForXul = @"C:\Users\eli\Desktop\temp\ff";
-
-                //GeckoPreferences.User["devtools.chrome.enabled"] = true;
-                //security.mixed_content.block_active_content
-                //settings
-                GeckoPreferences.Default["browser.xul.error_pages.enabled"] = true;
-                GeckoPreferences.Default["gfx.font_rendering.graphite.enabled"] = true;
-                GeckoPreferences.Default["full-screen-api.enabled"] = true;
-
-                //performance
-                GeckoPreferences.User["gfx.direct2d.disabled"] = true;
-                GeckoPreferences.User["layers.acceleration.disabled"] = true;
-                GeckoPreferences.User["javascript.options.jit.chrome"] = true;
-                GeckoPreferences.User["webgl.force-enabled"] = true;
-                //GeckoPreferences.User["layers.acceleration.force-enabled"] = true;
-                GeckoPreferences.User["layers.offmainthreadcomposition.enabled"] = true;
-                GeckoPreferences.User["browser.display.show_image_placeholders"] = false;
-                GeckoPreferences.User["content.notify.interval"] = 500000;
-                GeckoPreferences.User["content.switch.threshold"] = 250000;
-                //GeckoPreferences.User["javascript.options.mem.high_water_mark"] = 512;
-                GeckoPreferences.User["image.mem.max_decoded_image_kb"] = 512000;
-
-                // GeckoPreferences.User["browser.safebrowsing.enabled"] = false;
-                // GeckoPreferences.User["browser.safebrowsing.malware.enabled"] = false;
-                GeckoPreferences.Default["network.http.pipelining"] = true;
-                GeckoPreferences.Default["network.http.proxy.pipelining"] = true;
-                GeckoPreferences.Default["network.http.pipelining.aggressive"] = true;
-                GeckoPreferences.Default["network.http.pipelining.ssl"] = true;
-                GeckoPreferences.Default["network.http.speculative-parallel-limit"] = 0;
-                GeckoPreferences.Default["network.http.pipelining.maxrequests"] = 8;
-                GeckoPreferences.Default["network.proxy.socks_remote_dns"] = false;
-                GeckoPreferences.Default["network.prefetch-next"] = false;
-                GeckoPreferences.Default["allow_scripts_to_close_windows"] = false;
-
-                GeckoPreferences.Default["security.dialog_enable_delay"] = 0;
-                GeckoPreferences.Default["browser.tabs.animate"] = false;
-                GeckoPreferences.Default["extensions.blocklist.enabled"] = false;
-                GeckoPreferences.Default["plugins.click_to_play"] = true;
-
-                GeckoPreferences.Default["browser.cache.use_new_backend"] = 1;
-                GeckoPreferences.Default["browser.download.animateNotifications"] = false;
-                GeckoPreferences.Default["browser.preferences.animateFadeIn"] = false;
-
-                GeckoPreferences.Default["geo.enabled"] = false;
-                GeckoPreferences.User["geo.wifi.uri"] = "https://127.0.0.1";
-                user_pref("geo.wifi.logging.enabled", false);
-                GeckoPreferences.User["browser.search.geoSpecificDefaults"] = false;
-                GeckoPreferences.User["browser.search.geoSpecificDefaults.url"] = "";
-                GeckoPreferences.User["browser.search.geoip.url"] = "";
-
-                GeckoPreferences.User["toolkit.telemetry.enabled"] = false;
-                GeckoPreferences.User["toolkit.telemetry.server"] = "";
-
-                GeckoPreferences.User["image.http.accept"] = "*/*";
-                GeckoPreferences.User["services.sync.prefs.sync.intl.accept_languages"] = true;
-
-                GeckoPreferences.User["capability.principal.codebase.p0.granted"] = "UniversalXPConnect";
-                //GeckoPreferences.User["capability.principal.codebase.p0.id"] = "file://";
-                GeckoPreferences.User["capability.principal.codebase.p0.subjectName"] = "";
-                GeckoPreferences.User["security.fileuri.strict_origin_policy"] = false;
-
-                GeckoPreferences.Default["plugin.state.npctrl"] = 0;
-
-                GeckoPreferences.Default["general.useragent.override"] = BrowserSettimgs.UserAgentFF;
-
-
-                GeckoPreferences.Default["network.dns.disableIPv6"] = false;
-                //GeckoPreferences.User["network.proxy.type"] = 1;
-                //GeckoPreferences.User["network.proxy.share_proxy_settings"] = true;
-
-                //GeckoPreferences.User["network.proxy.http"] = "104.238.156.110";
-                //GeckoPreferences.User["network.proxy.http_port"] = 8800;
-
-                //GeckoPreferences.User["network.proxy.ssl"] = "104.238.156.110";
-                //GeckoPreferences.User["network.proxy.ssl_port"] = 8800;
-
-
-
-                //GeckoPreferences.Default["accessibility.blockautorefresh"] = true;
-                //GeckoPreferences.Default["browser.fullscreen.animate"] = 0;
-                //GeckoPreferences.Default["nglayout.initialpaint.delay"] = 0;
-                //GeckoPreferences.Default["content.notify.backoffcount"] = 5;
-                //GeckoPreferences.User["breakpad.reportURL"] = "";
-                //GeckoPreferences.User["browser.send_pings"] = false;
-                //GeckoPreferences.User["browser.send_pings.require_same_host"] = true;
-                //        [TestCase("gfx.font_rendering.graphite.enabled", true)]
-                //[TestCase("dom.max_script_run_time", 0)]
-                //[TestCase("browser.xul.error_pages.enabled", false)]
-                //[TestCase("accessibility.force_disabled", 1)]
-                //[TestCase("middlemouse.paste", false)]
-                //[TestCase("middlemouse.paste", false)]
-                //[TestCase("capability.principal.codebase.p0.granted", "UniversalXPConnect")]
-                //[TestCase("capability.principal.codebase.p0.granted", "file://")]
-                //[TestCase("capability.principal.codebase.p0.subjectName", "")]
-                //[TestCase("security.fileuri.strict_origin_policy", false)]
-                //[TestCase("layout.css.devPixelsPerPx", "1.0")]
-                //[TestCase("breakpad.reportURL", "")]
-                //[TestCase("breakpad.reportURL", "abcdefghijklmnopqrstuvwxyz!@#$%^&*()")]
-                //[TestCase("breakpad.reportURL", "\u00fe\u00ff\uf323")]
-                //GeckoPreferences.User["capability.principal.codebase.p0.granted"] = "UniversalXPConnect";
-                //GeckoPreferences.User["capability.principal.codebase.p0.id"] = "file://";
-                //GeckoPreferences.User["capability.principal.codebase.p0.subjectName"] = "";
-                //GeckoPreferences.User["security.fileuri.strict_origin_policy"] = false;
-
-                //GeckoPreferences.User["media.gmp-provider.enabled"] = false;
-                //GeckoPreferences.User["media.gmp-gmpopenh264.enabled"] = false;
-                //GeckoPreferences.User["media.peerconnection.video.enabled"] = false;
-                //GeckoPreferences.User["network.disable.ipc.security"] = true;
-                //GeckoPreferences.User["extensions.blocklist.enabled"] = true;
-                //GeckoPreferences.User["plugin.scan.4xPluginFolder"] = false;
-                //GeckoPreferences.User["application.use_ns_plugin_finder"] = true;
-
-                //user_pref("network.http.pipelining", true);
-                //user_pref("network.http.pipelining.abtest", false);
-                //user_pref("network.http.pipelining.aggressive", true);
-                //user_pref("network.http.pipelining.max-optimistic-requests", 3);
-                //user_pref("network.http.pipelining.maxrequests", 12);
-                //user_pref("network.http.pipelining.maxsize", 300000);
-                //user_pref("network.http.pipelining.read-timeout", 60000);
-                //user_pref("network.http.pipelining.reschedule-on-timeout", true);
-                //user_pref("network.http.pipelining.reschedule-timeout", 15000);
-                //user_pref("network.http.pipelining.ssl", true);
-                //user_pref("network.http.proxy.pipelining", true);
-
-                //user_pref("network.http.max-connections", 256);
-                //user_pref("network.http.max-persistent-connections-per-proxy", 256);
-                //user_pref("network.http.max-persistent-connections-per-server", 6);
-
-                //user_pref("network.http.redirection-limit", 20);
-                //user_pref("network.http.fast-fallback-to-IPv4", true);
-                //user_pref("network.dns.disablePrefetch", true);
-                //user_pref("network.prefetch-next", true);
-
-                //user_pref("browser.safebrowsing.downloads.enabled", false);
-                //user_pref("browser.safebrowsing.downloads.remote.enabled", false);
-                //user_pref("browser.safebrowsing.enabled", false);
-                //user_pref("browser.safebrowsing.maleware.enabled", false);
-
-                // GeckoPreferences.Default["general.useragent.override"] = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0-0.20) Gecko/20100101 Firefox/45.0";
-
-
-                NeedsToSetProxy = !GloableProfData.PData.ProxyIP.IsNullOrEmpty();
-
-                //foreach (Gecko.Plugins.PluginTag tag in Gecko.Plugins.PluginHost.GetPluginTags())
-                //{
-                //    if (tag.Name.ToLower().Contains("silverlight"))
-                //    {
-                //    }
-                //}
-
-                //ComPtr<nsIBlocklistService> pluginHost = Xpcom.GetService2<nsIBlocklistService>(Contracts.b);
-                //pluginHost.Instance.
-
+                catch { }
             }
-            catch { }
+            Xpcom.ProfileDirectory = profilepath;
+
+            var xulpath = AppDomain.CurrentDomain.BaseDirectory + "\\FFLibrary\\Firefox";
+            xulpath = xulpath.Replace("\\\\", "\\");
+            Xpcom.Initialize(xulpath);
+
+            DirForXul = xulpath;
+            //Xpcom.Initialize(@"C:\Users\eli\Desktop\temp\ff");
+            //DirForXul = @"C:\Users\eli\Desktop\temp\ff";
+
+            //GeckoPreferences.User["devtools.chrome.enabled"] = true;
+            //security.mixed_content.block_active_content
+            //settings
+            GeckoPreferences.Default["browser.xul.error_pages.enabled"] = true;
+            GeckoPreferences.Default["gfx.font_rendering.graphite.enabled"] = true;
+            GeckoPreferences.Default["full-screen-api.enabled"] = true;
+
+            //performance
+            GeckoPreferences.User["gfx.direct2d.disabled"] = true;
+            GeckoPreferences.User["layers.acceleration.disabled"] = true;
+            GeckoPreferences.User["javascript.options.jit.chrome"] = true;
+            GeckoPreferences.User["webgl.force-enabled"] = true;
+            //GeckoPreferences.User["layers.acceleration.force-enabled"] = true;
+            GeckoPreferences.User["layers.offmainthreadcomposition.enabled"] = true;
+            GeckoPreferences.User["browser.display.show_image_placeholders"] = false;
+            GeckoPreferences.User["content.notify.interval"] = 500000;
+            GeckoPreferences.User["content.switch.threshold"] = 250000;
+            //GeckoPreferences.User["javascript.options.mem.high_water_mark"] = 512;
+            GeckoPreferences.User["image.mem.max_decoded_image_kb"] = 512000;
+
+            // GeckoPreferences.User["browser.safebrowsing.enabled"] = false;
+            // GeckoPreferences.User["browser.safebrowsing.malware.enabled"] = false;
+            GeckoPreferences.Default["network.http.pipelining"] = true;
+            GeckoPreferences.Default["network.http.proxy.pipelining"] = true;
+            GeckoPreferences.Default["network.http.pipelining.aggressive"] = true;
+            GeckoPreferences.Default["network.http.pipelining.ssl"] = true;
+            GeckoPreferences.Default["network.http.speculative-parallel-limit"] = 0;
+            GeckoPreferences.Default["network.http.pipelining.maxrequests"] = 8;
+            GeckoPreferences.Default["network.proxy.socks_remote_dns"] = false;
+            GeckoPreferences.Default["network.prefetch-next"] = false;
+            GeckoPreferences.Default["allow_scripts_to_close_windows"] = false;
+
+            GeckoPreferences.Default["security.dialog_enable_delay"] = 0;
+            GeckoPreferences.Default["browser.tabs.animate"] = false;
+            GeckoPreferences.Default["extensions.blocklist.enabled"] = false;
+            GeckoPreferences.Default["plugins.click_to_play"] = true;
+
+            GeckoPreferences.Default["browser.cache.use_new_backend"] = 1;
+            GeckoPreferences.Default["browser.download.animateNotifications"] = false;
+            GeckoPreferences.Default["browser.preferences.animateFadeIn"] = false;
+
+            GeckoPreferences.Default["geo.enabled"] = false;
+            GeckoPreferences.User["geo.wifi.uri"] = "https://127.0.0.1";
+            user_pref("geo.wifi.logging.enabled", false);
+            GeckoPreferences.User["browser.search.geoSpecificDefaults"] = false;
+            GeckoPreferences.User["browser.search.geoSpecificDefaults.url"] = "";
+            GeckoPreferences.User["browser.search.geoip.url"] = "";
+
+            GeckoPreferences.User["toolkit.telemetry.enabled"] = false;
+            GeckoPreferences.User["toolkit.telemetry.server"] = "";
+
+            GeckoPreferences.User["image.http.accept"] = "*/*";
+            GeckoPreferences.User["services.sync.prefs.sync.intl.accept_languages"] = true;
+
+            GeckoPreferences.User["capability.principal.codebase.p0.granted"] = "UniversalXPConnect";
+            //GeckoPreferences.User["capability.principal.codebase.p0.id"] = "file://";
+            GeckoPreferences.User["capability.principal.codebase.p0.subjectName"] = "";
+            GeckoPreferences.User["security.fileuri.strict_origin_policy"] = false;
+
+            GeckoPreferences.Default["plugin.state.npctrl"] = 0;
+
+            GeckoPreferences.Default["general.useragent.override"] = BrowserSettimgs.UserAgentFF;
+
+
+            GeckoPreferences.Default["network.dns.disableIPv6"] = false;
+
+            GeckoPreferences.Default["dom.ipc.plugins.flash.subprocess.crashreporter"] = false;
+            GeckoPreferences.Default["dom.ipc.plugins.reportCrashURL"] = false;
+            GeckoPreferences.User["dom.ipc.plugins.enabled.npctrl.dll"] = false;
+            GeckoPreferences.User["dom.ipc.plugins.enabled.npqtplugin.dll"] = false;
+            GeckoPreferences.User["dom.ipc.plugins.enabled.npswf32.dll"] = false;
+            GeckoPreferences.User["dom.ipc.plugins.enabled.nptest.dll"] = false;
+
+
+
+
+
+
+
+
+            //GeckoPreferences.User["network.proxy.type"] = 1;
+            //GeckoPreferences.User["network.proxy.share_proxy_settings"] = true;
+
+            //GeckoPreferences.User["network.proxy.http"] = "104.238.156.110";
+            //GeckoPreferences.User["network.proxy.http_port"] = 8800;
+
+            //GeckoPreferences.User["network.proxy.ssl"] = "104.238.156.110";
+            //GeckoPreferences.User["network.proxy.ssl_port"] = 8800;
+
+
+
+            //GeckoPreferences.Default["accessibility.blockautorefresh"] = true;
+            //GeckoPreferences.Default["browser.fullscreen.animate"] = 0;
+            //GeckoPreferences.Default["nglayout.initialpaint.delay"] = 0;
+            //GeckoPreferences.Default["content.notify.backoffcount"] = 5;
+            //GeckoPreferences.User["breakpad.reportURL"] = "";
+            //GeckoPreferences.User["browser.send_pings"] = false;
+            //GeckoPreferences.User["browser.send_pings.require_same_host"] = true;
+            //        [TestCase("gfx.font_rendering.graphite.enabled", true)]
+            //[TestCase("dom.max_script_run_time", 0)]
+            //[TestCase("browser.xul.error_pages.enabled", false)]
+            //[TestCase("accessibility.force_disabled", 1)]
+            //[TestCase("middlemouse.paste", false)]
+            //[TestCase("middlemouse.paste", false)]
+            //[TestCase("capability.principal.codebase.p0.granted", "UniversalXPConnect")]
+            //[TestCase("capability.principal.codebase.p0.granted", "file://")]
+            //[TestCase("capability.principal.codebase.p0.subjectName", "")]
+            //[TestCase("security.fileuri.strict_origin_policy", false)]
+            //[TestCase("layout.css.devPixelsPerPx", "1.0")]
+            //[TestCase("breakpad.reportURL", "")]
+            //[TestCase("breakpad.reportURL", "abcdefghijklmnopqrstuvwxyz!@#$%^&*()")]
+            //[TestCase("breakpad.reportURL", "\u00fe\u00ff\uf323")]
+            //GeckoPreferences.User["capability.principal.codebase.p0.granted"] = "UniversalXPConnect";
+            //GeckoPreferences.User["capability.principal.codebase.p0.id"] = "file://";
+            //GeckoPreferences.User["capability.principal.codebase.p0.subjectName"] = "";
+            //GeckoPreferences.User["security.fileuri.strict_origin_policy"] = false;
+
+            //GeckoPreferences.User["media.gmp-provider.enabled"] = false;
+            //GeckoPreferences.User["media.gmp-gmpopenh264.enabled"] = false;
+            //GeckoPreferences.User["media.peerconnection.video.enabled"] = false;
+            //GeckoPreferences.User["network.disable.ipc.security"] = true;
+            //GeckoPreferences.User["extensions.blocklist.enabled"] = true;
+            //GeckoPreferences.User["plugin.scan.4xPluginFolder"] = false;
+            //GeckoPreferences.User["application.use_ns_plugin_finder"] = true;
+
+            //user_pref("network.http.pipelining", true);
+            //user_pref("network.http.pipelining.abtest", false);
+            //user_pref("network.http.pipelining.aggressive", true);
+            //user_pref("network.http.pipelining.max-optimistic-requests", 3);
+            //user_pref("network.http.pipelining.maxrequests", 12);
+            //user_pref("network.http.pipelining.maxsize", 300000);
+            //user_pref("network.http.pipelining.read-timeout", 60000);
+            //user_pref("network.http.pipelining.reschedule-on-timeout", true);
+            //user_pref("network.http.pipelining.reschedule-timeout", 15000);
+            //user_pref("network.http.pipelining.ssl", true);
+            //user_pref("network.http.proxy.pipelining", true);
+
+            //user_pref("network.http.max-connections", 256);
+            //user_pref("network.http.max-persistent-connections-per-proxy", 256);
+            //user_pref("network.http.max-persistent-connections-per-server", 6);
+
+            //user_pref("network.http.redirection-limit", 20);
+            //user_pref("network.http.fast-fallback-to-IPv4", true);
+            //user_pref("network.dns.disablePrefetch", true);
+            //user_pref("network.prefetch-next", true);
+
+            //user_pref("browser.safebrowsing.downloads.enabled", false);
+            //user_pref("browser.safebrowsing.downloads.remote.enabled", false);
+            //user_pref("browser.safebrowsing.enabled", false);
+            //user_pref("browser.safebrowsing.maleware.enabled", false);
+
+            // GeckoPreferences.Default["general.useragent.override"] = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0-0.20) Gecko/20100101 Firefox/45.0";
+
+
+           
+
+            //foreach (Gecko.Plugins.PluginTag tag in Gecko.Plugins.PluginHost.GetPluginTags())
+            //{
+            //    if (tag.Name.ToLower().Contains("silverlight"))
+            //    {
+            //    }
+            //}
+
+            //ComPtr<nsIBlocklistService> pluginHost = Xpcom.GetService2<nsIBlocklistService>(Contracts.b);
+            //pluginHost.Instance.
         }
 
         public static async Task<bool> AwaitforProxySet()
@@ -422,6 +445,10 @@ namespace zFirefoxBrowser.Helpers
             
 
             GeckoPreferences.Default["general.useragent.override"] = BrowserSettimgs.UserAgentFF;
+
+            GeckoPreferences.User["intl.accept_languages"] = BrowserSettimgs.AcceptLanguage;
+           // GeckoPreferences.Default["extensions.qls.backup_acceptlanguages"] = BrowserSettimgs.AcceptLanguage;
+            GeckoPreferences.User["general.useragent.locale"] = BrowserSettimgs.AcceptLanguage.Contains(",")? BrowserSettimgs.AcceptLanguage.Remove(BrowserSettimgs.AcceptLanguage.IndexOf(",")).Trim() : BrowserSettimgs.AcceptLanguage;
         }
 
         public static void SetPersonData(int birthdayYear, string children, string city, int cmbSelectedIndexDay, int cmbSelectedIndexMonth, int cmbSelectedIndexSex, string country, string dir, string email, string filePath, string firstName, bool inMonney, bool inPBNVault, string lastName, string notes, string password, string phoneNumber, string profileName, string projectDir, string projectName, string proxyIP, string proxyPassword, string proxyPort, string proxyUsername, int sIPBNType, string state, string street, string username, string webAddress, string zip)

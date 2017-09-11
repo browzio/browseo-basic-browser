@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:converter="clr-namespace:Prospector.Converters" 
+             xmlns:commonControls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
              mc:Ignorable="d" 
              Name="uc">
     <UserControl.Resources>
@@ -20,43 +21,59 @@
                     BorderThickness="0"
                     Background="WhiteSmoke"
                     ScrollViewer.VerticalScrollBarVisibility="Auto"
-                    ScrollViewer.HorizontalScrollBarVisibility="Hidden"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    ScrollViewer.CanContentScroll="False"
                     ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
                     SelectedIndex="{Binding SIListResults, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Margin="9">
-                            <TextBlock Text="{Binding Title, Mode=OneWay}"
-                                                   Margin="3"
-                                                   TextWrapping="Wrap"
-                                                   Foreground="Blue" />
+                    <Grid Margin="9">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="{Binding Title, Mode=OneWay}"
+                                   Margin="3"
+                                   TextWrapping="Wrap"
+                                   Foreground="Blue" />
 
-                            <TextBox Text="{Binding Link, Mode=OneWay}"
-                                     Background="Transparent"
-                                     BorderThickness="0"
-                                     IsReadOnly="True"
-                                     Margin="3"
-                                     TextWrapping="Wrap"
-                                     Foreground="Green" />
+                        <TextBox Text="{Binding Link, Mode=OneWay}"
+                                 Grid.Row="1"
+                                 Background="Transparent"
+                                 BorderThickness="0"
+                                 IsReadOnly="True"
+                                 Margin="3"
+                                 TextWrapping="Wrap"
+                                 Foreground="Green" />
 
                         <TextBlock Text="{Binding Published}"
-                                    Margin="3"
-                                    TextWrapping="Wrap"
+                                   Grid.Row="2"
+                                   Margin="3"
+                                   TextWrapping="Wrap"
                                    Visibility="{Binding AuthorityVisible}"/>
 
-                        <StackPanel Orientation="Horizontal" Visibility="{Binding AuthorityVisible}">
-                                <TextBlock Text="{Binding PageAuthority}"
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding AuthorityVisible}"
+                                    Grid.Row="3">
+                            <TextBlock Text="{Binding PageAuthority}"
                                                    Margin="3"
                                                    TextWrapping="Wrap"
                                                    FontWeight="SemiBold"
                                                    Foreground="Black" />
-                                <TextBlock Text="{Binding DomainAuthority}"
+                            <TextBlock Text="{Binding DomainAuthority}"
                                                    Margin="3"
                                                    TextWrapping="Wrap"
                                                    FontWeight="SemiBold"
                                                    Foreground="Black" />
-                            </StackPanel>
-                        <StackPanel Orientation="Horizontal" Visibility="{Binding WebhoseExtraVisible}">
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Visibility="{Binding WebhoseExtraVisible}"
+                                    Grid.Row="4">
                             <TextBlock Text="{Binding DomainScore, Mode=OneWay}"
                                        ToolTip="1-100,000"
                                                    TextWrapping="Wrap"
@@ -72,30 +89,109 @@
                                                    Foreground="Black" Margin="3"/>
                         </StackPanel>
 
-                        <TextBlock Text="{Binding Description, Mode=OneWay}"
-                                                   Margin="3"
-                                                   MaxWidth="450"
-                                                   HorizontalAlignment="Left"
-                                                   TextWrapping="Wrap"
-                                                   Foreground="Black" />
+                        <TextBlock FontWeight="Medium"
+                                    Grid.Row="5">
+                            <Run Text="Keword Appearances On Page: " />
+                            <Run Text="{Binding TimesKwFound}" />
+                        </TextBlock>
 
-                        <UniformGrid Rows="1" Visibility="{Binding WebhoseExtraVisible}" Width="450" HorizontalAlignment="Left">
+                        <TextBlock Text="{Binding Description, Mode=OneWay}"
+                                   Grid.Row="6"
+                                   Margin="3"
+                                   MaxWidth="450"
+                                   HorizontalAlignment="Left"
+                                   TextWrapping="Wrap"
+                                   Foreground="Black" />
+
+                        <Expander ExpandDirection="Down" IsExpanded="True" Header="Social Stats"
+                                  Grid.Row="7">
+                            <commonControls:SocialStatsUserControl />
+                        </Expander>
+
+                        <UniformGrid Rows="1" Visibility="{Binding WebhoseExtraVisible}" Width="450" HorizontalAlignment="Left"
+                                   Grid.Row="8">
                             <TextBlock Text="{Binding Lang}" Margin="3" />
                             <TextBlock Text="{Binding Pnum}" Margin="3" />
                             <TextBlock Text="{Binding Ptotal}" Margin="3" />
                             <TextBlock Text="{Binding Country}" Margin="3" />
                             <TextBlock Text="{Binding Type}" Margin="3" />
                         </UniformGrid>
-                        </StackPanel>
+                    </Grid>
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="View In Browser">
+                    <MenuItem Header="View In FF">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="BROWSERFF" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+
+                    <MenuItem Header="View In Chrome">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="BROWSER" />
                         </MenuItem.InputBindings>
                     </MenuItem>
+
+                    <Separator Margin="-30,0,0,0" />
+                    <MenuItem Header="Facebook Order By Shares">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBSHARES" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    <MenuItem Header="Facebook Order By Likes">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBLIKES" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    <MenuItem Header="Facebook Order By Comments">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBCOMMENTS" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    <MenuItem Header="Google+ Order By Plus Ones">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_GPLUSONES" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    <MenuItem Header="Pinterest Order By Pins">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_PINTERESTPINS" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    <MenuItem Header="Stumble Order By Views">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_STUMBLEVIEWS" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    <MenuItem Header="LinkedIn Order By Count">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_LINKEDINCOUNT" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    <MenuItem Header="Buffer Order By Shares">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_BUFFERSHARES" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    <MenuItem Header="Reddit Order By Ups">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_REDDITUPS" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    <MenuItem Header="Reddit Order By Score">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_REDDITSCORE" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+
+                    <Separator Margin="-30,0,0,0" />
+                    <MenuItem Header="Order By Keywords Found">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_KEYWORDFOUND" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>
+                    <Separator Margin="-30,0,0,0" />
 
                     <MenuItem Header="Curate It">
                         <MenuItem.InputBindings>
@@ -108,6 +204,8 @@
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="Curaste" />
                         </MenuItem.InputBindings>
                     </MenuItem>
+
+                    <Separator Margin="-30,0,0,0" />
 
                     <MenuItem Header="Moz Check">
                         <MenuItem.InputBindings>
@@ -123,102 +221,5 @@
                 </ContextMenu>
             </ListBox.ContextMenu>
         </ListView>
-        <!--<ListView IsSynchronizedWithCurrentItem="True" Margin="10"
-                  ItemsSource="{Binding ListResults}"
-                  Background="White"
-                  ScrollViewer.VerticalScrollBarVisibility="Auto"
-                  ScrollViewer.HorizontalScrollBarVisibility="Hidden"
-                  SelectedIndex="{Binding SIListResults, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="Results">
-                        <GridViewColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Background="#FFFDFDFD"  Orientation="Horizontal">
-                                    <StackPanel Margin="9">
-                                        <TextBlock Text="{Binding Title, Mode=OneWay}"
-                                                   Margin="3"
-                                                   TextWrapping="Wrap"
-                                                   Foreground="Blue" />
-
-                                        <TextBlock Text="{Binding Link, Mode=OneWay}"
-                                                   Margin="3"
-                                                   TextWrapping="Wrap"
-                                                   Foreground="Green" />
-
-                                        <StackPanel Orientation="Horizontal" Visibility="{Binding AuthorityVisible}">
-                                            <TextBlock Text="{Binding PageAuthority}"
-                                                   Margin="3"
-                                                   TextWrapping="Wrap"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="Black" />
-                                            <TextBlock Text="{Binding DomainAuthority}"
-                                                   Margin="3"
-                                                   TextWrapping="Wrap"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="Black" />
-                                        </StackPanel>
-
-                                        <TextBlock Text="{Binding Description, Mode=OneWay}"
-                                                   Margin="3"
-                                                   MaxWidth="450"
-                                                   HorizontalAlignment="Left"
-                                                   TextWrapping="Wrap"
-                                                   Foreground="Black" />
-                                        --><!--<TextBox Background="Transparent"
-                                                 BorderThickness="0"
-                                                 Text="{Binding Title, Mode=OneWay}"
-                                                 IsReadOnly="True"
-                                                 TextWrapping="Wrap"
-                                                 Foreground="Blue" />
-                                        
-                                        <TextBox Background="Transparent"
-                                                 BorderThickness="0"
-                                                 Text="{Binding Link, Mode=OneWay}"
-                                                 IsReadOnly="True"
-                                                 TextWrapping="Wrap"
-                                                 Foreground="Green" />
-                                        
-                                        <TextBox Background="Transparent"
-                                                 BorderThickness="0"
-                                                 Text="{Binding Description, Mode=OneWay}"
-                                                 IsReadOnly="True"
-                                                 TextWrapping="Wrap"
-                                                 Foreground="Gray" />--><!--
-                                    </StackPanel>
-                                </StackPanel>
-                            </DataTemplate>
-                        </GridViewColumn.CellTemplate>
-                    </GridViewColumn>
-                </GridView>
-            </ListView.View>
-            <ListBox.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="View In Browser">
-                        <MenuItem.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="BROWSER" />
-                        </MenuItem.InputBindings>
-                    </MenuItem>
-
-                    <MenuItem Header="Curate It">
-                        <MenuItem.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="PBNPOSTER" />
-                        </MenuItem.InputBindings>
-                    </MenuItem>
-
-                    <MenuItem Header="Moz Check">
-                        <MenuItem.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding RanckCheck}" CommandParameter="MOZ" />
-                        </MenuItem.InputBindings>
-                    </MenuItem>
-
-                    <MenuItem Header="Moz Check All" Visibility="{Binding Path= NotVisible_WebHose,Converter={StaticResource boolToVis}}">
-                        <MenuItem.InputBindings>
-                            <MouseBinding MouseAction="LeftClick" Command="{Binding RanckCheck}" CommandParameter="MOZALL" />
-                        </MenuItem.InputBindings>
-                    </MenuItem>
-                </ContextMenu>
-            </ListBox.ContextMenu>
-        </ListView>-->
     </Grid>
 </UserControl>

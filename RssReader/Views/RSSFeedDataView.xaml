@@ -1,0 +1,421 @@
+﻿<UserControl x:Class="RssReader.Views.RSSFeedDataView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:RssReader.Views"
+             xmlns:commonControls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
+             xmlns:helpers="clr-namespace:RssReader.Helpers"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <helpers:booleanToVisible x:Key="boolToVis" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Border BorderThickness="0"
+            BorderBrush="#dfdfdf"
+            Margin="0,0,0,15"
+            Background="White">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <!--<StackPanel Visibility="{Binding IsLoadingFeedData, Converter={StaticResource BooleanToVisibilityConverter}}"
+                        Margin="0,13,0,0"
+                        Grid.Row="1">
+                <commonControls:CirclePBarControl
+                        Visibility="{Binding ImageLink,Converter={StaticResource TextEmptyToVisibleConverter}}" />
+            </StackPanel>-->
+
+            <commonControls:CirclePBarControl Margin="0,13,0,0"
+                                              Grid.Row="1"
+                                              VerticalAlignment="Top"
+                                              Visibility="{Binding ImageLink,Converter={StaticResource TextEmptyToVisibleConverter}}" />
+            <Image Source="{Binding BitmapImage}"
+                   Margin="0,3,0,0"
+                   Width="160"
+                   MaxHeight="100"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Visibility="{Binding ImageLink,Converter={StaticResource TextEmptyToVisibleConverter}}"
+                   Stretch="UniformToFill">
+            </Image>
+            
+            <Grid Grid.Column="1"
+                  Margin="15,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="{Binding Title, Mode=OneWay}"
+                           Margin="0,0,0,0"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"
+                           TextTrimming="CharacterEllipsis"
+                           Foreground="#558aed"
+                           FontWeight="Bold"
+                           FontSize="14" />
+
+                <TextBlock Text="{Binding Link, Mode=OneWay}"
+                           Margin="0,5"
+                           TextWrapping="Wrap"
+                           Grid.Row="1"
+                           HorizontalAlignment="Left"
+                           Foreground="Gray" />
+
+                <TextBlock Text="{Binding Date, Mode=OneWay}"
+                           Margin="0"
+                           HorizontalAlignment="Left"
+                           Grid.Row="2"
+                           TextWrapping="Wrap"
+                           Foreground="#a1a1a2" />
+                
+                <TextBlock Text="{Binding Description, Mode=OneWay}"
+                           TextWrapping="Wrap"
+                           Foreground="#5a5a5a"
+                           Margin="0,5"
+                           Grid.Row="3" />
+
+                <Expander Grid.Row="4"
+                          ExpandDirection="Down"
+                          IsExpanded="True"
+                          Header="Social Stats">
+                    <commonControls:SocialStatsUserControl DataContext="{Binding SocialStatsReplys}" />
+                </Expander>
+
+                <StackPanel Grid.Row="5">
+                    <Button HorizontalAlignment="Left"
+                            Margin="0"
+                            Click="Button_Click"
+                            ContextMenuService.IsEnabled="False"
+                            Content="Share Via Chrome"
+                            Grid.Row="5"
+                            Style="{StaticResource linkStyle}">
+                        <Button.ContextMenu>
+                            <ContextMenu>
+                                <StackPanel Orientation="Horizontal"
+                                            HorizontalAlignment="Center">
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="facebook"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png"
+                                               ToolTip="facebook"
+                                               Width="18"
+                                               Height="18" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="google"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/googleplus-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="google+" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="digg"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/digg-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="digg" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="buffer"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/buffer-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="buffer" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="Scoopit"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/it_24.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="Scoop.it!" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="hootsuite"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/hootsuite_normal.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="Hootsuite" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="pintrest"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/Pinterest-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="pintrest" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="reddit"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/reddit-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="reddit" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="stumbleupon"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="stumbleupon" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="tumblr"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/tumblr-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="tumblr" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="twitter"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/twitter-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="twitter" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="wordpress"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/wordpress-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="wordpress" />
+                                    </Button>
+                                </StackPanel>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+
+                    <Button HorizontalAlignment="Left"
+                            Margin="0"
+                            Click="Button_Click"
+                            ContextMenuService.IsEnabled="False"
+                            Content="Share Via Firefox"
+                            Grid.Row="5"
+                            Style="{StaticResource linkStyle}">
+                        <Button.ContextMenu>
+                            <ContextMenu>
+                                <StackPanel Orientation="Horizontal"
+                                            HorizontalAlignment="Center">
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_facebook"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png"
+                                               ToolTip="facebook"
+                                               Width="18"
+                                               Height="18" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_google"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/googleplus-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="google+" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_digg"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/digg-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="digg" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_buffer"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/buffer-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="buffer" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_Scoopit"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/it_24.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="Scoop.it!" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_hootsuite"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/hootsuite_normal.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="Hootsuite" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_pintrest"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/Pinterest-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="pintrest" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_reddit"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/reddit-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="reddit" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_stumbleupon"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="stumbleupon" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_tumblr"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/tumblr-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="tumblr" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_twitter"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/twitter-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="twitter" />
+                                    </Button>
+
+                                    <Button Cursor="Hand"
+                                            Style="{StaticResource browser_btn}"
+                                            Margin="3"
+                                            Command="{Binding OnCommandFromView}"
+                                            CommandParameter="ff_wordpress"
+                                            Click="Button_Click_1">
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/wordpress-icon.png"
+                                               Width="18"
+                                               Height="18"
+                                               ToolTip="wordpress" />
+                                    </Button>
+                                </StackPanel>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+        </Grid>
+    </Border>
+
+</UserControl>

@@ -23,6 +23,15 @@
     <Grid>
         <Border BorderThickness="0,1,0,0" BorderBrush="#d0d0d0">
             <controls:NonReloadingTabControl Name="tbCntrl">
+                <TabItem Header="Search" Style="{StaticResource gmailTabStyle}">
+                    <localControls:SearchUserControl x:Name="ucSearch" x:FieldModifier="public" 
+                                                     OnOpenInBrowserRequested="ucSearch_OnOpenInBrowserRequested" 
+                                                     OnStoreForDominationRequested="ucSearch_OnStoreForDominationRequested"
+                                                     OnOpenInBrowserForDownloadRequested="ucSearch_OnOpenInBrowserForDownloadRequested" />
+                </TabItem>
+                <TabItem Header="Post Sorter" Style="{StaticResource gmailTabStyle}">
+                    <localControls:SharedPostsUserControl x:Name="ucSyncedPosts" OnBrowserNavigateToUrl="UcSyncedPosts_OnBrowserNavigateToUrl" />
+                </TabItem>
                 <TabItem Header="Dominator" Style="{StaticResource gmailTabStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -154,7 +163,7 @@
                                                                                                   ContentStringFormat="{TemplateBinding ContentStringFormat}" 
                                                                                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
                                                                                                   SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" 
-                                                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>  
+                                                                                                  VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                                                                 <Rectangle Height="1.5" x:Name="frame" VerticalAlignment="Bottom" StrokeDashArray="1 2" Stroke="#FFB2B2B2" StrokeThickness="2"/>
                                                                             </Grid>
 
@@ -287,15 +296,6 @@
                             </Grid>
                         </Expander>
                     </Grid>
-                </TabItem>
-                <TabItem Header="Post Sorter" Style="{StaticResource gmailTabStyle}">
-                    <localControls:SharedPostsUserControl x:Name="ucSyncedPosts" OnBrowserNavigateToUrl="UcSyncedPosts_OnBrowserNavigateToUrl" />
-                </TabItem>
-                <TabItem Header="Search" Style="{StaticResource gmailTabStyle}">
-                    <localControls:SearchUserControl x:Name="ucSearch" x:FieldModifier="public" 
-                                                     OnOpenInBrowserRequested="ucSearch_OnOpenInBrowserRequested" 
-                                                     OnStoreForDominationRequested="ucSearch_OnStoreForDominationRequested"
-                                                     OnOpenInBrowserForDownloadRequested="ucSearch_OnOpenInBrowserForDownloadRequested" />
                 </TabItem>
             </controls:NonReloadingTabControl>
         </Border>

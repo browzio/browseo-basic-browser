@@ -5,6 +5,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:conrols="clr-namespace:RssReader.Controlls"
+             xmlns:commonControls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
              xmlns:helpers="clr-namespace:RssReader.Helpers"
              mc:Ignorable="d"
              d:DesignHeight="500" d:DesignWidth="300">
@@ -20,7 +21,7 @@
     <Grid>
         <StackPanel Visibility="{Binding PBarVis, Converter={StaticResource boolToVis}}">
             <TextBlock Text="{Binding RssLink}" />
-            <conrols:CirclePBarControl />
+            <commonControls:CirclePBarControl />
         </StackPanel>
 
         <Grid Margin="5,0,5,5" Visibility="{Binding ListResultVis, Converter={StaticResource boolToVis}}" >
@@ -52,15 +53,16 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Image Source="{Binding ImageLink}"
-                               Margin="0,3,0,0" 
-                               Width="160"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               MaxHeight="100" Grid.Row="1"
-                               Visibility="{Binding ImageLinkVisible}"
-                               Stretch="UniformToFill"/>
+                                       Margin="0,3,0,0" 
+                                       Width="160"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       MaxHeight="100" Grid.Row="1"
+                                       Visibility="{Binding ImageLinkVisible}"
+                                       Stretch="UniformToFill"/>
                                 <Grid Grid.Column="1" Margin="15,0,0,0">
                                     <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
@@ -95,83 +97,190 @@
                                        Grid.Row="3"/>
                                     <!--</ScrollViewer>-->
 
+                                    <Expander Grid.Row="4"  ExpandDirection="Down" IsExpanded="True" Header="Social Stats">
+                                        <commonControls:SocialStatsUserControl />
+                                    </Expander>
 
-                                    <Button HorizontalAlignment="Left"
-                                Margin="0"
-                                Click="Button_Click"
-                                ContextMenuService.IsEnabled="False"
-                                Content="Share"
-                                Grid.Row="4" 
-                                Style="{StaticResource linkStyle}">
-                                        <Button.ContextMenu>
-                                            <ContextMenu>
-                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="facebook"
+                                    <StackPanel Grid.Row="5">
+
+                                        <Button HorizontalAlignment="Left"
+                                            Margin="0"
+                                            Click="Button_Click"
+                                            ContextMenuService.IsEnabled="False"
+                                            Content="Share Via Chrome"
+                                            Grid.Row="5" 
+                                            Style="{StaticResource linkStyle}">
+                                            <Button.ContextMenu>
+                                                <ContextMenu>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="facebook"
                                                                 Click="Button_Click_1">
-                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png" 
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png" 
                                                                    ToolTip="facebook"
                                                                    Width="18" Height="18" />
-                                                    </Button>
+                                                        </Button>
 
-                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="google"
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="google"
                                                                 Click="Button_Click_1">
-                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/googleplus-icon.png" 
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/googleplus-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="google+" />
-                                                    </Button>
+                                                        </Button>
 
-                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="digg"
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="digg"
                                                                 Click="Button_Click_1">
-                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/digg-icon.png" 
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/digg-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="digg" />
-                                                    </Button>
+                                                        </Button>
 
-                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="pintrest"
+                                                        <Button Cursor="Hand"
+                                                                Style="{StaticResource browser_btn}"
+                                                                Margin="3"
+                                                                Command="{Binding SendToBrowserSocial}"
+                                                                CommandParameter="buffer"
                                                                 Click="Button_Click_1">
-                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/Pinterest-icon.png" 
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/buffer-icon.png"
+                                                                   Width="18"
+                                                                   Height="18"
+                                                                   ToolTip="buffer" />
+                                                        </Button>
+
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="pintrest"
+                                                                Click="Button_Click_1">
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/Pinterest-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="pintrest" />
-                                                    </Button>
+                                                        </Button>
 
-                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="reddit"
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="reddit"
                                                                 Click="Button_Click_1">
-                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/reddit-icon.png" 
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/reddit-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="reddit" />
-                                                    </Button>
+                                                        </Button>
 
-                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="stumbleupon"
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="stumbleupon"
                                                                 Click="Button_Click_1">
-                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png" 
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="stumbleupon" />
-                                                    </Button>
+                                                        </Button>
 
-                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="tumblr"
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="tumblr"
                                                                 Click="Button_Click_1">
-                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/tumblr-icon.png" 
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/tumblr-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="tumblr" />
-                                                    </Button>
+                                                        </Button>
 
-                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="twitter"
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="twitter"
                                                                 Click="Button_Click_1">
-                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/twitter-icon.png" 
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/twitter-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="twitter" />
-                                                    </Button>
+                                                        </Button>
 
-                                                    <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="wordpress"
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="wordpress"
                                                                 Click="Button_Click_1">
-                                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/wordpress-icon.png" 
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/wordpress-icon.png" 
                                                                    Width="18" Height="18"
                                                                    ToolTip="wordpress" />
-                                                    </Button>
-                                                </StackPanel>
-                                            </ContextMenu>
-                                        </Button.ContextMenu>
-                                    </Button>
+                                                        </Button>
+                                                    </StackPanel>
+                                                </ContextMenu>
+                                            </Button.ContextMenu>
+                                        </Button>
+
+                                        <Button HorizontalAlignment="Left"
+                                            Margin="0"
+                                            Click="Button_Click"
+                                            ContextMenuService.IsEnabled="False"
+                                            Content="Share Via Firefox"
+                                            Grid.Row="5" 
+                                            Style="{StaticResource linkStyle}">
+                                            <Button.ContextMenu>
+                                                <ContextMenu>
+                                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="ff_facebook"
+                                                                Click="Button_Click_1">
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png" 
+                                                                   ToolTip="facebook"
+                                                                   Width="18" Height="18" />
+                                                        </Button>
+
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="ff_google"
+                                                                Click="Button_Click_1">
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/googleplus-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="google+" />
+                                                        </Button>
+
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="ff_digg"
+                                                                Click="Button_Click_1">
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/digg-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="digg" />
+                                                        </Button>
+
+                                                        <Button Cursor="Hand"
+                                                                Style="{StaticResource browser_btn}"
+                                                                Margin="3"
+                                                                Command="{Binding SendToBrowserSocial}"
+                                                                CommandParameter="ff_buffer"
+                                                                Click="Button_Click_1">
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/buffer-icon.png"
+                                                                   Width="18"
+                                                                   Height="18"
+                                                                   ToolTip="buffer" />
+                                                        </Button>
+
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="ff_pintrest"
+                                                                Click="Button_Click_1">
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/Pinterest-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="pintrest" />
+                                                        </Button>
+
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="ff_reddit"
+                                                                Click="Button_Click_1">
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/reddit-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="reddit" />
+                                                        </Button>
+
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="ff_stumbleupon"
+                                                                Click="Button_Click_1">
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="stumbleupon" />
+                                                        </Button>
+
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="ff_tumblr"
+                                                                Click="Button_Click_1">
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/tumblr-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="tumblr" />
+                                                        </Button>
+
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="ff_twitter"
+                                                                Click="Button_Click_1">
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/twitter-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="twitter" />
+                                                        </Button>
+
+                                                        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Command="{Binding SendToBrowserSocial}" CommandParameter="ff_wordpress"
+                                                                Click="Button_Click_1">
+                                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/wordpress-icon.png" 
+                                                                   Width="18" Height="18"
+                                                                   ToolTip="wordpress" />
+                                                        </Button>
+                                                    </StackPanel>
+                                                </ContextMenu>
+                                            </Button.ContextMenu>
+                                        </Button>
+                                    </StackPanel>
                                 </Grid>
 
                             </Grid>
@@ -180,11 +289,75 @@
                 </ListView.ItemTemplate>
                 <ListBox.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="View In Browser">
+                        <MenuItem Header="View In FF">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="BrowserFF" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+
+                        <MenuItem Header="View In Chrome">
                             <MenuItem.InputBindings>
                                 <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="Browser" />
                             </MenuItem.InputBindings>
                         </MenuItem>
+                        <Separator Margin="-30,0,0,0" />
+                        <MenuItem Header="Grab All Links">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="GrabAllLinks" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                        <Separator Margin="-30,0,0,0" />
+                        <MenuItem Header="Facebook Order By Shares">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBSHARES" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                        <MenuItem Header="Facebook Order By Likes">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBLIKES" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                        <MenuItem Header="Facebook Order By Comments">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBCOMMENTS" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                        <MenuItem Header="Google+ Order By Plus Ones">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_GPLUSONES" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                        <MenuItem Header="Pinterest Order By Pins">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_PINTERESTPINS" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                        <MenuItem Header="Stumble Order By Views">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_STUMBLEVIEWS" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                        <MenuItem Header="LinkedIn Order By Count">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_LINKEDINCOUNT" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                        <MenuItem Header="Buffer Order By Shares">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_BUFFERSHARES" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                        <MenuItem Header="Reddit Order By Ups">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_REDDITUPS" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                        <MenuItem Header="Reddit Order By Score">
+                            <MenuItem.InputBindings>
+                                <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_REDDITSCORE" />
+                            </MenuItem.InputBindings>
+                        </MenuItem>
+                        <Separator Margin="-30,0,0,0" />
 
                         <MenuItem Header="Send To Feed Masher">
                             <MenuItem.InputBindings>

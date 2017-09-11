@@ -26,6 +26,7 @@ using CrawlerContracts.PluginHosting;
 using CrawlerContracts;
 using System.Runtime.Remoting;
 using GoViral.Helpers;
+using BrowserHost;
 
 namespace GoViral.ViewModels
 {
@@ -396,7 +397,7 @@ namespace GoViral.ViewModels
                     }
                 }
                 linksWindow.ShowDialog();
-                if (linksWindow.OKClicked)
+                if (linksWindow.ButtonLeftClicked)
                 {
                     string[] splitLinks = linksWindow.tbInputedText.Text.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string link in splitLinks)
@@ -1009,6 +1010,8 @@ namespace GoViral.ViewModels
 
             WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
             WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
+            WebBrowser.OnBrowserContextMenuClicked += WebBrowser_OnBrowserContextMenuClicked;
+            WebBrowser.OnBrowserStatusChanged += WebBrowser_OnBrowserStatusChanged;
             WebBrowser.init(url, BrowserSettimgs.FlashEnabled, BrowserSettimgs.JavascriptEnabled, BrowserSettimgs.JavaEnabled);
             if (wfh == null)
                 wfh = new WindowsFormsHost();
@@ -1018,6 +1021,302 @@ namespace GoViral.ViewModels
 
             //WebBrowser.Reload();
         }
+
+        private void WebBrowser_OnBrowserStatusChanged(string oMessage)
+        {
+            if (oMessage == null) return;
+            HuverLink = oMessage;
+        }
+
+        #region contextmenue
+        public string HuverLink { get; set; }
+        public event Action<string,string> OnSentForSeo = delegate { };
+        public event Action<string,string> OnCurateToPBN = delegate { };
+        public event Action<string> OnCreateNewTab = delegate { };
+        private void WebBrowser_OnBrowserContextMenuClicked(int contextMenueItemID)
+        {
+            switch (contextMenueItemID)
+            {
+                case 333:
+                    if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
+                    {
+                        string sitename = WebBrowser.CurrAddress.Replace("http://", "");
+                        sitename = sitename.Replace("https://", "");
+                        sitename = sitename.Replace("www.", "");
+                        if (sitename.Contains("."))
+                        {
+                            sitename = sitename.Remove(sitename.IndexOf("."));
+                        }
+                        OnSentForSeo(sitename, HuverLink);
+                    }
+                    //WebBrowser.CBrowser.Browser.GetHost().SendFocusEvent
+                    // WebBrowser.CBrowser.Browser.GetHost().ShowDevTools(CefWindowInfo.Create(), new DemoClient(), new CefBrowserSettings() { }, new CefPoint(110,110));
+                    break;
+
+                case 111:
+                    try
+                    {
+                        var host = WebBrowser.GetBrowser().GetHost();
+                        var wi = CefWindowInfo.Create();
+                        wi.SetAsPopup(IntPtr.Zero, "DevTools");
+                        host.ShowDevTools(wi, new DevToolsWebClient(), new CefBrowserSettings(), new CefPoint(0, 0));
+                    }
+                    catch { }
+                    break;
+
+                #region curate
+                case 666:
+                case 222:
+                    try
+                    {
+                        if (WebBrowser.GetTheMainFrame() == null || WebBrowser.GetTheMainFrame().Url == null) return;
+
+                        string dir = Path.Combine(MyFilesDatabase.GetBaseDir(), "TempHTML");
+                        if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+
+                        string file = Path.Combine(dir, "html.txt");
+                        if (File.Exists(file)) File.Delete(file);
+
+                        //the javascript
+                        string jsForExecution = "var range = window.getSelection().getRangeAt(0)," +
+                                                "content = range.extractContents()," +
+                                                "span = document.createElement('SPAN');" +
+                                                "span.appendChild(content);" +
+                                                "var htmltext = span.innerHTML.toString();" +
+                                                "range.insertNode(span);" +
+                                                "nativeImplementation(htmltext);";
+                        WebBrowser.GetTheMainFrame().ExecuteJavaScript(jsForExecution, WebBrowser.GetTheMainFrame().Url, 0);
+
+
+
+                        System.Threading.Tasks.Task.Factory.StartNew(() =>
+                        {
+                            while (!File.Exists(file))
+                            {
+                                System.Threading.Thread.Sleep(150);
+                            }
+
+                            if (contextMenueItemID == 666)
+                            {
+                                OnCurateToPBN(File.ReadAllText(file), WebBrowser.CurrAddress);
+                            }
+                            else
+                            {
+                                string thecontent = "<blockquote>" + File.ReadAllText(file) + "<br />";
+                                if (!string.IsNullOrEmpty(WebBrowser.CurrAddress) && !string.IsNullOrWhiteSpace(WebBrowser.CurrAddress))
+                                    thecontent += "<a href=\"" + WebBrowser.CurrAddress + " \" > " + WebBrowser.CurrAddress + " </a>";
+                                thecontent += "</blockquote>";
+                                Application.Current.Dispatcher.Invoke(delegate
+                                {
+                                    MyFilesDatabase.SetClipboardText(thecontent);
+                                });
+                            }
+                            File.Delete(file);
+                        });
+
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                    break;
+                #endregion
+
+                #region newTab
+                case 999:
+                    if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
+                    {
+                        OnCreateNewTab(HuverLink);
+                    }
+                    break;
+                #endregion
+
+                #region copy link
+                case 888:
+                    if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
+                    {
+                        MyFilesDatabase.SetClipboardText(HuverLink);
+                    }
+                    break;
+                #endregion
+
+                #region imageDownload
+                case 777:
+                    System.Threading.Tasks.Task.Factory.StartNew(() =>
+                    {
+                        string imgUrl = "";
+                        if (WebBrowser.GetTheMainFrame() != null && WebBrowser.GetTheMainFrame().Url != null)
+                        {
+                            string url = WebBrowser.GetTheMainFrame().Url;
+
+                            imgUrl = ChromeBrowserHostControl.GetImageUrl(url);
+                        }
+
+                        if (imgUrl == "")
+                        {
+                            if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
+                            {
+                                string url = HuverLink;
+                                if (url.ToLower().Contains("imgurl=") && url.ToLower().Contains("google."))
+                                {
+                                    url = url.Split(new string[] { "imgurl=" }, StringSplitOptions.None)[1];
+                                    if (url.Contains("%253"))
+                                    {
+                                        url = url.Remove(url.IndexOf("%253"));
+                                    }
+                                    if (url.Contains("&imgrefurl"))
+                                    {
+                                        url = url.Remove(url.IndexOf("&imgrefurl"));
+                                    }
+                                }
+
+                                if (url.Contains("%3A"))
+                                {
+                                    url = url.Replace("%3A", ":");
+                                }
+                                if (url.Contains("%2F"))
+                                {
+                                    url = url.Replace("%2F", "/");
+                                }
+                                if (url.Contains("%2520"))
+                                {
+                                    url = url.Replace("%2520", " ");
+                                }
+                                if (url.Contains("%20"))
+                                {
+                                    url = url.Replace("%20", " ");
+                                }
+                                imgUrl = ChromeBrowserHostControl.GetImageUrl(url);
+                            }
+                        }
+
+                        if (imgUrl == "")
+                        {
+                            MessageBox.Show("No image found to download. Make sure the mouse is over a image and try again, or open the image as a tab and then download it.");
+                            return;
+                        }
+
+                        MyFilesDatabase.DownloadImage(imgUrl);
+                    });
+                    break;
+                #endregion
+
+                //#region go viral
+                //case 555:
+                //    if ((string.IsNullOrEmpty(HuverLink) && string.IsNullOrWhiteSpace(HuverLink)) ||
+                //        (string.IsNullOrEmpty(AddressEditable) && string.IsNullOrWhiteSpace(AddressEditable)))
+                //    {
+                //        MessageBox.Show("Cant complete action make sure the mouse pointer is hovering over the link you want.");
+                //        return;
+                //    }
+                //    string linkToGet = HuverLink;
+                //    string link = HuverLink;
+                //    WebBrowser.GetTheMainFrame().GetSource(new SourceVisitor(htmlSource =>
+                //    {
+                //        try
+                //        {
+                //            string splitter = getsplitter();
+                //            if (AddressEditable.Contains("facebook.com/groups/?category=membership"))
+                //            {
+                //                string fromsource = linkToGet.Replace(Social.FACEBOOK_GROUPS_DEFAULT_URL, "/groups/");
+                //                fromsource = htmlSource.Substring(htmlSource.IndexOf(fromsource));
+                //                string name = fromsource.Substring(fromsource.IndexOf(">") + 1);
+                //                name = name.Remove(name.IndexOf("<"));
+
+                //                string id = fromsource.Substring(fromsource.IndexOf("id="));
+                //                id = id.Replace("id=", "");
+                //                id = id.Remove(id.IndexOf("\""));
+
+                //                link = Social.FACEBOOK_GROUPS_DEFAULT_URL + name + "-" + id;
+                //            }
+                //            else
+                //            {
+                //                linkToGet = linkToGet.Replace(Social.FACEBOOK_GROUPS_DEFAULT_URL, "/groups/");
+                //                linkToGet = linkToGet.Replace(Social.FACEBOOK_EVENTS_DEFAULT_URL, "/events/");
+                //                linkToGet = linkToGet.Replace("?ref=br_rs&action_history=null", "?ref=br_rs&amp;action_history=null");
+                //                link = getLinkFromUrlAndSource(linkToGet, htmlSource, splitter);
+                //            }
+
+                //            Application.Current.Dispatcher.Invoke(delegate
+                //            {
+                //                RaiseOnAddedToGoViral(link, "", null);
+                //            });
+                //        }
+                //        catch (Exception ex)
+                //        {
+                //            MessageBox.Show("Couldnt pull data.");
+                //        }
+                //    }));
+                //    break;
+
+                //case 444:
+                //    SourceVisitor visitor = new SourceVisitor(htmlSource =>
+                //    {
+                //        try
+                //        {
+                //            List<string> linksToReturn = new List<string>();
+                //            if (AddressEditable.Contains("facebook.com/groups/?category=membership"))
+                //            {
+                //                List<string> links = htmlSource.Split(new string[] { "group_browse_new" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                //                links.RemoveAt(0);
+                //                foreach (var linkl in links)
+                //                {
+                //                    string name = "", id = "";
+                //                    try
+                //                    {
+                //                        name = linkl.Substring(linkl.IndexOf(">") + 1);
+                //                        name = name.Remove(name.IndexOf("<"));
+
+                //                        id = linkl.Substring(linkl.IndexOf("id=") + 3);
+                //                        id = id.Remove(id.IndexOf("\""));
+
+                //                        Convert.ToInt64(id);
+                //                    }
+                //                    catch
+                //                    { continue; }
+
+                //                    linksToReturn.Add(Social.FACEBOOK_GROUPS_DEFAULT_URL + name + "-" + id);
+                //                }
+
+                //            }
+                //            else
+                //            {
+                //                string splitter = getsplitter();
+
+                //                List<string> links = htmlSource.Split(new string[] { splitter }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                //                links.RemoveAt(0);
+
+
+                //                foreach (string linkl in links)
+                //                {
+                //                    string linkToGetl = linkl.Remove(linkl.IndexOf("\""));
+                //                    string linkToAdd = getLinkFromUrlAndSource(linkToGetl, htmlSource, splitter);
+                //                    linksToReturn.Add(linkToAdd);
+                //                }
+                //            }
+
+                //            Application.Current.Dispatcher.Invoke((Action)delegate
+                //            {
+                //                RaiseOnAddedToGoViral(null, "", linksToReturn);
+                //            });
+                //        }
+                //        catch
+                //        {
+                //            MessageBox.Show("Couldnt pull pages.");
+                //        }
+                //    });
+                //    WebBrowser.GetTheMainFrame().GetSource(visitor);
+                //    break;
+                //#endregion
+
+                default:
+                    break;
+            }
+        }
+        private class DevToolsWebClient : CefClient
+        {
+        }
+        #endregion
 
         public void DisposeBrowser()
         {
