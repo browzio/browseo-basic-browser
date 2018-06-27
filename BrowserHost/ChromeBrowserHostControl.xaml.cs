@@ -1,4 +1,5 @@
-﻿using DragDropListview;
+﻿using Browmium.WPF.WinForms;
+using DragDropListview;
 using Organiser.Common.Classes;
 using System;
 using System.Collections.Generic;
@@ -186,7 +187,7 @@ namespace BrowserHost
         }
         private void Btvm_OnSetUserAgent(string agent)
         {
-            BrowserInit.settings.UserAgent = BrowserSettimgs.UserAgentChrome = agent;
+            BrowserLibraryInit.Instance.Settings.UserAgent = BrowserSettimgs.UserAgentChrome = agent;
 
             Btvm_OnRefreshSessionSettings();
         }

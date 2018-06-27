@@ -27,9 +27,118 @@ using System.Xml.Serialization;
 using Xilium.CefGlue;
 using Xilium.CefGlue.Client;
 using Organiser.Common.Browser;
+using BrowseoFX_WPF.Core;
+using BrowseoFX_WPF.Windows;
+using System.Windows;
 
 namespace Crawler
 {
+    public class CrawlerFF : MarshalByRefObject, IPlugin 
+    {
+        private CrawlerStates crawlerState;
+
+        public event Action OnReportInitialized;
+        public event Action<string> OnReportSerializedResult;
+
+
+        BrowserWindow window;
+
+        #region init
+        
+        public CrawlerFF()
+        {
+        }
+
+        //IPlugin
+        public void InitializeCefWithCachePath(string path)
+        {
+            window = new BrowserWindow();
+            window.Title = GloableProfData.PData.ProjectName;
+            window.Width = System.Windows.SystemParameters.WorkArea.Width / 2;
+            window.Height = System.Windows.SystemParameters.WorkArea.Height / 2;
+
+            window.Closing += Window_Closing;
+
+            window.browser.OnGloableWebView_Loaded += OnGloableWebView_Loaded;
+
+            Application app = new Application();
+            app.Run(window);
+        }
+
+        private void OnGloableWebView_Loaded()
+        {
+            SetAccessToken(Social.FACEBOOK_GRAPH_LINK);
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Shutdown();
+        }
+
+
+        #endregion
+
+        #region setters
+
+        //IPlugin
+        public void SetCrawlerState(int state)
+        {
+            crawlerState = (CrawlerStates)state;
+        }
+
+        //IPlugin
+        public void SetPersonData(string serializedPdata)
+        {
+            GloableProfData.PData = serializedPdata.XmlDeserializeFromString<PersonData>();//.XmlDeserializeFromString(typeof(PersonData)) as PersonData;
+        }
+
+        //IPlugin
+        public void SetAccessToken(string fbtokenLink)
+        {
+            BrowseoFXManager.Instance.GloableWebView.Navigate(fbtokenLink);
+        }
+
+        #endregion
+
+
+        #region getters
+
+        //IPlugin
+        public virtual object GetService(Type serviceType)
+        {
+            if (serviceType.IsAssignableFrom(GetType())) return this;
+            return null;
+        }
+
+        #endregion
+
+
+        //IPlugin
+        public void NavigateToUrl(string url)
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        //IPlugin
+        public void Shutdown()
+        {
+            try
+            {
+                window.Closing -= Window_Closing;
+                window.Close();
+                BrowseoFXManager.Instance.Shutdown();
+            }
+            catch { }
+        }
+
+        //MarshalByRefObject
+        public override object InitializeLifetimeService()
+        {
+            return null; // live forever
+        }
+    }
     //public class CrawlerEntry
     //{
     //    public static void Main(string[] args)
@@ -107,9 +216,7 @@ namespace Crawler
             //{
 
             //ConsoleManager.Show();
-            Console.WriteLine(path);
             var exePath = AppDomain.CurrentDomain.BaseDirectory;
-            Console.WriteLine(exePath);
 
             // Load CEF. This checks for the correct CEF version.
             CefRuntime.Load();
@@ -228,7 +335,7 @@ namespace Crawler
                         //Debugger.Launch();
                         //maybe to add = keywords,emails,new_like_count,description,sharedposts
                         pageType = CrawlerStates.GraphSearch_Pages;
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.12/" + pageName + "?fields=" +
                                             @"about,id,link,founded,can_post,category,talking_about_count,likes,
                                         photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)},
                                         videos.limit(30){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
@@ -238,7 +345,7 @@ namespace Crawler
                         if (urltillId.Contains(Social.FACEBOOK_GROUPS_DEFAULT_URL))
                         {
                             pageType = CrawlerStates.PageType_Groups;
-                            preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
+                            preRegetTokenUrl = "https://graph.facebook.com/v2.12/" + pageName + "?fields=" +
                                             @"description,name,privacy,updated_time,
                                         members.limit(0).summary(true),
                                         feed.limit(100){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
@@ -247,7 +354,7 @@ namespace Crawler
                         else if (urltillId.Contains(Social.FACEBOOK_EVENTS_DEFAULT_URL))
                         {
                             pageType = CrawlerStates.PageType_Events;
-                            preRegetTokenUrl = "https://graph.facebook.com/v2.3/" + pageName + "?fields=" +
+                            preRegetTokenUrl = "https://graph.facebook.com/v2.12/" + pageName + "?fields=" +
                                               @"description,location,privacy,start_time,ticket_uri,timezone,updated_time,
                                             interested.limit(0).summary(true),
                                             invited.limit(0).summary(true),
@@ -257,7 +364,7 @@ namespace Crawler
                         else if (urltillId.Contains(Social.FACEBOOK_PLACES_DEFAULT_URL))
                         {
                             pageType = CrawlerStates.PageType_Places;
-                            preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + "?fields=" +
+                            preRegetTokenUrl = "https://graph.facebook.com/v2.12/" + pageName + "?fields=" +
                                             @"about,id,name,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,location,
                                         photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)},
                                         albums{photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)}},
@@ -269,13 +376,13 @@ namespace Crawler
                         else if (urltillId.Contains(Social.FACEBOOK_PHOTOS_DEFAULT_URL))
                         {
                             pageType = CrawlerStates.PageType_Photos;
-                            preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + @"?fields=
+                            preRegetTokenUrl = "https://graph.facebook.com/v2.12/" + pageName + @"?fields=
                                             created_time,link,name,source,updated_time,album,from,picture,images,likes.limit(0).summary(true),comments.limit(200).summary(true)&access_token=" + AccessToken;
                         }
                         else if (urltillId.Contains(Social.FACEBOOK_VIDEOS_DEFAULT_URL))
                         {
                             pageType = CrawlerStates.PageType_Videos;
-                            preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName + @"?fields=
+                            preRegetTokenUrl = "https://graph.facebook.com/v2.12/" + pageName + @"?fields=
                                             picture,id,embed_html,source,updated_time,description,created_time,likes.limit(0).summary(true),comments.limit(200).summary(true)&access_token=" + AccessToken;
                         }
                         else if (urltillId.Contains(Social.FACEBOOK_USERS_DEFAULT_URL))
@@ -290,7 +397,7 @@ namespace Crawler
 
                     case CrawlerStates.LoadAllPhotos:
                         allCrawledPhotos.Clear();
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName +
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.12/" + pageName +
                                            "?fields=photos.limit(50){picture,id,link,updated_time,images,likes.limit(0).summary(true),comments.limit(0).summary(true)}&access_token=" + AccessToken;
                         browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                         break;
@@ -310,7 +417,7 @@ namespace Crawler
 
                     case CrawlerStates.LoadAllVideos:
                         allCrawledVideos.Clear();
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/" + pageName +
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.12/" + pageName +
                                           "?fields=videos.limit(50){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)}&access_token=" + AccessToken;
                         browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                         break;
@@ -330,35 +437,39 @@ namespace Crawler
 
                     case CrawlerStates.GraphSearch_Pages:
                         //search?q=bodybuilding&type=page&limit=500&fields=about,description,id,link,founded,can_post,category,talking_about_count,likes,picture{url}
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.12/search?q=" + pageName +
                             "&type=page&limit=500&fields=about,description,id,link,name,founded,can_post,category,talking_about_count,likes,picture{url}&access_token=" + AccessToken;
                         browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                         break;
 
                     case CrawlerStates.GraphSearch_Groups:
+                        //https://www.facebook.com/search/groups/?q=tech
+                        allMediaLinkToCrawl.Clear();
+                        browser.GetMainFrame().LoadUrl("/https://www.facebook.com/search/groups/?q=" + pageName);
+
                         //search?q=bodybuilding&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy 
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
-                           "&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy&access_token=" + AccessToken;
-                        browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
+                        //preRegetTokenUrl = "https://graph.facebook.com/v2.12/search?q=" + pageName +
+                        //   "&type=group&limit=500&fields=description,id,name,picture{url},members.limit(0).summary(true),privacy&access_token=" + AccessToken;
+                        //browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                         break;
 
                     case CrawlerStates.GraphSearch_Events:
                         //v2.3 search?q=bodybuilding&type=event&limit=500&fields=description,id,picture{url},date,interested.limit(0).summary(true),invited.limit(0).summary(true) 
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.12/search?q=" + pageName +
                            "&type=event&limit=500&fields=description,id,name,picture{url},date,interested.limit(0).summary(true)&access_token=" + AccessToken;
                         browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                         break;
 
                     case CrawlerStates.GraphSearch_Places:
                         //search?q=bodybuilding&type=place&limit=300&fields=about,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,picture{url},location
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.12/search?q=" + pageName +
                            "&type=place&limit=200&fields=about,id,name,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,picture{url},location&access_token=" + AccessToken;
                         browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                         break;
 
                     case CrawlerStates.GraphSearch_Users:
                         //search?q=bodybuilding&type=user&limit=500&fields=name,id,link,picture //other then that need to crawl
-                        preRegetTokenUrl = "https://graph.facebook.com/v2.5/search?q=" + pageName +
+                        preRegetTokenUrl = "https://graph.facebook.com/v2.12/search?q=" + pageName +
                            "&type=user&limit=500&fields=name,id,link,picture&access_token=" + AccessToken;
                         browser.GetMainFrame().LoadUrl(preRegetTokenUrl);
                         break;
@@ -475,8 +586,10 @@ namespace Crawler
                         GetVideosViaHtmlCrawl(source, json, url);
                         break;
 
+                    case CrawlerStates.GraphSearch_Groups:
+                        GetGroupsFromSearchCrawl(source, json, url);
+                        break;
                     case CrawlerStates.GraphSearch_Pages:
-                    case CrawlerStates.GraphSearch_Groups: 
                     case CrawlerStates.GraphSearch_Events:   
                     case CrawlerStates.GraphSearch_Places: 
                     case CrawlerStates.GraphSearch_Users:
@@ -500,9 +613,52 @@ namespace Crawler
             }
         }
 
+        private void GetGroupsFromSearchCrawl(string source, string json, string url)
+        {
+            try
+            {
+                source = source.Replace("&quot;", "");
+                source = source.Replace("quot;", "");
 
+                //<div id="BrowseResultsContainer">
+                string firstResponders = source.Substring(source.IndexOf("id=\"BrowseResultsContainer\">"));
+                firstResponders = firstResponders.Substring(0, firstResponders.IndexOf("result_below_fold"));
+                foreach (var d in FBSourceCrawler.GetIdsFromVideoScrape(firstResponders))
+                {
+                    if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
+                }
 
+                //result_below_fold
+                if (source.Contains("result_below_fold"))
+                {
+                    try
+                    {
+                        string secondResponders = source.Substring(source.IndexOf("result_below_fold"));
+                        if (secondResponders.Contains("fbBrowseScrollingPagerContainer"))
+                        {
+                            secondResponders = secondResponders.Remove(secondResponders.IndexOf("fbBrowseScrollingPagerContainer"));
+                            foreach (var d in FBSourceCrawler.GetIdsFromVideoScrape(secondResponders))
+                            {
+                                if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
+                            }
 
+                            //fbBrowseScrollingPagerContainer
+                            List<string> afterScrolledData = source.Split(new string[] { "fbBrowseScrollingPagerContainer" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                            afterScrolledData.RemoveAt(0);
+                            foreach (var item in afterScrolledData)
+                            {
+                                foreach (var d in FBSourceCrawler.GetIdsFromVideoScrape(item))
+                                {
+                                    if (!allMediaLinkToCrawl.Contains(d)) allMediaLinkToCrawl.Add(d);
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { OnReportSerializedResult("N/A"); }
+        }
 
         private void GetVideosFromSearchCrawl(string source, string json, string url)
         {
@@ -614,6 +770,7 @@ namespace Crawler
         {
             try
             {
+                
                 MediaResult resultToReply = new MediaResult();
 
                 source = source.Replace("&quot;", "");

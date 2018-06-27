@@ -11,6 +11,9 @@ using System.Net;
 using System.Text;
 using System.Windows;
 using System.Linq;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace Organiser.Common.Classes
 {
@@ -202,8 +205,11 @@ namespace Organiser.Common.Classes
         public static bool WebGLEnabled = true;
 
         public static string UserAgentFF = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0";
-        public static string UserAgentChrome = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36";
+        public static string UserAgentChrome = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.170 Safari/537.36";
         public static string AcceptLanguage = "en-US, en";
+
+        //public string UserAgent_Current = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0";
+        public static string UserAgent_CurrentFFBuild = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0";
 
         private static List<string> timeZoneList;
         public static List<string> AvailableTimeZones
@@ -1479,7 +1485,7 @@ namespace Organiser.Common.Classes
                             {
                                 double total = 0;
                                 bool showedMSgBox = false;
-                                foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcessesByName("BrowserAndFeatures"))
+                                foreach (System.Diagnostics.Process process in System.Diagnostics.Process.GetProcessesByName("BrowserModules"))
                                 {
                                     var counter = new System.Diagnostics.PerformanceCounter("Process", "Working Set - Private", process.ProcessName);
                                     total += counter.RawValue / (1024 * 1024);
@@ -1615,49 +1621,101 @@ namespace Organiser.Common.Classes
         {
             string filepath = Path.Combine(projectPath, "ProjectData.ini");
             IniFile ini = new IniFile(filepath);
-            GloableProfData.PData = new PersonData();
+            GloableProfData.PData = GetUpPdaaFromPath(projectPath);
             try
-            {
-                GloableProfData.PData.ProjectName = ini.IniReadValue("Data", "ProjectName");
-                GloableProfData.PData.ProfileName = ini.IniReadValue("Data", "ProfileName");
-                GloableProfData.PData.FirstName = ini.IniReadValue("Data", "FirstName");
-                GloableProfData.PData.LastName = ini.IniReadValue("Data", "LastName");
-                GloableProfData.PData.Email = ini.IniReadValue("Data", "Email");
-                GloableProfData.PData.Password = ini.IniReadValue("Data", "Password");
-                GloableProfData.PData.Username = ini.IniReadValue("Data", "Username");
-                GloableProfData.PData.ProxyIP = ini.IniReadValue("Data", "ProxyIP");
-                GloableProfData.PData.ProxyPort = ini.IniReadValue("Data", "ProxyPort");
-                GloableProfData.PData.ProxyUsername = ini.IniReadValue("Data", "ProxyUsername");
-                GloableProfData.PData.ProxyPassword = ini.IniReadValue("Data", "ProxyPassword");
-                GloableProfData.PData.PhoneNumber = ini.IniReadValue("Data", "PhoneNumber");
-                GloableProfData.PData.Street = ini.IniReadValue("Data", "Street");
-                GloableProfData.PData.City = ini.IniReadValue("Data", "City");
-                GloableProfData.PData.State = ini.IniReadValue("Data", "State");
-                GloableProfData.PData.Zip = ini.IniReadValue("Data", "Zip");
-                GloableProfData.PData.Country = ini.IniReadValue("Data", "Country");
-                GloableProfData.PData.WebAddress = ini.IniReadValue("Data", "WebAddress");
-                GloableProfData.PData.Notes = ini.IniReadValue("Data", "Notes");
-                try
-                {
-                    GloableProfData.PData.CmbSelectedIndexSex = Convert.ToInt32(ini.IniReadValue("Data", "Sex"));
-                    GloableProfData.PData.CmbSelectedIndexDay = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayDay"));
-                    GloableProfData.PData.CmbSelectedIndexMonth = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayMonth"));
-                }
-                catch { }
-                GloableProfData.PData.ProjectDir = projectPath;
-                try
-                {
-                    GloableProfData.PData.BirthdayYear = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayYear"));
-                }
-                catch { }
-
-
+            { 
                 MyFilesDatabase.GetSavedSesstion(GloableProfData.PData.ProjectName);
             }
             catch { }
         }
 
+        public static PersonData GetUpPdaaFromPath(string projectPath)
+        {
+            string filepath = Path.Combine(projectPath, "ProjectData.ini");
+            IniFile ini = new IniFile(filepath);
+            PersonData PData = new PersonData();
+            try
+            {
+                PData.ProjectName = ini.IniReadValue("Data", "ProjectName");
+                PData.ProfileName = ini.IniReadValue("Data", "ProfileName");
+                PData.FirstName = ini.IniReadValue("Data", "FirstName");
+                PData.LastName = ini.IniReadValue("Data", "LastName");
+                PData.Email = ini.IniReadValue("Data", "Email");
+                PData.Password = ini.IniReadValue("Data", "Password");
+                PData.Username = ini.IniReadValue("Data", "Username");
+                PData.ProxyIP = ini.IniReadValue("Data", "ProxyIP");
+                PData.ProxyPort = ini.IniReadValue("Data", "ProxyPort");
+                PData.ProxyUsername = ini.IniReadValue("Data", "ProxyUsername");
+                PData.ProxyPassword = ini.IniReadValue("Data", "ProxyPassword");
+                PData.PhoneNumber = ini.IniReadValue("Data", "PhoneNumber");
+                PData.Street = ini.IniReadValue("Data", "Street");
+                PData.City = ini.IniReadValue("Data", "City");
+                PData.State = ini.IniReadValue("Data", "State");
+                PData.Zip = ini.IniReadValue("Data", "Zip");
+                PData.Country = ini.IniReadValue("Data", "Country");
+                PData.WebAddress = ini.IniReadValue("Data", "WebAddress");
+                PData.Notes = ini.IniReadValue("Data", "Notes");
+                try
+                {
+                   PData.CmbSelectedIndexSex = Convert.ToInt32(ini.IniReadValue("Data", "Sex"));
+                   PData.CmbSelectedIndexDay = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayDay"));
+                   PData.CmbSelectedIndexMonth = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayMonth"));
+                }
+                catch { }
+                PData.ProjectDir = projectPath;
+                try
+                {
+                    PData.BirthdayYear = Convert.ToInt32(ini.IniReadValue("Data", "BirthdayYear"));
+                }
+                catch { }
+            }
+            catch { }
+            return PData;
+        }
+
         #region imacros
+
+        public static void SetUpImacroProfileInfo()
+        {
+            var datasourcePath = Path.Combine(Organiser.Common.Classes.MyFilesDatabase.GetBaseDir(), "BrowseoIA_DataSource", GloableProfData.PData.ProjectName);
+
+            if (!Directory.Exists(datasourcePath)) Directory.CreateDirectory(datasourcePath);
+            var pdataSource = GloableProfData.PData;
+            if (!pdataSource.BIADefault && pdataSource.Profiles != null)
+            {
+                foreach (var p in pdataSource.Profiles)
+                {
+                    if(p.BIADefault)
+                    {
+                        pdataSource = p;
+                        break;
+                    }
+                }
+            }
+            var datasourceFile = Path.Combine(datasourcePath, "ProjectProfileInfo.txt");
+            var datatsourceText = pdataSource.ProjectName + "," +
+                                                    pdataSource.ProfileName + "," +
+                                                    pdataSource.FirstName + "," +
+                                                    pdataSource.LastName + "," +
+                                                    pdataSource.PhoneNumber + "," +
+                                                    pdataSource.Username + "," +
+                                                    pdataSource.Email + "," +
+                                                    pdataSource.Password + "," +
+                                                    (pdataSource.CmbSelectedIndexSex + 1).ToString() + "," +//1 male 2 female
+                                                    (pdataSource.CmbSelectedIndexDay + 1).ToString() + "," + //actual day
+                                                    (pdataSource.CmbSelectedIndexMonth + 1).ToString() + "," +//actual month
+                                                    pdataSource.BirthdayYear.ToString() + "," + 
+                                                    pdataSource.Street + "," +
+                                                    pdataSource.City + "," +
+                                                    pdataSource.State + "," +
+                                                    pdataSource.Zip + "," +
+                                                    pdataSource.Country + "," +
+                                                    pdataSource.WebAddress + "," +
+                                                    pdataSource.Notes;
+
+            File.WriteAllText(datasourceFile, datatsourceText);
+        }
+
         public static string GetBaseMacroDir()
         {
             string ddir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\RAWSocialOrganizer\\MacroDefaultDir";
@@ -1712,6 +1770,179 @@ namespace Organiser.Common.Classes
             if (!File.Exists(fPath)) return "";
 
             return File.ReadAllText(fPath);
+        }
+
+        //[DllImport("user32.dll")]
+        //static extern int SetWindowText(IntPtr hWnd, string text);
+
+        public static async void LaunchToSystemFF(string args,string cachepath, PersonData PersonData, bool outerprocess = true,string projname = "")
+        {
+            string ffpath = cachepath;
+
+
+            string prefs = ffpath + "\\prefs.js";
+            string filetext = File.Exists(prefs) ? File.ReadAllText(prefs) : "";
+            //string filetext = "";
+            if (File.Exists(prefs)) File.Delete(prefs);
+
+            List<string> fileTextLines = filetext.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            for (int i = fileTextLines.Count - 1; i >= 0; i--)
+            {
+                var line = fileTextLines[i];
+                if (line.Contains("user_pref(\"plugin.state.npctrl\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"plugin.state.flash\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"plugin.state.java\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"media.peerconnection.enabled\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"privacy.donottrackheader.enabled\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"services.sync.prefs.sync.privacy.donottrackheader.enabled\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.type\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.http\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.http_port\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.ssl\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.ssl_port\", "))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.backup.ssl\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.backup.ssl_port\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.ftp\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.ftp_port\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.socks\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.socks_port\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.backup.socks\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+                else if (line.Contains("user_pref(\"network.proxy.backup.socks_port\","))
+                {
+                    fileTextLines.RemoveAt(i);
+                }
+            }
+
+
+
+            if (outerprocess)
+            {
+                //filetext +=
+                //     "user_pref(\"plugin.state.npctrl\", 0); \n" +
+                //      "user_pref(\"plugin.state.flash\", 0); \n" +
+                //       "user_pref(\"plugin.state.java\", 0); \n" +
+                //        "user_pref(\"media.peerconnection.enabled\", false); \n" +
+                //         "user_pref(\"privacy.donottrackheader.enabled\", true); \n" +
+                //         "user_pref(\"browser.tabs.remote.autostart.2\", false); \n" +
+                //         "user_pref(\"browser.tabs.remote.autostart\", false); \n" +
+                //        "user_pref(\"services.sync.prefs.sync.privacy.donottrackheader.enabled\", true);";
+
+                fileTextLines.Add("user_pref(\"plugin.state.npctrl\", 0);");
+                fileTextLines.Add("user_pref(\"plugin.state.flash\", 0);");
+                fileTextLines.Add("user_pref(\"plugin.state.java\", 0);");
+                fileTextLines.Add("user_pref(\"media.peerconnection.enabled\", false);");
+                fileTextLines.Add("user_pref(\"privacy.donottrackheader.enabled\", true);");
+                fileTextLines.Add("user_pref(\"browser.tabs.remote.autostart.2\", false);");
+                fileTextLines.Add("user_pref(\"browser.tabs.remote.autostart\", false);");
+                fileTextLines.Add("user_pref(\"services.sync.prefs.sync.privacy.donottrackheader.enabled\", true);");
+            }
+
+            if (!string.IsNullOrEmpty(PersonData.ProxyIP) && !string.IsNullOrWhiteSpace(PersonData.ProxyIP))
+            {
+                fileTextLines.Add("user_pref(\"network.proxy.type\", 1); ");
+                fileTextLines.Add("user_pref(\"network.proxy.share_proxy_settings\", true);");
+                fileTextLines.Add("user_pref(\"network.proxy.http\", \"" + PersonData.ProxyIP + "\");");
+                fileTextLines.Add("user_pref(\"network.proxy.http_port\", " + PersonData.ProxyPort + ");");
+                fileTextLines.Add("user_pref(\"network.proxy.ssl\", \"" + PersonData.ProxyIP + "\");");
+                fileTextLines.Add("user_pref(\"network.proxy.ssl_port\", " + PersonData.ProxyPort + ");");
+                fileTextLines.Add("user_pref(\"network.proxy.backup.ssl\", \"" + PersonData.ProxyIP + "\");");
+                fileTextLines.Add("user_pref(\"network.proxy.backup.ssl_port\", " + PersonData.ProxyPort + ");");
+                fileTextLines.Add("user_pref(\"network.proxy.ftp\", \"" + PersonData.ProxyIP + "\");");
+                fileTextLines.Add("user_pref(\"network.proxy.backup.ftp_port\", " + PersonData.ProxyPort + ");");
+                fileTextLines.Add("user_pref(\"network.proxy.socks\", \"" + PersonData.ProxyIP + "\");");
+                fileTextLines.Add("user_pref(\"network.proxy.socks_port\", " + PersonData.ProxyPort + ");");
+                fileTextLines.Add("user_pref(\"network.proxy.backup.socks\", \"" + PersonData.ProxyIP + "\");");
+                fileTextLines.Add("user_pref(\"network.proxy.backup.socks_port\", " + PersonData.ProxyPort + ");");
+
+                //filetext =
+                //     filetext + " \n" +
+                //     "user_pref(\"network.proxy.type\", 1); \n" +
+                //     "user_pref(\"network.proxy.share_proxy_settings\", true); \n" +
+                //     "user_pref(\"network.proxy.http\", \"" + PersonData.ProxyIP + "\"); \n" +
+                //     "user_pref(\"network.proxy.http_port\", " + PersonData.ProxyPort + "); \n" +
+                //     "user_pref(\"network.proxy.ssl\", \"" + PersonData.ProxyIP + "\"); \n" +
+                //     "user_pref(\"network.proxy.ssl_port\", " + PersonData.ProxyPort + "); \n" +
+                //     "user_pref(\"network.proxy.backup.ssl\", \"" + PersonData.ProxyIP + "\"); \n" +
+                //     "user_pref(\"network.proxy.backup.ssl_port\", " + PersonData.ProxyPort + "); \n" +
+                //     "user_pref(\"network.proxy.ftp\", \"" + PersonData.ProxyIP + "\"); \n" +
+                //     "user_pref(\"network.proxy.ftp_port\", " + PersonData.ProxyPort + "); \n" +
+                //     "user_pref(\"network.proxy.backup.ftp\", \"" + PersonData.ProxyIP + "\"); \n" +
+                //     "user_pref(\"network.proxy.backup.ftp_port\", " + PersonData.ProxyPort + "); \n" +
+                //     "user_pref(\"network.proxy.socks\", \"" + PersonData.ProxyIP + "\"); \n" +
+                //     "user_pref(\"network.proxy.socks_port\", " + PersonData.ProxyPort + "); \n" +
+                //     "user_pref(\"network.proxy.backup.socks\", \"" + PersonData.ProxyIP + "\"); \n" +
+                //     "user_pref(\"network.proxy.backup.socks_port\", " + PersonData.ProxyPort + ");";
+            }
+            File.WriteAllLines(prefs, fileTextLines.ToArray());
+            //if (outerprocess)
+            //{
+                var exePath =outerprocess ? AppDomain.CurrentDomain.BaseDirectory + "\\firefox-sdk\\bin\\firefox.exe" : "firefox.exe";
+                exePath = exePath.Replace("\\\\", "\\");
+                Process process = new Process();
+                process.StartInfo.FileName = exePath;
+                process.StartInfo.Arguments = args;
+                process.StartInfo.UseShellExecute = true;
+                process.Start();
+                //if (projname != "")
+                //{
+                //    await Task.Delay(500); // <-- ugly hack
+                //    SetWindowText(process.MainWindowHandle, projname);
+                //}
+           // }
         }
         #endregion
     }

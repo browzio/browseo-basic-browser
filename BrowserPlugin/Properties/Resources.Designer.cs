@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace BrowserPlugin.Properties
+namespace BrowserPlugin2.Properties
 {
 
 

@@ -34,6 +34,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Browser.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\BrowserAndFeatures\bin\x86\Debug\Browser.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Organiser.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\BrowserAndFeatures\bin\x86\Debug\Organiser.Common.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -51,12 +59,6 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsFormsIntegration" />
-    <Reference Include="XulFx">
-      <HintPath>..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\bin\Debug\XulFx.dll</HintPath>
-    </Reference>
-    <Reference Include="XulFx.Windows.Forms">
-      <HintPath>..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\bin\Debug\XulFx.Windows.Forms.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -76,12 +78,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Controls\FFXulBrowserControl.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="Controls\FFXulBrowserControl.Designer.cs">
-      <DependentUpon>FFXulBrowserControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\FFXulBrowserUserControl.xaml.cs">
       <DependentUpon>FFXulBrowserUserControl.xaml</DependentUpon>
@@ -119,16 +115,19 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Browser.Common\Browser.Common.csproj">
-      <Project>{c6134f4b-6ab7-4969-9b28-044c473247dc}</Project>
-      <Name>Browser.Common</Name>
+    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
+      <Project>{f8b2ddd8-df68-4649-a477-092232a34f60}</Project>
+      <Name>BrowseoFX.WPF</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
-      <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
-      <Name>Organiser.Common</Name>
+    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\XulFx.Wpf\XulFx.Wpf.csproj">
+      <Project>{10f8b93a-db19-4182-833b-1488bdc12e6f}</Project>
+      <Name>XulFx.Wpf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\XulFx\XulFx.csproj">
+      <Project>{4ba81c79-e01b-47ff-bb34-155a55bd85c6}</Project>
+      <Name>XulFx</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

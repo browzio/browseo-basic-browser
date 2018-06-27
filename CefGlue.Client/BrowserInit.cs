@@ -284,7 +284,7 @@ public class BrowserInit
                 if (exitCode != -1) return;
 
                 var exePath = AppDomain.CurrentDomain.BaseDirectory;
-                if(!limitless) exePath  = exePath + "\\BrowserAndFeatures.exe";
+                if(!limitless) exePath  = exePath + "\\BrowserModules.exe";
                 else exePath = exePath + "\\Browser.Adapter.exe";
                 exePath = exePath.Replace("\\\\", "\\");
 
@@ -301,8 +301,8 @@ public class BrowserInit
                     // UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2556.0 Safari/537.36",
                     // UserAgent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.86 Safari/537.36",
                     UserAgent = BrowserSettimgs.UserAgentChrome,
-                    //  RemoteDebuggingPort=123321,
-                    NoSandbox = false,
+                            //  RemoteDebuggingPort=123321,
+                            NoSandbox = false,
                     ///BackgroundColor = new CefColor(1,11,23,122)
                     LogSeverity = CefLogSeverity.Disable,
 
@@ -330,12 +330,12 @@ public class BrowserInit
 
                 Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_BrowserStart);
 
-                try
-                {
-                    Application.EnableVisualStyles();
-                    Application.SetCompatibleTextRenderingDefault(false);
-                }
-                catch { }
+                //try
+                //{
+                //    Application.EnableVisualStyles();
+                //    Application.SetCompatibleTextRenderingDefault(false);
+                //}
+                //catch { }
 #if DEBUG
                 int iiiiiiiiii = 0;
 #else
@@ -509,6 +509,8 @@ public class BrowserInit
                 GloableProfData.PData.WebAddress = webAddress;
                 GloableProfData.PData.Zip = zip; 
             }
+
+            MyFilesDatabase.SetUpImacroProfileInfo();
         }
 
 

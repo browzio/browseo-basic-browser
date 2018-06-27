@@ -61,5 +61,15 @@ namespace Xilium.CefGlue.Client
         protected override void OnScrollOffsetChanged(CefBrowser browser, double x, double y)
         {
         }
+
+        protected override CefAccessibilityHandler GetAccessibilityHandler()
+        {
+            return null;
+        }
+
+        protected override void OnImeCompositionRangeChanged(CefBrowser browser, CefRange selectedRange, CefRectangle[] characterBounds)
+        {
+
+        }
     }
 }

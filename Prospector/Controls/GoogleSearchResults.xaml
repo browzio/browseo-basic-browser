@@ -90,7 +90,8 @@
                         </StackPanel>
 
                         <TextBlock FontWeight="Medium"
-                                    Grid.Row="5">
+                                   Grid.Row="5"
+                                   Visibility="{Binding DwExtras}">
                             <Run Text="Keword Appearances On Page: " />
                             <Run Text="{Binding TimesKwFound}" />
                         </TextBlock>
@@ -103,7 +104,10 @@
                                    TextWrapping="Wrap"
                                    Foreground="Black" />
 
-                        <Expander ExpandDirection="Down" IsExpanded="True" Header="Social Stats"
+                        <Expander ExpandDirection="Down"
+                                  IsExpanded="True"
+                                  Header="Social Stats"
+                                  Visibility="{Binding DwExtras}"
                                   Grid.Row="7">
                             <commonControls:SocialStatsUserControl />
                         </Expander>
@@ -133,60 +137,81 @@
                         </MenuItem.InputBindings>
                     </MenuItem>
 
-                    <Separator Margin="-30,0,0,0" />
-                    <MenuItem Header="Facebook Order By Shares">
+                    <!--<MenuItem Header="View In Tor">
+                        <MenuItem.InputBindings>
+                            <MouseBinding MouseAction="LeftClick"
+                                          Command="{Binding SendToBrowser}"
+                                          CommandParameter="BROWSERTOR" />
+                        </MenuItem.InputBindings>
+                    </MenuItem>-->
+
+                    <Separator Margin="-30,0,0,0"
+                               Visibility="{Binding DwExtras}" />
+                    <MenuItem Header="Facebook Order By Shares"
+                              Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBSHARES" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="Facebook Order By Likes">
+                    <MenuItem Header="Facebook Order By Likes"
+                              Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBLIKES" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="Facebook Order By Comments">
+                    <MenuItem Header="Facebook Order By Comments"
+                              Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBCOMMENTS" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="Google+ Order By Plus Ones">
+                    <MenuItem Header="Google+ Order By Plus Ones"
+                              Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_GPLUSONES" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="Pinterest Order By Pins">
+                    <MenuItem Header="Pinterest Order By Pins"
+                              Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_PINTERESTPINS" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="Stumble Order By Views">
+                    <MenuItem Header="Stumble Order By Views"
+                              Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_STUMBLEVIEWS" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="LinkedIn Order By Count">
+                    <MenuItem Header="LinkedIn Order By Count"
+                              Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_LINKEDINCOUNT" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="Buffer Order By Shares">
+                    <MenuItem Header="Buffer Order By Shares"
+                              Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_BUFFERSHARES" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="Reddit Order By Ups">
+                    <MenuItem Header="Reddit Order By Ups"
+                              Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_REDDITUPS" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="Reddit Order By Score">
+                    <MenuItem Header="Reddit Order By Score"
+                              Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_REDDITSCORE" />
                         </MenuItem.InputBindings>
                     </MenuItem>
 
-                    <Separator Margin="-30,0,0,0" />
-                    <MenuItem Header="Order By Keywords Found">
+                    <Separator Margin="-30,0,0,0"
+                               Visibility="{Binding DwExtras}" />
+                    <MenuItem Header="Order By Keywords Found"
+                              Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_KEYWORDFOUND" />
                         </MenuItem.InputBindings>

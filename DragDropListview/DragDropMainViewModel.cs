@@ -43,8 +43,7 @@ namespace DragDropListview
 
         public event Action<int> OnHasReminders = delegate { };//int, amount of reminders     
         public event Action<string> OnDoubleClickedSite = delegate { };//string, site to open
-        public event Action<string[]> OnSelsectedLauncAll = delegate { };//string, site to open          
-
+        public event Action<string[]> OnSelsectedLauncAll = delegate { };//string, site to open
 
         public List<Reminder> Reminders { get; set; }
         public ObservableCollection<Reminder> RemindersByDate { get; set; }
@@ -136,6 +135,8 @@ namespace DragDropListview
             }
         }
 
+        public bool FinishedLoadingInstance { get; set; }
+
         public static int LastSelectedIndex { get; set; }
 
         //Thread saveThread;
@@ -164,6 +165,7 @@ namespace DragDropListview
                         instance.FillImportsList();
                         instance.FillSessionListFromFile();
                         instance.CheckReminders();
+                        instance.FinishedLoadingInstance = true;
                     }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
                 }
                 return instance;

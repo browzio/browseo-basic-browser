@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Permissions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web;
 using System.Windows;
 
 namespace BrowserAndFeatures
@@ -17,16 +18,29 @@ namespace BrowserAndFeatures
     [SecurityPermission(SecurityAction.Demand, Flags = SecurityPermissionFlag.ControlAppDomain)]
     public partial class App : Application
     {
+        bool debug = true;
         public static bool browserinit = true;
         protected override void OnStartup(StartupEventArgs e)
         {
-#if DEBUG
-            browserinit = false;
-            FeatureCallage.SetPersonData();
-#else
+            System.Windows.Forms.Application.EnableVisualStyles();
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
 
-            this.Shutdown();
-#endif
+            //var encoded = HttpUtility.UrlEncode(@"C:\Users\eli\Desktop\move\Macros\Macro Scripts Guy\Macro Club Scripts nsiprefs update\Macro Club Scripts\Tumblr\Tumblr Follow Top.js");
+            //var encoded2 = Uri.EscapeDataString(@"C:\Users\eli\Desktop\move\Macros\Macro Scripts Guy\Macro Club Scripts nsiprefs update\Macro Club Scripts\Tumblr\Tumblr Follow Top.js");
+
+
+
+
+            if (debug) {
+                browserinit = false;
+                FeatureCallage.SetPersonData();
+            }
+            else
+            {
+                this.Shutdown();
+            }
+
+
 
 
 

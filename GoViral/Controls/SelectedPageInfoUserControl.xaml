@@ -123,6 +123,11 @@
                         <TextBlock Text="Likes:" />
                         <TextBlock Text="{Binding likes.summary.total_count}" />
                     </StackPanel>
+                    <controls:SocialShareButtonsView Margin="5" 
+                                                     Name="socialShareButtons"
+                                                     OnClickedShareButton="SocialShareButtonsView_OnClickedShareButton"
+                                                     Loaded="socialShareButtons_Loaded" >
+                    </controls:SocialShareButtonsView>
                     <Button Content="Add To Sorter" Name="cbSync" Click="cbSync_Click" Margin="5" HorizontalAlignment="Left" Width="100">
                         <Button.Tag>
                             <MultiBinding Converter="{StaticResource idtolinkconv}" UpdateSourceTrigger="PropertyChanged">
@@ -518,7 +523,7 @@
                                             <Image.ContextMenu>
                                                 <ContextMenu>
                                                     <MenuItem Name="Copy" Header="Copy Link" Tag="{Binding permalink_url}" Click="miVids_Click" />
-                                                    <MenuItem Name="Download" Header="Download Video" Tag="{Binding source}" Click="miVids_Click" />
+                                                    <!--<MenuItem Name="Download" Header="Download Video" Tag="{Binding source}" Click="miVids_Click" />-->
                                                     <Separator Margin="-30,0,0,0" />
                                                     <MenuItem Header="Order By Likes" Click="MenuItem_Click" Name="ORDERVIDS_LIKES" />
                                                     <MenuItem Header="Order By Comments" Click="MenuItem_Click" Name="OORDERVIDS_COMMENTS" />
@@ -577,13 +582,17 @@
                     <Expander.Header>
                         <TextBlock Text="Posts" Foreground="#ffce44" />
                     </Expander.Header>
-                    <StackPanel Name="spSelectedFBDataPosts" PreviewMouseWheel="spSelectedFBData_PreviewMouseWheel">
-                        <ListView ItemsSource="{Binding SelectedFolder.SelectedPageFBGraphData.posts.data}" 
-                              ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
-                              ItemTemplate="{StaticResource ListviewFeedOrPostsItemTemplate}"
-                              ContextMenu="{StaticResource CMLVFBData}"
-                              Name="lvPosts"
-                              BorderThickness="0,0,0,0" />
+                    <StackPanel Name="spSelectedFBDataPosts"
+                                PreviewMouseWheel="spSelectedFBData_PreviewMouseWheel">
+
+                        <ListView ItemsSource="{Binding SelectedFolder.SelectedPageFBGraphData.posts.data}"
+                                  ItemContainerStyle="{StaticResource MetroListBoxItemStyle}"
+                                  ItemTemplate="{StaticResource ListviewFeedOrPostsItemTemplate}"
+                                  ContextMenu="{StaticResource CMLVFBData}"
+                                  Name="lvPosts"
+                                  BorderThickness="0,0,0,0">
+                        </ListView>
+
                     </StackPanel>
                 </Expander>
                 

@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BrowserAndFeatures</RootNamespace>
-    <AssemblyName>BrowserAndFeatures</AssemblyName>
+    <AssemblyName>BrowserModules</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -64,9 +64,22 @@
     <Reference Include="CookComputing.XmlRpcV2">
       <HintPath>..\WordPressSharp\packages\xmlrpcnet.3.0.0.266\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DwayneNeed, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Downloads\MicrosoftDwayneNeed\sourceCode\sourceCode\Microsoft.DwayneNeed\Microsoft.DwayneNeed\bin\Release\Microsoft.DwayneNeed.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DwayneNeed.Win32, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Downloads\MicrosoftDwayneNeed\sourceCode\sourceCode\Microsoft.DwayneNeed\Microsoft.DwayneNeed\bin\Release\Microsoft.DwayneNeed.Win32.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -79,6 +92,14 @@
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="XulFx, Version=52.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd2\vmas-xulfx-a340969180cd\XulFx.Wpf\bin\x86\Release\XulFx.dll</HintPath>
+    </Reference>
+    <Reference Include="XulFx.Wpf, Version=52.0.0.0, Culture=neutral, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd2\vmas-xulfx-a340969180cd\XulFx.Wpf\bin\x86\Release\XulFx.Wpf.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -123,6 +144,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -133,11 +155,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
+      <Project>{f8b2ddd8-df68-4649-a477-092232a34f60}</Project>
+      <Name>BrowseoFX.WPF</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
       <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
       <Name>CefGlue.WindowsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
+    <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue\CefGlue.csproj">
       <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
       <Name>CefGlue</Name>
     </ProjectReference>
@@ -149,13 +175,17 @@
       <Project>{09b014dc-bfc6-4e41-a7e8-c6b8c285758d}</Project>
       <Name>AnyProjFFProcess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Browmium.WPF\Browmium.WPF.csproj">
+      <Project>{984aa90d-4b3c-47a1-adb7-33d6fe14996b}</Project>
+      <Name>Browmium.WPF</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BrowseoFX.CMD\BrowseoFX.CMD.csproj">
+      <Project>{ca877f0e-24ee-4c3a-8f6c-95571e4807c6}</Project>
+      <Name>BrowseoFX.CMD</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Browser.Common\Browser.Common.csproj">
       <Project>{c6134f4b-6ab7-4969-9b28-044c473247dc}</Project>
       <Name>Browser.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">
-      <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>
-      <Name>CefGlue.Client</Name>
     </ProjectReference>
     <ProjectReference Include="..\CrawlerContracts\CrawlerContracts.csproj">
       <Project>{3749fa3f-e42d-4e28-a77c-68fe06dcd8d2}</Project>
@@ -224,18 +254,14 @@
       <Project>{9f8c4c2c-6d6b-4869-abcc-3947111ead18}</Project>
       <Name>zFirefoxBrowser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\zFirefoxXulBrowser\zFirefoxXulBrowser.csproj">
-      <Project>{d472a10b-8e4e-4ee9-ae75-46a4d215d818}</Project>
-      <Name>zFirefoxXulBrowser</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="browseo %281%29.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>call "$(DevEnvDir)..\tools\vsvars32.bat"
-editbin /LARGEADDRESSAWARE "C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\BrowserPlugin\bin\x86\Release\BrowserAndFeatures.exe"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

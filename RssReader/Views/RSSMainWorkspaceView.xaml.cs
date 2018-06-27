@@ -20,6 +20,7 @@ namespace RssReader.Views
     /// </summary>
     public partial class RSSMainWorkspaceView : UserControl
     {
+
         public RSSMainWorkspaceView()
         {
             InitializeComponent();

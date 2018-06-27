@@ -104,6 +104,8 @@ namespace CrawlerContracts
             Plugin.OnReportSerializedResult += Plugin_OnReportSerializedResult;
         }
 
+
+        [STAThread]
         public void InitializeCefWithCachePath(string path)
         {
             Plugin.InitializeCefWithCachePath(path);

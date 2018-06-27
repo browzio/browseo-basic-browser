@@ -10,6 +10,7 @@
              xmlns:commonConvs="clr-namespace:Organiser.Common.Converters;assembly=Organiser.Common"
              xmlns:commonClass="clr-namespace:Organiser.Common.Classes;assembly=Organiser.Common"
              xmlns:commonControls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
+             xmlns:interop="clr-namespace:Microsoft.DwayneNeed.Interop;assembly=Microsoft.DwayneNeed"
              mc:Ignorable="d"
              d:DesignWidth="640"
              d:DesignHeight="480">
@@ -111,7 +112,6 @@
 
                     <Button Name="openMacros"  
                             DockPanel.Dock="Right"
-                            Click="openMacros_Click"
                             ToolTip="Open Macros"
                             Margin="0,0,10,0"
                             Command="{Binding OpenMacrosCommand}"
@@ -391,10 +391,10 @@
                     </Button>
 
                     <Button Name="btnShare" 
-                     Click="BtnWithContextMenue_Click"
-                     DockPanel.Dock="Right"
-                     ToolTip="Share Site"
-                     Style="{DynamicResource browser_btn}">
+                            Click="BtnWithContextMenue_Click"
+                            DockPanel.Dock="Right"
+                            ToolTip="Share Site"
+                            Style="{DynamicResource browser_btn}">
                         <TextBlock Text="Share"  FontSize="10" Foreground="#c7c7c7" Margin="0,0,0,0"/>
                         <Button.ContextMenu>
                             <ContextMenu>
@@ -606,7 +606,7 @@
                                             <RowDefinition />
                                         </Grid.RowDefinitions>
                                         <TextBox IsReadOnly="True" BorderThickness="0" Text="{Binding Url}" />
-                                        <commonControls:SocialStatsUserControl Grid.Row="1" />
+                                        <commonControls:SocialStatsUserControl DataContext="{Binding SocialStatsReplys}" Grid.Row="1" />
                                     </Grid>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
@@ -667,8 +667,55 @@
                         </ListView>
                     </Grid>
                 </Expander>
-                <ContentPresenter Content="{Binding WebBrowserHost}" Name="host" Grid.Row="1"
-                                  HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+
+                <!--<interop:AirspaceDecorator AirspaceMode="Clip"
+                                           Name="AirspaceHost"
+                                           Grid.Row="1"
+                                           HorizontalAlignment="Stretch"
+                                           IsInputRedirectionEnabled="True"
+                                           IsOutputRedirectionEnabled="True">
+                    <interop:AirspaceDecorator.Background>
+                        <VisualBrush TileMode="Tile"
+                                     Viewport="0,0,150,150"
+                                     ViewportUnits="Absolute"
+                                     Opacity="0.05">
+                            <VisualBrush.Visual>
+                                <Border BorderBrush="#FFF0F0F0"
+                                        BorderThickness="4">
+                                    <StackPanel Orientation="Vertical">
+                                        <TextBlock FontWeight="Bold"
+                                                   Margin="0,0,0,10"
+                                                   FontSize="16"
+                                                   Text="Brow·SEO" />
+                                        <Image Source="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico"
+                                               Stretch="Fill"
+                                               Margin="0,0,0,-80"
+                                               Width="45"
+                                               Height="45" />
+                                    </StackPanel>
+                                </Border>
+                            </VisualBrush.Visual>
+                            <VisualBrush.Transform>
+                                <RotateTransform Angle="-22.5" />
+                            </VisualBrush.Transform>
+                        </VisualBrush>
+                    </interop:AirspaceDecorator.Background>-->
+                    <!--<Grid Name="host"
+                          Grid.Row="1"
+                          HorizontalAlignment="Stretch"
+                          Margin="-10,0,0,-10">
+                        --><!--<ContentPresenter 
+                              Grid.Row="1"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch" />--><!--
+                    </Grid>-->
+                    <ContentPresenter Content="{Binding WebBrowserHost}"
+                                      Name="host"
+                                      Grid.Row="1"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Stretch" />
+                <!--</interop:AirspaceDecorator>-->
+                
 
                 <Expander Name="flyOut" Grid.RowSpan="2"
                           ExpandDirection="Right"
@@ -763,7 +810,7 @@
                     </Grid>
                 </Expander>
 
-                <Expander Name="MacroflyOut" Grid.RowSpan="2"
+                <!--<Expander Name="MacroflyOut" Grid.RowSpan="2"
                           x:FieldModifier="public"
                           ExpandDirection="Right"
                           Style="{StaticResource AnimatedExpanderStyle}"
@@ -890,7 +937,7 @@
                             </StackPanel>
                     </StackPanel>
                     </Grid>
-                </Expander>
+                </Expander>-->
             </Grid>
         </DockPanel>
     </Grid>

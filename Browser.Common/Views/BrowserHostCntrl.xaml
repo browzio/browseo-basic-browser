@@ -165,7 +165,7 @@
                                 </Path>
                                 <Path Name="TabPath" Grid.ColumnSpan="2" VerticalAlignment="Top" Stretch="Fill" Stroke="#FF999999" Data="M39,96 C48.75,96 59.25,0 76,0 92.75,0 247,0 258,0 269,0 285.5,95.75 295,96" />
                                 <StackPanel Orientation="Horizontal" Margin="13 0 0 0" Grid.Column="1">
-                                    <Image Source="{Binding FaviconPath}" MaxHeight="17" MaxWidth="17" VerticalAlignment="Center" Grid.Column="1" HorizontalAlignment="Left" />
+                                    <!--<Image Source="{Binding FaviconPath}" MaxHeight="17" MaxWidth="17" VerticalAlignment="Center" Grid.Column="1" HorizontalAlignment="Left" />-->
                                     <TextBlock Text="{Binding Title}" MaxWidth="83" HorizontalAlignment="Left"  Margin="2 0 0 0" VerticalAlignment="Center"  />
                                 </StackPanel>
                                 <Button KeyboardNavigation.IsTabStop="False" Margin="100 0 10 0"  Grid.Column="2" Style="{StaticResource CloseButtonStyle}" Command="Close" ToolTip="Close"/>

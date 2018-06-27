@@ -20,44 +20,55 @@
             <converter:LinkCleanerConverter x:Key="linkCleanerconv" />
         </ResourceDictionary>
     </UserControl.Resources>
-    <Grid>
-        <Border BorderThickness="0,1,0,0" BorderBrush="#d0d0d0">
-            <controls:NonReloadingTabControl Name="tbCntrl">
-                <TabItem Header="Search" Style="{StaticResource gmailTabStyle}">
+    <Grid Background="WhiteSmoke">
+        <Border BorderThickness="0,0,0,0" BorderBrush="#d0d0d0">
+            <controls:NonReloadingTabControl Name="tbCntrl"
+                                             BorderThickness="0"
+                                             TabIndex="{Binding TCMainIndex, Mode=TwoWay,UpdateSourceTrigger=PropertyChanged}">
+                <!--<TabItem Header="Search" Style="{StaticResource gmailTabStyle}">
                     <localControls:SearchUserControl x:Name="ucSearch" x:FieldModifier="public" 
                                                      OnOpenInBrowserRequested="ucSearch_OnOpenInBrowserRequested" 
                                                      OnStoreForDominationRequested="ucSearch_OnStoreForDominationRequested"
                                                      OnOpenInBrowserForDownloadRequested="ucSearch_OnOpenInBrowserForDownloadRequested" />
-                </TabItem>
-                <TabItem Header="Post Sorter" Style="{StaticResource gmailTabStyle}">
-                    <localControls:SharedPostsUserControl x:Name="ucSyncedPosts" OnBrowserNavigateToUrl="UcSyncedPosts_OnBrowserNavigateToUrl" />
-                </TabItem>
+                </TabItem>-->
                 <TabItem Header="Dominator" Style="{StaticResource gmailTabStyle}">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
+                            <!--<ColumnDefinition Width="*" />-->
+                            <!--<ColumnDefinition Width="*" />-->
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="1*" MinHeight="300" />
+                            <RowDefinition Height="2*" />
+                        </Grid.RowDefinitions>
 
-                        <Expander ExpandDirection="Left" Background="WhiteSmoke">
+                        <!--<Expander ExpandDirection="Left" Background="WhiteSmoke" Padding="0,0,2,0">
                             <Expander.Header>
-                                <Grid>
+                                <Grid Background="WhiteSmoke">
                                     <Grid.LayoutTransform>
                                         <RotateTransform Angle="90" />
                                     </Grid.LayoutTransform>
                                     <TextBlock Text="Saved Pages" Foreground="#4c8cf5" />
                                 </Grid>
-                            </Expander.Header>
-                            <Grid>
+                            </Expander.Header>-->
+                        <Grid  Margin="0,0,2,0"
+                               Background="WhiteSmoke">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="*" />
                                 </Grid.RowDefinitions>
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal">
-                                        <Button Content="New Folder" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="NEWFOLDER" />
-                                        <Button Content="Add Links" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="MULTILINKS" />
+                                    <Button Content="Dominate From Search"
+                                            Margin="3"
+                                            Command="{Binding OnBtnClicked}"
+                                            CommandParameter="DominateAll" />
+                                    <Button Content="New Folder"
+                                            Margin="3"
+                                            Command="{Binding OnBtnClicked}"
+                                            CommandParameter="NEWFOLDER" />
+                                    <Button Content="Add Links" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="MULTILINKS" />
                                         <Button Content="De Dupe" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="DEDUPE" />
                                         <Button Content="Save" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="SAVE" />
                                     </StackPanel>
@@ -72,9 +83,10 @@
                                           ScrollViewer.CanContentScroll="False"
                                           PreviewMouseWheel="lbFolders_PreviewMouseWheel"
                                           Grid.Row="1"
+                                          Grid.IsSharedSizeScope="True"
                                           Name="lbFolders"
                                           MinWidth="150"
-                                          MaxWidth="500"
+                                          MaxWidth="510"
                                           Background="WhiteSmoke"
                                           BorderThickness="0,0,0,0">
                                     <ListView.ItemContainerStyle>
@@ -133,9 +145,22 @@
                                     </ListView.ItemsPanel>
                                     <ListView.ItemTemplate>
                                         <DataTemplate>
-                                            <Expander ExpandDirection="Down" IsExpanded="{Binding IsEExpanded}">
+                                            <Expander ExpandDirection="Down" AllowDrop="True" Drop="Expander_Drop" IsExpanded="{Binding IsEExpanded}" Background="WhiteSmoke">
                                                 <Expander.Header>
-                                                    <TextBlock Text="{Binding FolderTitle}" Foreground="#1ba261" />
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition SharedSizeGroup="g1" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="{Binding FolderTitle}"
+                                                               Foreground="#1ba261"
+                                                               Margin="2"/>
+                                                    <TextBlock Text="{Binding ProjectsFolderName}"
+                                                               Grid.Column="1"
+                                                               HorizontalAlignment="Right"
+                                                               FontWeight="Medium"
+                                                               Margin="8,2,2,2"/>
+                                                </Grid>
                                                 </Expander.Header>
                                                 <ListView  ItemsSource="{Binding SavedLinksList}"
                                                            SelectedIndex="{Binding SISavedLinks, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -261,9 +286,9 @@
                                 </ListView>
                                 <!--</ScrollViewer>-->
                             </Grid>
-                        </Expander>
+                        <!--</Expander>-->
 
-                        <Grid Grid.Column="1">
+                        <!--<Grid Grid.Column="1" Name="grdBrowser" Background="WhiteSmoke">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
@@ -272,29 +297,86 @@
                                 <TextBlock Text="{Binding BrowserPreviewStatus}" VerticalAlignment="Center" DockPanel.Dock="Left" HorizontalAlignment="Left" MaxWidth="250" />
                                 <Button Content="Refresh User Token" DockPanel.Dock="Right" Width="150" Command="{Binding OnBtnClicked}" HorizontalAlignment="Right" CommandParameter="REFRESHTOKEN" />
                             </DockPanel>
-
-                            <ContentPresenter Grid.Row="1"
+                            <browseoFXControls:BaseBrowserControl Margin="-8,0,-10,-10" Padding="1" Grid.Row="1" x:Name="BFXBrowser" x:FieldModifier="public" />
+                            --><!--<ContentPresenter Grid.Row="1"
                               HorizontalAlignment="Stretch" 
                               VerticalAlignment="Stretch"
-                              Content="{Binding WebBrowserHost}" />
-                        </Grid>
+                              Content="{Binding WebBrowserHost}" />--><!--
+                        </Grid>-->
 
-                        <Expander ExpandDirection="Right" Grid.Column="2" Background="WhiteSmoke">
+                        <!--<Expander ExpandDirection="Right"
+                                  Grid.Column="1"
+                                  Background="WhiteSmoke"
+                                  Margin="0,0,0,0">
                             <Expander.Header>
-                                <Grid>
+                                <Grid Background="WhiteSmoke">
                                     <Grid.LayoutTransform>
                                         <RotateTransform Angle="90" />
                                     </Grid.LayoutTransform>
                                     <TextBlock Text="Page Info" Foreground="#4c8cf5" />
                                 </Grid>
-                            </Expander.Header>
-                            <Grid Background="WhiteSmoke">
+                            </Expander.Header>-->
+                        <Grid Background="WhiteSmoke"
+                              Grid.Row="1"
+                              Margin="0,0,0,0">
                                 <local:SelectedPageInfoUserControl x:Name="ucSelectedPageInfo" 
+                                                                   OnClickedSendSocialLink="ucSelectedPageInfo_OnClickedSendSocialLink"
                                                                    AddUrlToPostsSync="selectedPageInfoUC_AddUrlToPostsSync" 
                                                                    AddUrlForMulti="ucSelectedPageInfo_AddUrlForMulti" 
                                                                    OnNavigateToUrl="ucSelectedPageInfo_OnNavigateToUrl"/>
                             </Grid>
-                        </Expander>
+                        <!--</Expander>-->
+                    </Grid>
+                </TabItem>
+
+                <TabItem Header="Post Sorter"
+                         Style="{StaticResource gmailTabStyle}">
+                    <localControls:SharedPostsUserControl x:Name="ucSyncedPosts"
+                                                          OnBrowserNavigateToUrl="UcSyncedPosts_OnBrowserNavigateToUrl" />
+                </TabItem>
+
+                <TabItem Header="Collaborator"
+                         Style="{StaticResource gmailTabStyle}">
+                    <Grid DataContext="{Binding ColaboratorTabVM}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <UniformGrid Rows="1">
+                            <Button Content="un/Check all"
+                                    Command="{Binding OnCommandFromView}"
+                                    CommandParameter="CheckUncheckAll"
+                                    Margin="5"/>
+                            <Button Content="Load Checked"
+                                    Command="{Binding OnCommandFromView}"
+                                    CommandParameter="LoadCheckedIntoDominator"
+                                    Margin="5" />
+                            <Button Content="Import Projects"
+                                    ToolTip="Projects linked to here will share the dominator tab content."
+                                    Command="{Binding OnCommandFromView}"
+                                    CommandParameter="ImportProjects"
+                                    Margin="5" />
+                            <Button Content="Remove Checked"
+                                    Command="{Binding OnCommandFromView}"
+                                    CommandParameter="RemoveChecked"
+                                    Margin="5" />
+                            <!--<Button Content="Delete Checked" Margin="5" />-->
+                        </UniformGrid>
+
+                        <ListView Grid.Row="1"
+                                  ItemsSource="{Binding ImportedPrjects}"
+                                  BorderThickness="0"
+                                  Margin="5">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <CheckBox Content="{Binding Name}"
+                                                  IsChecked="{Binding IsChecked}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
                     </Grid>
                 </TabItem>
             </controls:NonReloadingTabControl>

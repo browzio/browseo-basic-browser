@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{05AC600C-F668-4BFA-8F8A-6DE63D73526F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>RssReader</RootNamespace>
+    <AssemblyName>RssReader</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controlls\LinksToRssUserControl.xaml.cs">
+      <DependentUpon>LinksToRssUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controlls\RssControl.xaml.cs">
+      <DependentUpon>RssControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controlls\RssTabbedControl.xaml.cs">
+      <DependentUpon>RssTabbedControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converter\FalseToVisConverter.cs" />
+    <Compile Include="Helpers\ArithmaticConverter.cs" />
+    <Compile Include="Helpers\booleanToVisible.cs" />
+    <Compile Include="Models\AvailableTabsAndLinks.cs" />
+    <Compile Include="Models\RSSFeedData.cs" />
+    <Compile Include="ViewModels\RSSFeedViewModel.cs" />
+    <Compile Include="ViewModels\RSSTabViewModel.cs" />
+    <Compile Include="Models\SavedPostedFeed.cs" />
+    <Compile Include="Mvvm\LinksToRssVM.cs" />
+    <Compile Include="ViewModels\RSSMainWorkspaceViewModel.cs" />
+    <Compile Include="Views\RSSFeedView.xaml.cs">
+      <DependentUpon>RSSFeedView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RSSFeedDataView.xaml.cs">
+      <DependentUpon>RSSFeedDataView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RSSMainWorkspaceView.xaml.cs">
+      <DependentUpon>RSSMainWorkspaceView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\RSSTabView.xaml.cs">
+      <DependentUpon>RSSTabView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\LinksToRssWindow.xaml.cs">
+      <DependentUpon>LinksToRssWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controlls\RssDisplayerControl.xaml.cs">
+      <DependentUpon>RssDisplayerControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controlls\RssListsControl.xaml.cs">
+      <DependentUpon>RssListsControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RssReaderMainViewModel.cs" />
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\RssList.cs" />
+    <Compile Include="Models\RssResult.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
+      <Name>CefGlue.WindowsForms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
+      <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
+      <Name>CefGlue</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">
+      <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>
+      <Name>CefGlue.Client</Name>
+      <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
+      <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
+      <Name>Organiser.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\CefGlue.Client\bin\Debug\Browseo.Client.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\HtmlAgilityPack.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\Organiser.Common\bin\Debug\Organiser.Common.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\PresentationCore.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\PresentationFramework.Aero.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\PresentationFramework.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.DataSetExtensions.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Drawing.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.ServiceModel.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Windows.Forms.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xaml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\WindowsBase.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\WindowsFormsIntegration.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\bin\Debug\Xilium.CefGlue.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\bin\Debug\Xilium.CefGlue.WindowsForms.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\Controlls\LinksToRssUserControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\Controlls\RssDisplayerControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\Controlls\RssListsControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\Controlls\RssTabbedControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\MainWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\Controlls\RssControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\Views\RSSFeedView.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\Views\RSSFeedDataView.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\Views\RSSMainWorkspaceView.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\Views\RSSTabView.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\Windows\LinksToRssWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\RssReader\obj\Debug\GeneratedInternalTypeHelper.g.cs" />
+  </ItemGroup>
+</Project>

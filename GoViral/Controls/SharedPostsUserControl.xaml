@@ -22,7 +22,11 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Clear all links" ToolTip="Clears all saved links in the projects" Command="{Binding OnBtnClick}" CommandParameter="ClearLinksAllProjects" Margin="4"  />
+            <Button Content="Clear all links"
+                    ToolTip="Clears all saved links in the projects"
+                    Command="{Binding OnBtnClick}"
+                    CommandParameter="ClearLinksAllProjects"
+                    Margin="4"/>
             <Button Content="Add Projects" Command="{Binding OnBtnClick}" CommandParameter="AddProject" Margin="4"  />
             <Button Content="Add Links" Command="{Binding OnBtnClick}" CommandParameter="AddLinks" Margin="4"  />
             <Button Content="Save" Command="{Binding OnBtnClick}" CommandParameter="Save" Margin="4" />
@@ -31,6 +35,7 @@
                 <Image Source="pack://application:,,,/Organiser.Common;component/Image/refresh.png"  ToolTip="Refresh" SnapsToDevicePixels="True" Stretch="Uniform" />
             </Button>
         </StackPanel>
+        
         <ListView Name="lvProjects"
                   Background="WhiteSmoke"
                   BorderThickness="0,0,0,0"
@@ -41,9 +46,65 @@
                   SelectedIndex="{Binding SISavedProjectsList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Expander Name="exProjects" ExpandDirection="Down" Background="Transparent" Expanded="exProjects_Expanded">
+                    <!--<Grid Name="grdProjects">-->
+                        <!--<Grid Height="88"
+                              Width="{Binding ElementName=exProjects, Path=ActualWidth}"
+                              MaxWidth="{Binding  Converter={StaticResource convElementSizeMath}, ConverterParameter=M-M5, Path=ActualWidth, ElementName=uc}"
+                              Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=DataContext.VisiblityDoesntHasLinksOption}">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding ProjectName}"
+                                       FontSize="16"
+                                       Grid.Column="0"
+                                       VerticalAlignment="Center"
+                                       HorizontalAlignment="Left"
+                                       Name="tbProjNameToo"
+                                       SizeChanged="tbProjName_SizeChanged"
+                                       Width="{Binding Width}" />
+
+                            <StackPanel Orientation="Horizontal"
+                                        Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ListView}}, Path=DataContext.VisiblityDoesntHasLinksOption}"
+                                        HorizontalAlignment="Right"
+                                        Grid.Column="1">
+                                <Button Cursor="Hand"
+                                        Width="76"
+                                        Height="76"
+                                        Style="{StaticResource browser_btn}"
+                                        Margin="3"
+                                        Command="{Binding OnBtnClick}"
+                                        CommandParameter="launchToSystemFirefox">
+
+                                    <Image Source="pack://application:,,,/Organiser.Common;component/Image/firefox_icon.png"
+                                           ToolTip="Launch In Firefox"
+                                           Width="64"
+                                           Height="64" />
+                                </Button>
+
+                                <Button Cursor="Hand"
+                                        Width="76"
+                                        Height="76"
+                                        Style="{StaticResource browser_btn}"
+                                        Margin="3"
+                                        Command="{Binding OnBtnClick}"
+                                        CommandParameter="launchToSystemChrome">
+
+                                    <Image Source="pack://application:,,,/Organiser.Common;component/Image/google_chrome_icon2.png"
+                                           ToolTip="Launch In Chrome"
+                                           Width="64"
+                                           Height="64" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>-->
+
+                        <Expander Name="exProjects"
+                              ExpandDirection="Down"
+                              Background="Transparent"
+                              Expanded="exProjects_Expanded">
                         <Expander.Header>
-                            <Grid Width="{Binding ElementName=exProjects, Path=ActualWidth}" MaxWidth="{Binding  Converter={StaticResource convElementSizeMath}, ConverterParameter=M-M60, Path=ActualWidth, ElementName=uc}">
+                            <Grid Width="{Binding ElementName=exProjects, Path=ActualWidth}"
+                                  MaxWidth="{Binding  Converter={StaticResource convElementSizeMath}, ConverterParameter=M-M70, Path=ActualWidth, ElementName=uc}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />
@@ -51,15 +112,36 @@
                                     <!--<ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="Auto" />-->
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding ProjectName}" Grid.Column="0" VerticalAlignment="Center" Name="tbProjName" SizeChanged="tbProjName_SizeChanged" Width="{Binding Width}" />
-                                <TextBlock Text="|" Grid.Column="1" Margin="3" FontSize="16" />
-                                <TextBlock Text="{Binding UrlsToSyndicateMessage}" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding ProjectName}"
+                                           Grid.Column="0"
+                                           VerticalAlignment="Center"
+                                           Name="tbProjName"
+                                           SizeChanged="tbProjName_SizeChanged"
+                                           Width="{Binding Width}" />
+                                <TextBlock Text="|"
+                                           Grid.Column="1"
+                                           Margin="3"
+                                           FontSize="16" />
+
+                                <StackPanel Orientation="Horizontal"
+                                            Grid.Column="2"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding UrlsToSyndicateMessage}" />
+
+                                    <TextBlock Text="To Syndicate"
+                                               Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.VisiblityHasLinksOption}" />
+                                </StackPanel>
                                 <!--<TextBlock Text="|" Grid.Column="3" Margin="3" FontSize="16"  />
                                 <TextBlock Text="{Binding IsSyncedMessage}" Grid.Column="4" HorizontalAlignment="Right" VerticalAlignment="Center" />-->
                             </Grid>
                         </Expander.Header>
-                        <Grid Name="grdProjSyndicates" Background="WhiteSmoke" PreviewMouseWheel="lvProjectSyndicates_PreviewMouseWheel">
+                        <Grid Name="grdProjSyndicates"
+                              Background="WhiteSmoke"
+                              PreviewMouseWheel="lvProjectSyndicates_PreviewMouseWheel">
                             <ListView Name="lvProjectSyndicates"
+                                      Loaded="lvProjectSyndicates_Loaded"
+                                      BorderThickness="0"
                                       Background="WhiteSmoke"
                                       ItemsSource="{Binding SyndicatedPostsList}"
                                       SelectedIndex="{Binding SISyndicatedPostsList, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
@@ -74,52 +156,115 @@
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
-                                            <CheckBox Content="Shared" 
-                                                      IsChecked="{Binding IsShared}" 
+                                            <CheckBox Content="Shared"
+                                                      Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.VisiblityHasLinksOption}"
+                                                      IsChecked="{Binding IsShared}"
                                                       Grid.Column="0"
                                                       VerticalAlignment="Center"
                                                       PreviewMouseUp="CheckBox_PreviewMouseUp_ChangeSI"
-                                                      Width="{Binding Converter={StaticResource convElementSizeMath}, ConverterParameter=M+M30, Path=ActualWidth, ElementName=tbProjName}" />
-                                            <Grid Grid.Column="1" >
+                                                      Width="{Binding Converter={StaticResource convElementSizeMath}, ConverterParameter=M+M40, Path=ActualWidth, ElementName=tbProjName}"/>
+                                            
+                                            <Grid Grid.Column="1">
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto" />
                                                     <RowDefinition Height="Auto" />
                                                 </Grid.RowDefinitions>
-                                                <TextBlock Text="{Binding PageName}" 
-                                                         Grid.Row="0"
-                                                         PreviewMouseUp="CheckBox_PreviewMouseUp_ChangeSI"
-                                                         PreviewMouseDown="Grid_PreviewMouseDown" />
+                                                <TextBlock Text="{Binding PageName}"
+                                                           Grid.Row="0"
+                                                           PreviewMouseUp="CheckBox_PreviewMouseUp_ChangeSI"
+                                                           PreviewMouseDown="Grid_PreviewMouseDown" />
                                                 <TextBox Text="{Binding Url}"
-                                                         IsReadOnly="True" 
+                                                         IsReadOnly="True"
                                                          Grid.Row="1"
                                                          Style="{StaticResource TextboxGray}"
                                                          PreviewMouseUp="CheckBox_PreviewMouseUp_ChangeSI"
                                                          PreviewMouseDown="Grid_PreviewMouseDown" />
                                             </Grid>
+                                            
+                                            <StackPanel Orientation="Horizontal"
+                                                        Visibility="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type UserControl}}, Path=DataContext.VisiblityDoesntHasLinksOption}"
+                                                        HorizontalAlignment="Right"
+                                                        Grid.Column="2">
+                                                <Button Cursor="Hand"
+                                                        Width="52"
+                                                        Height="52"
+                                                        Style="{StaticResource browser_btn}"
+                                                        Margin="3"
+                                                        Click="BtnWithContextMenue_Click">
+                                                    <Button.ContextMenu>
+                                                        <ContextMenu>
+                                                            <MenuItem Header="Open in installed"
+                                                                      Name="launchToSystemFirefox"
+                                                                      Click="miSyststemFFClick"/>
+
+                                                            <MenuItem Header="Open in 52"
+                                                                      Name="launchToSystemFirefox52"
+                                                                      Click="miSyststemFFClick" />
+                                                        </ContextMenu>
+                                                    </Button.ContextMenu>
+                                                    <Image Source="pack://application:,,,/Organiser.Common;component/Image/firefox_icon.png"
+                                                           ToolTip="Launch In Firefox"
+                                                           Width="40"
+                                                           Height="40" />
+                                                </Button>
+
+                                                <Button Cursor="Hand"
+                                                        Width="52"
+                                                        Height="52"
+                                                        Style="{StaticResource browser_btn}"
+                                                        Margin="3,3,0,3"
+                                                        PreviewMouseDown="Button_PreviewMouseDown"
+                                                        Name="launchToSystemChrome">
+
+                                                    <Image Source="pack://application:,,,/Organiser.Common;component/Image/google_chrome_icon2.png"
+                                                           ToolTip="Launch In Chrome"
+                                                           Width="40"
+                                                           Height="40" />
+                                                </Button>
+                                            </StackPanel> 
                                         </Grid>
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
                                 <ListView.ContextMenu>
                                     <ContextMenu>
-                                        <MenuItem Header="Launch In Project Browser Window" Command="{Binding OnCommandRaisedInView}" CommandParameter="OpenInProjBrowser" />
-                                        <MenuItem Header="Launch In Project Browser FF" Command="{Binding OnCommandRaisedInView}" CommandParameter="OpenInProjBrowserFF" />
+                                        <MenuItem Header="Launch In Project Browser Window"
+                                                  Command="{Binding OnCommandRaisedInView}"
+                                                  CommandParameter="OpenInProjBrowser" />
+                                        <MenuItem Header="Launch In Project Browser FF"
+                                                  Command="{Binding OnCommandRaisedInView}"
+                                                  CommandParameter="OpenInProjBrowserFF" />
                                     </ContextMenu>
                                 </ListView.ContextMenu>
                             </ListView>
                         </Grid>
                     </Expander>
+                    <!--</Grid>-->
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Edit" Command="{Binding OnBtnClick}" CommandParameter="CMEdit" />
+                    <MenuItem Header="Edit"
+                              Command="{Binding OnBtnClick}"
+                              CommandParameter="CMEdit" />
                     <Separator Margin="-30,0,0,0" />
-                    <MenuItem Header="Clear Links" Command="{Binding OnBtnClick}" CommandParameter="CMClear" />
-                    <MenuItem Header="Delete Folder" Command="{Binding OnBtnClick}" CommandParameter="CMDelete" />
+                    <MenuItem Header="Clear Links"
+                              Command="{Binding OnBtnClick}"
+                              CommandParameter="CMClear" />
+                    <MenuItem Header="Delete Folder"
+                              Command="{Binding OnBtnClick}"
+                              CommandParameter="CMDelete" />
+
+                    <!--<MenuItem Header="Delete"
+                              Visibility="{Binding VisiblityDoesntHasLinksOption}"
+                              Command="{Binding OnBtnClick}"
+                              CommandParameter="CMDelete" />-->
                 </ContextMenu>
             </ListView.ContextMenu>
-        </ListView>    
+        </ListView>
+
+       
     </Grid>
 </UserControl>

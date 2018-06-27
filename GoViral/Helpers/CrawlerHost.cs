@@ -45,7 +45,7 @@ namespace GoViral.Helpers
             HostToPluginContract.LoadPlugin(new PluginStartupInfo()
             {
                 FullAssemblyPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Crawler.dll"),
-                MainClass = "Crawler.Crawler",
+                MainClass = "Crawler.CrawlerFF",
                 Name = "BrowseoNinjaCrawler",
                 AssemblyName = "Crawler",
             });

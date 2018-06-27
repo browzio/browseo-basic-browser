@@ -31,7 +31,7 @@ namespace GoViral.Controls
         }
         public SharedPostsUserControl()
         {
-            InitializeComponent();  
+            InitializeComponent();
         }
 
         private void CheckBox_PreviewMouseUp_ChangeSI(object sender, MouseButtonEventArgs e)
@@ -109,6 +109,39 @@ namespace GoViral.Controls
             if (sv == null) return;
 
             sv.ScrollToVerticalOffset(sv.VerticalOffset - e.Delta);
+        }
+
+        private void Button_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ((sender as Button).DataContext as SyncedProjectData).RaiseOnCommandFromView((sender as Button).Name);
+        }
+
+        private void BtnWithContextMenue_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                (sender as Button).ContextMenu.IsEnabled = true;
+                (sender as Button).ContextMenu.PlacementTarget = (sender as Button);
+                (sender as Button).ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+                (sender as Button).ContextMenu.IsOpen = true;
+            }
+            catch { }
+        }
+
+        private void miSyststemFFClick(object sender, RoutedEventArgs e)
+        {
+            ((sender as MenuItem).DataContext as SyncedProjectData).RaiseOnCommandFromView((sender as MenuItem).Name);
+        }
+
+        private void lvProjectSyndicates_Loaded(object sender, RoutedEventArgs e)
+        {
+            var lvProjectSyndicates = sender as ListView;
+            if (lvProjectSyndicates == null) return;
+
+            if (ViewModel != null && ViewModel.typeOfSyncerPath == SyncedProjectsVM.TypeOfSystemBrowSERLauncher)
+            {
+                lvProjectSyndicates.ContextMenu = null;
+            }
         }
     }
 }

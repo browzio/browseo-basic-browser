@@ -41,8 +41,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Delimon\Delimon.Win32.IO\Delimon.Win32.IO.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Microsoft.DwayneNeed">
+      <HintPath>..\..\..\..\Downloads\MicrosoftDwayneNeed\sourceCode\sourceCode\Microsoft.DwayneNeed\Microsoft.DwayneNeed\bin\Debug\Microsoft.DwayneNeed.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DwayneNeed.Win32">
+      <HintPath>..\..\..\..\Downloads\MicrosoftDwayneNeed\sourceCode\sourceCode\Microsoft.DwayneNeed\Microsoft.DwayneNeed\bin\Release\Microsoft.DwayneNeed.Win32.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

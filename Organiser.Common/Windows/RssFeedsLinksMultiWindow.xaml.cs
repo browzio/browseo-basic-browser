@@ -30,14 +30,22 @@ namespace Organiser.Common.Windows
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             ButtonLeftClicked = true;
-            this.DialogResult = true;
+            try
+            {
+                this.DialogResult = true;
+            }
+            catch { }
             this.Close();
         }
 
         private void buttonRight_Click(object sender, RoutedEventArgs e)
         {
             ButtonRightClicked = true;
-            this.DialogResult = true;
+            try
+            {
+                this.DialogResult = true;
+            }
+            catch { }
             this.Close();
         }
     }

@@ -36,33 +36,40 @@ namespace Browser.Common.ViewModels
         {
             string param = obj as string;
             if (param == null) return;
-
-            switch (param)
+            try
             {
-                case "Custom":
-                    if (CustomeAgentText.IsNullOrEmpty()) return;
+                switch (param)
+                {
+                    case "Custom":
+                        if (CustomeAgentText.IsNullOrEmpty()) return;
 
-                    OnSelectedUserAgentChange(CustomeAgentText);
-                    break;
+                        OnSelectedUserAgentChange(CustomeAgentText);
+                        break;
 
-                case "FromList":
-                    foreach (var ua in UserAgentList)
-                    {
-                        if (ua.IsSelected)
+                    case "FromList":
+                        foreach (var ua in UserAgentList)
                         {
-                            OnSelectedUserAgentChange(ua.Agent);
-                            break;
+                            if (ua.IsSelected)
+                            {
+                                OnSelectedUserAgentChange(ua.Agent);
+                                break;
+                            }
                         }
-                    }
-                    break;
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
             }
         }
 
         public void SetUpFFAgents()
         {
+            //
+            UserAgentList.Add(new UserAgent() { Version = "Firefox 52", Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0" });
             UserAgentList.Add(new UserAgent() { Version = "Firefox 47 win10", Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0" });
             UserAgentList.Add(new UserAgent() { Version = "Firefox 47 win7", Agent = "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:47.0) Gecko/20100101 Firefox/47.0" });
             UserAgentList.Add(new UserAgent() { Version = "Firefox 45.0", Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0" });
@@ -100,6 +107,7 @@ namespace Browser.Common.ViewModels
 
         public void SetUpChromeAgents()
         {
+            UserAgentList.Add(new UserAgent() { Version = "Chrome 66 win10", Agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.170 Safari/537.36" });
             UserAgentList.Add(new UserAgent() { Version = "Chrome 56 win10", Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36" });
             UserAgentList.Add(new UserAgent() { Version = "Chrome 51 win10", Agent = "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36" });
             UserAgentList.Add(new UserAgent() { Version = "Chrome 51 win7", Agent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36" });

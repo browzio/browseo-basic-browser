@@ -65,8 +65,8 @@
       <HintPath>bin\x86\Debug\InputSimulator.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -128,13 +128,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+    <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
       <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
       <Name>CefGlue.WindowsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
+    <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue\CefGlue.csproj">
       <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
       <Name>CefGlue</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Browmium.WPF\Browmium.WPF.csproj">
+      <Project>{984aa90d-4b3c-47a1-adb7-33d6fe14996b}</Project>
+      <Name>Browmium.WPF</Name>
     </ProjectReference>
     <ProjectReference Include="..\Browser.Common\Browser.Common.csproj">
       <Project>{c6134f4b-6ab7-4969-9b28-044c473247dc}</Project>

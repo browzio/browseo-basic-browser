@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BrowseoFX_WPF.Core;
+using Organiser.Common.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +22,7 @@ namespace RssReader.Views
     /// </summary>
     public partial class RSSFeedView : UserControl
     {
+
         public RSSFeedView()
         {
             InitializeComponent();

@@ -24,11 +24,16 @@ namespace GoViral.Controls
     public partial class ProjectsWithBrowser : UserControl
     {
         ViewModels.GoViralVM ViewModel;
+
+
+        public event Action<string, string, string> OnClickedSendSocialLink;
+
         public ProjectsWithBrowser()
         {
             InitializeComponent();
 
             ViewModel = new ViewModels.GoViralVM();
+            //ViewModel.WebBrowserControler = BFXBrowser.BaseBrowser;
             DataContext = ViewModel;
         }
 
@@ -78,25 +83,29 @@ namespace GoViral.Controls
 
         private void NavigateToUrl(string url)
         {
-            if (tbCntrl.SelectedIndex != 2) tbCntrl.SelectedIndex = 2;
+            //if (tbCntrl.SelectedIndex != 2) tbCntrl.SelectedIndex = 2;
             if (url.Contains("/?ref=br_rs")) url = url.Replace("/?ref=br_rs", "");
 
-            string urltillId = url.Remove(url.LastIndexOf("/"));
-            string name = url.Substring(url.LastIndexOf("/") + 1);
-            if (url.Contains("-"))
+            if (url.Contains("facebook.com") && url.Contains("-"))
             {
-                string id = url.Substring(url.LastIndexOf("-") + 1);
-                long tryparseResult = 0;
-                if (Int64.TryParse(id, out tryparseResult))
+                string urltillId = url.Remove(url.LastIndexOf("/"));
+                string name = url.Substring(url.LastIndexOf("/") + 1);
+                if (name.Contains("-"))
                 {
-                    url = "https://www.facebook.com/" + id;
-                }
-                else
-                {
-                    url = "https://www.facebook.com/" + name;
+                    string id = name.Substring(name.LastIndexOf("-") + 1);
+                    //long tryparseResult = 0;
+                    //if (Int64.TryParse(id, out tryparseResult))
+                    //{
+                        url = "https://www.facebook.com/" + id;
+                    //}
+                    //else
+                    //{
+                    //    url = "https://www.facebook.com/" + name;
+                    //}
                 }
             }
-            ViewModel.WebBrowser.Navigate(url);
+            ViewModel.RaiseOnSelectedTabNavigate(url);
+            //ViewModel.WebBrowser.Navigate(url);
         }
 
 
@@ -162,7 +171,8 @@ namespace GoViral.Controls
 
         private void ucSearch_OnOpenInBrowserForDownloadRequested(string source)
         {
-            ViewModel.WebBrowser.GetBrowser().GetHost().StartDownload(source);
+            //BFXBrowser.BaseBrowser.StartDownload(source);
+            //ViewModel.WebBrowser.GetBrowser().GetHost().StartDownload(source);
             // (this.DataContext as ViewModels.GoViralVM).WebBrowser.Navigate(source);
         }
         #endregion
@@ -174,6 +184,133 @@ namespace GoViral.Controls
                 ucSyncedPosts.ViewModel = new ViewModels.SyncedProjectsVM(ViewModels.SyncedProjectsVM.TypeOfGoViral);
                 ucSyncedPosts.DataContext = ucSyncedPosts.ViewModel;
             }
+        }
+
+
+        private Action EmptyDelegate = delegate () { };
+        void updateLayouts()
+        {
+            UpdateLayout();
+            //try
+            //{
+            //    BaseBrowser.MainWebView.Widget.BaseWindow.Instance.Repaint(true);
+            //}
+            //catch { }
+
+            Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.Render, EmptyDelegate);
+        }
+
+        private void Expander_Expanded(object sender, RoutedEventArgs e)
+        {
+            updateLayouts();
+        }
+
+        private void Expander_Expanded_1(object sender, RoutedEventArgs e)
+        {
+            updateLayouts();
+        }
+
+        private void Expander_Collapsed(object sender, RoutedEventArgs e)
+        {
+            updateLayouts();
+        }
+
+        private void Expander_Collapsed_1(object sender, RoutedEventArgs e)
+        {
+            updateLayouts();
+        }
+
+        private void ucSelectedPageInfo_OnClickedSendSocialLink(string param, string url, string imgLink)
+        {
+            OnClickedSendSocialLink?.Invoke(param, url, imgLink);
+        }
+
+        private void Expander_Drop(object sender, DragEventArgs e)
+        {
+            //string link = "https://www.facebook.com/" + type + "/" + name + "-" + id;
+
+            if (e.Data.GetData("HTML Format") != null)
+            {
+                var currentFolder = (sender as Expander).DataContext as Models.Folder;
+                var htmlFormat = e.Data.GetData("HTML Format").ToString();
+                if (htmlFormat.Contains("SourceURL:https://www.facebook.com/search/groups/"))
+                {
+                    var urlSubstring = "<a href=\"";
+                    var titleSubstring = "\">";
+
+                    var url = e.Data.GetData("HTML Format").ToString();
+                    url = url.Substring(url.IndexOf(urlSubstring) + urlSubstring.Length);
+                    url = url.Remove(url.IndexOf("\""));
+                    url = url.Replace("?ref=br_rs", "");
+                    if (url.EndsWith("/")) url = url.Remove(url.Length - 1);
+
+                    var id = url.Substring(url.LastIndexOf("/") + 1);
+
+                    url = url.Remove(url.LastIndexOf("/") + 1);
+
+                    var title = e.Data.GetData("HTML Format").ToString();
+                    title = title.Substring(title.LastIndexOf(titleSubstring) + titleSubstring.Length);
+                    title = title.Remove(title.IndexOf("</a>"));
+                    title = title.Replace("&amp", "");
+
+
+                    //if (currentFolder.SelectedFolder == null) currentFolder.SavedLinksList = new System.Collections.ObjectModel.ObservableCollection<Models.ListOption>();
+                    currentFolder.SavedLinksList.Add(new Models.ListOption() { Name = title, Url = url + title + "-" + id });
+                }
+                else if(e.Data.GetData("Text") != null)
+                {
+                    var text = e.Data.GetData("Text").ToString();
+                    text = text.Replace("?ref=br_rs", "");
+                    text = text.Remove(text.LastIndexOf("/"));
+                    var id = text.Substring(text.LastIndexOf("/") + 1);
+                    if (id.Contains("-")) id = id.Substring(id.LastIndexOf("-"));
+                    id = id.Replace("-", "");
+
+                    if (htmlFormat.Contains("SourceURL:https://www.facebook.com/search/pages/"))
+                    {
+                        //pages
+                        currentFolder.SavedLinksList.Add(new Models.ListOption() { Name = id, Url = "https://www.facebook.com/pages/" + id + "-" + id });
+                    }
+                    else if (htmlFormat.Contains("SourceURL:https://www.facebook.com/search/str") && !htmlFormat.Contains("photos-keyword"))
+                    {
+
+                        //places
+                        currentFolder.SavedLinksList.Add(new Models.ListOption() { Name = id, Url = "https://www.facebook.com/places/" + id + "-" + id });
+                    }
+                    else if (htmlFormat.Contains("SourceURL:https://www.facebook.com/search/videos"))
+                    {
+                        //videos
+                        text = text.Replace("https://www.facebook.com/", "");
+                        text = text.Remove(text.IndexOf("/"));
+
+                        currentFolder.SavedLinksList.Add(new Models.ListOption() { Name = text, Url = "https://www.facebook.com/videos/" + text + "-" + id });
+                    }
+                    else if (htmlFormat.Contains("SourceURL:https://www.facebook.com/search/str") && htmlFormat.Contains("photos-keyword"))
+                    {
+                        //photos
+                        text = text.Replace("https://www.facebook.com/", "");
+                        text = text.Remove(text.IndexOf("/"));
+
+                        currentFolder.SavedLinksList.Add(new Models.ListOption() { Name = text, Url = "https://www.facebook.com/photos/" + text + "-" + id });
+                    }
+                    else if (htmlFormat.Contains("SourceURL:https://www.facebook.com/search/events/"))
+                    {
+                        //events
+                        currentFolder.SavedLinksList.Add(new Models.ListOption() { Name = id, Url = "https://www.facebook.com/events/" + id + "-" + id });
+                    }
+                    else
+                    {
+                        //pages
+                        text = e.Data.GetData("Text").ToString();
+                        text = text.Remove(text.LastIndexOf("/"));
+                        text = text.Substring(text.LastIndexOf("/") + 1);
+                        text = text.Replace("-", " ");
+                        text = text.Replace("-"+id, "");
+                        currentFolder.SavedLinksList.Add(new Models.ListOption() { Name = text, Url = "https://www.facebook.com/pages/" + text + "-" + id });
+                    }
+                }
+            }
+           // 
         }
     }
 }

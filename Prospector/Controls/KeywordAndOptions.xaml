@@ -93,7 +93,7 @@
                     <TextBlock Text="Either of these:" TextWrapping="Wrap" Width="60" VerticalAlignment="Top" />
                     <StackPanel Grid.Column="1">
                         <TextBox Text="{Binding SpecificKws}" />
-                        <TextBlock Text="(Coma seperated additional keywords to serch for)"  VerticalAlignment="Top" HorizontalAlignment="Center" />
+                        <TextBlock Text="(Comma seperated additional keywords to search for)"  VerticalAlignment="Top" HorizontalAlignment="Center" />
                     </StackPanel>
                 </Grid>
 
@@ -108,7 +108,7 @@
                            ToolTip="Enter the top level domain (TLD),&#x0a; for example instead of www.yahoo.com enter yahoo.com" />
                     <StackPanel Grid.Column="2">
                         <TextBox Text="{Binding SpecificSites}"  />
-                        <TextBlock Text="(Coma seperated sites to serch in)"  VerticalAlignment="Top" HorizontalAlignment="Center" />
+                        <TextBlock Text="(Comma separated sites to search in)"  VerticalAlignment="Top" HorizontalAlignment="Center" />
                     </StackPanel>
                 </Grid>
 
@@ -131,6 +131,11 @@
             <StackPanel Grid.Column="1" Grid.RowSpan="3" Margin="3" Visibility="{Binding Path=NotVisible_WebHose,Converter={StaticResource boolToVis}}">
                 <CheckBox Content="Use Proxy" IsChecked="{Binding UseProxy}" />
 
+                <CheckBox Content="Dark Web Api"
+                          IsChecked="{Binding UseDarkWebIsChecked}"
+                          Visibility="{Binding Path= Visible_DW,Converter={StaticResource boolToVis}}"
+                          Margin="2" />
+
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Max Results" VerticalAlignment="Center" />
                     <ComboBox ItemsSource="{Binding MaxPages}" 
@@ -140,7 +145,9 @@
             </StackPanel>
             <StackPanel Margin="7" Grid.Column="1" Grid.RowSpan="5" VerticalAlignment="Top" Visibility="{Binding Path= Visible_WebHose,Converter={StaticResource boolToVis}}">
                 <StackPanel>
-                    <CheckBox Content="KW In Title" IsChecked="{Binding KWinTitleIsChecked}" Margin="2" />
+                    <CheckBox Content="KW In Title"
+                              IsChecked="{Binding KWinTitleIsChecked}"
+                              Margin="2" />
                     <CheckBox Content="KW In Content" IsChecked="{Binding KWinContentIsChecked}" Margin="2" />
 
                     <StackPanel Margin="0,10,0,0">
@@ -326,17 +333,11 @@
             </Grid>
         </Grid>
 
-        <StackPanel IsEnabled="{Binding IsNotSerching}" Orientation="Horizontal" Grid.ColumnSpan="2" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Left"  Margin="5,10">
-            <Button Command="{Binding StartSearch}" Content="Search" Width="95"/>
-
-            <Button Command="{Binding Clear}" Content="Clear" Margin="10,0" Width="95"/>
-
-            <Button Command="{Binding Export}" Content="Export Results" Width="95"/>
-
-            <Button Command="{Binding SetMoz}" Content="Set Moz Keys" Margin="10,0" Width="95"/>
-
-            <Button Command="{Binding SetProxy}" Content="Set Proxy" Margin="0" Width="95"/>
-        </StackPanel>
+        <localControls:ButtonOptions Grid.ColumnSpan="2"
+                                     Grid.Row="2"
+                                     VerticalAlignment="Bottom"
+                                     HorizontalAlignment="Left"
+                                     Margin="5,10" />
 
         <localControls:GoogleSearchResults Grid.RowSpan="3" Grid.Column="2"  Margin="10,5,10,10"/>
 

@@ -1,0 +1,389 @@
+﻿<UserControl x:Class="BrowserAndFeatures2.FeatureCallage2"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:BrowserAndFeatures2"
+             xmlns:commonControlls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
+             xmlns:ffXulBrowser="clr-namespace:BrowseoFX_WPF.Controls;assembly=BrowseoFX.WPF"
+             SnapsToDevicePixels="True"
+             mc:Ignorable="d"
+             d:DesignHeight="900"
+             d:DesignWidth="1100">
+    <UserControl.Background>
+        <ImageBrush ImageSource="pack://application:,,,/Organiser.Common;component/Image/bg.png"
+                    TileMode="Tile"
+                    ViewportUnits="Absolute"
+                    Viewport="0,0,72,72" />
+    </UserControl.Background>
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="{x:Type TabItem}"
+                   x:Key="gmailTabStyle90">
+                <Setter Property="VerticalAlignment"
+                        Value="Bottom" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type TabItem}">
+                            <Grid Cursor="Hand"
+                                  Name="grdContent">
+                                <Border Name="Border"
+                                        Height="30"
+                                        Width="101"
+                                        Margin="6"
+                                        BorderBrush="White"
+                                        BorderThickness="1"
+                                        Background="WhiteSmoke"
+                                        CornerRadius="1">
+                                    <Border Name="Border2"
+                                            Height="26"
+                                            Width="95"
+                                            Margin="0,0,0,0"
+                                            BorderBrush="#e0e0e0"
+                                            Background="#f8f8f8"
+                                            BorderThickness="1"
+                                            CornerRadius="1">
+                                        <ContentPresenter x:Name="TitleContent"
+                                                          VerticalAlignment="Center"
+                                                          HorizontalAlignment="Center"
+                                                          ContentSource="Header"
+                                                          Margin="0,0,0,1"
+                                                          TextElement.FontSize="13"
+                                                          TextElement.Foreground="Black">
+                                        </ContentPresenter>
+                                    </Border>
+                                </Border>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected"
+                                         Value="True">
+                                    <Setter TargetName="Border"
+                                            Property="Background"
+                                            Value="#5ea9f5" />
+                                    <Setter TargetName="Border"
+                                            Property="BorderThickness"
+                                            Value="1" />
+                                    <Setter TargetName="Border2"
+                                            Property="BorderBrush"
+                                            Value="#5ea9f5" />
+
+                                    <Setter TargetName="Border2"
+                                            Property="Background"
+                                            Value="#FF389BFF" />
+                                    <Setter TargetName="Border2"
+                                            Property="BorderThickness"
+                                            Value="1" />
+                                    <Setter TargetName="Border2"
+                                            Property="BorderBrush"
+                                            Value="#FF389BFF" />
+                                    <Setter TargetName="TitleContent"
+                                            Property="TextElement.Foreground"
+                                            Value="White" />
+                                </Trigger>
+                                <!--<Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Border" Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect BlurRadius="3" ShadowDepth="0" Color="LightGray" Direction="0" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>-->
+                                <MultiTrigger>
+                                    <MultiTrigger.Conditions>
+                                        <Condition Property="IsMouseOver"
+                                                   Value="True" />
+                                        <Condition Property="IsSelected"
+                                                   Value="False" />
+                                    </MultiTrigger.Conditions>
+                                    <Setter TargetName="Border"
+                                            Property="Effect">
+                                        <Setter.Value>
+                                            <DropShadowEffect BlurRadius="3"
+                                                              ShadowDepth="0"
+                                                              Color="LightGray"
+                                                              Direction="0" />
+                                        </Setter.Value>
+                                    </Setter>
+                                </MultiTrigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid>
+        <commonControlls:NonReloadingTabControl Name="tbControl"
+                                                BorderThickness="0"
+                                                Padding="0"
+                                                SelectionChanged="tbControl_SelectionChanged"
+                                                Background="Transparent">
+            <TabControl.Style>
+                <Style TargetType="{x:Type TabControl}">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type TabControl}">
+                                <Grid ClipToBounds="true"
+                                      SnapsToDevicePixels="true"
+                                      KeyboardNavigation.TabNavigation="Local">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition x:Name="ColumnDefinition0" />
+                                        <ColumnDefinition x:Name="ColumnDefinition1"
+                                                          Width="0" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition x:Name="RowDefinition0"
+                                                       Height="Auto" />
+                                        <RowDefinition x:Name="RowDefinition1"
+                                                       Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <ScrollViewer Grid.Column="0"
+                                                  Grid.Row="0"
+                                                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                                                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                                  Panel.ZIndex="3">
+                                        <TabPanel x:Name="HeaderPanel"
+                                                  Grid.Column="0"
+                                                  IsItemsHost="true"
+                                                  Margin="0,0,0,-2"
+                                                  Grid.Row="0"
+                                                  KeyboardNavigation.TabIndex="1" />
+                                    </ScrollViewer>
+                                    <Border x:Name="ContentPanel"
+                                            BorderThickness="0,1,0,0"
+                                            Grid.Column="0"
+                                            Panel.ZIndex="0"
+                                            KeyboardNavigation.DirectionalNavigation="Contained"
+                                            Grid.Row="1"
+                                            KeyboardNavigation.TabIndex="2"
+                                            KeyboardNavigation.TabNavigation="Local">
+                                        <ContentPresenter Margin="0,15,0,0"
+                                                          x:Name="PART_SelectedContentHost"
+                                                          ContentSource="SelectedContent"
+                                                          SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                        <!--<Grid Margin="0,15,0,0" x:Name="PART_SelectedContentHost"  SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>-->
+                                    </Border>
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="TabStripPlacement"
+                                             Value="Bottom">
+                                        <Setter Property="Grid.Row"
+                                                TargetName="HeaderPanel"
+                                                Value="1" />
+                                        <Setter Property="Grid.Row"
+                                                TargetName="ContentPanel"
+                                                Value="0" />
+                                        <Setter Property="Height"
+                                                TargetName="RowDefinition0"
+                                                Value="*" />
+                                        <Setter Property="Height"
+                                                TargetName="RowDefinition1"
+                                                Value="Auto" />
+                                        <Setter Property="Margin"
+                                                TargetName="HeaderPanel"
+                                                Value="2,0,2,2" />
+                                    </Trigger>
+                                    <Trigger Property="TabStripPlacement"
+                                             Value="Left">
+                                        <Setter Property="Grid.Row"
+                                                TargetName="HeaderPanel"
+                                                Value="0" />
+                                        <Setter Property="Grid.Row"
+                                                TargetName="ContentPanel"
+                                                Value="0" />
+                                        <Setter Property="Grid.Column"
+                                                TargetName="HeaderPanel"
+                                                Value="0" />
+                                        <Setter Property="Grid.Column"
+                                                TargetName="ContentPanel"
+                                                Value="1" />
+                                        <Setter Property="Width"
+                                                TargetName="ColumnDefinition0"
+                                                Value="Auto" />
+                                        <Setter Property="Width"
+                                                TargetName="ColumnDefinition1"
+                                                Value="*" />
+                                        <Setter Property="Height"
+                                                TargetName="RowDefinition0"
+                                                Value="*" />
+                                        <Setter Property="Height"
+                                                TargetName="RowDefinition1"
+                                                Value="0" />
+                                        <Setter Property="Margin"
+                                                TargetName="HeaderPanel"
+                                                Value="2,2,0,2" />
+                                    </Trigger>
+                                    <Trigger Property="TabStripPlacement"
+                                             Value="Right">
+                                        <Setter Property="Grid.Row"
+                                                TargetName="HeaderPanel"
+                                                Value="0" />
+                                        <Setter Property="Grid.Row"
+                                                TargetName="ContentPanel"
+                                                Value="0" />
+                                        <Setter Property="Grid.Column"
+                                                TargetName="HeaderPanel"
+                                                Value="1" />
+                                        <Setter Property="Grid.Column"
+                                                TargetName="ContentPanel"
+                                                Value="0" />
+                                        <Setter Property="Width"
+                                                TargetName="ColumnDefinition0"
+                                                Value="*" />
+                                        <Setter Property="Width"
+                                                TargetName="ColumnDefinition1"
+                                                Value="Auto" />
+                                        <Setter Property="Height"
+                                                TargetName="RowDefinition0"
+                                                Value="*" />
+                                        <Setter Property="Height"
+                                                TargetName="RowDefinition1"
+                                                Value="0" />
+                                        <Setter Property="Margin"
+                                                TargetName="HeaderPanel"
+                                                Value="0,2,2,2" />
+                                    </Trigger>
+                                    <Trigger Property="IsEnabled"
+                                             Value="false">
+                                        <Setter Property="Foreground"
+                                                Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TabControl.Style>
+            <TabItem Header="Firefox"
+                     Style="{StaticResource gmailTabStyle90}">
+                <ffXulBrowser:BrowserControl Name="ffXulBrowser" />
+            </TabItem>
+            <TabItem Header="Chrome"
+                     Style="{StaticResource gmailTabStyle90}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource tbLinkStyle}"
+                               Name="tbLinkChrome"
+                               Text="https://browz.io/chrome-lite"
+                               PreviewMouseUp="tbPreviewLink_PreviewMouseUp" />
+
+                    <Grid Grid.Row="1">
+                        <!--<Image Stretch="None" VerticalAlignment="Center" HorizontalAlignment="Center" Source="pack://application:,,,/Organiser.Common;component/Image/ScreenShot_Chrome.jpg" />-->
+                        <local:VideoTipPopup x:Name="ChromeVideoPopup"
+                                             Grid.Row="1" />
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Prospector"
+                     Style="{StaticResource gmailTabStyle90}"
+                     Name="tabProspector">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource tbLinkStyle}"
+                               Name="tbLinkProspector"
+                               Text="https://browz.io/prospector-lite"
+                               PreviewMouseUp="tbPreviewLink_PreviewMouseUp" />
+
+                    <Grid  IsEnabled="{Binding IsEnabledForFree}"
+                           Grid.Row="1">
+                        <!--<Image Stretch="None"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Source="pack://application:,,,/Organiser.Common;component/Image/ScreenShot_Prospector.jpg" />-->
+                        <local:VideoTipPopup x:Name="ProspectorVideoPopup"
+                                             Grid.Row="1" />
+                    </Grid>
+                </Grid>
+                <!--<nichCntrol:NichResearchControl />-->
+            </TabItem>
+            <TabItem Header="RSS"
+                     Style="{StaticResource gmailTabStyle90}"
+                     Name="tabrssControl">
+                <!--<rssReaders:RssTabbedControl Name="rssControl" />-->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource tbLinkStyle}"
+                               Name="tbLinkRss"
+                               Text="https://browz.io/rss-lite"
+                               PreviewMouseUp="tbPreviewLink_PreviewMouseUp" />
+
+                    <Grid  IsEnabled="{Binding IsEnabledForFree}"
+                           Grid.Row="1">
+                        <!--<Image Stretch="None"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Source="pack://application:,,,/Organiser.Common;component/Image/ScreenShot_RSS.jpg" />-->
+                        <local:VideoTipPopup x:Name="RSSVideoPopup"
+                                             Grid.Row="1" />
+                    </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="PublisHUB"
+                     Style="{StaticResource gmailTabStyle90}"
+                     Name="tabrsswisi">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource tbLinkStyle}"
+                               Name="tbPublishHub"
+                               Text="https://browz.io/publishub-lite"
+                               PreviewMouseUp="tbPreviewLink_PreviewMouseUp" />
+
+                    <Grid  IsEnabled="{Binding IsEnabledForFree}"
+                           Grid.Row="1">
+                        <!--<Image Stretch="None"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Source="pack://application:,,,/Organiser.Common;component/Image/ScreenShot_PublishHub.jpg" />-->
+                        <local:VideoTipPopup x:Name="PublishHUBVideoPopup"
+                                             Grid.Row="1" />
+                    </Grid>
+                </Grid>
+                <!--<wisi:WysiwigControl />-->
+                <!--<wisi:WysiwigControl Name="wysiwig" />-->
+            </TabItem>
+            <TabItem Header="BrowSEO IA"
+                     Style="{StaticResource gmailTabStyle90}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Style="{StaticResource tbLinkStyle}"
+                               Name="tbIA"
+                               Text="https://browz.io/ia-lite"
+                               PreviewMouseUp="tbPreviewLink_PreviewMouseUp" />
+
+                    <Grid  IsEnabled="{Binding IsEnabledForFree}"
+                           Grid.Row="1">
+                        <!--<Image Stretch="None"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Source="pack://application:,,,/Organiser.Common;component/Image/ScreenShot_IA.jpg" />-->
+                        <local:VideoTipPopup x:Name="IAVideoPopup"
+                                             Grid.Row="1" />
+                    </Grid>
+                </Grid>
+            </TabItem>
+        </commonControlls:NonReloadingTabControl>
+    </Grid>
+</UserControl>

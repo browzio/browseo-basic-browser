@@ -10,5 +10,6 @@ namespace Prospector.Models
     {
         public string Name { get; set; }
         public string Footprint { get; set; }
+        public string Type { get; set; }
     }
 }

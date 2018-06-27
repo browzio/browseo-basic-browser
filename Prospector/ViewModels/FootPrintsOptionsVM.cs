@@ -8,8 +8,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -18,6 +20,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using webhose;
+using webhoseio;
 
 namespace Prospector.ViewModels
 {
@@ -33,7 +36,8 @@ namespace Prospector.ViewModels
         public const int Link_Roundups = 4;
         public const int Custom = 5;
         public const int Webhose = 6;
-        public const int Saved = 7;
+        public const int DarkWeb = 7;
+        public const int Saved = 8;
 
         #region commands
         private ICommand startSearch;
@@ -88,6 +92,7 @@ namespace Prospector.ViewModels
             set { deleteSavedFootprint = value; }
         }
 
+        public ICommand OnCommandFromKODw { get; set; }
         #endregion
 
 
@@ -134,6 +139,14 @@ namespace Prospector.ViewModels
             set { listResults = value; }
         }
 
+        //DWGrdOptions
+        private ObservableCollection<DWQuerySelectableOptions> dWGrdOptions;
+        public ObservableCollection<DWQuerySelectableOptions> DWGrdOptions
+        {
+            get { return dWGrdOptions; }
+            set { dWGrdOptions = value; }
+        }
+
         private List<SearchResult> l_Blogs = new List<SearchResult>();
         private List<SearchResult> l_Forum = new List<SearchResult>();
         private List<SearchResult> l_Guest_Posts = new List<SearchResult>();
@@ -144,6 +157,7 @@ namespace Prospector.ViewModels
         private List<SearchResult> l_Custom = new List<SearchResult>();
         private List<SearchResult> l_Saved = new List<SearchResult>();
         private List<SearchResult> l_Webhose = new List<SearchResult>();
+        private List<SearchResult> l_DW = new List<SearchResult>();
 
         private ObservableCollection<int> maxPages;
         public ObservableCollection<int> MaxPages
@@ -247,6 +261,8 @@ namespace Prospector.ViewModels
                 Visible_savebtn = true;
                 Visible_WebHose = false;
                 NotVisible_WebHose = true;
+                Visible_DW = false;
+                DwExtras = Visibility.Visible;
                 switch (tCSelectedTabIndex)
                 {
                     case Blogs:
@@ -333,6 +349,7 @@ namespace Prospector.ViewModels
                         FootPrintString = "";
                         RBOrientation = Orientation.Vertical;
                         Visible_Custom = false;
+                        Visible_DW = true;
                         Visible_CommentSettings = false;
                         ListResults.Clear();
                         foreach (SearchResult result in l_Custom)
@@ -359,8 +376,8 @@ namespace Prospector.ViewModels
                         {
                             ListResults.Add(result);
                         }
-                        break;
-
+                        return;
+                        
                     case Webhose:
                         FootPrintString = "";
                         RBOrientation = Orientation.Horizontal;
@@ -376,16 +393,47 @@ namespace Prospector.ViewModels
                             ListResults.Add(result);
                         }
                         break;
+
+                    case DarkWeb:
+                        DwExtras = Visibility.Collapsed;
+                        CheckForTBPath();
+                        RaiseTextChangedDW();
+                        ListResults.Clear();
+                        foreach (SearchResult result in l_DW)
+                        {
+                            ListResults.Add(result);
+                        }
+                        break;
+
+                    default:
+                        break;
                 }
                 createTLDsList();
-                if (TCSelectedTabIndex != Saved)
                 setFootprintText("");
+                //if (TCSelectedTabIndex != Saved)
+                //setFootprintText("");
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("TCSelectedTabIndex"));
                 }
             }
         }
+
+        private void CheckForTBPath()
+        {
+            if (!TorPath.IsNullOrEmpty()) return;
+
+            Task.Run(() =>
+            {
+                var saveFolderTBPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Paths");
+                if (!Directory.Exists(saveFolderTBPath)) return;
+
+                var saveFileTBPath = Path.Combine(saveFolderTBPath, "TB");
+                if (!File.Exists(saveFileTBPath)) return;
+                TorPath = File.ReadAllText(saveFileTBPath);
+            });
+        }
+
 
         #region visible
         private bool visible_CommentSettings;
@@ -446,6 +494,20 @@ namespace Prospector.ViewModels
             }
         }
 
+        private bool Visible_dw;
+        public bool Visible_DW
+        {
+            get { return Visible_dw; }
+            set
+            {
+                Visible_dw = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Visible_DW"));
+                }
+            }
+        }
+
         //Visible_SavedFP
         private bool visible_SavedFP;
         public bool Visible_SavedFP
@@ -486,9 +548,13 @@ namespace Prospector.ViewModels
                 sISavedFP = value;
                 try
                 {
-                    if (value >= 0 && SavedFP.Count > 0)
+                    if (value == 0 && SavedFP.Count > 0)
                     {
-                        FootPrintString = SavedFP[value].Footprint;
+                        FootPrintString = SavedFP[0].Footprint;
+                    }
+                    else if (value >= 1 && SavedFP.Count > 0 && value-1 >0)
+                    {
+                        FootPrintString = SavedFP[value-1].Footprint;
                     }
                 }
                 catch { }
@@ -507,6 +573,7 @@ namespace Prospector.ViewModels
             {
                 var old = keyword;
                 keyword = value;
+                RaiseTextChangedDW();
                 setFootprintText(old);
                 if (PropertyChanged != null)
                 {
@@ -525,6 +592,21 @@ namespace Prospector.ViewModels
                 if (PropertyChanged != null)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("FootPrintString"));
+                }
+            }
+        }
+
+        //QueryStringDW
+        private string queryStringDW;
+        public string QueryStringDW
+        {
+            get { return queryStringDW; }
+            set
+            {
+                queryStringDW = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("QueryStringDW"));
                 }
             }
         }
@@ -687,6 +769,21 @@ namespace Prospector.ViewModels
             }
         }
 
+        //UseDarkWebIsChecked
+        private bool useDarkWebIsChecked;
+        public bool UseDarkWebIsChecked
+        {
+            get { return useDarkWebIsChecked; }
+            set
+            {
+                useDarkWebIsChecked = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("UseDarkWebIsChecked"));
+                }
+            }
+        }
+
         //KWinContentIsChecked
         private bool kWinContentIsChecked;
         public bool KWinContentIsChecked
@@ -741,6 +838,53 @@ namespace Prospector.ViewModels
             }
         }
 
+        //IsDWLive
+        private bool isDWLive;
+        public bool IsDWLive
+        {
+            get { return isDWLive; }
+            set
+            {
+                isDWLive = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("IsDWLive"));
+                }
+                RaiseTextChangedDW();
+            }
+        }
+
+        private Visibility dwExtras = Visibility.Visible;
+        public Visibility DwExtras
+        {
+            get { return dwExtras; }
+            set
+            {
+                dwExtras = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("DwExtras"));
+                }
+            }
+        }
+
+        //TorPath
+        private string torPath;
+        public string TorPath
+        {
+            get { return torPath; }
+            set
+            {
+                torPath = value;
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("TorPath"));
+                }
+            }
+        }
+
+        //TorSavePath
+
         private List<string> inProxyFileTextArr;
         string inFileText;
         int proxyIndex;
@@ -758,6 +902,8 @@ namespace Prospector.ViewModels
             SetMoz = new RelayCommand(OnSetMozClicked);
             RefreshSaved = new RelayCommand(OnRefreshSavewdFootprints);
             SetProxy = new RelayCommand(OnSetProxy);
+            OnCommandFromKODw = new RelayCommand(OnCommandFromKODw_Raised);
+
 
             WebsitesForBlogs = new ObservableCollection<Footprint>();
             Visible_Custom = true;
@@ -790,6 +936,9 @@ namespace Prospector.ViewModels
             addAllLangsForWebhose();
             CmbPerformanceScoresIndex = 0;
 
+            DWGrdOptions = new ObservableCollection<DWQuerySelectableOptions>();
+            CreateDWOptionsList();
+
             RBOrientation = Orientation.Vertical;
 
             IsNotSerching = true;
@@ -804,7 +953,50 @@ namespace Prospector.ViewModels
             //createSavedOptions();
         }
 
-       
+        private async void OnCommandFromKODw_Raised(object obj)
+        {
+            switch ((obj as string))
+            {
+                case "TorPath":
+                    using (System.Windows.Forms.OpenFileDialog openFileDialog = new System.Windows.Forms.OpenFileDialog())
+                    {
+                        // openFileDialog.InitialDirectory = @"C:\";
+                        openFileDialog.RestoreDirectory = true;
+
+                        System.Windows.Forms.DialogResult result = openFileDialog.ShowDialog();
+                        if (result == System.Windows.Forms.DialogResult.OK)
+                        {
+                            TorPath = openFileDialog.FileName;
+                        }
+                    }
+
+                    await Task.Run(()=> 
+                    {
+                        var saveFolderTBPath = Path.Combine(MyFilesDatabase.GetBaseDir(), "Paths");
+                        if (!Directory.Exists(saveFolderTBPath)) Directory.CreateDirectory(saveFolderTBPath);
+
+                        var saveFileTBPath = Path.Combine(saveFolderTBPath, "TB");
+                        File.WriteAllText(saveFileTBPath, TorPath);
+                    });
+                    break;
+                    
+
+                default:
+                    break;
+            }
+        }
+
+        private void CreateDWOptionsList()
+        {
+            DWGrdOptions.Add(new DWQuerySelectableOptions() { Type = "Site", Tooltip = "Limit the results to a specific onion site or sites." });
+            DWGrdOptions.Add(new DWQuerySelectableOptions() { Type = "Title", Tooltip = "A textual Boolean query describing the keywords that should (or shouldn’t) appear in the thread title." });
+            DWGrdOptions.Add(new DWQuerySelectableOptions() { Type = "External Links", Tooltip = "Search for pages that included links to another site. (note that you must escape the http:// part of the URL like so: http\\:\\/\\/)" });
+            DWGrdOptions.Add(new DWQuerySelectableOptions() { Type = "With Thread Title", Tooltip = "A textual Boolean query describing the keywords that should appear in the thread title." });
+            DWGrdOptions.Add(new DWQuerySelectableOptions() { Type = "Without Thread Title", Tooltip = "A textual Boolean query describing the keywords that shouldn’t appear in the thread title." });
+            DWGrdOptions.Add(new DWQuerySelectableOptions() { Type = "Thread Section Title", Tooltip = "A textual Boolean query describing the keywords that should (or shouldn’t) appear in the site’s section where the post was published" });
+            DWGrdOptions.Add(new DWQuerySelectableOptions() { Type = "Thread URL", Tooltip = "Get all the posts of a specific thread (note that you must escape the http:// part of the URL like so: http\\:\\/\\/)." });
+            //
+        }
 
         private void OnSetProxy(object param)
         {
@@ -1328,7 +1520,9 @@ namespace Prospector.ViewModels
                             string[] lineData = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
                             Application.Current.Dispatcher.Invoke((Action)delegate
                             {
-                                SavedFP.Add(new SavedFootprint() { Name = lineData[0], Footprint = lineData[1] });
+                                var sf = new SavedFootprint() { Name = lineData[0], Footprint = lineData[1] };
+                                if (lineData.Length >= 3) sf.Type = lineData[2];
+                                SavedFP.Add(sf);
                             });
                         }
                 }).Start();
@@ -1401,17 +1595,41 @@ namespace Prospector.ViewModels
                 FootPrintString = FootPrintString.Replace("%22", "\"");
         }
 
+        internal void RaiseTextChangedDW()
+        {
+            QueryStringDW = Keyword;
+            foreach (var option in DWGrdOptions)
+            {
+                foreach (var optionvalue in option.DWSelectedSiteOptions)
+                {
+                    if (optionvalue.Value.IsNullOrEmpty()) continue;
+
+                    QueryStringDW += " " + optionvalue.Type + ":" + optionvalue.Value;
+                }
+            }
+
+            if(IsDWLive) QueryStringDW += " is_live:true";
+        }
+
         private void search(object param)
         {
             Mouse.OverrideCursor = Cursors.Wait;
             IsNotSerching = false;
 
-            new Thread(() =>
+            new Thread( () =>
             {
                 try {
+                    #region darkweb
+                    if(TCSelectedTabIndex == FootPrintsOptionsVM.DarkWeb)
+                    {
+                        SearchDW(true,false,false);
+                        //   Console.WriteLine(output["DarkwebPosts"][0]["source"]["site"]);
+
+                    }
+                    #endregion
 
                     #region webhose
-                    if (TCSelectedTabIndex == FootPrintsOptionsVM.Webhose)
+                    else if (TCSelectedTabIndex == FootPrintsOptionsVM.Webhose)
                     {
                         WebhoseRequest clientRequest = new WebhoseRequest("d8010e66-8d57-4242-a2e1-22e2ad61a45f");
                         WebhoseQuery clientQuery = new WebhoseQuery();
@@ -1547,6 +1765,28 @@ namespace Prospector.ViewModels
                     #endregion
                     else
                     {
+                        if (TCSelectedTabIndex == FootPrintsOptionsVM.Saved)
+                        {
+                            if (SavedFP[SISavedFP].Type == "DARKWEB")
+                            {
+                                QueryStringDW = FootPrintString;
+                                SearchDW(false, true, false);
+                                IsNotSerching = true;
+                                Application.Current.Dispatcher.Invoke(() => { Mouse.OverrideCursor = null; });
+                                return;
+                            }
+                            //UseDarkWebIsChecked   Console.WriteLine(output["DarkwebPosts"][0]["source"]["site"]);
+
+                        }
+                        else if (TCSelectedTabIndex == FootPrintsOptionsVM.Custom && UseDarkWebIsChecked)
+                        {
+                            QueryStringDW = FootPrintString;
+                            SearchDW(false,false,true);
+                            IsNotSerching = true;
+                            Application.Current.Dispatcher.Invoke(() => { Mouse.OverrideCursor = null; });
+                            return;
+
+                        }
                         if (UseProxy && inProxyFileTextArr != null)
                         {
                             string[] pDetailes = inProxyFileTextArr[proxyIndex].Split(':');
@@ -1594,6 +1834,57 @@ namespace Prospector.ViewModels
                 IsNotSerching = true;
                 Application.Current.Dispatcher.Invoke(()=>{ Mouse.OverrideCursor = null; });
             }).Start();
+        }
+
+        private async void SearchDW(bool raiseTextChanged, bool addtosaved, bool addtocusto)
+        {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+           if(raiseTextChanged) RaiseTextChangedDW();
+
+            var client = new WebhoseClient(token: "d8010e66-8d57-4242-a2e1-22e2ad61a45f");
+            var query_params = new Dictionary<string, string>
+                            {
+                                {
+                                    "q",
+                                    QueryStringDW
+                                    //"tech site:onion.com title:titletech language:arabic published:>1525726800000 crawled:<1525467600000 is_live:true external_links:https://www.linkedin.com* site_type:news site_type:blogs thread.title:Blockchain thread.section_title:Bitcoin thread.url:http://fhacksnplmzxaaoo.onion/showthread.php thread.published:1525122000000"
+                                }
+                            };
+            var output = await client.QueryAsync("darkwebFilter", query_params);
+
+            //  Console.WriteLine(output["DarkwebPosts"][0]["text"]);
+            //  Console.WriteLine(output["DarkwebPosts"][0]["title"]);
+
+
+            // Get the next batch of posts
+
+            output = await output.GetNextAsync();
+            foreach (var post in output["DarkwebPosts"])
+            {
+                var description = post["text"].ToString();
+                if (description.Length > 500) description = description.Remove(500);
+                SearchResult sResult = new SearchResult()
+                {
+                    Title = post["title"].ToString(),
+                    Keyword = Keyword,
+                    Link = post["url"].ToString(),
+                    Description = description,
+                    SearchEngine = "Webhose",
+                    Published = post["thread"]["published"].ToString(),
+                    DwExtras = Visibility.Collapsed,
+                };
+
+                Application.Current.Dispatcher.Invoke((Action)delegate
+                {
+                    ListResults.Add(sResult);
+                    if (addtosaved)
+                        l_Saved.Add(sResult);
+                    else if (addtocusto)
+                        l_Custom.Add(sResult);
+                    else
+                        l_DW.Add(sResult);
+                });
+            }
         }
 
         private void sendLinkToBrowser(object obj)
@@ -1684,21 +1975,41 @@ namespace Prospector.ViewModels
                         break;
 
                     default:
-                        try
-                        {
-                            OnClickedSearch(ListResults[SIListResults].Link, commandParam == "BROWSERFF");
-                            Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToBrowser + " " + ListResults[SIListResults].Link);
-                        }
-                        catch
+                        if(commandParam == "BROWSERTOR")
                         {
                             try
                             {
-                                OnClickedSearch(ListResults[SIListResults - 1].Link, commandParam == "BROWSERFF");
-                                Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToBrowser + " " + ListResults[SIListResults - 1].Link);
+                                var exePath = TorPath;
+                                exePath = exePath.Replace("\\\\", "\\");
+
+                                var pTCPath = exePath.Replace("firefox.exe", @"TorBrowser\Data\Browser\") + GloableProfData.PData.ProjectName;
+
+                                Process process = new Process();
+                                process.StartInfo.FileName = exePath;
+                                process.StartInfo.Arguments = "-new-instance -allow-remote -new-tab -url \"" + ListResults[SIListResults].Link + "\"";
+                                process.StartInfo.UseShellExecute = true;
+                                process.Start();
+                            }
+                            catch { }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                OnClickedSearch(ListResults[SIListResults].Link, commandParam == "BROWSERFF");
+                                Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToBrowser + " " + ListResults[SIListResults].Link);
                             }
                             catch
                             {
-                                MessageBox.Show("Couldnt open link.");
+                                try
+                                {
+                                    OnClickedSearch(ListResults[SIListResults - 1].Link, commandParam == "BROWSERFF");
+                                    Organiser.Common.Classes.UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_ProspectorToBrowser + " " + ListResults[SIListResults - 1].Link);
+                                }
+                                catch
+                                {
+                                    MessageBox.Show("Couldnt open link.");
+                                }
                             }
                         }
                         break;
@@ -1946,11 +2257,23 @@ namespace Prospector.ViewModels
                 if (!string.IsNullOrWhiteSpace(sfw.tbName.Text) && !string.IsNullOrEmpty(sfw.tbName.Text))
                 {
                     SavedFP.Clear();
-                    SavedFP.Add(new SavedFootprint() { Name = sfw.tbName.Text, Footprint = FootPrintString });
+                    switch (param as string)
+                    {
+                        case "DARKWEB":
+                            SavedFP.Add(new SavedFootprint() { Name = sfw.tbName.Text, Footprint = QueryStringDW, Type = "DARKWEB" });
+                            break;
+
+                        default:
+                            SavedFP.Add(new SavedFootprint() { Name = sfw.tbName.Text, Footprint = FootPrintString, Type= "default" });
+                            break;
+                    }
+
                     saveSavedFootprints(true);
                 }
             }
         }
+
+        
 
         private void DeleteSavedFootprintClicked(object param)
         {
@@ -1980,6 +2303,10 @@ namespace Prospector.ViewModels
                         {
                             string[] lineData = line.Split(new string[] { MyFilesDatabase.SPLITTER }, StringSplitOptions.None);
                             SavedFootprint fpFromFile = new SavedFootprint() { Name = lineData[0], Footprint = lineData[1] };
+                            if(lineData.Length >=3)
+                            {
+                                fpFromFile.Type = lineData[2];
+                            }
                             foreach (SavedFootprint fp in SavedFP)
                             {
                                 if (fp.Name == fpFromFile.Name) continue;
@@ -1990,6 +2317,7 @@ namespace Prospector.ViewModels
                                 {
                                     SavedFP.Add(fpFromFile);
                                 });
+                                SISavedFP = 0;
                             }
                         }
                     }
@@ -1997,7 +2325,7 @@ namespace Prospector.ViewModels
                     string fileContents = "";
                     foreach (SavedFootprint sfp in SavedFP)
                     {
-                        fileContents += sfp.Name + MyFilesDatabase.SPLITTER + sfp.Footprint + Environment.NewLine;
+                        fileContents += sfp.Name + MyFilesDatabase.SPLITTER + sfp.Footprint + MyFilesDatabase.SPLITTER + sfp.Type + Environment.NewLine;
                     }
 
                     File.WriteAllText(filePath, fileContents);

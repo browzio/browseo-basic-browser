@@ -773,6 +773,7 @@ namespace zFirefoxBrowser.ViewModels
                     };
                     CrawledLinksOnPage.Add(linkOfPage);
                     await linkOfPage.SocialStatsReplys.AsyncGetAllStatsFor(linkOfPage.Url);
+                    linkOfPage.RaisePropertyChanged("SocialStatsReplys");
                 }
 
                 if (IsCrawlAllActive)
@@ -1808,16 +1809,20 @@ namespace zFirefoxBrowser.ViewModels
             }
         }
 
+        static string prevUri = "";
         MacroPromptService popupService;
         private async void Browser_CreateWindow(object sender, GeckoCreateWindowEventArgs e)
         {
+
             //return;
-            if (e.Uri.Contains("about:blank"))
+            if (e.Uri.Contains("about:blank") || prevUri == e.Uri)
             {
+                prevUri = "";
                 e.Cancel = true;
                 return;
             }
 
+            prevUri = e.Uri;
            
 
             if (macroPlayer == null || !macroPlayer.IsRunning)
@@ -1841,7 +1846,7 @@ namespace zFirefoxBrowser.ViewModels
                     !target.Contains("google/authenticate"))
                 {
                     if (target.Contains("microsoft") ||
-                        target.Contains("facebook") ||
+                        (target.Contains("facebook") && WebBrowser.Browser.Url.Authority != "www.facebook.com") ||
                         target.Contains("share") ||
                         target.Contains("twitter") ||
                         target.Contains("gplus") ||

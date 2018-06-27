@@ -23,7 +23,8 @@ namespace GoViral.ViewModels
         public const string TypeOfGoViral = "GoViral";
         public const string TypeOfSEO = "SocialEngagerOptimizer";
         public const string TypeOfInsteo = "InsteoOptimizer";
-        private string typeOfSyncerPath = "";
+        public const string TypeOfSystemBrowSERLauncher = "System BrowSER Launcher";
+        public string typeOfSyncerPath = "";
 
         public ICommand SelectFolderSelect_Click { get; set; }
         public ICommand OnBtnClick { get; set; }
@@ -41,6 +42,22 @@ namespace GoViral.ViewModels
             set { sISavedProjectsList = value; RaisePropertyChanged("SISavedProjectsList"); }
         }
 
+
+        //
+        private Visibility visiblityHasLinksOption = Visibility.Visible;
+        public Visibility VisiblityHasLinksOption
+        {
+            get { return visiblityHasLinksOption; }
+            set { visiblityHasLinksOption = value; RaisePropertyChanged("VisiblityHasLinksOption"); }
+        }
+        private Visibility visiblityDoesntHasLinksOption = Visibility.Collapsed;
+        public Visibility VisiblityDoesntHasLinksOption
+        {
+            get { return visiblityDoesntHasLinksOption; }
+            set { visiblityDoesntHasLinksOption = value; RaisePropertyChanged("VisiblityDoesntHasLinksOption"); }
+        }
+
+
         private object mLock = new object();
 
         public SyncedProjectsVM(string type)
@@ -54,6 +71,11 @@ namespace GoViral.ViewModels
             new Thread(LoadSyncedProjectsList).Start();
 
             typeOfSyncerPath = type;
+            if(typeOfSyncerPath == TypeOfSystemBrowSERLauncher)
+            {
+                VisiblityHasLinksOption = Visibility.Collapsed;
+                VisiblityDoesntHasLinksOption = Visibility.Visible;
+            }
         }
 
         #endregion
@@ -100,7 +122,7 @@ namespace GoViral.ViewModels
                             }
                         }
 
-                        if (SavedProjectsList.Count == 0 || !SavedProjectsList.Any(p => p.Name == GloableProfData.PData.ProjectName))
+                        if (typeOfSyncerPath != TypeOfSystemBrowSERLauncher && (SavedProjectsList.Count == 0 || !SavedProjectsList.Any(p => p.Name == GloableProfData.PData.ProjectName)))
                         {
                             Application.Current.Dispatcher.Invoke(new Action<int, SavedSyncProject>(addToSavedProjectsList), DispatcherPriority.Normal, 0,
                                 new SavedSyncProject()

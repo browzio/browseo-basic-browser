@@ -7,13 +7,7 @@
              xmlns:viewModel="clr-namespace:zFirefoxXulBrowser.ViewModels"
              xmlns:browserCommonViews="clr-namespace:Browser.Common.Views;assembly=Browser.Common"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300" Background="WhiteSmoke">
 
-    <Grid>
-        <ContentPresenter Content="{Binding WebBrowserHost}"
-                          Name="host"
-                          Grid.Row="1"
-                          HorizontalAlignment="Stretch"
-                          VerticalAlignment="Stretch" />
-    </Grid>
+    <Grid Name="host" Margin="-10" />
 </UserControl>

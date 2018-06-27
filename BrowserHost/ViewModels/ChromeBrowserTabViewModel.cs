@@ -255,7 +255,7 @@ namespace WpfCefDynamBrowser.ViewModels
                         var host = WebBrowser.GetBrowser().GetHost();
                         var wi = CefWindowInfo.Create();
                         wi.SetAsPopup(IntPtr.Zero, "DevTools");
-                        host.ShowDevTools(wi, new DevToolsWebClient() , new CefBrowserSettings(), new CefPoint(0, 0));
+                        host.ShowDevTools(wi, new DevToolsWebClient(), new CefBrowserSettings(), new CefPoint(0, 0));
                     }
                     catch { }
                     break;
@@ -448,6 +448,7 @@ namespace WpfCefDynamBrowser.ViewModels
                     }));
                     break;
 
+                    //dominate all
                 case 444:
                     SourceVisitor visitor = new SourceVisitor(htmlSource =>
                     {
@@ -458,23 +459,39 @@ namespace WpfCefDynamBrowser.ViewModels
                             {
                                 List<string> links = htmlSource.Split(new string[] { "group_browse_new" }, StringSplitOptions.RemoveEmptyEntries).ToList();
                                 links.RemoveAt(0);
+                                links.RemoveAt(links.Count - 1);
+
                                 foreach (var linkl in links)
                                 {
-                                    string name = "", id = "";
+                                    if (linkl.StartsWith("\",\"rel\":\"dialog-post\",\"ctor\":{\"")) continue;
+
                                     try
                                     {
-                                        name = linkl.Substring(linkl.IndexOf(">") + 1);
+                                        string fromsource = linkl.Replace(Social.FACEBOOK_GROUPS_DEFAULT_URL, "/groups/");
+                                        fromsource = htmlSource.Substring(htmlSource.IndexOf(fromsource));
+                                        string name = fromsource.Substring(fromsource.IndexOf(">") + 1);
                                         name = name.Remove(name.IndexOf("<"));
 
-                                        id = linkl.Substring(linkl.IndexOf("id=") + 3);
+                                        string id = fromsource.Substring(fromsource.IndexOf("id="));
+                                        id = id.Replace("id=", "");
                                         id = id.Remove(id.IndexOf("\""));
 
-                                        Convert.ToInt64(id);
+
+                                        //name = linkl.Substring(linkl.IndexOf(">") + 1);
+                                        //name = name.Remove(name.IndexOf("<"));
+
+                                        //id = linkl.Substring(linkl.IndexOf("id=") + 3);
+                                        //id = id.Remove(id.IndexOf("\""));
+
+                                        //Convert.ToInt64(id);
+                                        var linkl2 = Social.FACEBOOK_GROUPS_DEFAULT_URL + name + "-" + id;
+                                        linkl2 = linkl2.Replace("&amp;ref=group_browse_new", "");
+                                        linksToReturn.Add(linkl2);
                                     }
                                     catch
                                     { continue; }
 
-                                    linksToReturn.Add(Social.FACEBOOK_GROUPS_DEFAULT_URL + name + "-" + id);
+
                                 }
 
                             }
@@ -488,7 +505,9 @@ namespace WpfCefDynamBrowser.ViewModels
 
                                 foreach (string linkl in links)
                                 {
+
                                     string linkToGetl = linkl.Remove(linkl.IndexOf("\""));
+                                    if (linkToGetl == "https://www.facebook.com/?sk=ff") continue;
                                     string linkToAdd = getLinkFromUrlAndSource(linkToGetl, htmlSource, splitter);
                                     linksToReturn.Add(linkToAdd);
                                 }
@@ -518,14 +537,18 @@ namespace WpfCefDynamBrowser.ViewModels
 
         private string getsplitter()
         {
-            string splitter = "<div class=\"_gll\"><a href=\"";
+            string splitter = "<a href=\"";
             if (AddressEditable.Contains("/keywords_places/"))
             {
                 splitter = "<a href=\"";
             }
             else if (AddressEditable.Contains("/pages/"))
             {
-                splitter = "<div class=\"_gll\"><div><a href=\"";
+                splitter = "<a class=\"_32mo\" href=\"";
+            }
+            else if (AddressEditable.Contains("/groups/"))
+            {
+                splitter = "class=\"_52eh _5bcu\"><a href=\"";
             }
             else if (AddressEditable.Contains("/videos/"))
             {
@@ -570,6 +593,8 @@ namespace WpfCefDynamBrowser.ViewModels
             }
             else
             {
+                //"<div class=\"_gll\"><a href=\""
+                //splitter = "<a href=\"";
                 id = htmlSource.Substring(0, htmlSource.IndexOf(splitter + url));
                 id = id.Replace("&quot;", "");
                 id = id.Replace("quot;", "");
@@ -668,8 +693,8 @@ namespace WpfCefDynamBrowser.ViewModels
             {
                 StatusMessage = "Done";
                 SocialStatsCrawl();
-                inGetFavicon = false;
-                if (!inGetFavicon) GetFavicon();
+                //inGetFavicon = false;
+                //if (!inGetFavicon) GetFavicon();
             }
         }
 

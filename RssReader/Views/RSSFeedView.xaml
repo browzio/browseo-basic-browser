@@ -44,7 +44,7 @@
                   ItemContainerStyle="{DynamicResource MetroListBoxItemStyle}">
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <local:RSSFeedDataView   />
+                    <local:RSSFeedDataView />
                 </DataTemplate>
             </ListView.ItemTemplate>
 
@@ -170,13 +170,13 @@
                     </MenuItem>
                     <Separator Margin="-30,0,0,0" />
 
-                    <MenuItem Header="Send To Feed Masher">
+                    <!--<MenuItem Header="Send To Feed Masher">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick"
                                           Command="{Binding OnCommandFromView}"
                                           CommandParameter="Masher" />
                         </MenuItem.InputBindings>
-                    </MenuItem>
+                    </MenuItem>-->
 
                     <MenuItem Header="Curate It">
                         <MenuItem.InputBindings>

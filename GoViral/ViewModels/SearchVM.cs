@@ -17,6 +17,8 @@ using System.Windows.Input;
 using System.Collections;
 using System.Collections.Generic;
 using GoViral.Models.FilterResults;
+//using BrowseoFX_WPF.Windows;
+//using BrowseoFX_WPF.Crawlers;
 
 namespace GoViral.ViewModels
 {
@@ -181,7 +183,25 @@ namespace GoViral.ViewModels
                     break;
 
                 case "SEARCH":
-                    new Thread(beginCrawlerSearch).Start();
+                    //new Thread(beginCrawlerSearch).Start();
+
+                    string[] kws = SearchText.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (var kw in kws)
+                    {
+                        //if (IsCheckedPage)
+                        //{
+                        //    FBConverseoOGCrawler crawler = new FBConverseoOGCrawler();
+                        //    crawler.StartWindow();
+                        //    crawler.SearchForPage(kw.Trim());
+                        //}
+                        //if (IsCheckedGroup) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Groups, url = kw.Trim() });
+                        //if (IsCheckedEvent) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Events, url = kw.Trim() });
+                        //if (IsCheckedPlace) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Places, url = kw.Trim() });
+                        //if (IsCheckedUser) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Users, url = kw.Trim() });
+                        //if (IsCheckedPhotos) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Photos, url = kw.Trim() });
+                        //if (IsCheckedVideos) mCrawlerHost.PreInitStates.Add(new CrawlerPreInitState() { state = CrawlerStates.GraphSearch_Videos, url = kw.Trim() });
+                        //UsageTracker.AddTraceCookie(UsageTracker.Usage_Type_FacebookCralEvent + " Searched fo kw " + kw);
+                    }
                     break;
 
                 case "CANCEL":
@@ -601,71 +621,77 @@ namespace GoViral.ViewModels
                         resultWithKw = new SearchResult() { Keyword = searchState.url };
                         SearchResultsWithKwList.SearchResultsList.Add(resultWithKw);
                     }
-                    switch (searchState.state)
+                    try
                     {
-                        case CrawlerStates.GraphSearch_Pages:
-                            PagesResult pagesResult = JsonConvert.DeserializeObject<PagesResult>(json); 
-                            foreach (var result in pagesResult.data)
-                            {
-                                if (resultWithKw.PagesResult.data.Any(d => d.name == result.name)) continue;
-                                resultWithKw.PagesResult.data.Add(result);
-                            }
-                            break;
-                        case CrawlerStates.GraphSearch_Groups:
-                            GroupsResult groupsResult = JsonConvert.DeserializeObject<GroupsResult>(json);
-                            foreach (var result in groupsResult.data)
-                            {
-                                if (resultWithKw.PagesResult.data.Any(d => d.name == result.name)) continue;
-                                resultWithKw.GroupsResult.data.Add(result);
-                            }
-                            break;
-                        case CrawlerStates.GraphSearch_Events:
-                            EventsResult eventsResult = JsonConvert.DeserializeObject<EventsResult>(json);
-                            foreach (var result in eventsResult.data)
-                            {
-                                if (resultWithKw.PagesResult.data.Any(d => d.name == result.name)) continue;
-                                resultWithKw.EventsResult.data.Add(result);
-                            }
-                            break;
-                        case CrawlerStates.GraphSearch_Places:
-                            PlacesResult placesResult = JsonConvert.DeserializeObject<PlacesResult>(json);
-                            foreach (var result in placesResult.data)
-                            {
-                                if (resultWithKw.PagesResult.data.Any(d => d.name == result.name)) continue;
-                                resultWithKw.PlacesResult.data.Add(result);
-                            }
-                            break;
-                        case CrawlerStates.GraphSearch_Users:
-                            PersonsResult personsResult = JsonConvert.DeserializeObject<PersonsResult>(json);
-                            foreach (var result in personsResult.data)
-                            {
-                                if (resultWithKw.PagesResult.data.Any(d => d.name == result.name)) continue;
-                                resultWithKw.PersonsResult.data.Add(result);
-                            }
-                            break;
+                        switch (searchState.state)
+                        {
+                            case CrawlerStates.GraphSearch_Pages:
+                                PagesResult pagesResult = JsonConvert.DeserializeObject<PagesResult>(json);
+                                foreach (var result in pagesResult.data)
+                                {
+                                    if (resultWithKw.PagesResult.data.Any(d => d.name == result.name)) continue;
+                                    resultWithKw.PagesResult.data.Add(result);
+                                }
+                                break;
+                            case CrawlerStates.GraphSearch_Groups:
+                                GroupsResult groupsResult = JsonConvert.DeserializeObject<GroupsResult>(json);
+                                foreach (var result in groupsResult.data)
+                                {
+                                    if (resultWithKw.PagesResult.data.Any(d => d.name == result.name)) continue;
+                                    resultWithKw.GroupsResult.data.Add(result);
+                                }
+                                break;
+                            case CrawlerStates.GraphSearch_Events:
+                                EventsResult eventsResult = JsonConvert.DeserializeObject<EventsResult>(json);
+                                foreach (var result in eventsResult.data)
+                                {
+                                    if (resultWithKw.PagesResult.data.Any(d => d.name == result.name)) continue;
+                                    resultWithKw.EventsResult.data.Add(result);
+                                }
+                                break;
+                            case CrawlerStates.GraphSearch_Places:
+                                PlacesResult placesResult = JsonConvert.DeserializeObject<PlacesResult>(json);
+                                foreach (var result in placesResult.data)
+                                {
+                                    if (resultWithKw.PagesResult.data.Any(d => d.name == result.name)) continue;
+                                    resultWithKw.PlacesResult.data.Add(result);
+                                }
+                                break;
+                            case CrawlerStates.GraphSearch_Users:
+                                PersonsResult personsResult = JsonConvert.DeserializeObject<PersonsResult>(json);
+                                foreach (var result in personsResult.data)
+                                {
+                                    if (resultWithKw.PagesResult.data.Any(d => d.name == result.name)) continue;
+                                    resultWithKw.PersonsResult.data.Add(result);
+                                }
+                                break;
 
-                        case CrawlerStates.GraphSearch_Photos:
-                            MediaResult photoResult = json.XmlDeserializeFromString<MediaResult>();
-                            foreach(var result in photoResult.data)
-                            {
-                                if (resultWithKw.MediaResult.data.Any(d => d.id == result.id)) continue;
-                                resultWithKw.MediaResult.data.Add(result);
-                            }
-                            break;
+                            case CrawlerStates.GraphSearch_Photos:
+                                MediaResult photoResult = json.XmlDeserializeFromString<MediaResult>();
+                                foreach (var result in photoResult.data)
+                                {
+                                    if (resultWithKw.MediaResult.data.Any(d => d.id == result.id)) continue;
+                                    resultWithKw.MediaResult.data.Add(result);
+                                }
+                                break;
 
-                        case CrawlerStates.GraphSearch_Videos:
-                            MediaResult videoResult = json.XmlDeserializeFromString<MediaResult>();
-                            foreach (var result in videoResult.data)
-                            {
-                                if (resultWithKw.MediaResultVideos.data.Any(d => d.id == result.id)) continue;
-                                resultWithKw.MediaResultVideos.data.Add(result);
-                            }
-                            break;
+                            case CrawlerStates.GraphSearch_Videos:
+                                MediaResult videoResult = json.XmlDeserializeFromString<MediaResult>();
+                                foreach (var result in videoResult.data)
+                                {
+                                    if (resultWithKw.MediaResultVideos.data.Any(d => d.id == result.id)) continue;
+                                    resultWithKw.MediaResultVideos.data.Add(result);
+                                }
+                                break;
 
-                        default:
-                            break;
-                    } 
+                            default:
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
 
+                    }
                     RaisePropertyChanged("SearchResultsList");
                 }
 

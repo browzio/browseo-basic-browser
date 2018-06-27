@@ -1,5 +1,6 @@
 ﻿using Gecko;
 using Gecko.Interfaces;
+using Gecko.Javascript;
 using Gecko.Services;
 using Organiser.Common.Classes;
 using SocialOrganizer.Models;
@@ -22,9 +23,113 @@ namespace zFirefoxXulBrowser.API
                 GloableProfData.PData = data;
             }
 
-            InitDirectoryPaths();
-            InitPreferences();
-            InitProxy();
+            //InitDirectoryPaths();
+            //GeckoPreferences.Default["media.peerconnection.enabled"] = false;
+            //GeckoPreferences.Default["media.peerconnection.use_document_iceservers"] = false;
+            ////Mozilla/5.0 (Windows NT 6.2; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0
+            //GeckoPreferences.Default["general.useragent.override"] = "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:52.0) Gecko/20100101 Firefox/52.0";
+            ////SetSettings();
+            ////InitPreferences();
+            //InitProxy();
+        }
+
+        private static void InitDirectoryPaths()
+        {
+            //var xulfxPath = System.IO.Path.Combine(@"C:\Users\eli\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\bin\Debug", "XulFx.xpi");
+            //Xpcom.XulfxPath = xulfxPath;
+            var XulComponents = AppDomain.CurrentDomain.BaseDirectory + "\\MozillaFx\\XulComponents";
+            XulComponents = XulComponents.Replace("\\\\", "\\");
+            Xpcom.ComponentsPath = XulComponents;
+
+            var xulfxPath = AppDomain.CurrentDomain.BaseDirectory + "\\MozillaFx\\XulFx.xpi";
+            xulfxPath = xulfxPath.Replace("\\\\", "\\");
+            Xpcom.XulfxPath = xulfxPath;
+
+            //var profileDirectory = @"C:\Users\eli\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\bin\Debug\profile";
+            //Xpcom.ProfilePath = profileDirectory;
+            var profileDirectory = Path.Combine(MyFilesDatabase.GetBaseDir(), "CachesFF\\" + GloableProfData.PData.ProjectName);
+            profileDirectory = profileDirectory.Replace("\\\\", "\\");
+            //Xpcom.ProfilePath = profileDirectory;
+            try
+            {
+                string startupFile = Path.Combine(profileDirectory, "startupCache", "startupCache.4.little");
+                FileInfo fi = new FileInfo(startupFile);
+                if (fi.Exists)
+                {
+                    fi.Delete();
+                }
+            }
+            catch { }
+                        //if (!Directory.Exists(profileDirectory)) Directory.CreateDirectory(profileDirectory);
+            //try
+            //{
+            //    var filepath = Path.Combine(profileDirectory, "userChrome.css");
+            //    if (!File.Exists(filepath))
+            //    {
+            //        /* set default namespace to XUL */
+            //        //var chrome = "@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");" +
+            //        //    "toolbar, " +
+            //        //    "toolbarpalette {" +
+            //        //        "background - color: rgb(235, 235, 235) !important;" +
+            //        //    "}" +
+            //        //    "toolbar#nav-bar {" +
+            //        //        "background-image: none !important;" +
+            //        //    "}";
+            //        var chrome = "@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");" +
+            //        "toolbar {" +
+            //            "background - color: rgb(235, 235, 235) !important;" +
+            //        "}";
+            //        File.WriteAllText(filepath, chrome);
+            //    }
+
+            //var binDirectory = @"C:\Users\eli\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\PutXulRunnerFolderHere\firefox-sdk\bin";
+            //Xpcom.Initialize(binDirectory);
+            var binDirectory = AppDomain.CurrentDomain.BaseDirectory + "\\MozillaFx";
+            binDirectory = binDirectory.Replace("\\\\", "\\");
+            Xpcom.Initialize(binDirectory);
+
+            //var xulfxPath = Path.Combine(@"C:\Users\eli\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\bin\Debug", "XulFx.xpi");
+            //Xpcom.XulfxPath = xulfxPath;
+
+            //var profileDirectory = Path.Combine(MyFilesDatabase.GetBaseDir(), "CachesMozillaFx\\" + GloableProfData.PData.ProjectName);
+            //if (!Directory.Exists(profileDirectory)) Directory.CreateDirectory(profileDirectory);
+            //try
+            //{
+            //    var filepath = Path.Combine(profileDirectory, "userChrome.css");
+            //    if (!File.Exists(filepath))
+            //    {
+            //        /* set default namespace to XUL */
+            //        //var chrome = "@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");" +
+            //        //    "toolbar, " +
+            //        //    "toolbarpalette {" +
+            //        //        "background - color: rgb(235, 235, 235) !important;" +
+            //        //    "}" +
+            //        //    "toolbar#nav-bar {" +
+            //        //        "background-image: none !important;" +
+            //        //    "}";
+            //        var chrome = "@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");" +
+            //        "toolbar {" +
+            //            "background - color: rgb(235, 235, 235) !important;" +
+            //        "}";
+            //        File.WriteAllText(filepath, chrome);
+            //    }
+
+            ////    string startupFile = Path.Combine(profileDirectory, "startupCache", "startupCache.4.little");
+            ////    FileInfo fi = new FileInfo(startupFile);
+            ////    if (fi.Exists)
+            ////    {
+            ////        fi.Delete();
+            ////    }
+            ////}
+            ////catch { }
+            //Xpcom.ProfilePath = profileDirectory;
+
+
+            //var binDirectory = @"C:\Users\eli\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\PutXulRunnerFolderHere\firefox-sdk\bin";
+            //Xpcom.Initialize(binDirectory);
+
+
+            //  nsConsoleListener.Init();
         }
 
         private static void InitPreferences()
@@ -101,218 +206,180 @@ namespace zFirefoxXulBrowser.API
             GeckoPreferences.User["dom.ipc.plugins.enabled.nptest.dll"] = false;
         }
 
-        private static void InitDirectoryPaths()
-        {
-            var profileDirectory = Path.Combine(MyFilesDatabase.GetBaseDir(), "CachesFF\\" + GloableProfData.PData.ProjectName);
-            if (!Directory.Exists(profileDirectory)) Directory.CreateDirectory(profileDirectory);
-            try
-            {
-                var filepath = Path.Combine(profileDirectory, "userChrome.css");
-                if (!File.Exists(filepath))
-                {
-                    /* set default namespace to XUL */
-                    //var chrome = "@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");" +
-                    //    "toolbar, " +
-                    //    "toolbarpalette {" +
-                    //        "background - color: rgb(235, 235, 235) !important;" +
-                    //    "}" +
-                    //    "toolbar#nav-bar {" +
-                    //        "background-image: none !important;" +
-                    //    "}";
-                    var chrome = "@namespace url(\"http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul\");" +
-                    "toolbar {" +
-                        "background - color: rgb(235, 235, 235) !important;" +
-                    "}";
-                    File.WriteAllText(filepath, chrome);
-                }
-
-                string startupFile = Path.Combine(profileDirectory, "startupCache", "startupCache.4.little");
-                FileInfo fi = new FileInfo(startupFile);
-                if (fi.Exists)
-                {
-                    fi.Delete();
-                }
-            }
-            catch { }
-            Xpcom.ProfilePath = profileDirectory;
-
-            var xulfxPath = Path.Combine(@"C:\Users\eli\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\bin\Debug", "XulFx.xpi");
-            Xpcom.XulfxPath = xulfxPath;
-
-            var binDirectory = @"C:\Users\eli\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\PutXulRunnerFolderHere\firefox-sdk\bin";
-            Xpcom.Initialize(binDirectory);
-        }
 
         public static void InitProxy()
         {
-            GeckoPreferences.User["network.proxy.type"] = 1;
-            GeckoPreferences.User["network.proxy.share_proxy_settings"] = true;
-
-            GeckoPreferences.User["network.proxy.http"] = GloableProfData.PData.ProxyIP;
-            GeckoPreferences.User["network.proxy.http_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
-
-            GeckoPreferences.User["network.proxy.ssl"] = GloableProfData.PData.ProxyIP;
-            GeckoPreferences.User["network.proxy.ssl_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
-
-            GeckoPreferences.User["network.proxy.backup.ssl"] = GloableProfData.PData.ProxyIP;
-            GeckoPreferences.User["network.proxy.backup.ssl_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
-
-            GeckoPreferences.User["network.proxy.ftp"] = GloableProfData.PData.ProxyIP;
-            GeckoPreferences.User["network.proxy.ftp_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
-            GeckoPreferences.User["network.proxy.backup.ftp"] = GloableProfData.PData.ProxyIP;
-            GeckoPreferences.User["network.proxy.backup.ftp_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
-
-            GeckoPreferences.User["network.proxy.socks"] = GloableProfData.PData.ProxyIP;
-            GeckoPreferences.User["network.proxy.socks_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
-            GeckoPreferences.User["network.proxy.backup.socks"] = GloableProfData.PData.ProxyIP;
-            GeckoPreferences.User["network.proxy.backup.socks_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
-
-            if (!GloableProfData.PData.ProxyUsername.IsNullOrEmpty())
+            if (!GloableProfData.PData.ProxyIP.IsNullOrEmpty())
             {
-                //TODO check
-                DefaultPromptFactory.PromptGetter = () => new ProxyLoginPromptBypass();
+                GeckoPreferences.User["network.proxy.type"] = 1;
+                GeckoPreferences.User["network.proxy.share_proxy_settings"] = true;
 
-                GeckoPreferences.User["network.proxy.login"] = GloableProfData.PData.ProxyUsername;
-                GeckoPreferences.User["network.proxy.password"] = GloableProfData.PData.ProxyPassword;
+                GeckoPreferences.User["network.proxy.http"] = GloableProfData.PData.ProxyIP;
+                GeckoPreferences.User["network.proxy.http_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
+
+                GeckoPreferences.User["network.proxy.ssl"] = GloableProfData.PData.ProxyIP;
+                GeckoPreferences.User["network.proxy.ssl_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
+
+                GeckoPreferences.User["network.proxy.backup.ssl"] = GloableProfData.PData.ProxyIP;
+                GeckoPreferences.User["network.proxy.backup.ssl_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
+
+                GeckoPreferences.User["network.proxy.ftp"] = GloableProfData.PData.ProxyIP;
+                GeckoPreferences.User["network.proxy.ftp_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
+                GeckoPreferences.User["network.proxy.backup.ftp"] = GloableProfData.PData.ProxyIP;
+                GeckoPreferences.User["network.proxy.backup.ftp_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
+
+                GeckoPreferences.User["network.proxy.socks"] = GloableProfData.PData.ProxyIP;
+                GeckoPreferences.User["network.proxy.socks_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
+                GeckoPreferences.User["network.proxy.backup.socks"] = GloableProfData.PData.ProxyIP;
+                GeckoPreferences.User["network.proxy.backup.socks_port"] = Convert.ToInt32(GloableProfData.PData.ProxyPort);
+
+                if (!GloableProfData.PData.ProxyUsername.IsNullOrEmpty())
+                {
+                    //TODO check
+                    DefaultPromptFactory.PromptGetter = () => new ProxyLoginPromptBypass();
+
+                    GeckoPreferences.User["network.proxy.login"] = GloableProfData.PData.ProxyUsername;
+                    GeckoPreferences.User["network.proxy.password"] = GloableProfData.PData.ProxyPassword;
+                }
             }
         }
 
         public static void SetSettings()
         {
-            if (!BrowserSettimgs.DoNotTrackEnabled)
-            {
-                GeckoPreferences.Default["privacy.donottrackheader.enabled"] = true;
-                GeckoPreferences.Default["privacy.trackingprotection.enabled"] = true;
-                GeckoPreferences.Default["privacy.donottrackheader.value"] = 1;
-                GeckoPreferences.Default["services.sync.prefs.sync.privacy.donottrackheader.enabled"] = true;
-                GeckoPreferences.Default["services.sync.prefs.sync.privacy.trackingprotection.enabled"] = true;
-            }
-            else
-            {
-                GeckoPreferences.Default["privacy.donottrackheader.enabled"] = false;
-                GeckoPreferences.Default["privacy.trackingprotection.enabled"] = false;
-                GeckoPreferences.Default["privacy.donottrackheader.value"] = 0;
-                GeckoPreferences.Default["services.sync.prefs.sync.privacy.donottrackheader.enabled"] = false;
-                GeckoPreferences.Default["services.sync.prefs.sync.privacy.trackingprotection.enabled"] = false;
-            }
+            //if (!BrowserSettimgs.DoNotTrackEnabled)
+            //{
+            //    GeckoPreferences.Default["privacy.donottrackheader.enabled"] = true;
+            //    GeckoPreferences.Default["privacy.trackingprotection.enabled"] = true;
+            //    GeckoPreferences.Default["privacy.donottrackheader.value"] = 1;
+            //    GeckoPreferences.Default["services.sync.prefs.sync.privacy.donottrackheader.enabled"] = true;
+            //    GeckoPreferences.Default["services.sync.prefs.sync.privacy.trackingprotection.enabled"] = true;
+            //}
+            //else
+            //{
+            //    GeckoPreferences.Default["privacy.donottrackheader.enabled"] = false;
+            //    GeckoPreferences.Default["privacy.trackingprotection.enabled"] = false;
+            //    GeckoPreferences.Default["privacy.donottrackheader.value"] = 0;
+            //    GeckoPreferences.Default["services.sync.prefs.sync.privacy.donottrackheader.enabled"] = false;
+            //    GeckoPreferences.Default["services.sync.prefs.sync.privacy.trackingprotection.enabled"] = false;
+            //}
 
-            if (BrowserSettimgs.FlashEnabled)
-            {
-                //plugin.state.flash
-                GeckoPreferences.Default["plugin.state.flash"] = 2;
-                GeckoPreferences.Default["plugin.scan.plid.all"] = true;
-            }
-            else
-            {
-                GeckoPreferences.Default["plugin.state.flash"] = 0;
-                GeckoPreferences.Default["plugin.scan.plid.all"] = false;
-            }
+            //if (BrowserSettimgs.FlashEnabled)
+            //{
+            //    //plugin.state.flash
+            //    GeckoPreferences.Default["plugin.state.flash"] = 2;
+            //    GeckoPreferences.Default["plugin.scan.plid.all"] = true;
+            //}
+            //else
+            //{
+            //    GeckoPreferences.Default["plugin.state.flash"] = 0;
+            //    GeckoPreferences.Default["plugin.scan.plid.all"] = false;
+            //}
 
-            if (BrowserSettimgs.JavaEnabled)
-            {
-                //plugin.state.java;1
-                GeckoPreferences.Default["plugin.state.java"] = 1;
-            }
-            else
-            {
-                GeckoPreferences.Default["plugin.state.java"] = 0;
-            }
+            //if (BrowserSettimgs.JavaEnabled)
+            //{
+            //    //plugin.state.java;1
+            //    GeckoPreferences.Default["plugin.state.java"] = 1;
+            //}
+            //else
+            //{
+            //    GeckoPreferences.Default["plugin.state.java"] = 0;
+            //}
 
-            if (BrowserSettimgs.JavascriptEnabled)
-            {
-                //javascript.enabled;true
-                GeckoPreferences.Default["javascript.enabled"] = true;
-            }
-            else
-            {
-                GeckoPreferences.Default["javascript.enabled"] = false;
-            }
+            //if (BrowserSettimgs.JavascriptEnabled)
+            //{
+            //    //javascript.enabled;true
+            //    GeckoPreferences.Default["javascript.enabled"] = true;
+            //}
+            //else
+            //{
+            //    GeckoPreferences.Default["javascript.enabled"] = false;
+            //}
 
-            if (BrowserSettimgs.WebRTCEnabled)
-            {
-                GeckoPreferences.Default["media.peerconnection.enabled"] = true;
-                GeckoPreferences.Default["media.peerconnection.use_document_iceservers"] = true;
-            }
-            else
-            {
-                GeckoPreferences.Default["media.peerconnection.enabled"] = false;
-                GeckoPreferences.Default["media.peerconnection.use_document_iceservers"] = false;
-            }
+            ////if (BrowserSettimgs.WebRTCEnabled)
+            ////{
+            ////    GeckoPreferences.Default["media.peerconnection.enabled"] = true;
+            ////    GeckoPreferences.Default["media.peerconnection.use_document_iceservers"] = true;
+            ////}
+            ////else
+            ////{
+            //    GeckoPreferences.Default["media.peerconnection.enabled"] = false;
+            //    GeckoPreferences.Default["media.peerconnection.use_document_iceservers"] = false;
+            ////}
 
-            if (BrowserSettimgs.WebGLEnabled)
-            {
-                GeckoPreferences.Default["webgl.disabled"] = false;
-                GeckoPreferences.User["webgl.force-enabled"] = true;
-            }
-            else
-            {
-                GeckoPreferences.Default["webgl.disabled"] = true;
-                GeckoPreferences.User["webgl.force-enabled"] = false;
-            }
-
-
-
-            if (BrowserSettimgs.SIFontStandard != BrowserSettimgs.AvailableFonts.IndexOf("Times New Roman"))
-            {
-                GeckoPreferences.Default["font.default.x-western"] = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontStandard];
-            }
-            else
-            {
-                GeckoPreferences.Default["font.default.x-western"] = "serif";
-            }
-            if (BrowserSettimgs.SIFontSerif != BrowserSettimgs.AvailableFonts.IndexOf("Times New Roman"))
-            {
-                GeckoPreferences.Default["font.name.serif.x-western"] = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontStandard];
-            }
-            else
-            {
-                GeckoPreferences.Default["font.name.serif.x-western"] = "Times New Roman";
-            }
-            if (BrowserSettimgs.SIFontSansSerif != BrowserSettimgs.AvailableFonts.IndexOf("Arial"))
-            {
-                GeckoPreferences.Default["font.name.sans-serif.x-western"] = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontStandard];
-            }
-            else
-            {
-                GeckoPreferences.Default["font.name.sans-serif.x-western"] = "Arial";
-            }
-            if (BrowserSettimgs.SIFontFixedWidth != BrowserSettimgs.AvailableFonts.IndexOf("Consolas"))
-            {
-                GeckoPreferences.Default["font.name.monospace.x-western"] = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontStandard];
-                GeckoPreferences.Default["font.name.cursive.x-western"] = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontStandard];
-            }
-            else
-            {
-                GeckoPreferences.Default["font.name.monospace.x-western"] = "Courier New";
-                GeckoPreferences.Default["font.name.cursive.x-western"] = "Comic Sans MS";
-            }
-            if (BrowserSettimgs.DefaultFontSize != 16)
-            {
-                GeckoPreferences.Default["font.size.variable.x-western"] = BrowserSettimgs.DefaultFontSize;
-                GeckoPreferences.Default["font.size.fixed.x-western"] = BrowserSettimgs.DefaultFontSize;
-            }
-            else
-            {
-                GeckoPreferences.Default["font.size.variable.x-western"] = 16;
-                GeckoPreferences.Default["font.size.fixed.x-western"] = 13;
-            }
-
-            if (BrowserSettimgs.HideFonts)
-            {
-                GeckoPreferences.User["browser.display.use_document_fonts"] = 0;
-            }
-            else
-            {
-                GeckoPreferences.Default["browser.display.use_document_fonts"] = 1;
-            }
-            GeckoPreferences.Default["font.minimum-size.x-western"] = BrowserSettimgs.MnimumFontSize;
+            //if (BrowserSettimgs.WebGLEnabled)
+            //{
+            //    GeckoPreferences.Default["webgl.disabled"] = false;
+            //    GeckoPreferences.User["webgl.force-enabled"] = true;
+            //}
+            //else
+            //{
+            //    GeckoPreferences.Default["webgl.disabled"] = true;
+            //    GeckoPreferences.User["webgl.force-enabled"] = false;
+            //}
 
 
-            GeckoPreferences.Default["general.useragent.override"] = BrowserSettimgs.UserAgentFF;
 
-            GeckoPreferences.User["intl.accept_languages"] = BrowserSettimgs.AcceptLanguage;
-            // GeckoPreferences.Default["extensions.qls.backup_acceptlanguages"] = BrowserSettimgs.AcceptLanguage;
-            GeckoPreferences.User["general.useragent.locale"] = BrowserSettimgs.AcceptLanguage.Contains(",") ? BrowserSettimgs.AcceptLanguage.Remove(BrowserSettimgs.AcceptLanguage.IndexOf(",")).Trim() : BrowserSettimgs.AcceptLanguage;
+            //if (BrowserSettimgs.SIFontStandard != BrowserSettimgs.AvailableFonts.IndexOf("Times New Roman"))
+            //{
+            //    GeckoPreferences.Default["font.default.x-western"] = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontStandard];
+            //}
+            //else
+            //{
+            //    GeckoPreferences.Default["font.default.x-western"] = "serif";
+            //}
+            //if (BrowserSettimgs.SIFontSerif != BrowserSettimgs.AvailableFonts.IndexOf("Times New Roman"))
+            //{
+            //    GeckoPreferences.Default["font.name.serif.x-western"] = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontStandard];
+            //}
+            //else
+            //{
+            //    GeckoPreferences.Default["font.name.serif.x-western"] = "Times New Roman";
+            //}
+            //if (BrowserSettimgs.SIFontSansSerif != BrowserSettimgs.AvailableFonts.IndexOf("Arial"))
+            //{
+            //    GeckoPreferences.Default["font.name.sans-serif.x-western"] = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontStandard];
+            //}
+            //else
+            //{
+            //    GeckoPreferences.Default["font.name.sans-serif.x-western"] = "Arial";
+            //}
+            //if (BrowserSettimgs.SIFontFixedWidth != BrowserSettimgs.AvailableFonts.IndexOf("Consolas"))
+            //{
+            //    GeckoPreferences.Default["font.name.monospace.x-western"] = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontStandard];
+            //    GeckoPreferences.Default["font.name.cursive.x-western"] = BrowserSettimgs.AvailableFonts[BrowserSettimgs.SIFontStandard];
+            //}
+            //else
+            //{
+            //    GeckoPreferences.Default["font.name.monospace.x-western"] = "Courier New";
+            //    GeckoPreferences.Default["font.name.cursive.x-western"] = "Comic Sans MS";
+            //}
+            //if (BrowserSettimgs.DefaultFontSize != 16)
+            //{
+            //    GeckoPreferences.Default["font.size.variable.x-western"] = BrowserSettimgs.DefaultFontSize;
+            //    GeckoPreferences.Default["font.size.fixed.x-western"] = BrowserSettimgs.DefaultFontSize;
+            //}
+            //else
+            //{
+            //    GeckoPreferences.Default["font.size.variable.x-western"] = 16;
+            //    GeckoPreferences.Default["font.size.fixed.x-western"] = 13;
+            //}
+
+            //if (BrowserSettimgs.HideFonts)
+            //{
+            //    GeckoPreferences.User["browser.display.use_document_fonts"] = 0;
+            //}
+            //else
+            //{
+            //    GeckoPreferences.Default["browser.display.use_document_fonts"] = 1;
+            //}
+            //GeckoPreferences.Default["font.minimum-size.x-western"] = BrowserSettimgs.MnimumFontSize;
+
+
+            //GeckoPreferences.Default["general.useragent.override"] = BrowserSettimgs.UserAgentFF;
+
+            //GeckoPreferences.User["intl.accept_languages"] = BrowserSettimgs.AcceptLanguage;
+            //// GeckoPreferences.Default["extensions.qls.backup_acceptlanguages"] = BrowserSettimgs.AcceptLanguage;
+            //GeckoPreferences.User["general.useragent.locale"] = BrowserSettimgs.AcceptLanguage.Contains(",") ? BrowserSettimgs.AcceptLanguage.Remove(BrowserSettimgs.AcceptLanguage.IndexOf(",")).Trim() : BrowserSettimgs.AcceptLanguage;
         }
 
         public static void SetPersonData(int birthdayYear, string children, string city, int cmbSelectedIndexDay, int cmbSelectedIndexMonth, int cmbSelectedIndexSex, string country, string dir, string email, string filePath, string firstName, bool inMonney, bool inPBNVault, string lastName, string notes, string password, string phoneNumber, string profileName, string projectDir, string projectName, string proxyIP, string proxyPassword, string proxyPort, string proxyUsername, int sIPBNType, string state, string street, string username, string webAddress, string zip)
@@ -390,32 +457,68 @@ namespace zFirefoxXulBrowser.API
 
         public static void Shutdown()
         {
-            Xpcom.Shutdown();
+            //Xpcom.Shutdown();
         }
 
-        private class ProxyLoginPromptBypass : DefaultPromptService, nsIAuthPrompt, nsIAuthPrompt2
-        {
-            static bool setProxy;
+        //private class ProxyLoginPromptBypass : DefaultPromptService, nsIAuthPrompt, nsIAuthPrompt2
+        //{
+        //    static bool setProxy;
 
-            public override bool PromptAuth(nsIChannel aChannel, uint level, nsIAuthInformation authInfo)
-            {
-                if (!GloableProfData.PData.ProxyUsername.IsNullOrEmpty())
-                {
-                    nsString.Set(authInfo.SetUsernameAttribute, GloableProfData.PData.ProxyUsername);
-                    nsString.Set(authInfo.SetPasswordAttribute, GloableProfData.PData.ProxyPassword);
-                    //GeckoPreferences.Default.Reset();
-                    return true;
-                }
-                else
-                {
-                    return base.PromptAuth(aChannel, level, authInfo);
-                }
-            }
+        //    public override bool PromptAuth(nsIChannel aChannel, uint level, nsIAuthInformation authInfo)
+        //    {
+        //        if (!GloableProfData.PData.ProxyUsername.IsNullOrEmpty())
+        //        {
+        //            nsString.Set(authInfo.SetUsernameAttribute, GloableProfData.PData.ProxyUsername);
+        //            nsString.Set(authInfo.SetPasswordAttribute, GloableProfData.PData.ProxyPassword);
+        //            //GeckoPreferences.Default.Reset();
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            return base.PromptAuth(aChannel, level, authInfo);
+        //        }
+        //    }
 
-            public override nsICancelable AsyncPromptAuth(nsIChannel aChannel, nsIAuthPromptCallback aCallback, nsISupports aContext, uint level, nsIAuthInformation authInfo)
-            {
-                throw new System.Runtime.InteropServices.COMException();
-            }
-        }
+        //    public override nsICancelable AsyncPromptAuth(nsIChannel aChannel, nsIAuthPromptCallback aCallback, nsISupports aContext, uint level, nsIAuthInformation authInfo)
+        //    {
+        //        throw new System.Runtime.InteropServices.COMException();
+        //    }
+        //}
     }
+
+    //public class nsConsoleListener : Gecko.Interfaces.nsIConsoleListener, Gecko.Interfaces.nsIObserver
+    //{
+    //    public static void Init()
+    //    {
+
+    //        var cobs = new nsConsoleListener();
+    //        var cc = Xpcom.GetService<Gecko.Interfaces.nsIConsoleService>(Gecko.Contracts.ConsoleService);
+    //        cc.RegisterListener(cobs);
+    //        var svc = Xpcom.GetService<Gecko.Interfaces.nsIObserverService>(Gecko.Contracts.ObserverService);
+    //        svc.AddObserver(cobs, "console-api-log-event", false);
+    //    }
+
+    //    public void Observe(Gecko.Interfaces.nsIConsoleMessage aMessage)
+    //    {
+    //        string message = aMessage.GetMessageAttribute();
+    //        if (message.StartsWith("[JavaScript Error:"))
+    //        {
+    //            Console.WriteLine("[{0}] jserror: {1}", DateTime.UtcNow.ToString("HH:mm:ss"), message);
+    //        }
+    //    }
+
+    //    void Gecko.Interfaces.nsIObserver.Observe(Gecko.Interfaces.nsISupports aSubject, string aTopic, string aData)
+    //    {
+    //        try
+    //        {
+    //            var js = GeckoJavascriptBridge.GetService();
+    //            string s = js.EvaluateToString(aSubject, GeckoPrincipal.SystemPrincipal, "this.wrappedJSObject.arguments + ' [level: ' + this.wrappedJSObject.level + ', file: \"' + this.wrappedJSObject.filename + '\", line: ' + this.wrappedJSObject.lineNumber + ']'");
+    //            Console.WriteLine("[{0}] console ({1}): {2}", DateTime.UtcNow.ToString("HH:mm:ss"), aData, s);
+    //        }
+    //        catch (Gecko.GeckoJavaScriptException e)
+    //        {
+    //            Console.WriteLine("[{0}] {1}", DateTime.UtcNow.ToString("HH:mm:ss"), e.ToString());
+    //        }
+    //    }
+    //}
 }

@@ -84,6 +84,20 @@ namespace Organiser.Common.Classes
                    pathToDirectory == MyFilesDatabase.Path.Combine(bdir, "IFTT", "Wordpress.js");
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     public class MacroOnDownload
     {
         public static string FOLDER = "*", FILE = "*", WAIT = "YES", SIZE = "";
@@ -920,41 +934,57 @@ namespace Organiser.Common.Classes
                 case "Tumblr Follow Top":
                 case "Tumblr Follow":
                 case "Tumblr Like":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltipKeywords.png";
+                    mfile.TooltipText = "Keywords,times to run";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
+                case "wordpress IA":
+                    mfile.TooltipText = "KW,Sort Feed (relevance=1 or date=2),Like Posts (1=yes or 2=no),Follow (1=yes or no=2, How many Actions (1-99)";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
+
 
                 case "Reddit Subreddit Scrape":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltipKeywordFilePathsScrape.png";
+                    mfile.TooltipText = "Keyword, limit, sort";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 case "Reddit Subreddit 3 in 1":
                 case "Reddit Comment":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltipKeywordComment.png";
+                    mfile.TooltipText = "Keyword, comment, times to run";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 case "Pinterest Repin and Like From Search":
                     //case "Reddit Save":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltippintrestLikeReshare.png";
+                    mfile.TooltipText = "Keyword, board, times to run";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 case "Pinterest Create Board":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltipCreateBoard.png";
+                    mfile.TooltipText = "Board name, times to run";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 case "FB Photo Upload":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltipfbProfilephoto.png";
+                    mfile.TooltipText = "Local filepath, times to run";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 case "FB Like Posts By URL":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltipFBurl.png";
+                    mfile.TooltipText = "URL, times to run";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 case "Facebook Post":
                 case "Google+ Post":
                 case "Twitter Post":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltipPosttext.png";
+                    mfile.TooltipText = "Post Text, times to run";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 case "Twitter Create Twitter List":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltipKeywordNameDescription.png";
+                    mfile.TooltipText = "Keyword ,list name,description";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 case "Twitter Reply By Kw":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltipKeywordtext.png";
+                    mfile.TooltipText = "Keyword,reply text, times to run";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 case "Google+ Post With URL":
-                    return "pack://application:,,,/Organiser.Common;component/Image/tooltipPosttextURL.png";
+                    mfile.TooltipText = "url, post text, times to run";
+                    return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 //case "Diigo_via_Gmail":
                 //    mfile.TooltipText = "email";
@@ -1073,7 +1103,7 @@ namespace Organiser.Common.Classes
                 case "Bing Image Downloader":
                 case "Google Image Crawl and Download":
                 case "Google Image Downloader":
-                    mfile.TooltipText = "# of images,keyword";
+                    mfile.TooltipText = "keyword, # of images";
                     return "pack://application:,,,/Organiser.Common;component/Image/tooltip_blank.png";
 
                 case "Instagram Hashtag":

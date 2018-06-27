@@ -1010,21 +1010,25 @@ namespace WPF_WYSIWYG_HTML_Editor
                 while (m.Success)
                 {
                     string link = m.Groups[1].ToString();
-                    try
-                    { 
-                        Status = "Uploading file " + link + ".";
-                        // string text = m.Groups[2].ToString();
-                        link = link.Replace("%20", " ");
-                        string mime = GetMimeType(link);
-                        Data data = Data.CreateFromFilePath(link.Replace("file:///", ""), mime);
-                        UploadResult uResult = client.UploadFile(data);
-                        content = content.Replace(link.Replace(" ", "%20"), uResult.Url);
-                    }
-                    catch (Exception ex)
+                    if (File.Exists(link))
                     {
-                        errorString += "Image upload failed " + ex.Message+Environment.NewLine;
-                        content = content.Replace(link,"");
+                        try
+                        {
+                            Status = "Uploading file " + link + ".";
+                            // string text = m.Groups[2].ToString();
+                            link = link.Replace("%20", " ");
+                            string mime = GetMimeType(link);
+                            Data data = Data.CreateFromFilePath(link.Replace("file:///", ""), mime);
+                            UploadResult uResult = client.UploadFile(data);
+                            content = content.Replace(link.Replace(" ", "%20"), uResult.Url);
+                        }
+                        catch (Exception ex)
+                        {
+                            errorString += "Image upload failed " + ex.Message + Environment.NewLine;
+                            content = content.Replace(link, "");
+                        }
                     }
+
                     
                     m = m.NextMatch();
                 }

@@ -52,6 +52,10 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Windows.Forms" />
@@ -68,13 +72,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+    <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
       <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
       <Name>CefGlue.WindowsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
+    <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue\CefGlue.csproj">
       <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
       <Name>CefGlue</Name>
     </ProjectReference>

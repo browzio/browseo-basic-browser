@@ -52,9 +52,11 @@ namespace RssReader.ViewModels
 
                     foreach (var feed in RSSFeeds)
                     {
+                        if (feed.FeedUrl == "True" || feed.FeedUrl == "False") continue;
                         if (feed.Urls != null && feed.Urls.Count > 1)
                             foreach (var url in feed.Urls)
                             {
+                                if (url == "True" || url == "False") continue;
                                 rsslw.tbInputedText.Text += url + Environment.NewLine;
                             }
                         else
@@ -131,16 +133,24 @@ namespace RssReader.ViewModels
 
         private async void LoadFeedsFromFiles()
         {
-            var rssFeedsFromFile = await Task.Run(() => { return MyFilesDatabase.GetRssFeedLinks(GloableProfData.PData, Title); });
-            if (rssFeedsFromFile.Count == 0) return;
-
-            if (rssFeedsFromFile[0].ToLower().Trim() == "true" || rssFeedsFromFile[0].ToLower().Trim() == "false")
+            new Thread(async()=> 
             {
-                loadFeedsGrouped = Convert.ToBoolean(rssFeedsFromFile[0].Trim());
-                rssFeedsFromFile.RemoveAt(0);
-            }
+                var rssFeedsFromFile = await Task.Run(() => { return MyFilesDatabase.GetRssFeedLinks(GloableProfData.PData, Title); });
+                if (rssFeedsFromFile.Count == 0) return;
 
-            CreateRSSFeedsCollection(rssFeedsFromFile);
+                if (rssFeedsFromFile[0].ToLower().Trim() == "true" || rssFeedsFromFile[0].ToLower().Trim() == "false")
+                {
+                    loadFeedsGrouped = Convert.ToBoolean(rssFeedsFromFile[0].Trim());
+                    rssFeedsFromFile.RemoveAt(0);
+                }
+                else if (rssFeedsFromFile[rssFeedsFromFile.Count - 1].ToLower().Trim() == "true" || rssFeedsFromFile[rssFeedsFromFile.Count - 1].ToLower().Trim() == "false")
+                {
+                    loadFeedsGrouped = Convert.ToBoolean(rssFeedsFromFile[rssFeedsFromFile.Count - 1].Trim());
+                }
+
+                System.Windows.Application.Current.Dispatcher.Invoke(()=> { CreateRSSFeedsCollection(rssFeedsFromFile); });
+            }).Start();
+
         }
 
         private void CreateRSSFeedsCollection(List<string> rssFeeds)
@@ -149,6 +159,8 @@ namespace RssReader.ViewModels
 
             foreach (var feedUrl in rssFeeds)
             {
+                if (feedUrl == "True" || feedUrl == "False") continue;
+
                 if (!loadFeedsGrouped) RSSFeeds.Add(CreateNewFeed(feedUrl));
                 else
                 {

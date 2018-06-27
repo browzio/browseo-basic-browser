@@ -62,6 +62,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\WordPressSharp\packages\xmlrpcnet.3.0.0.266\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.DwayneNeed, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Downloads\MicrosoftDwayneNeed\sourceCode\sourceCode\Microsoft.DwayneNeed\Microsoft.DwayneNeed\bin\Release\Microsoft.DwayneNeed.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.DwayneNeed.Win32, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Downloads\MicrosoftDwayneNeed\sourceCode\sourceCode\Microsoft.DwayneNeed\Microsoft.DwayneNeed\bin\Release\Microsoft.DwayneNeed.Win32.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -80,6 +92,12 @@
     <Reference Include="WpfHost.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\plugins\WpfHost\bin\Debug\WpfHost.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="XulFx">
+      <HintPath>..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd2\vmas-xulfx-a340969180cd\XulFx.Wpf\bin\x86\Release\XulFx.dll</HintPath>
+    </Reference>
+    <Reference Include="XulFx.Wpf">
+      <HintPath>..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd2\vmas-xulfx-a340969180cd\XulFx.Wpf\bin\x86\Release\XulFx.Wpf.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +120,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -109,13 +128,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
-      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
-      <Name>CefGlue.WindowsForms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
-      <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
-      <Name>CefGlue</Name>
+    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
+      <Project>{f8b2ddd8-df68-4649-a477-092232a34f60}</Project>
+      <Name>BrowseoFX.WPF</Name>
     </ProjectReference>
     <ProjectReference Include="..\AnyProjectBrowserProcess\AnyProjectBrowserProcess.csproj">
       <Project>{e6dae4fe-e359-4d5a-81cc-ff233aa99df9}</Project>
@@ -124,6 +139,10 @@
     <ProjectReference Include="..\AnyProjFFProcess\AnyProjFFProcess.csproj">
       <Project>{09b014dc-bfc6-4e41-a7e8-c6b8c285758d}</Project>
       <Name>AnyProjFFProcess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BrowseoFX.CMD\BrowseoFX.CMD.csproj">
+      <Project>{ca877f0e-24ee-4c3a-8f6c-95571e4807c6}</Project>
+      <Name>BrowseoFX.CMD</Name>
     </ProjectReference>
     <ProjectReference Include="..\Browser.Common\Browser.Common.csproj">
       <Project>{c6134f4b-6ab7-4969-9b28-044c473247dc}</Project>

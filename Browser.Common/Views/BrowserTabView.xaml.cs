@@ -121,51 +121,51 @@ namespace Browser.Common.Views
         {
             flyOut.IsExpanded = false;
             flyOut.Visibility = Visibility.Collapsed;
-            if (!MacroflyOut.IsExpanded) host.Width = browserGrd.ActualWidth;
-            else host.Width = host.ActualWidth + 330;
+            host.Width = browserGrd.ActualWidth;
+            //else host.Width = host.ActualWidth + 330;
         }
 
         MacroManger managerForTab;
         public event Action OnInitializedMacros = delegate { };
-        public async void openMacros_Click(object sender, RoutedEventArgs e)
-        {
-            //System.Diagnostics.Debugger.Launch();
-            if (!MacroflyOut.IsExpanded)
-            {
-                host.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
-                MacroflyOut.IsExpanded = true;
-                MacroflyOut.Visibility = Visibility.Visible;
-               if(host.ActualWidth > 330) host.Width = host.ActualWidth - 330;
+        //public async void openMacros_Click(object sender, RoutedEventArgs e)
+        //{
+        //    //System.Diagnostics.Debugger.Launch();
+        //    if (!MacroflyOut.IsExpanded)
+        //    {
+        //        host.HorizontalAlignment = System.Windows.HorizontalAlignment.Left;
+        //        MacroflyOut.IsExpanded = true;
+        //        MacroflyOut.Visibility = Visibility.Visible;
+        //       if(host.ActualWidth > 330) host.Width = host.ActualWidth - 330;
 
 
-                MacroflyOut.Cursor = Cursors.Wait;
-                await MacroSettings.InitMacrosSettings();
-                if (MacroflyOut.DataContext == null || MacroflyOut.DataContext.GetType() != typeof(MacroManger))
-                {
-                    if (managerForTab == null)
-                    {
-                        managerForTab = new MacroManger();
-                        managerForTab.OnPlayMacro += ManagerForTab_OnPlayMacro;
-                    }
-                    MacroflyOut.DataContext = managerForTab;
-                    try
-                    {
-                        await managerForTab.LoadIMacros(false);
-                    }
-                    catch { "Failed To Load Macro List".Show(); }
+        //        MacroflyOut.Cursor = Cursors.Wait;
+        //        await MacroSettings.InitMacrosSettings();
+        //        if (MacroflyOut.DataContext == null || MacroflyOut.DataContext.GetType() != typeof(MacroManger))
+        //        {
+        //            if (managerForTab == null)
+        //            {
+        //                managerForTab = new MacroManger();
+        //                managerForTab.OnPlayMacro += ManagerForTab_OnPlayMacro;
+        //            }
+        //            MacroflyOut.DataContext = managerForTab;
+        //            try
+        //            {
+        //                await managerForTab.LoadIMacros(false);
+        //            }
+        //            catch { "Failed To Load Macro List".Show(); }
 
-                    OnInitializedMacros();
+        //            OnInitializedMacros();
                    
-                }
-                MacroflyOut.Cursor = this.Cursor;
-            }
+        //        }
+        //        MacroflyOut.Cursor = this.Cursor;
+        //    }
 
-            // (DataContext as BrowserTabViewModel).RaiseOnInitializedMacrosFromView(MacroflyOut.DataContext as MacroManger);
-        }
+        //    // (DataContext as BrowserTabViewModel).RaiseOnInitializedMacrosFromView(MacroflyOut.DataContext as MacroManger);
+        //}
 
         private void BrowserTabView_OnInitializeMacrosRequest()
         {
-            openMacros_Click(null,null);
+           // openMacros_Click(null,null);
         }
 
         private async void ManagerForTab_OnPlayMacro(MacroManger manger, IIMPlayType type, int loop)
@@ -178,23 +178,19 @@ namespace Browser.Common.Views
 
         private void btnCloseMacroFlyout_Click(object sender, RoutedEventArgs e)
         {
-            MacroflyOut.IsExpanded = false;
-            MacroflyOut.Visibility = Visibility.Collapsed;
-            if (!flyOut.IsExpanded) host.Width = browserGrd.ActualWidth;
-            else host.Width = host.ActualWidth + 330;
+            //MacroflyOut.IsExpanded = false;
+            //MacroflyOut.Visibility = Visibility.Collapsed;
+            //if (!flyOut.IsExpanded) host.Width = browserGrd.ActualWidth;
+            //else host.Width = host.ActualWidth + 330;
         }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             host.Width = browserGrd.ActualWidth;
             host.Height = browserGrd.ActualHeight;
-            if ((flyOut.IsExpanded && !MacroflyOut.IsExpanded) || (!flyOut.IsExpanded && MacroflyOut.IsExpanded))
+            if (flyOut.IsExpanded)
             {
                 host.Width = browserGrd.ActualWidth - 330;
-            }
-            else if (flyOut.IsExpanded && MacroflyOut.IsExpanded)
-            {
-                host.Width = browserGrd.ActualWidth - 660;
             }
 
             if (SocialStatsExpander.IsExpanded && browserGrd.ActualHeight > 350)

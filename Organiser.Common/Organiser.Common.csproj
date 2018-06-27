@@ -45,8 +45,8 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Delimon\Delimon.Win32.IO\Delimon.Win32.IO.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -83,8 +83,12 @@
     <Compile Include="Classes\Facebook\FacebookGraphResult.cs" />
     <Compile Include="Classes\Facebook\FacebookGraphSearch.cs" />
     <Compile Include="Classes\Facebook\SourceCrawler.cs" />
+    <Compile Include="Classes\Helpers\Keyboard.cs" />
     <Compile Include="Classes\Helpers\TwoCaptchaClient.cs" />
     <Compile Include="Classes\Helpers\WebRequests.cs" />
+    <Compile Include="Controlls\SocialShareButtonsView.xaml.cs">
+      <DependentUpon>SocialShareButtonsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Extensions\Int32Extension.cs" />
     <Compile Include="Controlls\FlexibleMessageBox.cs" />
     <Compile Include="Classes\Helpers\GloableProfData.cs" />
@@ -177,6 +181,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controlls\SocialButtonsUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controlls\SocialShareButtonsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -443,16 +451,6 @@
     <Resource Include="Image\tooltip_blank.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
-      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
-      <Name>CefGlue.WindowsForms</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
-      <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
-      <Name>CefGlue</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Image\linkedin-icon.png" />
   </ItemGroup>
   <ItemGroup>
@@ -494,6 +492,40 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Image\youtube_icon_x1.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\firefox_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\google_chrome_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\google_chrome_icon2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ic_create_new_folder_black_24dp_1x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
+      <Name>CefGlue.WindowsForms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue\CefGlue.csproj">
+      <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
+      <Name>CefGlue</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\blogger-icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ScreenShot_Chrome.jpg" />
+    <Resource Include="Image\ScreenShot_IA.jpg" />
+    <Resource Include="Image\ScreenShot_PublishHub.jpg" />
+    <Resource Include="Image\ScreenShot_RSS.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\ScreenShot_Prospector.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

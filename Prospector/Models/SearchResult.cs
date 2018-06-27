@@ -210,6 +210,16 @@ namespace Prospector.Models
             }
         }
 
+        private Visibility dwExtras = Visibility.Visible;
+        public Visibility DwExtras
+        {
+            get { return dwExtras; }
+            set
+            {
+                dwExtras = value; RaisePropertyChanged("DwExtras");
+            }
+        }
+
         private SocialStatsReplys socialStatsReplys;
         public SocialStatsReplys SocialStatsReplys
         {

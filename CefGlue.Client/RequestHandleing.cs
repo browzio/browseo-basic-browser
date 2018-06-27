@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows.Forms;
 using Xilium.CefGlue.WindowsForms;
 using System.IO;
+using Browmium.WPF.WinForms;
 
 namespace Xilium.CefGlue.Client
 {
@@ -100,13 +101,13 @@ namespace Xilium.CefGlue.Client
             }
 
             ////userAgent
-            if (BrowserInit.settings != null && BrowserInit.settings.UserAgent != null && BrowserInit.settings.UserAgent != BrowserSettimgs.UserAgentChrome)
+            if (BrowserLibraryInit.Instance.Settings != null && BrowserLibraryInit.Instance.Settings.UserAgent != null && BrowserLibraryInit.Instance.Settings.UserAgent != BrowserSettimgs.UserAgentChrome)
             {
                 var headersua = request.GetHeaderMap();
                 var useragent = headersua["User-Agent"];
                 if (useragent != null)
                 {
-                    headersua["User-Agent"] = BrowserInit.settings.UserAgent;
+                    headersua["User-Agent"] = BrowserLibraryInit.Instance.Settings.UserAgent;
                     request.SetHeaderMap(headersua);
                 }
                 //frame.ExecuteJavaScript("window.__defineGetter__('userAgent', function () { return '" + BrowserInit.settings.UserAgent + "'; });", request.Url, 0);

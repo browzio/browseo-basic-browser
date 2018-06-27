@@ -55,14 +55,14 @@ namespace IMacroMultyLayout.ViewModels
         }
 
 
-        private int minWaitTimeBetweenLaunches;
+        private int minWaitTimeBetweenLaunches = 1;
         public int MinWaitTimeBetweenLaunches
         {
             get { return minWaitTimeBetweenLaunches; }
             set { minWaitTimeBetweenLaunches = value; RaisePropertyChanged("TimesToPlayMax"); }
         }
         
-        private int maxWaitTimeBetweenLaunches;
+        private int maxWaitTimeBetweenLaunches = 1;
         public int MaxWaitTimeBetweenLaunches
         {
             get { return maxWaitTimeBetweenLaunches; }
@@ -366,52 +366,75 @@ namespace IMacroMultyLayout.ViewModels
                                         datasourceForProj += dsLines[i] + Environment.NewLine; 
                                 }
                             }
+                            //foreach (var mac in checkedMAcros)
+                            //{
+                            //    if (EachOnSeperateProcessChecked)
+                            //    {
+                            //        randTimesToPlay = new Random().Next(TimesToPlay, TimesToPlayMax);
+                            //        //for (int i = 0; i < TimesToPlay; i++)
+                            //        //{
+
+                            //        //"C:\Program Files\Mozilla Firefox\firefox.exe" imacros://run/?m="_My Macro.IIM"
+                            //        var info = new ProcessStartInfo
+                            //        {
+                            //            Arguments = "\"" + proj.FilePath + "\"" + " " + CloseOnComplete + " " + "\"" + datasourceForProj + "\"" + " " + "\"" + mac.FilePath + "\"" + " " + windowsLaunched + " " + randTimesToPlay,
+                            //            CreateNoWindow = true,
+                            //            UseShellExecute = false,
+                            //            FileName = "AnyProjFFProcess.exe"
+                            //        };
+
+
+                            //        Process p = Process.Start(info);
+                            //        ProcessManager.Instance.AddProcess(p);
+                            //        windowsLaunched++;
+                            //        // p.WaitForExit();
+                            //        //}
+                            //    }
+                            //    else
+                            //    {
+                            //        macroPaths += mac.FilePath + MyFilesDatabase.SPLITTER;
+                            //    }
+                            //}
+
+                            //if (macroPaths != "")
+                            //{
+                            //    var info = new ProcessStartInfo
+                            //    {
+                            //        Arguments = "\"" + proj.FilePath + "\"" + " " + CloseOnComplete + " " + "\"" + datasourceForProj + "\"" + " " + "\"" + macroPaths + "\"" + " " + windowsLaunched + " " + randTimesToPlay,
+                            //        CreateNoWindow = true,
+                            //        UseShellExecute = false,
+                            //        FileName = "AnyProjFFProcess.exe"
+                            //    };
+
+
+                            //    Process p = Process.Start(info);
+                            //    ProcessManager.Instance.AddProcess(p);
+                            //    windowsLaunched++;
+                            //}
+
+                            var PersonData = MyFilesDatabase.GetUpPdaaFromPath(proj.FilePath);
+                           string ffpath = Path.Combine(MyFilesDatabase.GetBaseDir(), "CachesFF\\" + proj.Name);
+                                if (!Directory.Exists(ffpath)) Directory.CreateDirectory(ffpath);
+
                             foreach (var mac in checkedMAcros)
                             {
-                                if (EachOnSeperateProcessChecked)
-                                {
-                                    randTimesToPlay = new Random().Next(TimesToPlay, TimesToPlayMax);
-                                    //for (int i = 0; i < TimesToPlay; i++)
-                                    //{
-                                    var info = new ProcessStartInfo
-                                    {
-                                        Arguments = "\"" + proj.FilePath + "\"" + " " + CloseOnComplete + " " + "\"" + datasourceForProj + "\"" + " " + "\"" + mac.FilePath + "\"" + " " + windowsLaunched + " " + randTimesToPlay,
-                                        CreateNoWindow = true,
-                                        UseShellExecute = false,
-                                        FileName = "AnyProjFFProcess.exe"
-                                    };
+                                //MyFilesDatabase.LaunchToSystemFF("-new-instance -no-remote -new-tab -url about:home -new-tab -url " + url + " -profile \"" + ffpath + "\"", ffpath, PersonData);
+                                //MyFilesDatabase.LaunchToSystemFF("-new-instance -no-remote -profile \"" + ffpath + "\" -url \"imacros://run/?m=" + mac.FilePath + "\"", ffpath, PersonData,true,PersonData.ProjectName);
 
-
-                                    Process p = Process.Start(info);
-                                    ProcessManager.Instance.AddProcess(p);
-                                    windowsLaunched++;
-                                    // p.WaitForExit();
-                                    //}
-                                }
-                                else
-                                {
-                                    macroPaths += mac.FilePath + MyFilesDatabase.SPLITTER;
-                                }
-                            }
-
-                            if (macroPaths != "")
-                            {
                                 var info = new ProcessStartInfo
                                 {
-                                    Arguments = "\"" + proj.FilePath + "\"" + " " + CloseOnComplete + " " + "\"" + datasourceForProj + "\"" + " " + "\"" + macroPaths + "\"" + " " + windowsLaunched + " " + randTimesToPlay,
+                                    Arguments = "\"" + proj.FilePath + "\"" + " " + "\"imacros://run/?m=" + mac.FilePath + "\" "+ windowsLaunched + " " + "\"" + datasourceForProj + "\"",
                                     CreateNoWindow = true,
                                     UseShellExecute = false,
-                                    FileName = "AnyProjFFProcess.exe"
+                                    FileName = "BrowseoFX.CMD.exe"
                                 };
-
-
                                 Process p = Process.Start(info);
                                 ProcessManager.Instance.AddProcess(p);
+
+                                int randLaunchWait = new Random().Next(MinWaitTimeBetweenLaunches, MaxWaitTimeBetweenLaunches) * 1000;
+                                await Task.Delay(randLaunchWait < 5000 ? randLaunchWait + 5000 : randLaunchWait);
                                 windowsLaunched++;
                             }
-
-                            int randLaunchWait =  new Random().Next(MinWaitTimeBetweenLaunches, MaxWaitTimeBetweenLaunches);
-                            await Task.Delay(randLaunchWait * 1000);
                         }
                         Running = false;
                         break;

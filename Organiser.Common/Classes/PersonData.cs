@@ -1,6 +1,10 @@
-﻿using System;
+﻿using Delimon.Win32.IO;
+using Organiser.Common.Classes;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel; 
+using System.ComponentModel;
+using System.Xml.Serialization;
 
 namespace SocialOrganizer.Models
 {
@@ -441,5 +445,36 @@ namespace SocialOrganizer.Models
         public string Dir { get; set; }
         public string FilePath { get; set; }
         public string ProjectDir { get; set; }
+
+        public List<PersonData> _profiles;
+
+        [XmlIgnore]
+        public List<PersonData> Profiles
+        {
+            get
+            {
+                if (_profiles == null) _profiles = new List<PersonData>();
+                _profiles.Clear();
+                foreach (var item in new DirectoryInfo(ProjectDir).GetDirectories())
+                {
+                    string pname = item.Name;
+                    if (pname.Contains("_folder_")) continue;
+
+                    if (pname.Contains("_tier_")) continue;
+
+                    PersonData pnamefromFile = MyFilesDatabase.GetSubProjectPersonData(item.FullName);
+                    _profiles.Add(pnamefromFile);
+                }
+                return _profiles;
+            }
+        }
+
+        public string ProfOrProjName
+        {
+            get
+            {
+                return ProfileName.IsNullOrEmpty() ? ProjectName : ProfileName;
+            }
+        }
     }
 } 

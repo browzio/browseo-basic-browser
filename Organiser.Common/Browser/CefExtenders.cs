@@ -246,7 +246,7 @@ namespace Organiser.Common.Browser
     {
         public event Action<string, string> OnGotSourceFromLoadEnd = delegate { };
 
-        protected override void OnLoadStart(CefBrowser browser, CefFrame frame)
+        protected override void OnLoadStart(CefBrowser browser, CefFrame frame, CefTransitionType transitionType)
         {
             // A single CefBrowser instance can handle multiple requests
             //   for a single URL if there are frames (i.e. <FRAME>, <IFRAME>).
@@ -264,10 +264,15 @@ namespace Organiser.Common.Browser
             if (frame.IsMain)
             {
                 Console.WriteLine("END: {0}, {1}", browser.GetMainFrame().Url, httpStatusCode);
-                if (browser.GetMainFrame().Url.Contains("/photos/") || browser.GetMainFrame().Url.Contains("/search/videos/"))
+                if (browser.GetMainFrame().Url.Contains("photos-keyword") || browser.GetMainFrame().Url.Contains("/search/videos/")
+                    || browser.GetMainFrame().Url.Contains("/search/groups/"))
                 {
                     maxrecursive = 3;
-                    if (browser.GetMainFrame().Url.Contains("/search/photos/") || browser.GetMainFrame().Url.Contains("/search/videos/")) maxrecursive = 75;
+                    if (browser.GetMainFrame().Url.Contains("photos-keyword") || browser.GetMainFrame().Url.Contains("/search/videos/"))
+                        maxrecursive = 75;
+                    else if (browser.GetMainFrame().Url.Contains("/search/groups/"))
+                        maxrecursive = 3;
+
                     recursiveScrollCalls = 0;
                     getAllotOfPhotosRecursive(browser);
                 }
@@ -295,8 +300,11 @@ namespace Organiser.Common.Browser
             (text, url) =>
             {
 
-                if (browser.GetMainFrame().Url.Contains("/search/photos/") || browser.GetMainFrame().Url.Contains("/search/videos/"))
+                if (browser.GetMainFrame().Url.Contains("photos-keyword") || browser.GetMainFrame().Url.Contains("/search/videos/")
+                || browser.GetMainFrame().Url.Contains("/search/groups/"))
                 {
+                    Debugger.Launch();
+
                     if (recursiveScrollCalls >= maxrecursive)
                     {
                         OnGotSourceFromLoadEnd(text, url);
@@ -410,6 +418,16 @@ namespace Organiser.Common.Browser
         protected override void OnScrollOffsetChanged(CefBrowser browser, double x, double y)
         {
            // throw new NotImplementedException();
+        }
+
+        protected override CefAccessibilityHandler GetAccessibilityHandler()
+        {
+            return null;
+        }
+
+        protected override void OnImeCompositionRangeChanged(CefBrowser browser, CefRange selectedRange, CefRectangle[] characterBounds)
+        {
+
         }
     }
 }

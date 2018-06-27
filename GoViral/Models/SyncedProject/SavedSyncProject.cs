@@ -38,10 +38,10 @@ namespace GoViral.Models
             {
                 if (SyndicatedPostsList == null)
                 {
-                    return "0 Urls To Syndicate";
+                    return "0 Urls ";
                 }
 
-                return SyndicatedPostsList.Count + " Urls To Syndicate";
+                return SyndicatedPostsList.Count + " Urls ";
             }
         }
 
@@ -94,6 +94,7 @@ namespace GoViral.Models
             set { visibleHasNext = value; RaisePropertyChanged("VisibleHasNext"); }
         }
 
+        object isOpenLock = new object();
 
         //object mLock = new object();
 
@@ -116,10 +117,14 @@ namespace GoViral.Models
                 case "OpenInProjBrowserFF":
                     new Thread(launchInBrowser).Start(true);
                     break;
+
                 default:
                     break;
             }
         }
+
+
+
 
         private void launchInBrowser(object isFF)
         {
@@ -139,8 +144,11 @@ namespace GoViral.Models
                 };
                 if (toff)
                 {
-                    info.Arguments = "\"" + projpath + "\"" + " " + "\""+ url + "\"" + " " + TypeOfSync;
-                    info.FileName = "AnyProjFFProcess.exe";
+                    //info.Arguments = "\"" + projpath + "\"" + " " + "\""+ url + "\"" + " " + TypeOfSync;
+                    //info.FileName = "AnyProjFFProcess.exe";
+
+                    info.Arguments = "\"" + projpath + "\"" + " " + "\"" + url + "\" " + " " + 1 + " " + TypeOfSync;
+                    info.FileName = "BrowseoFX.CMD.exe";
                 }
                 else
                 {
@@ -162,6 +170,15 @@ namespace GoViral.Models
         private void SyndicatedPostsList_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             RaisePropertyChanged("UrlsToSyndicateMessage");
+
+            if(e.NewItems != null)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    //(item as SyncedProjectData).OnCommandRaisedInView = new RelayCommand(OnCommandRaisedInView_Activated);
+                    (item as SyncedProjectData).FromProject = Name;
+                }
+            }
         }
     }
 }

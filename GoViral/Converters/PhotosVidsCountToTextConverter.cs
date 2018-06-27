@@ -43,9 +43,9 @@ namespace GoViral.Converters
                             Organiser.Common.Classes.Paging paging = values[3] as Organiser.Common.Classes.Paging;
 
                             if (photoArr != null && count > 0 && paging != null)
-                                return "Load All...";
+                                return "";
                             if (VidArr != null && count > 0 && paging != null)
-                                return "Load All...";
+                                return "";
                         }
                     }
                 }

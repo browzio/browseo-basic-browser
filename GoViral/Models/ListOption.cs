@@ -40,6 +40,8 @@ namespace GoViral.Models
         {
             get { return fBGraphData; }
             set { fBGraphData = value; RaisePropertyChanged("FBGraphData"); OnFBGraphDataChanged(); }
-        } 
+        }
+        
+       // public FacebookGraphData VirtulizingFBGraphData { get; set; }
     }
 }

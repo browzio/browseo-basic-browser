@@ -27,11 +27,26 @@ using CrawlerContracts;
 using System.Runtime.Remoting;
 using GoViral.Helpers;
 using BrowserHost;
+using Gecko;
+using Gecko.Interfaces;
+using System.Net;
+using System.Runtime.InteropServices;
 
 namespace GoViral.ViewModels
 {
     public class GoViralVM : MarshalByRefObject, INotifyPropertyChanged 
     {
+
+        private ColaborationViewModel colaboratorTabVM;
+        public ColaborationViewModel ColaboratorTabVM
+        {
+            get { return colaboratorTabVM; }
+            set { colaboratorTabVM = value; RaisePropertyChanged("ColaboratorTabVM"); }
+        }
+
+        public event Action<string> OnSelectedTabNavigate;
+        public event Action OnDominateAll;
+
         #region propchanged and marshal
         protected void RaisePropertyChanged(string name)
         {
@@ -47,10 +62,19 @@ namespace GoViral.ViewModels
         {
             return null; //live forever
         }
+
         #endregion
 
         public ICommand OnBtnClicked { get; set; }
         public ICommand CTMenuClick { get; set; }
+
+
+        private int tCMainIndex;
+        public int TCMainIndex
+        {
+            get { return tCMainIndex; }
+            set { tCMainIndex = value; RaisePropertyChanged("TCMainIndex"); }
+        }
 
 
         private ObservableCollection<Folder> folders;
@@ -97,23 +121,23 @@ namespace GoViral.ViewModels
             }
         }
 
-        private WindowsFormsHost wfh;
-        public WindowsFormsHost WebBrowserHost
-        {
-            get
-            {
-                if (wfh == null)
-                {
-                    RefreshBrowser();
-                }
-                return wfh;
-            }
-            set
-            {
-                wfh = value; RaisePropertyChanged("WebBrowserHost");
-            }
-        }
-        public BrowserCntrl WebBrowser { get; set; }
+        //private WindowsFormsHost wfh;
+        //public WindowsFormsHost WebBrowserHost
+        //{
+        //    get
+        //    {
+        //        if (wfh == null)
+        //        {
+        //            RefreshBrowser();
+        //        }
+        //        return wfh;
+        //    }
+        //    set
+        //    {
+        //        wfh = value; RaisePropertyChanged("WebBrowserHost");
+        //    }
+        //}
+        //public BrowserCntrl WebBrowser { get; set; }
         private string browserPreviewStatus;
         public string BrowserPreviewStatus
         {
@@ -121,6 +145,8 @@ namespace GoViral.ViewModels
             set { browserPreviewStatus = value; RaisePropertyChanged("BrowserPreviewStatus"); }
         }
 
+        //public BaseBrowserViewModel WebBrowserControler { get; set; }
+        bool canceledCrawl = false;
 
         #region pbar
         private Visibility pBarVisible;
@@ -161,8 +187,13 @@ namespace GoViral.ViewModels
 
         private object mLock = new object();
 
+        public string AccessToken { get; set; }
+
         public GoViralVM()
         {
+            ColaboratorTabVM = new ColaborationViewModel(this);
+            ColaboratorTabVM.LoadColabiratedProjects();
+
             OnBtnClicked = new RelayCommand(On_OnBtnClicked);
             CTMenuClick = new RelayCommand(On_CTMenuClick);
 
@@ -172,7 +203,7 @@ namespace GoViral.ViewModels
             //{
             //    PopulatList();
             //}, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
-            new Thread(PopulatList).Start();
+            new Thread(PopulatList).Start(GloableProfData.PData.ProjectName);
 
             uiContextScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 
@@ -207,7 +238,7 @@ namespace GoViral.ViewModels
                                 }
 
                                 Folders[SIFolders].FolderTitle = setFolderNAmeWindow.tbInputText.Text;
-                                SaveList();
+                                //SaveList();
                             }
                         }
                     }, CancellationToken.None, TaskCreationOptions.None, TaskScheduler.FromCurrentSynchronizationContext());
@@ -221,10 +252,10 @@ namespace GoViral.ViewModels
                         {
                             Folders.RemoveAt(SIFolders);
 
-                            Task.Factory.StartNew(() =>
-                            {
-                                SaveList();
-                            });
+                            //Task.Factory.StartNew(() =>
+                            //{
+                            //    SaveList();
+                            //});
                         }
                     }
                     catch { }
@@ -327,6 +358,10 @@ namespace GoViral.ViewModels
                     addNewFolder();
                     break;
 
+                case "DominateAll":
+                    OnDominateAll?.Invoke();
+                    break;
+
                 case "MULTILINKS":
                     OpenMultyLinks(null, showWindow: true);
                     break;
@@ -362,14 +397,306 @@ namespace GoViral.ViewModels
                     break;
 
                 case "REFRESHTOKEN":
-                    WebBrowser.Navigate(Social.FACEBOOK_GRAPH_LINK);
+                    //BrowseoFXManager.Instance.TabbrowserHandler.SelectedTabNavigate(Social.FACEBOOK_GRAPH_LINK);
+                    // WebBrowser.Navigate(Social.FACEBOOK_GRAPH_LINK);
+
+                    //WebBrowserControler.MainWebView.Navigated += MainWebView_Navigated_Token;
+                    //WebBrowserControler.SelectedTabNavigate(Social.FACEBOOK_GRAPH_LINK);
+
+                    OnSelectedTabNavigate?.Invoke(Social.FACEBOOK_GRAPH_LINK);
                     break;
 
                 default:
                     break;
             }
         }
+
+
+        internal void RaiseOnSelectedTabNavigate(string url)
+        {
+            OnSelectedTabNavigate?.Invoke(url);
+        }
+
+        //private void MainWebView_Navigated_Token(object sender, Gecko.GeckoNavigatedEventArgs e)
+        //{
+        //    if (WebBrowserControler.SelectedContentDocument.ReadyState == "loading") return;
+        //    WebBrowserControler.MainWebView.Navigated -= MainWebView_Navigated_Token;
+        //    string source = (WebBrowserControler.SelectedContentDocument.DocumentElement as Gecko.DOM.HTML.GeckoHTMLHtmlElement).OuterHtml;
+
+        //    string accessTiken = source.Trim().Split(new string[] { "placeholder=\"Paste in an existing Access Token or click &quot;Get User Access Token" }, StringSplitOptions.None)[1];
+        //    accessTiken = accessTiken.Split(new string[] { "value=" }, StringSplitOptions.None)[1];
+        //    accessTiken = accessTiken.Remove(accessTiken.IndexOf(@">"));
+        //    AccessToken = accessTiken.Replace("\"", "");
+        //    AccessToken = AccessToken.Replace(" type=text", "");
+        //}
         #endregion
+
+        public async void Folder_OnSelectedCheckStats(Folder folder, string url)
+        {
+            if (AccessToken.IsNullOrEmpty())
+            {
+                "You must refresh the Access Token before continuing.".Show();
+                return;
+            }
+            canceledCrawl = false;
+            LoadingStatus = "Start";
+            //new Thread(() =>
+            //{
+            //    if (!initializeCrawler())
+            //    {
+            //        return;
+            //    }
+
+            //    if (url != null)
+            //    {
+            //        addLinkForCrawlerAddInn(url, folder, folder.SavedLinksList[folder.SISavedLinks], null, CrawlerStates.FbGraphCrawl);
+            //    }
+            //    else
+            //    {
+            //        foreach (ListOption option in folder.SavedLinksList)
+            //        {
+            //            addLinkForCrawlerAddInn(option.Url, folder, option, null, CrawlerStates.FbGraphCrawl);
+            //        }
+            //    }
+
+            //    mCrawlerHost.IninAdin();
+            //}).Start(); 
+
+            //checkOnePage
+            if (url != null)
+            {
+                //FBConverseoOGCrawler crawler = new FBConverseoOGCrawler();
+                //crawler.StartWindow();
+                //crawler.ReadStats(url);
+
+                //using (var windowMediator = Xpcom.GetService2<nsIXMLHttpRequest>(Contracts.XmlHttpRequest))
+                //{
+
+                //}
+
+                await ReadStats(url, folder, folder.SelectedPage);
+            }
+            //check all pages in folder
+            else
+            {
+                foreach (ListOption option in folder.SavedLinksList)
+                {
+                    LoadingStatus = " STARTING " + option.Name;
+                    await ReadStats(option.Url, folder, option);
+                    LoadingStatus = "End";
+                    PBarVisible = Visibility.Collapsed;
+                    if (canceledCrawl) return;
+                    //addLinkForCrawlerAddInn(option.Url, folder, option, null, CrawlerStates.FbGraphCrawl);
+                }
+            }
+
+            LoadingStatus = "End";
+        }
+
+        private async Task ReadStats(string url,Folder folder, ListOption option)
+        {
+            IsIndeterminate = true;
+            PBarVisible = Visibility.Visible;
+
+            if (url.Contains("/?ref=br_rs")) url = url.Replace("/?ref=br_rs", "");
+            if (url.Contains("?ref=br_rs")) url = url.Replace("?ref=br_rs", "");
+
+            string pageName = url;
+            string urltillId = url;
+            string fullOgUrl = "";
+
+            pageName = getPageNameOrIdFromUrl(url);
+            if (string.IsNullOrEmpty(pageName) || string.IsNullOrWhiteSpace(pageName))
+            {
+                return;
+            }
+            if (url.Contains("/")) urltillId = url.Remove(url.LastIndexOf("/") + 1);
+
+
+            if (url.StartsWith("https://www.facebook.com/pages/"))
+            {
+                fullOgUrl = "https://graph.facebook.com/v2.12/" + pageName + "?fields=" +
+                                            @"about,id,link,founded,can_post,category,talking_about_count,likes,
+                                        photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)},
+                                        videos.limit(30){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
+                                        posts.limit(100){caption,description,picture,full_picture,shares,link,message,via,source,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)},
+                                        feed.limit(70){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
+                                        &access_token=" + AccessToken;
+            }
+            else if (url.StartsWith(Social.FACEBOOK_GROUPS_DEFAULT_URL))
+            {
+                fullOgUrl = "https://graph.facebook.com/v2.12/" + pageName + "?fields=" +
+                                            @"description,name,privacy,updated_time,
+                                        members.limit(0).summary(true),
+                                        feed.limit(100){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
+                                        &access_token=" + AccessToken;
+
+               // return;
+            }
+            else if (url.StartsWith(Social.FACEBOOK_EVENTS_DEFAULT_URL))
+            {
+                fullOgUrl = "https://graph.facebook.com/v2.12/" + pageName + "?fields=" +
+                                              @"description,location,privacy,start_time,ticket_uri,timezone,updated_time,
+                                            interested.limit(0).summary(true),
+                                            invited.limit(0).summary(true),
+                                            feed.limit(100){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
+                                            &access_token=" + AccessToken;
+
+               // return;
+            }
+            else if (url.StartsWith(Social.FACEBOOK_PLACES_DEFAULT_URL))
+            {
+                fullOgUrl = "https://graph.facebook.com/v2.12/" + pageName + "?fields=" +
+                                            @"about,id,name,category,can_post,description,founded,is_community_page,is_permanently_closed,is_published,is_unclaimed,is_verified,link,talking_about_count,website,likes,location,
+                                        photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)},
+                                        albums{photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)}},
+                                        videos.limit(30){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
+                                        posts.limit(100){caption,description,picture,full_picture,shares,link,message,via,source,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)},
+                                        feed.limit(70){caption,created_time,description,full_picture,id,is_expired,is_hidden,is_published,link,message,name,object_id,picture,shares,source,story,type,updated_time,comments.limit(0).summary(true),likes.limit(0).summary(true)}
+                                        &access_token=" + AccessToken;
+            }
+            else if (url.StartsWith(Social.FACEBOOK_PHOTOS_DEFAULT_URL))
+            {
+                fullOgUrl = "https://graph.facebook.com/v2.12/" + pageName + @"?fields=
+                                            created_time,link,name,source,updated_time,album,from,picture,images,likes.limit(0).summary(true),comments.limit(200).summary(true)&access_token=" + AccessToken;
+            }
+            else if (url.StartsWith(Social.FACEBOOK_VIDEOS_DEFAULT_URL))
+            {
+                fullOgUrl = "https://graph.facebook.com/v2.12/" + pageName + @"?fields=
+                                            picture,id,embed_html,source,updated_time,description,created_time,likes.limit(0).summary(true),comments.limit(200).summary(true)&access_token=" + AccessToken;
+            }
+
+            try
+            {
+                nsICookieService CookieMan = Xpcom.GetService<nsICookieService>("@mozilla.org/cookieService;1");
+                var cookies = Xpcom.QueryInterface<nsICookieService>(CookieMan);
+                Marshal.ReleaseComObject(CookieMan);
+
+                var uri = IOService.GetService().CreateNsIUri(fullOgUrl);
+                string cookie = cookies.GetCookieString(uri, null); //i've implemented my own cookie service
+
+                WebClient webClient = new WebClient();
+                webClient.Headers.Add(HttpRequestHeader.Cookie, cookie);
+                //webClient.Headers.Add(HttpRequestHeader.Accept, "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+                //webClient.Headers.Add(HttpRequestHeader.AcceptEncoding, "gzip, deflate");
+                //webClient.Headers.Add(HttpRequestHeader.AcceptLanguage, "en-US,en;q=0.5");
+                webClient.Headers.Add(HttpRequestHeader.UserAgent, BrowserSettimgs.UserAgent_CurrentFFBuild);
+                webClient.Proxy = MyFilesDatabase.GetRequestsProxy();
+
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        string json = webClient.DownloadString(fullOgUrl);
+
+                        var j = Newtonsoft.Json.JsonConvert.DeserializeObject<FacebookGraphDataForMedia>(json);
+                        FacebookGraphData data = new FacebookGraphData()
+                        {
+                            about = j.about,
+                            album = j.album,
+                            albums = j.albums,
+                            can_post = j.can_post,
+                            category = j.category,
+                            comments = j.comments,
+                            description = j.description,
+                            embed_html = j.embed_html,
+                            feed = j.feed,
+                            founded = j.founded,
+                            id = j.id,
+                            images = j.images,
+                            interested = j.interested,
+                            invited = j.invited,
+                            is_community_page = j.is_community_page,
+                            is_permanently_closed = j.is_permanently_closed,
+                            is_published = j.is_published,
+                            is_unclaimed = j.is_unclaimed,
+                            is_verified = j.is_verified,
+                            length = j.length,
+                            likes = j.likes == null ? 0 : j.likes.summary == null ? 0 : j.likes.summary.total_count,
+                            link = j.link,
+                            members = j.members,
+                            name = j.name,
+                            paging = j.paging,
+                            permalink_url = j.permalink_url,
+                            photos = j.photos,
+                            picture = j.picture,
+                            posts = j.posts,
+                            privacy = j.privacy,
+                            source = j.source,
+                            start_time = j.start_time,
+                            talking_about_count = j.talking_about_count,
+                            timezone = j.timezone,
+                            updated_time = j.updated_time,
+                            videos = j.videos,
+                            views = j.views,
+                            website = j.website,
+                        };
+
+                        option.FBGraphData = data;
+
+                        //data.posts = new Posts();
+                        //data.posts.data = new ObservableCollection<FacebookGraphPostResult>();
+
+                        //option.VirtulizingFBGraphData = new FacebookGraphData();
+                        //option.VirtulizingFBGraphData.posts = new Posts();
+                        //option.VirtulizingFBGraphData.posts.data = new ObservableCollection<FacebookGraphPostResult>();
+
+                        //foreach (var post in j.posts.data)
+                        //{
+                        //    option.VirtulizingFBGraphData.posts.data.Add(post);
+
+                        //    if (data.posts.data.Count > 5) continue;
+
+                        //    data.posts.data.Add(post);
+                        //}
+
+                        PBarVisible = Visibility.Collapsed;
+                    }
+                    catch(Exception ex)
+                    {
+                        var message = option.Name + " cannot be loaded due to missing permissions, or does not support this operation. Please read the Graph API documentation at https://developers.facebook.com/docs/graph-api " + ex.Message;
+                        message.Show();
+                    }
+                });
+
+                webClient.Dispose();
+            }
+            catch { }
+
+            folder.Raise_OnFBGraphDataChanged();
+            PBarVisible = Visibility.Collapsed;
+        }
+
+        internal void LoadMorePosts()
+        {
+            //TODO: Maybe laaaaater
+        }
+
+        private string getPageNameOrIdFromUrl(string url)
+        {
+            try
+            {
+                if (!url.Contains("https://www.facebook.com/")) return "";
+
+                string pageName = url;
+                pageName = url.Substring(url.LastIndexOf("/") + 1);
+                if (url.Contains("-"))
+                {
+                    string id = url.Substring(url.LastIndexOf("-") + 1);
+                    //long tryparseResult = 0;
+                    //if (Int64.TryParse(id, out tryparseResult))
+                    //{
+                       pageName = id;
+                    //}
+                }
+
+                return pageName;
+            }
+            catch
+            {
+                return "";
+            }
+        }
 
         private void OpenMultyLinks(List<string> links, bool showWindow)
         {
@@ -454,31 +781,6 @@ namespace GoViral.ViewModels
             });
         }
 
-        void Folder_OnSelectedCheckStats(Folder folder, string url)
-        {
-            new Thread(() =>
-            {
-                if (!initializeCrawler())
-                {
-                    return;
-                }
-
-                if (url != null)
-                {
-                    addLinkForCrawlerAddInn(url, folder, folder.SavedLinksList[folder.SISavedLinks], null, CrawlerStates.FbGraphCrawl);
-                }
-                else
-                {
-                    foreach (ListOption option in folder.SavedLinksList)
-                    {
-                        addLinkForCrawlerAddInn(option.Url, folder, option, null, CrawlerStates.FbGraphCrawl);
-                    }
-                }
-
-                mCrawlerHost.IninAdin();
-            }).Start(); 
-        }
-
         public void BeginAllPhotosScrape(Folder folder, ListOption option, bool useGraph)
         {
             new Thread(() =>
@@ -511,8 +813,12 @@ namespace GoViral.ViewModels
             mCrawlerHost.PreInitStates.Add(crawlSearchState);
         }
 
+       
         private void Folder_OnCanceledAStatsCheck(ListOption option)
         {
+            canceledCrawl = true;
+            PBarVisible = Visibility.Collapsed;
+
             if (mCrawlerHost != null)
             {
                 if (option != null)
@@ -711,40 +1017,81 @@ namespace GoViral.ViewModels
                 try
                 {
                     bool wasvisible = PBarVisible == Visibility.Visible;
-                    if(!wasvisible)
-                        PBarVisible = Visibility.Visible; 
+                    if (!wasvisible)
+                        PBarVisible = Visibility.Visible;
                     LoadingStatus = "Saving Do Not Close Project";
 
-                    string saveToDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "GoViral", GloableProfData.PData.ProjectName);
-                    if (!Directory.Exists(saveToDir)) Directory.CreateDirectory(saveToDir);
+                    ColaboratorTabVM.SaveImportedCheckedProjects();
+                    //string saveToDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "GoViral", GloableProfData.PData.ProjectName);
+                    //if (!Directory.Exists(saveToDir)) Directory.CreateDirectory(saveToDir);
 
-                    string saveToFilePath = Path.Combine(saveToDir, "info");
-                    //if (File.Exists(saveToFilePath)) File.Delete(saveToFilePath);
-                   // try
-                   // {
-                        string sss = Folders.XmlSerializeToString();
-                        File.WriteAllText(saveToFilePath, sss);
-                    //}
-                    //catch(OutOfMemoryException)
+                    //string saveToFilePath = Path.Combine(saveToDir, "info");
+                    //string allfoldersxml = Folders.XmlSerializeToString();
+                    //File.WriteAllText(saveToFilePath, allfoldersxml);
+
+
+                    //List<KeyValuePair<string, Folder>> projectsFolders = new List<KeyValuePair<string, Folder>>();
+                    //foreach (var folder in Folders)
                     //{
-                    //    File.Delete(saveToFilePath);
-                    //    foreach (string chunk in Folders.XmlSerializeToStringChunks())
+                    //    projectsFolders.Add(new KeyValuePair<string, Folder>(folder.ProjectsFolderName, folder));
+                    //}
+                    //foreach (var projFolder in projectsFolders)
+                    //{
+                    //    string saveToDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "GoViral", projFolder.Key);
+                    //    if (!Directory.Exists(saveToDir)) Directory.CreateDirectory(saveToDir);
+
+                    //    string saveToFilePath = Path.Combine(saveToDir, "info");
+                    //    File.WriteAllText(saveToFilePath, projFolder.XmlSerializeToString());
+                    //}
+
+                    List<KeyValuePair<string, ObservableCollection<Folder>>> linkedList = new List<KeyValuePair<string, ObservableCollection<Folder>>>();
+                    foreach (var folder in Folders)
+                    {
+                        ObservableCollection<Folder> foldersToSave = new ObservableCollection<Folder>();
+                        foreach (var projectFolder in Folders)
+                        {
+                            if (projectFolder.ProjectsFolderName == folder.ProjectsFolderName)
+                            {
+                                foldersToSave.Add(projectFolder);
+                            }
+                        }
+
+
+                        var projectsFolders = linkedList.FirstOrDefault(f => f.Key == folder.ProjectsFolderName);
+                        if(projectsFolders.Key == null || projectsFolders.Value == null)
+                        {
+                            linkedList.Add(new KeyValuePair<string, ObservableCollection<Folder>>(folder.ProjectsFolderName, foldersToSave));
+                        }
+                    }
+                    foreach (var item in linkedList)
+                    {
+                        string saveToDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "GoViral", item.Key);
+                        if (!Directory.Exists(saveToDir)) Directory.CreateDirectory(saveToDir);
+
+                        string saveToFilePath = Path.Combine(saveToDir, "info");
+                        File.WriteAllText(saveToFilePath, item.Value.XmlSerializeToString());
+                    }
+
+                    //foreach (var folder in Folders)
+                    //{
+                    //    string saveToDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "GoViral", folder.ProjectsFolderName);
+                    //    if (!Directory.Exists(saveToDir)) Directory.CreateDirectory(saveToDir);
+
+                    //    string saveToFilePath = Path.Combine(saveToDir, "info");
+
+                    //    ObservableCollection<Folder> foldersToSave = new ObservableCollection<Folder>();
+                    //    foreach (var projectFolder in Folders)
                     //    {
-                    //        File.AppendAllText(saveToFilePath, chunk);
+                    //        if(projectFolder.ProjectsFolderName == folder.ProjectsFolderName)
+                    //        {
+                    //            foldersToSave.Add(projectFolder);
+                    //        }
                     //    }
-                    //}
-                    //MemoryStream sessionData = new MemoryStream();
-                    //DataContractSerializer serializer = new DataContractSerializer(typeof(ObservableCollection<Folder>));
-                    //serializer.WriteObject(sessionData, Folders);
 
-                    //using (FileStream fileStream = File.OpenWrite(saveToFilePath))
-                    //{
-                    //    sessionData.Seek(0, SeekOrigin.Begin);
-                    //    sessionData.CopyTo(fileStream);
-                    //    fileStream.Flush();
+                    //    File.WriteAllText(saveToFilePath, foldersToSave.XmlSerializeToString());
                     //}
 
-                    LoadingStatus = "Done";    
+                    LoadingStatus = "Done";
                     if (!wasvisible)
                         PBarVisible = Visibility.Collapsed;
                 }
@@ -755,52 +1102,75 @@ namespace GoViral.ViewModels
                 }
             }
         }
-
-        public void PopulatList()
+        
+        public void PopulatList(object projectname)
         {
             lock (mLock)
             {
                 try
                 {
-                    string saveToDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "GoViral", GloableProfData.PData.ProjectName);
+                    var projectsFolderName = projectname as string;
+                    string saveToDir = Path.Combine(MyFilesDatabase.GetBaseDir(), "GoViral", projectsFolderName);
                     if (!Directory.Exists(saveToDir)) return;
+                    var foldersFileInfo = new DirectoryInfo(saveToDir);
 
-                    string saveToFilePath = Path.Combine(saveToDir, "info");
-                    if (!File.Exists(saveToFilePath)) return;
-
-                    // File.ReadAllText(saveToFilePath);
-
-                    ObservableCollection<Folder> data = File.ReadAllText(saveToFilePath).XmlDeserializeFromString<ObservableCollection<Folder>>();
-                    // Folder needsToBeSelected = null;
-                    foreach (Folder folder in data)
+                    foreach (var file in foldersFileInfo.GetFiles())
                     {
-                        setFolderEvents(folder);
-                        folder.CTMenuClick = new RelayCommand(folder.On_CTMenuClick);
-                        if (folder.SavedLinksList != null)
+                        if (file.Name == "info")
                         {
-                            foreach (ListOption lo in folder.SavedLinksList)
+
+                            ObservableCollection<Folder> data = File.ReadAllText(file.FullName).XmlDeserializeFromString<ObservableCollection<Folder>>();
+                            // Folder needsToBeSelected = null;
+                            foreach (Folder mFolder in data)
                             {
-                                lo.OnFBGraphDataChanged += folder.Raise_OnFBGraphDataChanged;
-                                //if (lo.IsSelected)
-                                //{
-                                //    needsToBeSelected = folder;
-                                //}
+                                SetUpFolder(mFolder, projectsFolderName);
                             }
                         }
-                        folder.SISavedLinks = 0;
-                        Application.Current.Dispatcher.Invoke(delegate { Folders.Add(folder); });
+                        //else if (file.Extension.EndsWith("info"))
+                        //{
+                        //    Folder mFolder = File.ReadAllText(file.FullName).XmlDeserializeFromString<Folder>();
+                        //    SetUpFolder(mFolder, file.Name.Replace(".info", ""));
+                        //}
                     }
+                    
+                    
                     if (SelectedFolder != null)
                     {
                         SelectedFolder.IsEExpanded = true;
                     }
+
+                    TCMainIndex = 0;
                     RaisePropertyChanged("SelectedFolder");
+                    //ColaboratorTabVM.OnCommandFromView_Raised("LoadCheckedIntoDominator");
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
             }
+        }
+
+        private void SetUpFolder(Folder mFolder, string projectsFolderName)
+        {
+            var isFolderExisting = Folders.FirstOrDefault(f => f.FolderTitle == mFolder.FolderTitle);
+            Folders.Remove(isFolderExisting);
+
+            mFolder.ProjectsFolderName = projectsFolderName;
+            setFolderEvents(mFolder);
+            mFolder.CTMenuClick = new RelayCommand(mFolder.On_CTMenuClick);
+            if (mFolder.SavedLinksList != null)
+            {
+                foreach (ListOption lo in mFolder.SavedLinksList)
+                {
+                    lo.OnFBGraphDataChanged += mFolder.Raise_OnFBGraphDataChanged;
+                    //if (lo.IsSelected)
+                    //{
+                    //    needsToBeSelected = folder;
+                    //}
+                }
+            }
+            mFolder.SISavedLinks = 0;
+            Application.Current.Dispatcher.Invoke(delegate { Folders.Add(mFolder); });
         }
 
         private void setFolderEvents(Folder folder)
@@ -888,7 +1258,7 @@ namespace GoViral.ViewModels
 
                 addNewLoToFolder(Folders[SIFolders], fcw.tbName.Text, fcw.tbUrl.Text, null);
 
-                new Thread(SaveList).Start();
+                //new Thread(SaveList).Start();
             }
 
         }
@@ -937,7 +1307,7 @@ namespace GoViral.ViewModels
                 setFolderEvents(folder);
                 Folders.Add(folder);
 
-                Task.Factory.StartNew(SaveList);
+                //Task.Factory.StartNew(SaveList);
             }
         }
 
@@ -961,17 +1331,23 @@ namespace GoViral.ViewModels
                 folder.SavedLinksList.Remove(folder.SavedLinksList[folder.SISavedLinks]);
             }
 
-            Task.Factory.StartNew(() =>
-            {
-                SaveList();
-            });
+            //Task.Factory.StartNew(() =>
+            //{
+            //    SaveList();
+            //});
         }
         #endregion
 
         #region browser load and events
         void Folder_OnLoadInBrowser(string url)
         {
-            WebBrowser.Navigate(url);
+            //WebBrowser.Navigate(url);
+
+            //BrowseoFXManager.Instance.TabbrowserHandler.SelectedTabNavigate(url);
+
+            // WebBrowserControler.SelectedTabNavigate(url);
+
+            OnSelectedTabNavigate?.Invoke(url);
         }
 
         void WebBrowser_OnBrowserLoadingChanged(bool isLoading)
@@ -990,338 +1366,338 @@ namespace GoViral.ViewModels
         public void RefreshBrowser()
         {
             string url = "";
-            if (WebBrowser != null)
-            {
-                try
-                {
-                    if (WebBrowser.CBrowser != null && WebBrowser.GetBrowser() != null && WebBrowser.GetBrowser().GetMainFrame() != null)
-                    {
-                        url = WebBrowser.GetBrowser().GetMainFrame().Url;
-                    }
-                }
-                catch { }
-                WebBrowser.DisposeBrowserComponents();
-            }
+            //if (WebBrowser != null)
+            //{
+            //    try
+            //    {
+            //        if (WebBrowser.CBrowser != null && WebBrowser.GetBrowser() != null && WebBrowser.GetBrowser().GetMainFrame() != null)
+            //        {
+            //            url = WebBrowser.GetBrowser().GetMainFrame().Url;
+            //        }
+            //    }
+            //    catch { }
+            //    WebBrowser.DisposeBrowserComponents();
+            //}
 
-            if(wfh != null)
-            {
-                wfh.Child.Dispose();
-            }
+            //if(wfh != null)
+            //{
+            //    wfh.Child.Dispose();
+            //}
 
-            WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
-            WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
-            WebBrowser.OnBrowserContextMenuClicked += WebBrowser_OnBrowserContextMenuClicked;
-            WebBrowser.OnBrowserStatusChanged += WebBrowser_OnBrowserStatusChanged;
-            WebBrowser.init(url, BrowserSettimgs.FlashEnabled, BrowserSettimgs.JavascriptEnabled, BrowserSettimgs.JavaEnabled);
-            if (wfh == null)
-                wfh = new WindowsFormsHost();
+            //WebBrowser = new Xilium.CefGlue.Client.BrowserCntrl();
+            //WebBrowser.OnBrowserLoadingChanged += WebBrowser_OnBrowserLoadingChanged;
+            //WebBrowser.OnBrowserContextMenuClicked += WebBrowser_OnBrowserContextMenuClicked;
+            //WebBrowser.OnBrowserStatusChanged += WebBrowser_OnBrowserStatusChanged;
+            //WebBrowser.init(url, BrowserSettimgs.FlashEnabled, BrowserSettimgs.JavascriptEnabled, BrowserSettimgs.JavaEnabled);
+            //if (wfh == null)
+            //    wfh = new WindowsFormsHost();
 
-            wfh.Child = WebBrowser;
+            //wfh.Child = WebBrowser;
             RaisePropertyChanged("WebBrowserHost");
 
             //WebBrowser.Reload();
         }
 
-        private void WebBrowser_OnBrowserStatusChanged(string oMessage)
-        {
-            if (oMessage == null) return;
-            HuverLink = oMessage;
-        }
+        //private void WebBrowser_OnBrowserStatusChanged(string oMessage)
+        //{
+        //    if (oMessage == null) return;
+        //    HuverLink = oMessage;
+        //}
 
-        #region contextmenue
-        public string HuverLink { get; set; }
-        public event Action<string,string> OnSentForSeo = delegate { };
-        public event Action<string,string> OnCurateToPBN = delegate { };
-        public event Action<string> OnCreateNewTab = delegate { };
-        private void WebBrowser_OnBrowserContextMenuClicked(int contextMenueItemID)
-        {
-            switch (contextMenueItemID)
-            {
-                case 333:
-                    if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
-                    {
-                        string sitename = WebBrowser.CurrAddress.Replace("http://", "");
-                        sitename = sitename.Replace("https://", "");
-                        sitename = sitename.Replace("www.", "");
-                        if (sitename.Contains("."))
-                        {
-                            sitename = sitename.Remove(sitename.IndexOf("."));
-                        }
-                        OnSentForSeo(sitename, HuverLink);
-                    }
-                    //WebBrowser.CBrowser.Browser.GetHost().SendFocusEvent
-                    // WebBrowser.CBrowser.Browser.GetHost().ShowDevTools(CefWindowInfo.Create(), new DemoClient(), new CefBrowserSettings() { }, new CefPoint(110,110));
-                    break;
+        //#region contextmenue
+        //public string HuverLink { get; set; }
+        //public event Action<string,string> OnSentForSeo = delegate { };
+        //public event Action<string,string> OnCurateToPBN = delegate { };
+        //public event Action<string> OnCreateNewTab = delegate { };
+        //private void WebBrowser_OnBrowserContextMenuClicked(int contextMenueItemID)
+        //{
+        //    switch (contextMenueItemID)
+        //    {
+        //        case 333:
+        //            if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
+        //            {
+        //                string sitename = WebBrowser.CurrAddress.Replace("http://", "");
+        //                sitename = sitename.Replace("https://", "");
+        //                sitename = sitename.Replace("www.", "");
+        //                if (sitename.Contains("."))
+        //                {
+        //                    sitename = sitename.Remove(sitename.IndexOf("."));
+        //                }
+        //                OnSentForSeo(sitename, HuverLink);
+        //            }
+        //            //WebBrowser.CBrowser.Browser.GetHost().SendFocusEvent
+        //            // WebBrowser.CBrowser.Browser.GetHost().ShowDevTools(CefWindowInfo.Create(), new DemoClient(), new CefBrowserSettings() { }, new CefPoint(110,110));
+        //            break;
 
-                case 111:
-                    try
-                    {
-                        var host = WebBrowser.GetBrowser().GetHost();
-                        var wi = CefWindowInfo.Create();
-                        wi.SetAsPopup(IntPtr.Zero, "DevTools");
-                        host.ShowDevTools(wi, new DevToolsWebClient(), new CefBrowserSettings(), new CefPoint(0, 0));
-                    }
-                    catch { }
-                    break;
+        //        case 111:
+        //            try
+        //            {
+        //                var host = WebBrowser.GetBrowser().GetHost();
+        //                var wi = CefWindowInfo.Create();
+        //                wi.SetAsPopup(IntPtr.Zero, "DevTools");
+        //                host.ShowDevTools(wi, new DevToolsWebClient(), new CefBrowserSettings(), new CefPoint(0, 0));
+        //            }
+        //            catch { }
+        //            break;
 
-                #region curate
-                case 666:
-                case 222:
-                    try
-                    {
-                        if (WebBrowser.GetTheMainFrame() == null || WebBrowser.GetTheMainFrame().Url == null) return;
+        //        #region curate
+        //        case 666:
+        //        case 222:
+        //            try
+        //            {
+        //                if (WebBrowser.GetTheMainFrame() == null || WebBrowser.GetTheMainFrame().Url == null) return;
 
-                        string dir = Path.Combine(MyFilesDatabase.GetBaseDir(), "TempHTML");
-                        if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+        //                string dir = Path.Combine(MyFilesDatabase.GetBaseDir(), "TempHTML");
+        //                if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
 
-                        string file = Path.Combine(dir, "html.txt");
-                        if (File.Exists(file)) File.Delete(file);
+        //                string file = Path.Combine(dir, "html.txt");
+        //                if (File.Exists(file)) File.Delete(file);
 
-                        //the javascript
-                        string jsForExecution = "var range = window.getSelection().getRangeAt(0)," +
-                                                "content = range.extractContents()," +
-                                                "span = document.createElement('SPAN');" +
-                                                "span.appendChild(content);" +
-                                                "var htmltext = span.innerHTML.toString();" +
-                                                "range.insertNode(span);" +
-                                                "nativeImplementation(htmltext);";
-                        WebBrowser.GetTheMainFrame().ExecuteJavaScript(jsForExecution, WebBrowser.GetTheMainFrame().Url, 0);
-
-
-
-                        System.Threading.Tasks.Task.Factory.StartNew(() =>
-                        {
-                            while (!File.Exists(file))
-                            {
-                                System.Threading.Thread.Sleep(150);
-                            }
-
-                            if (contextMenueItemID == 666)
-                            {
-                                OnCurateToPBN(File.ReadAllText(file), WebBrowser.CurrAddress);
-                            }
-                            else
-                            {
-                                string thecontent = "<blockquote>" + File.ReadAllText(file) + "<br />";
-                                if (!string.IsNullOrEmpty(WebBrowser.CurrAddress) && !string.IsNullOrWhiteSpace(WebBrowser.CurrAddress))
-                                    thecontent += "<a href=\"" + WebBrowser.CurrAddress + " \" > " + WebBrowser.CurrAddress + " </a>";
-                                thecontent += "</blockquote>";
-                                Application.Current.Dispatcher.Invoke(delegate
-                                {
-                                    MyFilesDatabase.SetClipboardText(thecontent);
-                                });
-                            }
-                            File.Delete(file);
-                        });
-
-                    }
-                    catch (Exception ex)
-                    {
-
-                    }
-                    break;
-                #endregion
-
-                #region newTab
-                case 999:
-                    if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
-                    {
-                        OnCreateNewTab(HuverLink);
-                    }
-                    break;
-                #endregion
-
-                #region copy link
-                case 888:
-                    if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
-                    {
-                        MyFilesDatabase.SetClipboardText(HuverLink);
-                    }
-                    break;
-                #endregion
-
-                #region imageDownload
-                case 777:
-                    System.Threading.Tasks.Task.Factory.StartNew(() =>
-                    {
-                        string imgUrl = "";
-                        if (WebBrowser.GetTheMainFrame() != null && WebBrowser.GetTheMainFrame().Url != null)
-                        {
-                            string url = WebBrowser.GetTheMainFrame().Url;
-
-                            imgUrl = ChromeBrowserHostControl.GetImageUrl(url);
-                        }
-
-                        if (imgUrl == "")
-                        {
-                            if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
-                            {
-                                string url = HuverLink;
-                                if (url.ToLower().Contains("imgurl=") && url.ToLower().Contains("google."))
-                                {
-                                    url = url.Split(new string[] { "imgurl=" }, StringSplitOptions.None)[1];
-                                    if (url.Contains("%253"))
-                                    {
-                                        url = url.Remove(url.IndexOf("%253"));
-                                    }
-                                    if (url.Contains("&imgrefurl"))
-                                    {
-                                        url = url.Remove(url.IndexOf("&imgrefurl"));
-                                    }
-                                }
-
-                                if (url.Contains("%3A"))
-                                {
-                                    url = url.Replace("%3A", ":");
-                                }
-                                if (url.Contains("%2F"))
-                                {
-                                    url = url.Replace("%2F", "/");
-                                }
-                                if (url.Contains("%2520"))
-                                {
-                                    url = url.Replace("%2520", " ");
-                                }
-                                if (url.Contains("%20"))
-                                {
-                                    url = url.Replace("%20", " ");
-                                }
-                                imgUrl = ChromeBrowserHostControl.GetImageUrl(url);
-                            }
-                        }
-
-                        if (imgUrl == "")
-                        {
-                            MessageBox.Show("No image found to download. Make sure the mouse is over a image and try again, or open the image as a tab and then download it.");
-                            return;
-                        }
-
-                        MyFilesDatabase.DownloadImage(imgUrl);
-                    });
-                    break;
-                #endregion
-
-                //#region go viral
-                //case 555:
-                //    if ((string.IsNullOrEmpty(HuverLink) && string.IsNullOrWhiteSpace(HuverLink)) ||
-                //        (string.IsNullOrEmpty(AddressEditable) && string.IsNullOrWhiteSpace(AddressEditable)))
-                //    {
-                //        MessageBox.Show("Cant complete action make sure the mouse pointer is hovering over the link you want.");
-                //        return;
-                //    }
-                //    string linkToGet = HuverLink;
-                //    string link = HuverLink;
-                //    WebBrowser.GetTheMainFrame().GetSource(new SourceVisitor(htmlSource =>
-                //    {
-                //        try
-                //        {
-                //            string splitter = getsplitter();
-                //            if (AddressEditable.Contains("facebook.com/groups/?category=membership"))
-                //            {
-                //                string fromsource = linkToGet.Replace(Social.FACEBOOK_GROUPS_DEFAULT_URL, "/groups/");
-                //                fromsource = htmlSource.Substring(htmlSource.IndexOf(fromsource));
-                //                string name = fromsource.Substring(fromsource.IndexOf(">") + 1);
-                //                name = name.Remove(name.IndexOf("<"));
-
-                //                string id = fromsource.Substring(fromsource.IndexOf("id="));
-                //                id = id.Replace("id=", "");
-                //                id = id.Remove(id.IndexOf("\""));
-
-                //                link = Social.FACEBOOK_GROUPS_DEFAULT_URL + name + "-" + id;
-                //            }
-                //            else
-                //            {
-                //                linkToGet = linkToGet.Replace(Social.FACEBOOK_GROUPS_DEFAULT_URL, "/groups/");
-                //                linkToGet = linkToGet.Replace(Social.FACEBOOK_EVENTS_DEFAULT_URL, "/events/");
-                //                linkToGet = linkToGet.Replace("?ref=br_rs&action_history=null", "?ref=br_rs&amp;action_history=null");
-                //                link = getLinkFromUrlAndSource(linkToGet, htmlSource, splitter);
-                //            }
-
-                //            Application.Current.Dispatcher.Invoke(delegate
-                //            {
-                //                RaiseOnAddedToGoViral(link, "", null);
-                //            });
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //            MessageBox.Show("Couldnt pull data.");
-                //        }
-                //    }));
-                //    break;
-
-                //case 444:
-                //    SourceVisitor visitor = new SourceVisitor(htmlSource =>
-                //    {
-                //        try
-                //        {
-                //            List<string> linksToReturn = new List<string>();
-                //            if (AddressEditable.Contains("facebook.com/groups/?category=membership"))
-                //            {
-                //                List<string> links = htmlSource.Split(new string[] { "group_browse_new" }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                //                links.RemoveAt(0);
-                //                foreach (var linkl in links)
-                //                {
-                //                    string name = "", id = "";
-                //                    try
-                //                    {
-                //                        name = linkl.Substring(linkl.IndexOf(">") + 1);
-                //                        name = name.Remove(name.IndexOf("<"));
-
-                //                        id = linkl.Substring(linkl.IndexOf("id=") + 3);
-                //                        id = id.Remove(id.IndexOf("\""));
-
-                //                        Convert.ToInt64(id);
-                //                    }
-                //                    catch
-                //                    { continue; }
-
-                //                    linksToReturn.Add(Social.FACEBOOK_GROUPS_DEFAULT_URL + name + "-" + id);
-                //                }
-
-                //            }
-                //            else
-                //            {
-                //                string splitter = getsplitter();
-
-                //                List<string> links = htmlSource.Split(new string[] { splitter }, StringSplitOptions.RemoveEmptyEntries).ToList();
-                //                links.RemoveAt(0);
+        //                //the javascript
+        //                string jsForExecution = "var range = window.getSelection().getRangeAt(0)," +
+        //                                        "content = range.extractContents()," +
+        //                                        "span = document.createElement('SPAN');" +
+        //                                        "span.appendChild(content);" +
+        //                                        "var htmltext = span.innerHTML.toString();" +
+        //                                        "range.insertNode(span);" +
+        //                                        "nativeImplementation(htmltext);";
+        //                WebBrowser.GetTheMainFrame().ExecuteJavaScript(jsForExecution, WebBrowser.GetTheMainFrame().Url, 0);
 
 
-                //                foreach (string linkl in links)
-                //                {
-                //                    string linkToGetl = linkl.Remove(linkl.IndexOf("\""));
-                //                    string linkToAdd = getLinkFromUrlAndSource(linkToGetl, htmlSource, splitter);
-                //                    linksToReturn.Add(linkToAdd);
-                //                }
-                //            }
 
-                //            Application.Current.Dispatcher.Invoke((Action)delegate
-                //            {
-                //                RaiseOnAddedToGoViral(null, "", linksToReturn);
-                //            });
-                //        }
-                //        catch
-                //        {
-                //            MessageBox.Show("Couldnt pull pages.");
-                //        }
-                //    });
-                //    WebBrowser.GetTheMainFrame().GetSource(visitor);
-                //    break;
-                //#endregion
+        //                System.Threading.Tasks.Task.Factory.StartNew(() =>
+        //                {
+        //                    while (!File.Exists(file))
+        //                    {
+        //                        System.Threading.Thread.Sleep(150);
+        //                    }
 
-                default:
-                    break;
-            }
-        }
-        private class DevToolsWebClient : CefClient
-        {
-        }
-        #endregion
+        //                    if (contextMenueItemID == 666)
+        //                    {
+        //                        OnCurateToPBN(File.ReadAllText(file), WebBrowser.CurrAddress);
+        //                    }
+        //                    else
+        //                    {
+        //                        string thecontent = "<blockquote>" + File.ReadAllText(file) + "<br />";
+        //                        if (!string.IsNullOrEmpty(WebBrowser.CurrAddress) && !string.IsNullOrWhiteSpace(WebBrowser.CurrAddress))
+        //                            thecontent += "<a href=\"" + WebBrowser.CurrAddress + " \" > " + WebBrowser.CurrAddress + " </a>";
+        //                        thecontent += "</blockquote>";
+        //                        Application.Current.Dispatcher.Invoke(delegate
+        //                        {
+        //                            MyFilesDatabase.SetClipboardText(thecontent);
+        //                        });
+        //                    }
+        //                    File.Delete(file);
+        //                });
+
+        //            }
+        //            catch (Exception ex)
+        //            {
+
+        //            }
+        //            break;
+        //        #endregion
+
+        //        #region newTab
+        //        case 999:
+        //            if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
+        //            {
+        //                OnCreateNewTab(HuverLink);
+        //            }
+        //            break;
+        //        #endregion
+
+        //        #region copy link
+        //        case 888:
+        //            if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
+        //            {
+        //                MyFilesDatabase.SetClipboardText(HuverLink);
+        //            }
+        //            break;
+        //        #endregion
+
+        //        #region imageDownload
+        //        case 777:
+        //            System.Threading.Tasks.Task.Factory.StartNew(() =>
+        //            {
+        //                string imgUrl = "";
+        //                if (WebBrowser.GetTheMainFrame() != null && WebBrowser.GetTheMainFrame().Url != null)
+        //                {
+        //                    string url = WebBrowser.GetTheMainFrame().Url;
+
+        //                    imgUrl = ChromeBrowserHostControl.GetImageUrl(url);
+        //                }
+
+        //                if (imgUrl == "")
+        //                {
+        //                    if (!string.IsNullOrEmpty(HuverLink) && !string.IsNullOrWhiteSpace(HuverLink))
+        //                    {
+        //                        string url = HuverLink;
+        //                        if (url.ToLower().Contains("imgurl=") && url.ToLower().Contains("google."))
+        //                        {
+        //                            url = url.Split(new string[] { "imgurl=" }, StringSplitOptions.None)[1];
+        //                            if (url.Contains("%253"))
+        //                            {
+        //                                url = url.Remove(url.IndexOf("%253"));
+        //                            }
+        //                            if (url.Contains("&imgrefurl"))
+        //                            {
+        //                                url = url.Remove(url.IndexOf("&imgrefurl"));
+        //                            }
+        //                        }
+
+        //                        if (url.Contains("%3A"))
+        //                        {
+        //                            url = url.Replace("%3A", ":");
+        //                        }
+        //                        if (url.Contains("%2F"))
+        //                        {
+        //                            url = url.Replace("%2F", "/");
+        //                        }
+        //                        if (url.Contains("%2520"))
+        //                        {
+        //                            url = url.Replace("%2520", " ");
+        //                        }
+        //                        if (url.Contains("%20"))
+        //                        {
+        //                            url = url.Replace("%20", " ");
+        //                        }
+        //                        imgUrl = ChromeBrowserHostControl.GetImageUrl(url);
+        //                    }
+        //                }
+
+        //                if (imgUrl == "")
+        //                {
+        //                    MessageBox.Show("No image found to download. Make sure the mouse is over a image and try again, or open the image as a tab and then download it.");
+        //                    return;
+        //                }
+
+        //                MyFilesDatabase.DownloadImage(imgUrl);
+        //            });
+        //            break;
+        //        #endregion
+
+        //        //#region go viral
+        //        //case 555:
+        //        //    if ((string.IsNullOrEmpty(HuverLink) && string.IsNullOrWhiteSpace(HuverLink)) ||
+        //        //        (string.IsNullOrEmpty(AddressEditable) && string.IsNullOrWhiteSpace(AddressEditable)))
+        //        //    {
+        //        //        MessageBox.Show("Cant complete action make sure the mouse pointer is hovering over the link you want.");
+        //        //        return;
+        //        //    }
+        //        //    string linkToGet = HuverLink;
+        //        //    string link = HuverLink;
+        //        //    WebBrowser.GetTheMainFrame().GetSource(new SourceVisitor(htmlSource =>
+        //        //    {
+        //        //        try
+        //        //        {
+        //        //            string splitter = getsplitter();
+        //        //            if (AddressEditable.Contains("facebook.com/groups/?category=membership"))
+        //        //            {
+        //        //                string fromsource = linkToGet.Replace(Social.FACEBOOK_GROUPS_DEFAULT_URL, "/groups/");
+        //        //                fromsource = htmlSource.Substring(htmlSource.IndexOf(fromsource));
+        //        //                string name = fromsource.Substring(fromsource.IndexOf(">") + 1);
+        //        //                name = name.Remove(name.IndexOf("<"));
+
+        //        //                string id = fromsource.Substring(fromsource.IndexOf("id="));
+        //        //                id = id.Replace("id=", "");
+        //        //                id = id.Remove(id.IndexOf("\""));
+
+        //        //                link = Social.FACEBOOK_GROUPS_DEFAULT_URL + name + "-" + id;
+        //        //            }
+        //        //            else
+        //        //            {
+        //        //                linkToGet = linkToGet.Replace(Social.FACEBOOK_GROUPS_DEFAULT_URL, "/groups/");
+        //        //                linkToGet = linkToGet.Replace(Social.FACEBOOK_EVENTS_DEFAULT_URL, "/events/");
+        //        //                linkToGet = linkToGet.Replace("?ref=br_rs&action_history=null", "?ref=br_rs&amp;action_history=null");
+        //        //                link = getLinkFromUrlAndSource(linkToGet, htmlSource, splitter);
+        //        //            }
+
+        //        //            Application.Current.Dispatcher.Invoke(delegate
+        //        //            {
+        //        //                RaiseOnAddedToGoViral(link, "", null);
+        //        //            });
+        //        //        }
+        //        //        catch (Exception ex)
+        //        //        {
+        //        //            MessageBox.Show("Couldnt pull data.");
+        //        //        }
+        //        //    }));
+        //        //    break;
+
+        //        //case 444:
+        //        //    SourceVisitor visitor = new SourceVisitor(htmlSource =>
+        //        //    {
+        //        //        try
+        //        //        {
+        //        //            List<string> linksToReturn = new List<string>();
+        //        //            if (AddressEditable.Contains("facebook.com/groups/?category=membership"))
+        //        //            {
+        //        //                List<string> links = htmlSource.Split(new string[] { "group_browse_new" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        //        //                links.RemoveAt(0);
+        //        //                foreach (var linkl in links)
+        //        //                {
+        //        //                    string name = "", id = "";
+        //        //                    try
+        //        //                    {
+        //        //                        name = linkl.Substring(linkl.IndexOf(">") + 1);
+        //        //                        name = name.Remove(name.IndexOf("<"));
+
+        //        //                        id = linkl.Substring(linkl.IndexOf("id=") + 3);
+        //        //                        id = id.Remove(id.IndexOf("\""));
+
+        //        //                        Convert.ToInt64(id);
+        //        //                    }
+        //        //                    catch
+        //        //                    { continue; }
+
+        //        //                    linksToReturn.Add(Social.FACEBOOK_GROUPS_DEFAULT_URL + name + "-" + id);
+        //        //                }
+
+        //        //            }
+        //        //            else
+        //        //            {
+        //        //                string splitter = getsplitter();
+
+        //        //                List<string> links = htmlSource.Split(new string[] { splitter }, StringSplitOptions.RemoveEmptyEntries).ToList();
+        //        //                links.RemoveAt(0);
+
+
+        //        //                foreach (string linkl in links)
+        //        //                {
+        //        //                    string linkToGetl = linkl.Remove(linkl.IndexOf("\""));
+        //        //                    string linkToAdd = getLinkFromUrlAndSource(linkToGetl, htmlSource, splitter);
+        //        //                    linksToReturn.Add(linkToAdd);
+        //        //                }
+        //        //            }
+
+        //        //            Application.Current.Dispatcher.Invoke((Action)delegate
+        //        //            {
+        //        //                RaiseOnAddedToGoViral(null, "", linksToReturn);
+        //        //            });
+        //        //        }
+        //        //        catch
+        //        //        {
+        //        //            MessageBox.Show("Couldnt pull pages.");
+        //        //        }
+        //        //    });
+        //        //    WebBrowser.GetTheMainFrame().GetSource(visitor);
+        //        //    break;
+        //        //#endregion
+
+        //        default:
+        //            break;
+        //    }
+        //}
+        ////private class DevToolsWebClient : CefClient
+        ////{
+        ////}
+        //#endregion
 
         public void DisposeBrowser()
         {
-            if(WebBrowser!=null)
-                WebBrowser.DisposeBrowserComponents();
+            //if(WebBrowser!=null)
+            //    WebBrowser.DisposeBrowserComponents();
 
             if (mCrawlerHost != null)
                 mCrawlerHost.Shutdown();

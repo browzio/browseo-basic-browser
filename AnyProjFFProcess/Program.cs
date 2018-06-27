@@ -175,69 +175,69 @@ namespace AnyProjFFProcess
 
             if (isMacroInit)
             {
-                // ffWindow.browserTabView.IsFromAnyProcess = true;
-                // ffWindow.browserTabView.MacroflyOut.IsExpanded = true;
-                ffWindow.Topmost = false;
-                ffWindow.browserTabView.openMacros_Click(null, null);
-                ffWindow.browserTabView.OnInitializedMacros += async () =>
-                {
-                    if (btvm == null)
-                    {
-                        await Task.Run(() => { while (btvm == null) { Thread.Sleep(250); } });
-                    }
-                    MacroManger managerForTab = ffWindow.browserTabView.MacroflyOut.DataContext as MacroManger;
-                    managerForTab.DataSourceSlideoutText = datasource;
-                    managerForTab.MaxLoop = TimesToPlay;
-                    if (managerForTab.MaxLoop < 1) managerForTab.MaxLoop = 1;
+                //// ffWindow.browserTabView.IsFromAnyProcess = true;
+                //// ffWindow.browserTabView.MacroflyOut.IsExpanded = true;
+                //ffWindow.Topmost = false;
+                //ffWindow.browserTabView.openMacros_Click(null, null);
+                //ffWindow.browserTabView.OnInitializedMacros += async () =>
+                //{
+                //    if (btvm == null)
+                //    {
+                //        await Task.Run(() => { while (btvm == null) { Thread.Sleep(250); } });
+                //    }
+                //    MacroManger managerForTab = ffWindow.browserTabView.MacroflyOut.DataContext as MacroManger;
+                //    managerForTab.DataSourceSlideoutText = datasource;
+                //    managerForTab.MaxLoop = TimesToPlay;
+                //    if (managerForTab.MaxLoop < 1) managerForTab.MaxLoop = 1;
 
-                    if (managerForTab != null)
-                    {
-                        int timesFinished = 0;
-                        managerForTab.OnMacroDone += () =>
-                        {
-                            //try
-                            //{
-                            //    if (paths != null && paths.Count != 0)
-                            //    {
-                            //        SsemaphoreSlim.Release();
-                            //        return;
-                            //    }
-                            //}
-                            //catch { return; }
-                            timesFinished++;
-                            if (paths != null && paths.Count > timesFinished) return;
+                //    if (managerForTab != null)
+                //    {
+                //        int timesFinished = 0;
+                //        managerForTab.OnMacroDone += () =>
+                //        {
+                //            //try
+                //            //{
+                //            //    if (paths != null && paths.Count != 0)
+                //            //    {
+                //            //        SsemaphoreSlim.Release();
+                //            //        return;
+                //            //    }
+                //            //}
+                //            //catch { return; }
+                //            timesFinished++;
+                //            if (paths != null && paths.Count > timesFinished) return;
 
-                            if (closeOnFinish)
-                            {
-                                ffWindow.Close();
-                            }
-                        };
-                        ffWindow.Closing += FfWindow_Closing;
-                        if (paths == null)
-                        {
-                            paths = new List<string>();
-                            paths.Add(macroPathorurl);
-                        }
-                        await managerForTab.SetMacroActiveByPaths(paths);
-                        //{
-                        //    //for (int i = 0; i < paths.Count; i++)
-                        //    //{
-                        //    //    for (int j = 0; j < TimesToPlay; j++)
-                        //    //    {
-                        //    //        await SsemaphoreSlim.WaitAsync();
-                        //    //        string fPathToM = paths[i];
-                        //    //        managerForTab.SetMacroActiveByPath(fPathToM);
-                        //    //    }
-                        //    //    paths.RemoveAt(i);
-                        //    //}
-                        //   await  managerForTab.SetMacroActiveByPaths(paths);
-                        //}
-                        //else
-                        //{
-                        //  await managerForTab.SetMacroActiveByPath(macroPathorurl);
-                        //}
-                    }
-                };
+                //            if (closeOnFinish)
+                //            {
+                //                ffWindow.Close();
+                //            }
+                //        };
+                //        ffWindow.Closing += FfWindow_Closing;
+                //        if (paths == null)
+                //        {
+                //            paths = new List<string>();
+                //            paths.Add(macroPathorurl);
+                //        }
+                //        await managerForTab.SetMacroActiveByPaths(paths);
+                //        //{
+                //        //    //for (int i = 0; i < paths.Count; i++)
+                //        //    //{
+                //        //    //    for (int j = 0; j < TimesToPlay; j++)
+                //        //    //    {
+                //        //    //        await SsemaphoreSlim.WaitAsync();
+                //        //    //        string fPathToM = paths[i];
+                //        //    //        managerForTab.SetMacroActiveByPath(fPathToM);
+                //        //    //    }
+                //        //    //    paths.RemoveAt(i);
+                //        //    //}
+                //        //   await  managerForTab.SetMacroActiveByPaths(paths);
+                //        //}
+                //        //else
+                //        //{
+                //        //  await managerForTab.SetMacroActiveByPath(macroPathorurl);
+                //        //}
+                //    }
+                //};
             }
 
             Application app = new Application();

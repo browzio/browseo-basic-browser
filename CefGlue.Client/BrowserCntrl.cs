@@ -73,7 +73,13 @@ namespace Xilium.CefGlue.Client
 
             };
             CBrowser.HandleWasCreated += browser_OnHandleCreated;
-            if (startUrl != "") CBrowser.StartUrl = startUrl;
+            if (startUrl != "")
+            {
+                var sUrl = startUrl;
+                if (!sUrl.StartsWith("http")) sUrl = "http://" + sUrl;
+
+                CBrowser.StartUrl = sUrl;
+            }
             //CBrowser.Width = this.Width;
             //CBrowser.Height = this.Height;
             CBrowser.Dock = DockStyle.Fill;

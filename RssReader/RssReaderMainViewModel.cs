@@ -212,10 +212,6 @@ namespace RssReader
 
                                             string date = item.PublishDate == null ? "" : item.PublishDate.ToString();
                                             
-
-                                            
-                                           
-
                                             if (tempResultsList.Count < 20)
                                             {
                                                 RssResult result = new RssResult()
@@ -349,76 +345,8 @@ namespace RssReader
 
         void result_OnClickedSendSocialLink(string type, string link, string imageLink)
         {
-            string fullUrl = "";
+            string fullUrl =  Social.GetShareUrl(type, link, imageLink);
 
-            switch (type)
-            {
-                case Social.SOCIALTYPE_fb:
-                case "ff_"+Social.SOCIALTYPE_fb:
-                    fullUrl = Social.SHARELINK_facebook + link;
-                    break;
-
-                case Social.SOCIALTYPE_gp:
-                case "ff_" + Social.SOCIALTYPE_gp:
-                    fullUrl = Social.SHARELINK_googleplus + link;
-                    break;
-
-                case Social.SOCIALTYPE_buffer:
-                case "ff_" + Social.SOCIALTYPE_buffer:
-                    fullUrl = Social.SHARELINK_buffer + link;
-                    break;
-
-                case Social.SOCIALTYPE_digg:
-                case "ff_" + Social.SOCIALTYPE_digg:
-                    fullUrl = Social.SHARELINK_digg + link;
-                    break;
-
-                case Social.SOCIALTYPE_pin:
-                case "ff_" + Social.SOCIALTYPE_pin:
-                    if (imageLink == "")
-                    {
-                        MessageBox.Show("The feed needs to link to a image share to pinterest.");
-                        return;
-                    }
-                    fullUrl = Social.SHARELINK_pintrest + link + "&media=" + imageLink;
-                    break;
-
-                case Social.SOCIALTYPE_reddit:
-                case "ff_" + Social.SOCIALTYPE_reddit:
-                    fullUrl = Social.SHARELINK_reddit + link;
-                    break;
-
-                case Social.SOCIALTYPE_stumble:
-                case "ff_" + Social.SOCIALTYPE_stumble:
-                    fullUrl = Social.SHARELINK_stumbleupon + link;
-                    break;
-
-                case Social.SOCIALTYPE_tumblr:
-                case "ff_" + Social.SOCIALTYPE_tumblr:
-                    fullUrl = Social.SHARELINK_tumblr + link;
-                    break;
-
-                case Social.SOCIALTYPE_twit:
-                case "ff_" + Social.SOCIALTYPE_twit:
-                    fullUrl = Social.SHARELINK_twitter + link;
-                    break;
-
-                case Social.SOCIALTYPE_wp:
-                case "ff_" + Social.SOCIALTYPE_wp:
-                    SetNameAndDataWindow alw = new SetNameAndDataWindow();
-                    alw.tblockInfo.Text = "Enter wordpress site (browzio.wordpress.com):";
-                    alw.ShowDialog();
-                    if (!alw.OkClicked) return;
-                    string wpUrl = alw.tbInputText.Text;
-                    if (!wpUrl.Contains("http"))
-                        wpUrl = "https://" + wpUrl;
-                    fullUrl = wpUrl + Social.SHARELINK_wordpress + link;
-                    break;
-
-                default:
-                    fullUrl = link;
-                    break;
-            }
 
             Organiser.Common.Classes.UsageTracker.AddTraceCookie(type + " "+UsageTracker.Usage_Type_ShareFromRss);
             OnLaunchToBrowser(fullUrl, link, type.StartsWith("ff_"));

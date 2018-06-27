@@ -4,45 +4,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms.Integration;
+using System.Windows;
+using SocialOrganizer.Models;
+using Gecko;
+using Gecko.DOM;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.IO;
+using Organiser.Common.Windows;
+using System.Drawing;
+using System.Text.RegularExpressions;
+using System.Net;
+using System.Runtime.ExceptionServices;
+using System.Diagnostics;
+using Gecko.Windows;
 using zFirefoxXulBrowser.Controls;
+using Gecko.Interfaces;
 
 namespace zFirefoxXulBrowser.ViewModels
 {
     public class FoxXulViewModel : ViewModelBase
     {
-        private FFXulBrowserControl webBrowser;
-        public FFXulBrowserControl WebBrowser
+        public static WebView WebBrowser
         {
-            get
-            {
-                return webBrowser;
-            }
-            set { webBrowser = value; RaisePropertyChanged("WebBrowser"); }
+            get { return FFXulBrowserUserControl.pageView; }
         }
-
-        private WindowsFormsHost wfh;
-        public WindowsFormsHost WebBrowserHost
-        {
-            get
-            {
-                if (WebBrowser == null) WebBrowser = new FFXulBrowserControl();
-
-                if (wfh == null)
-                    wfh = new WindowsFormsHost() { Child = WebBrowser };
-
-                return wfh;
-            }
-            set { wfh = value; RaisePropertyChanged("WebBrowserHost"); }
-        }
-
         public FoxXulViewModel()
         {
-        }
-
-        private void InitBrowser(string address)
-        {
-            WebBrowser.initBrowser(address);
         }
     }
 }

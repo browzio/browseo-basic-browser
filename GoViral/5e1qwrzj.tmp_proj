@@ -1,0 +1,256 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{0D0B3748-C24C-464A-B051-B06C983831EF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>GoViral</RootNamespace>
+    <AssemblyName>GoViral</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Controls\SearchUserControl.xaml.cs">
+      <DependentUpon>SearchUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SelectedPageInfoUserControl.xaml.cs">
+      <DependentUpon>SelectedPageInfoUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SharedPostsUserControl.xaml.cs">
+      <DependentUpon>SharedPostsUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ViralProjectsWithBrowser.xaml.cs">
+      <DependentUpon>ViralProjectsWithBrowser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Converters\LinkCleanerConverter.cs" />
+    <Compile Include="Converters\LinkToImageConverter.cs" />
+    <Compile Include="Converters\PageTypeFromUrlToVisibleConverter.cs" />
+    <Compile Include="Converters\PhotoLinkToImageConverter.cs" />
+    <Compile Include="Converters\PhotosVidsCountToTextConverter.cs" />
+    <Compile Include="Converters\PostIdToUrlConverter.cs" />
+    <Compile Include="Converters\RelationshipToEnabledConv.cs" />
+    <Compile Include="Converters\RelationshipToImageConv.cs" />
+    <Compile Include="Converters\RelationshipToTextConv.cs" />
+    <Compile Include="Converters\RelationshipToVisibleConv.cs" />
+    <Compile Include="Helpers\CrawlerHost.cs" />
+    <Compile Include="Instagram\InstControls\InstaDominateUserControl.xaml.cs">
+      <DependentUpon>InstaDominateUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Instagram\InstControls\InstaSearchUserControl.xaml.cs">
+      <DependentUpon>InstaSearchUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Instagram\InstControls\InstaUserUserControl.xaml.cs">
+      <DependentUpon>InstaUserUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Instagram\InstControls\InstTabsUserControl.xaml.cs">
+      <DependentUpon>InstTabsUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Instagram\InstModels\InstaFolder.cs" />
+    <Compile Include="Instagram\InstModels\InstaMedia.cs" />
+    <Compile Include="Instagram\InstModels\InstaResponseLists.cs" />
+    <Compile Include="Instagram\InstModels\InstaTag.cs" />
+    <Compile Include="Instagram\InstModels\InstaUser.cs" />
+    <Compile Include="Instagram\InstViewModels\InstaDominateVM.cs" />
+    <Compile Include="Instagram\InstViewModels\InstaSearchVM.cs" />
+    <Compile Include="Instagram\InstViewModels\InstaVM.cs" />
+    <Compile Include="Instagram\IntsWindows\SelectOptionToSendWindow.xaml.cs">
+      <DependentUpon>SelectOptionToSendWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Instagram\InstaResourcesDictionary.xaml.cs" />
+    <Compile Include="Models\FilterResults\FilterOption.cs" />
+    <Compile Include="Models\Folder.cs" />
+    <Compile Include="Models\ListOption.cs" />
+    <Compile Include="Models\Search\SearchResult.cs" />
+    <Compile Include="Models\SyncedProject\SavedSyncProject.cs" />
+    <Compile Include="Models\SyncedProject\SyncedProjectData.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="ViewModels\GoViralVM.cs" />
+    <Compile Include="ViewModels\SearchVM.cs" />
+    <Compile Include="ViewModels\SyncedProjectsVM.cs" />
+    <Compile Include="Windows\ToFolderChooserWindow.xaml.cs">
+      <DependentUpon>ToFolderChooserWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\TopNsearchResultsToDominateWindow.xaml.cs">
+      <DependentUpon>TopNsearchResultsToDominateWindow.xaml</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
+      <Project>{F8B2DDD8-DF68-4649-A477-092232A34F60}</Project>
+      <Name>BrowseoFX.WPF</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Source\Repos\InstaSharp\InstaNonPortable\InstaNonPortable.csproj">
+      <Project>{2001dee3-524c-4d55-8ac4-3bf35608b35c}</Project>
+      <Name>InstaNonPortable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
+      <Name>CefGlue.WindowsForms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\CefGlue.csproj">
+      <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
+      <Name>CefGlue</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BrowserHost\BrowserHost.csproj">
+      <Project>{49DE8815-1834-4DA8-9E06-FE5EA2382C3E}</Project>
+      <Name>BrowserHost</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">
+      <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>
+      <Name>CefGlue.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\CrawlerContracts\CrawlerContracts.csproj">
+      <Project>{3749fa3f-e42d-4e28-a77c-68fe06dcd8d2}</Project>
+      <Name>CrawlerContracts</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Organiser.Common\Organiser.Common.csproj">
+      <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
+      <Name>Organiser.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ItemGroup>
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\CefGlue.Client\bin\Debug\Browseo.Client.dll" />
+    <ReferencePath Include="C:\Users\eli\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\BrowseoFX,WPF\bin\x86\Debug\BrowseoFX.WPF.exe" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\BrowserHost\bin\x86\Debug\BrowserHost.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\CrawlerContracts\bin\Debug\CrawlerContracts.dll" />
+    <ReferencePath Include="C:\Users\eli\Source\Repos\InstaSharp\InstaNonPortable\bin\Debug\InstaNonPortable.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\Microsoft.CSharp.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\Organiser.Common\bin\Debug\Organiser.Common.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\PresentationCore.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\PresentationFramework.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.AddIn.Contract.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.AddIn.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Core.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.DataSetExtensions.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Data.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Messaging.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Net.Http.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Remoting.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Runtime.Serialization.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETPortable\v4.0\Profile\Profile344\System.ServiceModel.Web.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Windows.Forms.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xaml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\System.Xml.Linq.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETPortable\v4.0\Profile\Profile344\System.Xml.Serialization.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\WindowsBase.dll" />
+    <ReferencePath Include="C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\WindowsFormsIntegration.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue\bin\Debug\Xilium.CefGlue.dll" />
+    <ReferencePath Include="C:\Users\eli\Desktop\move\cefbuilds\xilium-xilium.cefglue-a91ffcc230b0\xilium-xilium.cefglue-a91ffcc230b0\CefGlue.WindowsForms\bin\Debug\Xilium.CefGlue.WindowsForms.dll" />
+    <ReferencePath Include="C:\Users\eli\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd2\vmas-xulfx-a340969180cd\XulFx.Wpf\bin\x86\Release\XulFx.dll" />
+    <ReferencePath Include="C:\Users\eli\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd2\vmas-xulfx-a340969180cd\XulFx.Wpf\bin\x86\Release\XulFx.Wpf.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Controls\SearchUserControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Controls\SelectedPageInfoUserControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Controls\SharedPostsUserControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Controls\ViralProjectsWithBrowser.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Instagram\InstaResourcesDictionary.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Instagram\InstControls\InstaDominateUserControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Instagram\InstControls\InstaSearchUserControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Instagram\InstControls\InstaUserUserControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Instagram\InstControls\InstTabsUserControl.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Instagram\IntsWindows\SelectOptionToSendWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Windows\ToFolderChooserWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\Windows\TopNsearchResultsToDominateWindow.g.cs" />
+    <Compile Include="C:\Users\eli\Desktop\move\xilium-xilium.cefglue-335450e6011d\GoViral\obj\Debug\GeneratedInternalTypeHelper.g.cs" />
+  </ItemGroup>
+</Project>

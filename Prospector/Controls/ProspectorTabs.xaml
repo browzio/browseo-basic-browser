@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:Prospector.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="500" d:DesignWidth="650">
+             d:DesignHeight="500" d:DesignWidth="750">
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -104,6 +104,14 @@
 
             <TabItem Name="tabKingKontent" x:FieldModifier="public" Style="{StaticResource gmailTabStyle}"  Header="King Kontent">
                 <controls:KeywordAndOptions />
+            </TabItem>
+
+            <TabItem Style="{StaticResource gmailTabStyle}"
+                     Visibility="Collapsed"
+                     Name="tabDW"
+                     x:FieldModifier="public"
+                     Header="Dark Web">
+                <controls:KeywordOptionsDarkWeb />
             </TabItem>
 
             <TabItem Style="{StaticResource gmailTabStyle}"  Header="Saved">

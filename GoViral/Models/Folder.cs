@@ -39,6 +39,15 @@ namespace GoViral.Models
             set { folderTitle = value; RaisePropertyChanged("FolderTitle"); }
         }
 
+
+        private string projectsFolderName = GloableProfData.PData.ProjectName;
+        public string ProjectsFolderName
+        {
+            get { return projectsFolderName; }
+            set { projectsFolderName = value; RaisePropertyChanged("ProjectsFolderName"); }
+        }
+
+
         private bool isEExpanded;
         public bool IsEExpanded
         {
@@ -130,6 +139,7 @@ namespace GoViral.Models
         }
         
 
+
         public Folder()
         {
             CTMenuClick = new RelayCommand(On_CTMenuClick);
@@ -140,106 +150,113 @@ namespace GoViral.Models
         {
             string commandParam = param as string;
             if (commandParam == null) return;
-            switch (commandParam)
+            try
             {
-                case "Edit":
-                    OnSelectedEditOrRemove(this);
-                    break;
+                switch (commandParam)
+                {
+                    case "Edit":
+                        OnSelectedEditOrRemove(this);
+                        break;
 
-                case "Delete":
-                    if (MessageBox.Show("Are you sure you want to delete " + SavedLinksList[SISavedLinks].Name, "Are You Sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
-                    {
-                        SavedLinksList.RemoveAt(SISavedLinks);
-                        OnSelectedEditOrRemove(null);
-                    }
-                    break;
+                    case "Delete":
+                        if (MessageBox.Show("Are you sure you want to delete " + SavedLinksList[SISavedLinks].Name, "Are You Sure?", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+                        {
+                            SavedLinksList.RemoveAt(SISavedLinks);
+                            OnSelectedEditOrRemove(null);
+                        }
+                        break;
 
-                case "View":
-                    if (SISavedLinks != -1 && SavedLinksList.Count > 0)
-                    {
-                        OnLoadInBrowser(SavedLinksList[SISavedLinks].Url);
-                    }
-                    break;
+                    case "View":
+                        if (SISavedLinks != -1 && SavedLinksList.Count > 0)
+                        {
+                            OnLoadInBrowser(SavedLinksList[SISavedLinks].Url);
+                        }
+                        break;
 
-                case "Stats":
-                    OnSelectedCheckStats(this, SavedLinksList[SISavedLinks].Url);
-                    break;
+                    case "Stats":
+                        OnSelectedCheckStats(this, SavedLinksList[SISavedLinks].Url);
+                        break;
 
-                case "StatsAll":
-                    OnSelectedCheckStats(this, null);
-                    break;
+                    case "StatsAll":
+                        OnSelectedCheckStats(this, null);
+                        break;
 
-                case "Cancel":
-                    OnCanceledAStatsCheck(SavedLinksList[SISavedLinks]);
-                    break;
+                    case "Cancel":
+                        OnCanceledAStatsCheck(SavedLinksList[SISavedLinks]);
+                        break;
 
-                case "CancelAll":
-                    OnCanceledAStatsCheck(null);
-                    break;
+                    case "CancelAll":
+                        OnCanceledAStatsCheck(null);
+                        break;
 
-                case "ORDER_Likes":  
-                case "ORDER_TalkingAbout":   
-                    List<ListOption> loOrderd = SavedLinksList.OrderByDescending(l => l.FBGraphData == null ? 0 : commandParam == "ORDER_Likes" ? l.FBGraphData.likes : l.FBGraphData.talking_about_count).ToList();
-                    SavedLinksList.Clear();
-                    foreach (ListOption lo in loOrderd)
-                    {
-                        SavedLinksList.Add(lo);
-                    }
-                    break;
+                    case "ORDER_Likes":
+                    case "ORDER_TalkingAbout":
+                        List<ListOption> loOrderd = SavedLinksList.OrderByDescending(l => l.FBGraphData == null ? 0 : commandParam == "ORDER_Likes" ? l.FBGraphData.likes : l.FBGraphData.talking_about_count).ToList();
+                        SavedLinksList.Clear();
+                        foreach (ListOption lo in loOrderd)
+                        {
+                            SavedLinksList.Add(lo);
+                        }
+                        break;
 
-                case "ORDER_GroupsOpen":
-                    List<ListOption> loOrderdGroups = SavedLinksList.OrderByDescending(l => l.FBGraphData == null || l.FBGraphData.privacy == null ? "a" : l.FBGraphData.privacy).ToList();
-                    SavedLinksList.Clear();
-                    foreach (ListOption lo in loOrderdGroups)
-                    {
-                        SavedLinksList.Add(lo);
-                    }
-                    break;
+                    case "ORDER_GroupsOpen":
+                        List<ListOption> loOrderdGroups = SavedLinksList.OrderByDescending(l => l.FBGraphData == null || l.FBGraphData.privacy == null ? "a" : l.FBGraphData.privacy).ToList();
+                        SavedLinksList.Clear();
+                        foreach (ListOption lo in loOrderdGroups)
+                        {
+                            SavedLinksList.Add(lo);
+                        }
+                        break;
 
-                case "CopyLink":
-                    try
-                    {
-                        var url = SavedLinksList[SISavedLinks].Url;
-                        url = url.Substring(url.LastIndexOf("-") + 1);
-                        string fbDefault = "https://www.facebook.com/" + url;
-                        MyFilesDatabase.SetClipboardText(fbDefault);
-                    }
-                    catch{ }
-                    break;
+                    case "CopyLink":
+                        try
+                        {
+                            var url = SavedLinksList[SISavedLinks].Url;
+                            url = url.Substring(url.LastIndexOf("-") + 1);
+                            string fbDefault = "https://www.facebook.com/" + url;
+                            MyFilesDatabase.SetClipboardText(fbDefault);
+                        }
+                        catch { }
+                        break;
 
-                //case "ORDER_PostsByLikes":
-                //case "ORDER_PostsByShares":
-                //    if (SelectedPageFBGraphData != null)
-                //    {
-                //        if (SelectedPageFBGraphData.posts == null || SelectedPageFBGraphData.posts.data == null) return;
+                    //case "ORDER_PostsByLikes":
+                    //case "ORDER_PostsByShares":
+                    //    if (SelectedPageFBGraphData != null)
+                    //    {
+                    //        if (SelectedPageFBGraphData.posts == null || SelectedPageFBGraphData.posts.data == null) return;
 
-                //        List<FacebookGraphPostResult> pdOrderd = SelectedPageFBGraphData.posts.data.OrderByDescending(l => commandParam == "ORDER_PostsByLikes" ?
-                //                                                                                                           (l.likes == null ? 0 : l.likes.summary == null ? 0 : l.likes.summary.total_count) :
-                //                                                                                                           (l.shares == null ? 0 : l.shares.count)).ToList();
-                //        SelectedPageFBGraphData.posts.data.Clear();
-                //        foreach (FacebookGraphPostResult pResult in pdOrderd)
-                //        {
-                //            SelectedPageFBGraphData.posts.data.Add(pResult);
-                //        }
+                    //        List<FacebookGraphPostResult> pdOrderd = SelectedPageFBGraphData.posts.data.OrderByDescending(l => commandParam == "ORDER_PostsByLikes" ?
+                    //                                                                                                           (l.likes == null ? 0 : l.likes.summary == null ? 0 : l.likes.summary.total_count) :
+                    //                                                                                                           (l.shares == null ? 0 : l.shares.count)).ToList();
+                    //        SelectedPageFBGraphData.posts.data.Clear();
+                    //        foreach (FacebookGraphPostResult pResult in pdOrderd)
+                    //        {
+                    //            SelectedPageFBGraphData.posts.data.Add(pResult);
+                    //        }
 
-                //        RaisePropertyChanged("SelectedPageFBGraphData");
-                //    }
-                //    break;
+                    //        RaisePropertyChanged("SelectedPageFBGraphData");
+                    //    }
+                    //    break;
 
-                //case "ORDER_Shares":
-                //    FacebookGraphData fbgDataShare = SavedLinksList[SISavedLinks].FBGraphData;
-                //    if (fbgDataShare == null || fbgDataShare.posts == null || fbgDataShare.posts.data == null) return;
+                    //case "ORDER_Shares":
+                    //    FacebookGraphData fbgDataShare = SavedLinksList[SISavedLinks].FBGraphData;
+                    //    if (fbgDataShare == null || fbgDataShare.posts == null || fbgDataShare.posts.data == null) return;
 
-                //    List<FacebookGraphPostResult> prListToOrderShares = fbgDataShare.posts.data.OrderByDescending(s => s.shares == null ? 0 : s.shares.count).ToList();
-                //    fbgDataShare.posts.data.Clear();
-                //    foreach (FacebookGraphPostResult pResult in prListToOrderShares)
-                //    {
-                //        fbgDataShare.posts.data.Add(pResult);
-                //    }
-                //    break;
+                    //    List<FacebookGraphPostResult> prListToOrderShares = fbgDataShare.posts.data.OrderByDescending(s => s.shares == null ? 0 : s.shares.count).ToList();
+                    //    fbgDataShare.posts.data.Clear();
+                    //    foreach (FacebookGraphPostResult pResult in prListToOrderShares)
+                    //    {
+                    //        fbgDataShare.posts.data.Add(pResult);
+                    //    }
+                    //    break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
+            }catch(Exception ex)
+            {
+                var error = "Folder " + ex.Message;
+                error.Show();
             }
         }
 
