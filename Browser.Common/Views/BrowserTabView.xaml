@@ -668,7 +668,7 @@
                     </Grid>
                 </Expander>
 
-                <!--<interop:AirspaceDecorator AirspaceMode="Clip"
+                <interop:AirspaceDecorator AirspaceMode="Clip"
                                            Name="AirspaceHost"
                                            Grid.Row="1"
                                            HorizontalAlignment="Stretch"
@@ -699,7 +699,7 @@
                                 <RotateTransform Angle="-22.5" />
                             </VisualBrush.Transform>
                         </VisualBrush>
-                    </interop:AirspaceDecorator.Background>-->
+                    </interop:AirspaceDecorator.Background>
                     <!--<Grid Name="host"
                           Grid.Row="1"
                           HorizontalAlignment="Stretch"
@@ -714,7 +714,7 @@
                                       Grid.Row="1"
                                       HorizontalAlignment="Stretch"
                                       VerticalAlignment="Stretch" />
-                <!--</interop:AirspaceDecorator>-->
+                </interop:AirspaceDecorator>
                 
 
                 <Expander Name="flyOut" Grid.RowSpan="2"

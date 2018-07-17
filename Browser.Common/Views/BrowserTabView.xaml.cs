@@ -280,7 +280,10 @@ namespace Browser.Common.Views
         {
             if (!cmbSites.IsKeyboardFocusWithin)
             {
-                (DataContext as BrowserTabViewModel).ChangeAddressEditable(addy);
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    (DataContext as BrowserTabViewModel).ChangeAddressEditable(addy);
+                });
             }
         }
 

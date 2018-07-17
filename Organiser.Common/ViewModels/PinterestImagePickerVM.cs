@@ -138,7 +138,7 @@ namespace BrowserHost.ViewModels
                         }
                     }
 
-                    GC.Collect();
+                    //GC.Collect();
                 }
                 else
                 {

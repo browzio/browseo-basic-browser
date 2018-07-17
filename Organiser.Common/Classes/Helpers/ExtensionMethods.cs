@@ -73,5 +73,32 @@ namespace Organiser.Common.Classes
         {
             return System.Windows.MessageBox.Show(str, "BrowSEO", System.Windows.MessageBoxButton.YesNo, System.Windows.MessageBoxImage.Question) == System.Windows.MessageBoxResult.Yes;
         }
+
+        public static string ToWebString(this SortedDictionary<string, string> source)
+        {
+            var body = new StringBuilder();
+            try
+            {
+                if (source.Count != 0)
+                {
+
+                    foreach (var requestParameter in source)
+                    {
+                        body.Append(requestParameter.Key);
+                        body.Append("=");
+                        body.Append(Uri.EscapeDataString(requestParameter.Value));
+                        body.Append("&");
+                    }
+                    //remove trailing '&'
+                    body.Remove(body.Length - 1, 1);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error : " + ex.StackTrace);
+            }
+            return body.ToString();
+        }
     }
 }

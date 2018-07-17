@@ -89,12 +89,18 @@ namespace Browser.Common.ViewModels
         }
 
         #region browser statuses and messages
+        public bool WasLoading { get; set; }
 
         private bool isLoading;
         public bool IsLoading
         {
             get { return isLoading; }
-            set { isLoading = value; RaisePropertyChanged("IsLoading"); }
+            set
+            {
+                isLoading = value;
+                if (isLoading) WasLoading = true;
+                RaisePropertyChanged("IsLoading");
+            }
         }
 
         private string addressEditable;

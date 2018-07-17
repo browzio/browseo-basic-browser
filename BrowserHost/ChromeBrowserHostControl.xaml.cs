@@ -47,7 +47,7 @@ namespace BrowserHost
         }
 
 
-        private void browserHost_OnCloseTab(ExecutedRoutedEventArgs e)
+        private async void browserHost_OnCloseTab(ExecutedRoutedEventArgs e)
         {
             try
             {
@@ -63,7 +63,19 @@ namespace BrowserHost
 
                     try
                     {
-                        browserViewModel.Dispose();
+                        if (browserViewModel.WasLoading)
+                        {
+                            for (int i = 0; i < 10; i++)
+                            {
+                                if (!browserViewModel.IsLoading)
+                                    break;
+
+                                await Task.Delay(500);
+                            }
+
+                            if (!browserViewModel.IsLoading)
+                                browserViewModel.Dispose();
+                        }
                     }
                     catch { }
 
@@ -71,7 +83,7 @@ namespace BrowserHost
                         BrowserTabs[0].TabMargin = new Thickness(-3, 0, 0, 0);
                    
                     browserViewModel = null;
-                    GC.Collect();
+                    //GC.Collect();
                 }
             }
             catch { }

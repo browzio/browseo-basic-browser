@@ -47,6 +47,7 @@ namespace BrowserAndFeatures
         public event Action OnClickedReminders = delegate { };
         public event Action OnRequestedScreenLocation = delegate { };
 
+        bool browserinit = false;
 
         //FoxXulViewModel ffXulVm;
 
@@ -58,7 +59,7 @@ namespace BrowserAndFeatures
             this.DataContext = this;
             //RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
 
-            if (App.browserinit)
+            if (browserinit)
             {
                 BrowserLibraryInit.Instance.PlatformInitialize(null);
                 //BrowserInit.Init(false);
@@ -266,7 +267,7 @@ namespace BrowserAndFeatures
             //FoxInit.Shutdown();
             ProcessManager.Instance.DisposeAllProcess();
 
-            GC.Collect(); 
+            //GC.Collect(); 
         }
 
         #region other features tabs
@@ -277,44 +278,10 @@ namespace BrowserAndFeatures
         //GoViralVM goViralVM;
         InstaDominateVM instadmVM;
         LinksToRssVM feedMasherVM;
-        static bool wtfman = false;
         int curIndex = -1;
 
         private void tbControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-#if DEBUG
-            int wtf = 0;
-#else
-
-            if (!wtfman)
-            {
-                wtfman = true;
-                new Thread(() =>
-                {
-                    string tmpdir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp";
-                    int waited = 0;
-                    while (!Directory.Exists(tmpdir))
-                    {
-                        Thread.Sleep(500); waited++;
-                        if (waited == 10)
-                            System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
-                    }
-                    waited = 0;
-                    string fpat = System.IO.Path.Combine(tmpdir, "temerprings");
-                    while (!File.Exists(fpat))
-                    {
-                        Thread.Sleep(500); waited++;
-                        if (waited == 10)
-                            System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
-                    }
-                    if (File.ReadAllText(fpat).Trim() != "transition4")
-                        System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
-                    else
-                        File.Delete(fpat);
-                }).Start();
-            }
-#endif
-
             try
             {
                 if (curIndex == tbControl.SelectedIndex) return;

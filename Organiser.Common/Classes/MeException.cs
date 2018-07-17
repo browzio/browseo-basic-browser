@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Organiser.Common.Classes
 {
-    public class MyException : Exception
+    public class BadImageException : Exception
     {
-        public MyException(string message) : base(message)
+        public BadImageException(string message) : base(message)
         {
         }
 

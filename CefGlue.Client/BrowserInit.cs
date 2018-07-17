@@ -336,33 +336,6 @@ public class BrowserInit
                 //    Application.SetCompatibleTextRenderingDefault(false);
                 //}
                 //catch { }
-#if DEBUG
-                int iiiiiiiiii = 0;
-#else
-            new Thread(() =>
-            {
-                string tmpdir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\Temp";
-                int waited = 0;
-                while (!Directory.Exists(tmpdir))
-                {
-                    Thread.Sleep(500); waited++;
-                    if (waited == 10)
-                        System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
-                }
-                waited = 0;
-                string fpat = Path.Combine(tmpdir, "tmposbb11");
-                while (!File.Exists(fpat))
-                {
-                    Thread.Sleep(500); waited++;
-                    if (waited == 10)
-                        System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
-                }
-                if (File.ReadAllText(fpat).Trim() != "check1")
-                    System.Windows.Application.Current.Dispatcher.Invoke(() => { MyException ex = new MyException("Un Known"); ex.Source = "IMG"; throw ex; });
-                else
-                    File.Delete(fpat);
-            }).Start();
-#endif
             }
         }
 

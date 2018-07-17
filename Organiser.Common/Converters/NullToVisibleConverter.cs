@@ -13,12 +13,18 @@ namespace Organiser.Common.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var param = parameter as string;
-            if (param != null && param.ToUpper() == "NOT")
-                return value != null ? Visibility.Visible : Visibility.Collapsed;
-            else
-                return value == null ? Visibility.Visible : Visibility.Collapsed;
-
+            try
+            {
+                var param = parameter as string;
+                if (param != null && param.ToUpper() == "NOT")
+                    return value != null ? Visibility.Visible : Visibility.Collapsed;
+                else
+                    return value == null ? Visibility.Visible : Visibility.Collapsed;
+            }
+            catch
+            {
+                return Visibility.Collapsed;
+            }
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

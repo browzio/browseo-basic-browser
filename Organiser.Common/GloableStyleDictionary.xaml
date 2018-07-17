@@ -38,6 +38,14 @@
         <Setter Property="Margin" Value="0,0" />
     </Style>
 
+    <Style TargetType="{x:Type TextBox}" x:Key="SelectableTextBlock">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="IsReadOnly" Value="true"/>
+        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
     <Style  TargetType="{x:Type TextBox}" x:Key="TextboxGray">
         <Setter Property="Background" Value="#eeeeee"/>
         <Setter Property="Foreground" Value="#5c5c5c"/>
@@ -113,6 +121,43 @@
         <Setter Property="Margin" Value="3" />
         <Setter Property="Cursor" Value="Hand" />
         <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                                CornerRadius="0">
+                        <ContentControl Content="{TemplateBinding Content}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{StaticResource HighlightBrush}" />
+                <Setter Property="Border.BorderBrush" Value="{StaticResource BtnPressedBrush}" />
+                <Setter Property="Border.Effect">
+                    <Setter.Value>
+                        <DropShadowEffect ShadowDepth="0" BlurRadius="1.5" />
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="BorderBrush" Value="Black" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="{x:Type Button}" x:Key="FlatImageBtn">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Height" Value="35" />
+        <Setter Property="Width" Value="35" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="Margin" Value="2" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
@@ -527,6 +572,37 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Border" Property="Background" Value="#1E8EFF" />
+                            <Setter TargetName="Border" Property="BorderThickness" Value="1" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="White" />
+                            <Setter TargetName="TitleContent" Property="TextElement.Foreground" Value="White" />
+                        </Trigger>
+
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="BorderBrush" Value="White" />
+                        </Trigger>
+
+                    </ControlTemplate.Triggers>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type TabItem}" x:Key="anyTabStyle">
+        <Setter Property="VerticalAlignment" Value="Bottom"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type TabItem}">
+                    <Grid Cursor="Hand">
+                        <Border Name="Border" 
+                                Height="23"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="Black" BorderThickness="1" Margin="15,0,0,5">
+                            <ContentPresenter x:Name="TitleContent" VerticalAlignment="Center" Margin="10,0,10,0" HorizontalAlignment="Center" ContentSource="Header" TextElement.Foreground="{TemplateBinding Foreground}"/>
+                        </Border>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
                             <Setter TargetName="Border" Property="BorderThickness" Value="1" />
                             <Setter TargetName="Border" Property="BorderBrush" Value="White" />
                             <Setter TargetName="TitleContent" Property="TextElement.Foreground" Value="White" />

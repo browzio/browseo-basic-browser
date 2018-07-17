@@ -515,7 +515,7 @@ namespace GoViral.ViewModels
 
             if (url.StartsWith("https://www.facebook.com/pages/"))
             {
-                fullOgUrl = "https://graph.facebook.com/v2.12/" + pageName + "?fields=" +
+                fullOgUrl = "https://graph.facebook.com/v3.0/" + pageName + "?fields=" +
                                             @"about,id,link,founded,can_post,category,talking_about_count,likes,
                                         photos.limit(30){picture,id,link,updated_time,likes.limit(0).summary(true),comments.limit(0).summary(true)},
                                         videos.limit(30){permalink_url,picture,id,length,embed_html,source,updated_time,description,embeddable,title,likes.limit(0).summary(true),comments.limit(0).summary(true)},
