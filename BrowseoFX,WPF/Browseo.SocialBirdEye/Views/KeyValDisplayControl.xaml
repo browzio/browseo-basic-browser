@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="BrowseoFX_WPF.Browseo.SocialBirdEye.Views.KeyValDisplayControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BrowseoFX_WPF.Browseo.SocialBirdEye.Views"
+             xmlns:converters="clr-namespace:Organiser.Common.Converters;assembly=Organiser.Common"
+             mc:Ignorable="d"
+             Name="uc" Tag="Name:">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:NullToVisibleConverter x:Key="nullToVis" />
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Visibility="{Binding
+        RelativeSource={RelativeSource AncestorType={x:Type local:KeyValDisplayControl}}, Path=ParamValue, 
+        Converter={StaticResource nullToVis}, ConverterParameter=NOT}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" SharedSizeGroup="TextBlock"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock Grid.Column="0" 
+                   Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:KeyValDisplayControl}}, Path=ParamTitle}"
+                   VerticalAlignment="Center" />
+        <TextBox Grid.Column="1"
+                 VerticalAlignment="Center"
+                 Style="{StaticResource SelectableTextBlock}"
+                 Text="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:KeyValDisplayControl}}, Path=ParamValue}"/>
+    </Grid>
+</UserControl>

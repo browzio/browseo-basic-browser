@@ -120,7 +120,7 @@
     <Resource Include="browseo %281%29.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
+    <ProjectReference Include="..\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
       <Project>{f8b2ddd8-df68-4649-a477-092232a34f60}</Project>
       <Name>BrowseoFX.WPF</Name>
     </ProjectReference>

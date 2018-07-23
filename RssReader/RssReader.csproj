@@ -191,8 +191,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
-      <Project>{F8B2DDD8-DF68-4649-A477-092232A34F60}</Project>
+    <ProjectReference Include="..\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
+      <Project>{f8b2ddd8-df68-4649-a477-092232a34f60}</Project>
       <Name>BrowseoFX.WPF</Name>
     </ProjectReference>
     <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">

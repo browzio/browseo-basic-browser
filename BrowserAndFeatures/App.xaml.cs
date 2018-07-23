@@ -19,7 +19,7 @@ namespace BrowserAndFeatures
     public partial class App : Application
     {
         bool debug = true;
-      //  public static bool browserinit = true;
+        public static bool browserinit = true;
         protected override void OnStartup(StartupEventArgs e)
         {
             System.Windows.Forms.Application.EnableVisualStyles();
@@ -31,14 +31,15 @@ namespace BrowserAndFeatures
 
 
 
-            //if (debug) {
-              //  browserinit = false;
+            if (debug)
+            {
+                browserinit = false;
                 FeatureCallage.SetPersonData();
-            //}
-            //else
-            //{
-            //    this.Shutdown();
-            //}
+            }
+            else
+            {
+                this.Shutdown();
+            }
 
 
 

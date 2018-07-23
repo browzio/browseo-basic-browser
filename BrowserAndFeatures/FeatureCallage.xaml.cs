@@ -59,7 +59,7 @@ namespace BrowserAndFeatures
             this.DataContext = this;
             //RenderOptions.ProcessRenderMode = System.Windows.Interop.RenderMode.SoftwareOnly;
 
-            if (browserinit)
+            if (App.browserinit)
             {
                 BrowserLibraryInit.Instance.PlatformInitialize(null);
                 //BrowserInit.Init(false);

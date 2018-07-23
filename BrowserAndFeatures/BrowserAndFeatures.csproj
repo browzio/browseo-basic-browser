@@ -155,10 +155,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
-      <Project>{f8b2ddd8-df68-4649-a477-092232a34f60}</Project>
-      <Name>BrowseoFX.WPF</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
       <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
       <Name>CefGlue.WindowsForms</Name>
@@ -178,6 +174,10 @@
     <ProjectReference Include="..\Browmium.WPF\Browmium.WPF.csproj">
       <Project>{984aa90d-4b3c-47a1-adb7-33d6fe14996b}</Project>
       <Name>Browmium.WPF</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
+      <Project>{f8b2ddd8-df68-4649-a477-092232a34f60}</Project>
+      <Name>BrowseoFX.WPF</Name>
     </ProjectReference>
     <ProjectReference Include="..\BrowseoFX.CMD\BrowseoFX.CMD.csproj">
       <Project>{ca877f0e-24ee-4c3a-8f6c-95571e4807c6}</Project>

@@ -1,0 +1,140 @@
+﻿<UserControl x:Class="BrowseoFX_WPF.Browseo.SocialBirdEye.Views.FacebookAnalyticsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BrowseoFX_WPF.Browseo.SocialBirdEye.Views"
+             xmlns:converters="clr-namespace:Organiser.Common.Converters;assembly=Organiser.Common"
+             mc:Ignorable="d" 
+             Name="ucOverview"
+             d:DesignHeight="450" d:DesignWidth="650">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:NullToVisibleConverter x:Key="nullToVis" />
+
+            <DataTemplate x:Key="summaryTemplate">
+                <StackPanel Orientation="Vertical" Grid.IsSharedSizeScope="True">
+                    <local:KeyValDisplayControl Tag="likes:" 
+                                                DataContext="{Binding likes.summary.total_count}" />
+
+                    <local:KeyValDisplayControl Tag="comments:" 
+                                                DataContext="{Binding comments.summary.total_count}" />
+
+                    <local:KeyValDisplayControl Tag="reactions:" 
+                                                DataContext="{Binding reactions.summary.total_count}" />
+                </StackPanel>
+            </DataTemplate>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid Background="White" >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid>
+            <TextBlock Text="Summary" />
+        </Grid>
+        <WrapPanel Grid.Row="1"
+                   Margin="3"
+                   MaxWidth="{Binding ElementName=ucOverview, Path=ActualWidth}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="User Feed"
+                           FontSize="15"/>
+
+                <TextBlock Text="{Binding UserSummary.feedResponse.data.Length}"
+                                       Grid.Row="1"
+                                       FontSize="22"/>
+            </Grid>
+
+            <Border BorderThickness="1"
+                                BorderBrush="Gray" 
+                                Margin="3"/>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="User Feed"
+                                       FontSize="15"/>
+
+                <TextBlock Text="{Binding UserSummary.feedResponse.data.Length}"
+                                       Grid.Row="1"
+                                       FontSize="22"/>
+            </Grid>
+
+            <Border BorderThickness="1"
+                                BorderBrush="Gray" 
+                                Margin="3"/>
+
+
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="User Feed"
+                                       FontSize="15"/>
+
+                <TextBlock Text="{Binding UserSummary.feedResponse.data.Length}"
+                                       Grid.Row="1"
+                                       FontSize="22"/>
+            </Grid>
+
+            <Border BorderThickness="1"
+                                BorderBrush="Gray" 
+                                Margin="3"/>
+
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="User Feed"
+                                       FontSize="15"/>
+
+                <TextBlock Text="{Binding UserSummary.feedResponse.data.Length}"
+                                       Grid.Row="1"
+                                       FontSize="22"/>
+            </Grid>
+
+            <Border BorderThickness="1"
+                                BorderBrush="Gray" 
+                                Margin="3"/>
+
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <TextBlock Text="User Feed"
+                                       FontSize="15"/>
+
+                <TextBlock Text="{Binding UserSummary.feedResponse.data.Length}"
+                                       Grid.Row="1"
+                                       FontSize="22"/>
+            </Grid>
+
+            <Border BorderThickness="1"
+                                BorderBrush="Gray" 
+                                Margin="3"/>
+        </WrapPanel>
+    </Grid>
+</UserControl>

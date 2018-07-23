@@ -1,0 +1,237 @@
+﻿<UserControl x:Class="BrowseoFX_WPF.Controls.CmdBrowserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:BrowseoFX_WPF.Controls"
+             xmlns:commonControls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
+             xmlns:interop="clr-namespace:Microsoft.DwayneNeed.Interop;assembly=Microsoft.DwayneNeed"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Expander Name="SocialStatsExpander"
+                  ExpandDirection="Down"
+                  VerticalAlignment="Top"
+                  Header="Social Stats"
+                  Height="300"
+                  Background="WhiteSmoke"
+                  Visibility="Collapsed"
+                  IsExpanded="{Binding SocialStatsCrawlActive, UpdateSourceTrigger=PropertyChanged}"
+                  Expanded="SocialCrawl_Click"
+                  Collapsed="SocialStatsExpander_Collapsed">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1.5*" />
+                </Grid.ColumnDefinitions>
+                <CheckBox Content="Check All Links On Page"
+                          IsChecked="{Binding IsCrawlAllActive, UpdateSourceTrigger=PropertyChanged}"
+                          Grid.ColumnSpan="2"
+                          VerticalAlignment="Top"
+                          HorizontalAlignment="Left"
+                          Margin="3" />
+                <Button Content="Clear"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Style="{StaticResource FlatbtnStyle}"
+                        Width="70"
+                        Margin="3"
+                        Command="{Binding OnCommandFromView}"
+                        CommandParameter="ClearSocialStats"
+                        Grid.Column="1" />
+
+                <commonControls:CirclePBarControl Visibility="{Binding IsLoadingStatsVisible}"
+                                                  Grid.Column="1"
+                                                  Grid.Row="1" />
+                <Grid Grid.Row="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Button Style="{StaticResource FlatbtnStyle}"
+                            Content="Check These Links"
+                            Margin="3,3,6,3"
+                            Command="{Binding OnCommandFromView}"
+                            CommandParameter="CheckTheseLinks" />
+                    <TextBox Grid.Row="1"
+                             BorderThickness="0"
+                             Text="{Binding LinksToStatCheck, UpdateSourceTrigger=PropertyChanged}"
+                             MinWidth="225"
+                             AcceptsReturn="True"
+                             Height="215"
+                             VerticalAlignment="Center"
+                             Margin="3,3,6,3"
+                             ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto" />
+                </Grid>
+
+                <GridSplitter ResizeDirection="Columns"
+                              Margin="1"
+                              VerticalAlignment="Stretch"
+                              Grid.Column="0"
+                              Grid.Row="1"
+                              Width="1"
+                              Background="DarkGray" />
+                <ListView ItemsSource="{Binding CrawledLinksOnPage}"
+                          Grid.Column="1"
+                          BorderThickness="0"
+                          Grid.IsSharedSizeScope="True"
+                          Background="Transparent"
+                          ScrollViewer.CanContentScroll="False"
+                          Grid.Row="1">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="3">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBox IsReadOnly="True"
+                                         BorderThickness="0"
+                                         Text="{Binding Url}" />
+                                <commonControls:SocialStatsUserControl DataContext="{Binding SocialStatsReplys}"
+                                                                       Grid.Row="1" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Facebook Order By Shares">
+                                <MenuItem.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding OnCommandFromView}"
+                                                  CommandParameter="ORDERBY_FBSHARES" />
+                                </MenuItem.InputBindings>
+                            </MenuItem>
+                            <MenuItem Header="Facebook Order By Likes">
+                                <MenuItem.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding OnCommandFromView}"
+                                                  CommandParameter="ORDERBY_FBLIKES" />
+                                </MenuItem.InputBindings>
+                            </MenuItem>
+                            <MenuItem Header="Facebook Order By Comments">
+                                <MenuItem.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding OnCommandFromView}"
+                                                  CommandParameter="ORDERBY_FBCOMMENTS" />
+                                </MenuItem.InputBindings>
+                            </MenuItem>
+                            <MenuItem Header="Google+ Order By Plus Ones">
+                                <MenuItem.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding OnCommandFromView}"
+                                                  CommandParameter="ORDERBY_GPLUSONES" />
+                                </MenuItem.InputBindings>
+                            </MenuItem>
+                            <MenuItem Header="Pinterest Order By Pins">
+                                <MenuItem.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding OnCommandFromView}"
+                                                  CommandParameter="ORDERBY_PINTERESTPINS" />
+                                </MenuItem.InputBindings>
+                            </MenuItem>
+                            <MenuItem Header="Stumble Order By Views">
+                                <MenuItem.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding OnCommandFromView}"
+                                                  CommandParameter="ORDERBY_STUMBLEVIEWS" />
+                                </MenuItem.InputBindings>
+                            </MenuItem>
+                            <MenuItem Header="LinkedIn Order By Count">
+                                <MenuItem.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding OnCommandFromView}"
+                                                  CommandParameter="ORDERBY_LINKEDINCOUNT" />
+                                </MenuItem.InputBindings>
+                            </MenuItem>
+                            <MenuItem Header="Buffer Order By Shares">
+                                <MenuItem.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding OnCommandFromView}"
+                                                  CommandParameter="ORDERBY_BUFFERSHARES" />
+                                </MenuItem.InputBindings>
+                            </MenuItem>
+                            <MenuItem Header="Reddit Order By Ups">
+                                <MenuItem.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding OnCommandFromView}"
+                                                  CommandParameter="ORDERBY_REDDITUPS" />
+                                </MenuItem.InputBindings>
+                            </MenuItem>
+                            <MenuItem Header="Reddit Order By Score">
+                                <MenuItem.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{Binding SendToBrowser}"
+                                                  CommandParameter="ORDERBY_REDDITSCORE" />
+                                </MenuItem.InputBindings>
+                            </MenuItem>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
+                </ListView>
+            </Grid>
+        </Expander>
+
+        <interop:AirspaceDecorator AirspaceMode="None"
+                                   Grid.Row="1"
+                                   IsInputRedirectionEnabled="True"
+                                   IsOutputRedirectionEnabled="True">
+            <interop:AirspaceDecorator.Background>
+                <VisualBrush TileMode="Tile"
+                             Viewport="0,0,150,150"
+                             ViewportUnits="Absolute"
+                             Opacity="0.05">
+                    <VisualBrush.Visual>
+                        <Border BorderBrush="#FFF0F0F0"
+                                BorderThickness="4">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock FontWeight="Bold"
+                                           Margin="0,0,0,10"
+                                           FontSize="16"
+                                           Text="Brow·SEO" />
+                                <Image Source="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico"
+                                       Stretch="Fill"
+                                       Margin="0,0,0,-80"
+                                       Width="45"
+                                       Height="45" />
+                            </StackPanel>
+                        </Border>
+                    </VisualBrush.Visual>
+                    <VisualBrush.Transform>
+                        <RotateTransform Angle="-22.5" />
+                    </VisualBrush.Transform>
+                </VisualBrush>
+            </interop:AirspaceDecorator.Background>
+            <Grid Name="host"
+                  Grid.Row="1"
+                  HorizontalAlignment="Stretch"
+                  Margin="-10,0,0,-10">
+                <!--<ContentPresenter 
+                              Grid.Row="1"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch" />-->
+            </Grid>
+        </interop:AirspaceDecorator>
+    </Grid>
+</UserControl>

@@ -128,9 +128,13 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
-      <Project>{f8b2ddd8-df68-4649-a477-092232a34f60}</Project>
-      <Name>BrowseoFX.WPF</Name>
+    <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue.WindowsForms\CefGlue.WindowsForms.csproj">
+      <Project>{679af14d-8ff5-4608-bff8-ec1a7ded04a4}</Project>
+      <Name>CefGlue.WindowsForms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue\CefGlue.csproj">
+      <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
+      <Name>CefGlue</Name>
     </ProjectReference>
     <ProjectReference Include="..\AnyProjectBrowserProcess\AnyProjectBrowserProcess.csproj">
       <Project>{e6dae4fe-e359-4d5a-81cc-ff233aa99df9}</Project>
@@ -139,6 +143,10 @@
     <ProjectReference Include="..\AnyProjFFProcess\AnyProjFFProcess.csproj">
       <Project>{09b014dc-bfc6-4e41-a7e8-c6b8c285758d}</Project>
       <Name>AnyProjFFProcess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
+      <Project>{f8b2ddd8-df68-4649-a477-092232a34f60}</Project>
+      <Name>BrowseoFX.WPF</Name>
     </ProjectReference>
     <ProjectReference Include="..\BrowseoFX.CMD\BrowseoFX.CMD.csproj">
       <Project>{ca877f0e-24ee-4c3a-8f6c-95571e4807c6}</Project>

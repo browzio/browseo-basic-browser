@@ -27,7 +27,11 @@ namespace BrowserAndFeatures
         public MainWindow()
         {
             InitializeComponent();
-       //     this.Closed += (sender, args) => { PostQuitMessage(0); };
+
+#if RELEASE
+          this.Close();  
+#endif
+            //     this.Closed += (sender, args) => { PostQuitMessage(0); };
             this.Closed += MainWindow_Closed;
         }
 

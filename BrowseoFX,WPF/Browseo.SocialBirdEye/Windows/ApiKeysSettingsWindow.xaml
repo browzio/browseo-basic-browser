@@ -1,0 +1,45 @@
+﻿<Window x:Class="BrowseoFX_WPF.Browseo.SocialBirdEye.Windows.ApiKeysSettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BrowseoFX_WPF.Browseo.SocialBirdEye.Windows"
+        xmlns:views="clr-namespace:BrowseoFX_WPF.Browseo.SocialBirdEye.Views"
+        mc:Ignorable="d"
+        WindowStyle="ToolWindow"
+        WindowStartupLocation="CenterScreen"
+        Title="Api Keys Settings" Height="250" Width="400">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <views:GoogleEyeApisKeySettings x:Name="googleApisKeys" 
+                                        x:FieldModifier="public" />
+
+        <views:TwitterKeysSettins x:Name="twitterApisKeys" 
+                                  Visibility="Collapsed"
+                                        x:FieldModifier="public" />
+
+        <UniformGrid Rows="1" 
+                     Grid.Row="1"
+                     HorizontalAlignment="Right">
+
+            <!--<Button Name="btnCancel"
+                    Content="Cancel"
+                    Click="btnCancel_Click" />-->
+            
+            <Button Name="btnSave"
+                    Content="Save"
+                    Click="btnSave_Click" />
+        </UniformGrid>
+    </Grid>
+</Window>

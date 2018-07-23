@@ -71,13 +71,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Documents\Visual Studio 2015\Projects\Firefox Builds\Builds\xulfx\Rebuilt\vmas-xulfx-a340969180cd\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
-      <Project>{F8B2DDD8-DF68-4649-A477-092232A34F60}</Project>
-      <Name>BrowseoFX.WPF</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\temp\from cristian\cefglue.v3282_webrtc-disabled\src\xilium.cefglue\CefGlue\CefGlue.csproj">
       <Project>{703ff300-34b9-48d4-a5d6-e741f48d5f95}</Project>
       <Name>CefGlue</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BrowseoFX,WPF\BrowseoFX.WPF.csproj">
+      <Project>{f8b2ddd8-df68-4649-a477-092232a34f60}</Project>
+      <Name>BrowseoFX.WPF</Name>
     </ProjectReference>
     <ProjectReference Include="..\CefGlue.Client\CefGlue.Client.csproj">
       <Project>{311984df-eb92-4b01-b4ad-c7e73a13e271}</Project>
