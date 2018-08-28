@@ -28,8 +28,10 @@ namespace BrowserAndFeatures
         {
             InitializeComponent();
 
-#if RELEASE
-          this.Close();  
+#if DEBUG
+          int i = 0;
+#else
+            this.Close();
 #endif
             //     this.Closed += (sender, args) => { PostQuitMessage(0); };
             this.Closed += MainWindow_Closed;

@@ -76,12 +76,12 @@
 
     <Style x:Name="linkStyle" TargetType="{x:Type TextBlock}" x:Key="tbLinkStyle">
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="TextDecorations" Value="Underline" />
         <Setter Property="Foreground" Value="#558aed" />
         <Style.Triggers>
             <Trigger Property="IsMouseOver" Value="True">
                 <Setter Property="FontWeight" Value="Bold"/>
                 <Setter Property="TextWrapping" Value="NoWrap" />
+                <Setter Property="TextDecorations" Value="Underline" />
             </Trigger>
         </Style.Triggers>
         <!--<Setter Property="Template">

@@ -138,7 +138,7 @@ namespace BrowserAndFeatures
             //if (!allowFeedMash) feed.Visibility = System.Windows.Visibility.Collapsed;
             //if (!allowIndexer) indexer.Visibility = System.Windows.Visibility.Collapsed;
             //if (!allowYoutube) youtuber.Visibility = System.Windows.Visibility.Collapsed;
-            BrowseoFXManager.Instance.PanelUIHandler.IsEnabledForKK = false;
+            BrowseoFXManager.Instance.PanelUIHandler.IsEnabledForKK = hasKK;
             if (!hasKK)
             {
                 prospector.tabKingKontent.Visibility = System.Windows.Visibility.Collapsed;

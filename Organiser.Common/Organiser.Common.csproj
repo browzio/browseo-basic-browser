@@ -89,6 +89,7 @@
     <Compile Include="Controlls\SocialShareButtonsView.xaml.cs">
       <DependentUpon>SocialShareButtonsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\DatetimeToStringConverter.cs" />
     <Compile Include="Extensions\Int32Extension.cs" />
     <Compile Include="Controlls\FlexibleMessageBox.cs" />
     <Compile Include="Classes\Helpers\GloableProfData.cs" />
@@ -533,6 +534,18 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Image\baseline_close_black_18dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\social\baseline_person_black_18dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\social\baseline_thumb_up_alt_black_18dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\social\baseline_comment_black_18dp.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\Content\baseline_redo_black_18dp.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

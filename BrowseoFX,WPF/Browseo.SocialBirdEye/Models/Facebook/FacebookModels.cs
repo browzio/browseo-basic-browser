@@ -1532,9 +1532,13 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Models.Facebook
     //user_posts
     public class Post
     {
+        //Link caption in post that appears below name. The caption must be an actual URLs and should accurately reflect the URL and associated advertiser or business someone visits when they click on it.
         public string caption { get; set; }
+        //A description of a link in the post (appears beneath thecaption).
         public string description { get; set; }
+        //The status message in the post.
         public string message { get; set; }
+        //The name of the link.
         public string name { get; set; }
 
         public string id { get; set; }
@@ -1644,7 +1648,138 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Models.Facebook
 
         public paging paging { get; set; }
     }
-    
+
+    //likes.limit(0).summary(true),comments.limit(0).summary(true),reactions.limit(0).summary(true)
+    public class request_with_summary
+    {
+        public summary summary { get; set; }
+    }
+    public class summary
+    {
+        public int total_count { get; set; }
+    }
+
+    public class shares
+    {
+        public int count { get; set; }
+    }
+
+    public class from
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+
+        public string profile_pic { get { return "http://graph.facebook.com/" + id + "/picture"; } }
+        public string profile_url { get { return "http://www.facebook.com/" + id + ""; } }
+    }
+
+    public class target
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+    }
+
+    public class properties
+    {
+        public string name { get; set; }
+        public string text { get; set; }
+        public string href { get; set; }
+    }
+
+    public class like
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+        public string created_time { get; set; }
+
+        public paging paging { get; set; }
+    }
+
+
+    public class paging
+    {
+        public string previous { get; set; }
+        public string next { get; set; }
+    }
+
+    #region insights
+    //https://developers.facebook.com/docs/platforminsights/page
+    //read_insights
+
+    //InsightsResult
+    public class InsightsResultBase<T>
+    {
+        public string id { get; set; }
+        public string name { get; set; }
+        public string period { get; set; }
+        public string title { get; set; }
+        public string description { get; set; }
+        public string end_time { get; set; }
+
+        public T[] values { get; set; }
+    }
+
+    //Value
+    public class InsightsValue
+    {
+        public int value { get; set; }
+    }
+
+    //Page Like Sources
+    public class LikeSourceType
+    {
+        public int Ads { get; set; }
+        [JsonProperty("News Feed")]
+        public int NewsFeed { get; set; }
+        [JsonProperty("Page Suggestions")]
+        public int PageSuggestions { get; set; }
+        [JsonProperty("Restored Likes from Reactivated Accounts")]
+        public int RestoredLikesfromReactivatedAccounts { get; set; }
+        public int Search { get; set; }
+        [JsonProperty("Your Page")]
+        public int YourPage { get; set; }
+    }
+
+    //page_negative_feedback_by_type
+    public class NegativeFeedbackType
+    {
+        public int hide_clicks { get; set; }
+        public int hide_all_clicks { get; set; }
+        public int report_spam_clicks { get; set; }
+        public int unlike_page_clicks { get; set; }
+    }
+
+    //page_positive_feedback_by_type
+    public class PositiveFeedbackType
+    {
+        public int like { get; set; }
+        public int comment { get; set; }
+        public int link { get; set; }
+        public int answer { get; set; }
+        public int claim { get; set; }
+        public int rsvp { get; set; }
+    }
+
+    //Page Story Types
+    public class InsightsPageStoryType
+    {
+        public int checkin { get; set; }
+        public int coupon { get; set; }
+        [JsonProperty("event")]
+        public int mEvent { get; set; }
+        public int fan { get; set; }
+        public int mention { get; set; }
+        [JsonProperty("page post")]
+        public int pagePost { get; set; }
+        public int question { get; set; }
+        [JsonProperty("user post")]
+        public int userPost { get; set; }
+        public int other { get; set; }
+    }
+
+    //TODO:Tab Types
+    #endregion
+
     #region custom responses
 
     public interface IHavePosts
@@ -1663,6 +1798,7 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Models.Facebook
     }
     #endregion
 
+    #region todo delete old
     //name,id,friends
     //user_friends
     public class userResponse
@@ -1842,143 +1978,5 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Models.Facebook
 
         public paging paging { get; set; }
     }
-
-    //likes.limit(0).summary(true),comments.limit(0).summary(true),reactions.limit(0).summary(true)
-    public class request_with_summary
-    {
-        public summary summary { get; set; }
-    }
-    public class summary
-    {
-        public int total_count { get; set; }
-    }
-
-    public class shares
-    {
-        public int count { get; set; }
-    }
-
-    public class from
-    {
-        public string id { get; set; }
-        public string name { get; set; }
-    }
-
-    public class target
-    {
-        public string id { get; set; }
-        public string name { get; set; }
-    }
-
-    public class properties
-    {
-        public string name { get; set; }
-        public string text { get; set; }
-        public string href { get; set; }
-    }
-
-    public class like
-    {
-        public string id { get; set; }
-        public string name { get; set; }
-        public string created_time { get; set; }
-
-        public paging paging { get; set; }
-    }
-
-
-
-    //public class picture
-    //{
-    //    public int total_count { get; set; }
-
-    //    public class data
-    //    {
-    //        public string height { get; set; }
-    //        public string is_silhouette { get; set; }
-    //        public string url { get; set; }
-    //        public string width { get; set; }
-    //    }
-    //}
-
-    public class paging
-    {
-        public string previous { get; set; }
-        public string next { get; set; }
-    }
-
-    #region insights
-    //InsightsResult
-    public class InsightsResultBase<T>
-    {
-        public string id { get; set; }
-        public string name { get; set; }
-        public string period { get; set; }
-        public string title { get; set; }
-        public string description { get; set; }
-        public string end_time { get; set; }
-
-        public T[] values { get; set; }
-    }
-
-    //Value
-    public class InsightsValue
-    {
-        public int value { get; set; }
-    }
-
-    //Page Like Sources
-    public class LikeSourceType
-    {
-        public int Ads { get; set; }
-        [JsonProperty("News Feed")]
-        public int NewsFeed { get; set; }
-        [JsonProperty("Page Suggestions")]
-        public int PageSuggestions { get; set; }
-        [JsonProperty("Restored Likes from Reactivated Accounts")]
-        public int RestoredLikesfromReactivatedAccounts { get; set; }
-        public int Search { get; set; }
-        [JsonProperty("Your Page")]
-        public int YourPage { get; set; }
-    }
-
-    //page_negative_feedback_by_type
-    public class NegativeFeedbackType
-    {
-        public int hide_clicks { get; set; }
-        public int hide_all_clicks { get; set; }
-        public int report_spam_clicks { get; set; }
-        public int unlike_page_clicks { get; set; }
-    }
-
-    //page_positive_feedback_by_type
-    public class PositiveFeedbackType
-    {
-        public int like { get; set; }
-        public int comment { get; set; }
-        public int link { get; set; }
-        public int answer { get; set; }
-        public int claim { get; set; }
-        public int rsvp { get; set; }
-    }
-
-    //Page Story Types
-    public class InsightsPageStoryType
-    {
-        public int checkin { get; set; }
-        public int coupon { get; set; }
-        [JsonProperty("event")]
-        public int mEvent { get; set; }
-        public int fan { get; set; }
-        public int mention { get; set; }
-        [JsonProperty("page post")]
-        public int pagePost { get; set; }
-        public int question { get; set; }
-        [JsonProperty("user post")]
-        public int userPost { get; set; }
-        public int other { get; set; }
-    }
-
-    //TODO:Tab Types
     #endregion
 }

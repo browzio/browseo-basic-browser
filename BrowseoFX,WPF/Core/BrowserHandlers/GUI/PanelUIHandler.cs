@@ -34,7 +34,7 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
 
         public PanelUIHandler()
         {
-            IsEnabledForKK = true;
+           // IsEnabledForKK = true;
         }
         public void Init()
         {
@@ -61,7 +61,7 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
             //FbConverseo Button
             if (!NoFB)
             {
-                CreateBirdsEyeButton();
+                //CreateBirdsEyeButton();
                 CreateCheckpointCheck();
                 CreateLSBButton();
                 CreateSEOButton();

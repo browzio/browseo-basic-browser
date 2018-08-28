@@ -181,6 +181,12 @@
     <Compile Include="Browseo.SocialBirdEye\Views\PinterestEyeView.xaml.cs">
       <DependentUpon>PinterestEyeView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Browseo.SocialBirdEye\Views\SocialHeaderView.xaml.cs">
+      <DependentUpon>SocialHeaderView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browseo.SocialBirdEye\Views\StatsBarView.xaml.cs">
+      <DependentUpon>StatsBarView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Browseo.SocialBirdEye\Views\TwitterEyeView.xaml.cs">
       <DependentUpon>TwitterEyeView.xaml</DependentUpon>
     </Compile>
@@ -232,6 +238,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Browseo.SocialBirdEye\Views\PinterestEyeView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Browseo.SocialBirdEye\Views\SocialHeaderView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Browseo.SocialBirdEye\Views\StatsBarView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -370,7 +384,9 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Browseo.SocialBirdEye\Converters\" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Browser.Common\Browser.Common.csproj">
       <Project>{c6134f4b-6ab7-4969-9b28-044c473247dc}</Project>

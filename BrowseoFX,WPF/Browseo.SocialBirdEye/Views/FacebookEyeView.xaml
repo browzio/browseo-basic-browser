@@ -14,10 +14,23 @@
             </ResourceDictionary.MergedDictionaries>
 
             <converters:NullToVisibleConverter x:Key="nullToVis" />
+            <converters:ElementSizeMathConverter x:Key="mathConv" />
 
             <DataTemplate x:Key="summaryTemplate">
-                <StackPanel Orientation="Vertical" Grid.IsSharedSizeScope="True">
-                    <local:KeyValDisplayControl ParamTitle="likes:"
+                <StackPanel Orientation="Horizontal" Grid.IsSharedSizeScope="True">
+                    <local:StatsBarView Margin="3"
+                                        StatImageUrl="pack://application:,,,/Organiser.Common;component/Image/social/baseline_thumb_up_alt_black_18dp.png"
+                                        StatValue="{Binding likes.summary.total_count}" />
+
+                    <local:StatsBarView Margin="3"
+                                        StatImageUrl="pack://application:,,,/Organiser.Common;component/Image/social/baseline_comment_black_18dp.png"
+                                        StatValue="{Binding comments.summary.total_count}" />
+
+                    <local:StatsBarView Margin="3"
+                                        StatImageUrl="pack://application:,,,/Organiser.Common;component/Image/Content/baseline_redo_black_18dp.png"
+                                        StatValue="{Binding shares.count}" />
+
+                    <!--<local:KeyValDisplayControl ParamTitle="likes:"
                                                 ParamValue="{Binding likes.summary.total_count}"/>
 
                     <local:KeyValDisplayControl ParamTitle="comments:" 
@@ -25,6 +38,9 @@
 
                     <local:KeyValDisplayControl ParamTitle="reactions:" 
                                                 ParamValue="{Binding reactions.summary.total_count}" />
+                    
+                                                                    <local:KeyValDisplayControl ParamTitle="Shares:" 
+                                                                        ParamValue="{Binding shares.count}" />-->
                 </StackPanel>
             </DataTemplate>
 
@@ -86,7 +102,8 @@
                           HorizontalScrollBarVisibility="Auto"
                           VerticalScrollBarVisibility="Auto"
                           Style="{x:Null}">
-                <StackPanel>
+                <StackPanel MaxWidth="{Binding ElementName=svContent, Path=ActualWidth,Converter={StaticResource mathConv}, ConverterParameter=M-M28}"
+                            Margin="5">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
@@ -126,13 +143,46 @@
                               Visibility="{Binding Path=UserSummary.feedResponse, Converter={StaticResource nullToVis}, ConverterParameter=NOT}">
                         <StackPanel Orientation="Vertical" 
                                     Grid.IsSharedSizeScope="True">
-                            <ListView ItemsSource="{Binding UserSummary.feedResponse.data}"
-                                      Template="{StaticResource lvNoScrollTemplate}">
-                                <ListView.ItemTemplate>
+                            <ItemsControl ItemsSource="{Binding UserSummary.feedResponse.data}"
+                                      Margin="10"
+                                     
+                                      
+                                      Background="WhiteSmoke">
+                                    <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <StackPanel Orientation="Vertical"
-                                                    Grid.IsSharedSizeScope="True">
-                                            
+                                            <StackPanel Orientation="Vertical"
+                                                        Grid.IsSharedSizeScope="True"
+                                                        Background="White"
+                                                        Margin="5">
+
+                                                <local:SocialHeaderView ImageUrl="{Binding from.profile_pic}"
+                                                                        FromName="{Binding from.name}" 
+                                                                        ProfileUrl="{Binding from.profile_url}"
+                                                                        CreatedAtFull="{Binding created_time}"/>
+
+                                                <TextBox Text="{Binding message}"
+                                                           
+                                                           Style="{StaticResource SelectableTextBlock}"
+                                                           
+                                                           Margin="5"
+                                                           TextWrapping="Wrap" 
+                                                           FontSize="14" />
+
+                                                <Image Source="{Binding full_picture}"
+                                                       
+                                                       Visibility="{Binding Path=full_picture, Converter={StaticResource nullToVis}, ConverterParameter=NOT}"
+                                                       
+                                                       MaxWidth="360"
+                                                       MaxHeight="360"
+                                                       
+                                                       MinWidth="360"
+                                                       MinHeight="360"
+                                                       Stretch="Uniform"
+                                                       
+                                                       HorizontalAlignment="Left"
+                                                       Margin="5" />
+                                                <ContentPresenter ContentTemplate="{StaticResource summaryTemplate}"/>
+
                                                 <local:KeyValDisplayControl ParamTitle="Type:" 
                                                                         ParamValue="{Binding type}" />
 
@@ -142,23 +192,15 @@
                                                 <local:KeyValDisplayControl ParamTitle="Permalink Url:" 
                                                                         ParamValue="{Binding permalink_url}" />
 
-                                            <local:KeyValDisplayControl ParamTitle="Link:" 
+                                                <local:KeyValDisplayControl ParamTitle="Link:" 
                                                                         ParamValue="{Binding link}" />
 
-                                            <local:KeyValDisplayControl ParamTitle="Source:" 
+                                                <local:KeyValDisplayControl ParamTitle="Source:" 
                                                                         ParamValue="{Binding source}" />
-
-                                            <local:KeyValDisplayControl ParamTitle="Shares:" 
-                                                                        ParamValue="{Binding shares.count}" />
-
-                                            <ContentPresenter ContentTemplate="{StaticResource summaryTemplate}"/>
-                                            
-                                            <local:KeyValDisplayControl ParamTitle="Created At:" 
-                                                                        ParamValue="{Binding created_time}" />
-                                        </StackPanel>
+                                            </StackPanel>
                                     </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
                     </Expander>
                         
