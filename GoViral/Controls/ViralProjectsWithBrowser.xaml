@@ -40,7 +40,7 @@
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*" MinHeight="300" />
-                            <RowDefinition Height="2*" />
+                            <!--<RowDefinition Height="2*" />-->
                         </Grid.RowDefinitions>
 
                         <!--<Expander ExpandDirection="Left" Background="WhiteSmoke" Padding="0,0,2,0">
@@ -72,10 +72,10 @@
                                         <Button Content="De Dupe" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="DEDUPE" />
                                         <Button Content="Save" Margin="3" Command="{Binding OnBtnClicked}" CommandParameter="SAVE" />
                                     </StackPanel>
-                                    <StackPanel Visibility="{Binding PBarVisible}">
+                                    <!--<StackPanel Visibility="{Binding PBarVisible}">
                                         <ProgressBar Height="6" IsIndeterminate="{Binding IsIndeterminate}" Value="{Binding PBarValue}" />
                                         <TextBlock Text="{Binding LoadingStatus}" Foreground="#dd4f43" HorizontalAlignment="Left" MaxWidth="450"  />
-                                    </StackPanel>
+                                    </StackPanel>-->
                                 </StackPanel>
                                 <!--<ScrollViewer x:Name="MyScrollViewer" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="1">-->
                                 <ListView ItemsSource="{Binding Folders}"
@@ -247,7 +247,7 @@
                                                             <MenuItem Header="View" Command="{Binding CTMenuClick}" CommandParameter="View" />
                                                             <MenuItem Header="Edit" Command="{Binding CTMenuClick}" CommandParameter="Edit" />
                                                             <MenuItem Header="Delete" Command="{Binding CTMenuClick}" CommandParameter="Delete" />
-                                                            <Separator Margin="-30,0,0,0" />
+                                                            <!--<Separator Margin="-30,0,0,0" />
                                                             <MenuItem Header="Order By Likes" Command="{Binding CTMenuClick}" CommandParameter="ORDER_Likes" />
                                                             <MenuItem Header="Order By Talking About" Command="{Binding CTMenuClick}" CommandParameter="ORDER_TalkingAbout" />
                                                             <MenuItem Header="Order Groups By Privacy" Command="{Binding CTMenuClick}" CommandParameter="ORDER_GroupsOpen" />
@@ -256,7 +256,7 @@
                                                             <MenuItem Header="Crawl All Stats" Command="{Binding CTMenuClick}" CommandParameter="StatsAll" />
                                                             <Separator Margin="-30,0,0,0" />
                                                             <MenuItem Header="Cancel Crawl Check" Command="{Binding CTMenuClick}" CommandParameter="Cancel" />
-                                                            <MenuItem Header="Cancel Crawl All" Command="{Binding CTMenuClick}" CommandParameter="CancelAll" />
+                                                            <MenuItem Header="Cancel Crawl All" Command="{Binding CTMenuClick}" CommandParameter="CancelAll" />-->
                                                             <Separator Margin="-30,0,0,0" />
                                                             <MenuItem Header="Copy Link" Command="{Binding CTMenuClick}" CommandParameter="CopyLink" />
                                                         </ContextMenu>
@@ -269,12 +269,12 @@
                                         <ContextMenu>
                                             <ContextMenu.Style>
                                                 <Style TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}">
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                    <Style.Triggers>
+                                                <Setter Property="Visibility" Value="Visible" />
+                                                    <!--<Style.Triggers>
                                                         <DataTrigger Binding="{Binding Folders.Count}" Value="0">
                                                             <Setter Property="Visibility" Value="Collapsed" />
                                                         </DataTrigger>
-                                                    </Style.Triggers>
+                                                    </Style.Triggers>-->
                                                 </Style>
                                             </ContextMenu.Style>
                                             <!--<MenuItem Header="Order Pages By Likes" Command="{Binding CTMenuClick}" CommandParameter="ORDER_Likes" />
@@ -316,7 +316,7 @@
                                     <TextBlock Text="Page Info" Foreground="#4c8cf5" />
                                 </Grid>
                             </Expander.Header>-->
-                        <Grid Background="WhiteSmoke"
+                        <!--<Grid Background="WhiteSmoke"
                               Grid.Row="1"
                               Margin="0,0,0,0">
                                 <local:SelectedPageInfoUserControl x:Name="ucSelectedPageInfo" 
@@ -324,7 +324,7 @@
                                                                    AddUrlToPostsSync="selectedPageInfoUC_AddUrlToPostsSync" 
                                                                    AddUrlForMulti="ucSelectedPageInfo_AddUrlForMulti" 
                                                                    OnNavigateToUrl="ucSelectedPageInfo_OnNavigateToUrl"/>
-                            </Grid>
+                            </Grid>-->
                         <!--</Expander>-->
                     </Grid>
                 </TabItem>

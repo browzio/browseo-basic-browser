@@ -36,5 +36,21 @@ namespace Organiser.Common.Windows
         {
             this.Close();
         }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Keyboard.ClearFocus();
+            this.Focus();
+            tbInputText.Focus();
+        }
+
+        private void tbInputText_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                OkClicked = true;
+                this.Close();
+            }
+        }
     }
 }

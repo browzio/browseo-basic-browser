@@ -43,11 +43,11 @@
                                                                    ToolTip="reddit" />
         </Button>
 
-        <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Name="stumbleupon" Click="Button_Click_1" Height="35">
+        <!--<Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Name="stumbleupon" Click="Button_Click_1" Height="35">
             <Image Source="pack://application:,,,/Organiser.Common;component/Image/StumbleUpon-icon.png" 
                                                                    Width="30" Height="30"
                                                                    ToolTip="stumbleupon" />
-        </Button>
+        </Button>-->
 
         <Button Cursor="Hand" Style="{StaticResource browser_btn}" Margin="3" Name="tumblr" Click="Button_Click_1" Height="35">
             <Image Source="pack://application:,,,/Organiser.Common;component/Image/tumblr-icon.png" 

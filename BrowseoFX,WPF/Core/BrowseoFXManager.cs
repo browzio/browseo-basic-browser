@@ -52,6 +52,7 @@ namespace BrowseoFX_WPF.Core
     {
         void OnOpenIAMacros();
         void OnOpenFBConverseo();
+        void OnOpenFbSearch();
         void OnOpenLSB();
         void OnOpenSEO();
         void OnOpenSocialStats(SocialStatsCrawlerService sscs);
@@ -275,6 +276,9 @@ namespace BrowseoFX_WPF.Core
                 BFXMacrosDirectory = Path.Combine(binDirectory, "Imacros 8", "src");
                 Xpcom.LoadExtension(BFXMacrosDirectory, "chrome.manifest");
 
+                //var BFXFingerprintDirectory = Path.Combine(binDirectory, "canvas-fingerprint");
+                //Xpcom.LoadExtension(BFXFingerprintDirectory, "chrome.manifest");
+
 
 
                 //Defaullt Fx Addons
@@ -300,8 +304,8 @@ namespace BrowseoFX_WPF.Core
 
                 //Xpcom.RegisterInstance(typeof(nsISessionStore).GUID, "SessionStore", "@mozilla.org/browser/sessionstore;1", FXServices.SessionStoreService);
 
-                FXServices.ObserverService.AddObserver(new nsObserverAny(), "browserClassInitializer_12345", false);
-                FXServices.ObserverService.AddObserver(new nsObserverAny(), "browserClassInitializer_12345", false);
+                //FXServices.ObserverService.AddObserver(new nsObserverAny(), "browserClassInitializer_12345", false);
+                //FXServices.ObserverService.AddObserver(new nsObserverAny(), "browserClassInitializer_12345", false);
 
                 Xpcom.RegisterInstance(typeof(nsIWinTaskbar).GUID, "WinTaskbar", "@mozilla.org/windows-taskbar;1", nsWinTaskbar.Instance);
                 Xpcom.RegisterInstance(typeof(nsIBrowserHandler).GUID, "nsBrowserContentHandler", "@mozilla.org/browser/clh;1", nsBrowserHandler.Instance);
@@ -333,6 +337,7 @@ namespace BrowseoFX_WPF.Core
                         //sessionstore-init-started
                         //obsSvc.Instance.AddObserver(new nsObserverAny(), "xul-window-registered", false);
                         obsSvc.Instance.AddObserver(new nsObserverAny(), "sessionstore-init-started", false);
+                        obsSvc.Instance.AddObserver(new nsObserverFingerPrint(), "browseoFX-fingerprint-current", false);
 
                         obsSvc.Instance.AddObserver(this, "browser-delayed-startup-finished", false);
 
@@ -831,7 +836,7 @@ namespace BrowseoFX_WPF.Core
                 }
             }
             catch { }
-
+            
             //using (var PreferencesService = Xpcom.GetService2<Gecko.Interfaces.nsIPrefService>(Gecko.Contracts.PreferencesService))
             //{
             //    PreferencesService.Instance.ReadUserPrefs(FXServices.DirectoryServiceProvider.NewLocalFile(FXServices.PreferencesService.UserPrefsFile));
@@ -847,7 +852,7 @@ namespace BrowseoFX_WPF.Core
             //FXServices.ObserverService.NotifyObservers(null, "browser:purge-session-history", "");
 
             //Panel Ui Edits
-           PanelUIHandler.Init();
+            PanelUIHandler.Init();
 
             //Session store events
             //using (GeckoDOMEventTarget eventTarget = Xpcom.QueryInterface<nsIDOMEventTarget>(MainWindowElement.Instance).Wrap(GeckoDOMEventTarget.Create))
@@ -1345,6 +1350,12 @@ namespace BrowseoFX_WPF.Core
         internal void OpenFbConverseo()
         {
              if (FxMAnagerListenerNotifyer != null) FxMAnagerListenerNotifyer.OnOpenFBConverseo();
+            //BrowserWindow w = new BrowserWindow();
+        }
+
+        internal void FbSearch()
+        {
+            if (FxMAnagerListenerNotifyer != null) FxMAnagerListenerNotifyer.OnOpenFbSearch();
             //BrowserWindow w = new BrowserWindow();
         }
 

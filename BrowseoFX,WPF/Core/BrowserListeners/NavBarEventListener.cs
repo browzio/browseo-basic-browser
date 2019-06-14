@@ -63,6 +63,11 @@ namespace BrowseoFX_WPF.Core.BrowserListeners
                             BrowseoFXManager.Instance.OpenFbConverseo();
                             break;
 
+                        case NavBarListenerStates.navbar_FbSearch:
+                            if (RanTutLink("https://browz.io/fbconverseo-lite", BrowseoFXManager.Instance.PanelUIHandler.isEnabledForFree)) return;
+                            BrowseoFXManager.Instance.FbSearch();
+                            break;
+
                         case NavBarListenerStates.navbar_LSB:
                             if (RanTutLink("https://browz.io/lsb-lite", BrowseoFXManager.Instance.PanelUIHandler.isEnabledForFree)) return;
                             BrowseoFXManager.Instance.OpenLSB();
@@ -99,6 +104,19 @@ namespace BrowseoFX_WPF.Core.BrowserListeners
 
                         case NavBarListenerStates.panelUi_ctlSK_LikePosts:
                             Autotype("javascript:var inputs = document.getElementsByClassName('UFILikeLink _4x9- _4x9_ _48-k'); for(var i=0; i<inputs.length;i++) { inputs[i].click(); }");
+                            break;
+
+                        case NavBarListenerStates.panelUi_ctlSK_mindsSubscribe:
+                            Autotype("javascript:var inputs = document.getElementsByClassName('m-btn m-btn--with-icon m-btn--subscribe ng-star-inserted'); for(var i=0; i<inputs.length;i++) { inputs[i].click(); }");
+                            break;
+
+
+                        case NavBarListenerStates.PanelUISub_toolbarbutton_fingerprint:
+                            using (var obsSvc = Xpcom.GetService2<Gecko.Interfaces.nsIObserverService>(Gecko.Contracts.ObserverService))
+                            {
+                                //obsSvc.Instance.NotifyObservers(null, "browseoFX-navigate-fingerprint-view-page", null);
+                                obsSvc.Instance.NotifyObservers(null, "browseoFX-change-fingerprint", null);
+                            }
                             break;
 
                         default:

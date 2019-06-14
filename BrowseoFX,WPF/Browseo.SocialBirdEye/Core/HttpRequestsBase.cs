@@ -153,7 +153,15 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Core
             {
                 return HttpRequestsBase.HttpWebGetRequest(url);
             });
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(jsonResponse);
+            try
+            {
+                var response = Newtonsoft.Json.JsonConvert.DeserializeObject<T>(jsonResponse); 
+                return response;
+            }
+            catch (Exception ex)
+            {
+                return default(T);
+            }
         }
     }
 }

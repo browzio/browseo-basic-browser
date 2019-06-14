@@ -777,7 +777,8 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers
                 else if (SelectedContentDocument.Location.Href.Contains("https://www.facebook.com/search/events/"))
                 {
                     type = "events";
-                    var groupLists = SelectedContentDocument.GetElementsByClassName("_3u1 _gli _uvb");
+                    //var groupLists = SelectedContentDocument.GetElementsByClassName("_3u1 _gli _uvb");
+                    var groupLists = SelectedContentDocument.GetElementsByClassName("_3u1 _gli _6pe1");
                     foreach (var ellement in groupLists)
                     {
                         if (ellement.HasAttribute("data-bt"))
@@ -802,7 +803,8 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers
                 }
                 else
                 {
-                    var resultsClassname = "_3u1 _gli _uvb";
+                    //var resultsClassname = "_3u1 _gli _uvb";
+                    var resultsClassname = "_3u1 _gli _6pe1";
                     var ogDataAttribute = "data-bt";
                     var ogphotovideoDataAttribute = "data-gt";
                     var urlsClassName = "_32mo";

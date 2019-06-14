@@ -112,9 +112,9 @@ namespace Prospector.Helpers
                 {
                     if (resultPage == "")
                         return;
-                    resultPage = resultPage.Substring(resultPage.IndexOf("<h3") + 1);
+                    resultPage = resultPage.Substring(resultPage.IndexOf("<div class=\"ZINbbc xpd O9g5cc uUPGi\"") + 1);
                     resultPage = resultPage.Substring(0, resultPage.LastIndexOf("</body"));
-                    individualResults = resultPage.Split(new string[] { googleSearchSplit }, StringSplitOptions.None);
+                    individualResults = resultPage.Split(new string[] { "class=\"ZINbbc xpd O9g5cc uUPGi\"" }, StringSplitOptions.None);
                     splitResults(individualResults, url.pagenum);
                 }
             }
@@ -140,15 +140,24 @@ namespace Prospector.Helpers
 
                     string title = splistResult[1].Split(new string[] { "</a>" }, StringSplitOptions.None)[0];
                     title = title.Substring(title.IndexOf('>') + 1);
+                    title = title.Substring(title.IndexOf('>') + 1);
+                    title = title.Remove(title.IndexOf('<'));
                     title = title.Replace("<br>", "");//
                     title = title.Replace("<b>", "");
                     title = title.Replace("</b>", "");
                     title = title.Replace("�", "");
                     title = cleanString(title);
 
-
-                    string description = splistResult[2].Split(new string[] { @"class=""st"">" }, StringSplitOptions.None)[1];
-                    description = description.Remove(description.IndexOf("</span>"));
+                    string description = "";
+                    if (splistResult[1].Contains(@"</span>"))
+                    {
+                        description = splistResult[1].Split(new string[] { @"</span>" }, StringSplitOptions.None)[2];
+                    }
+                    else
+                    {
+                        description = splistResult[1].Split(new string[] { "<div class=\"BNeawe s3v9rd AP7Wnd\">" }, StringSplitOptions.None)[2];
+                    }
+                    description = description.Remove(description.IndexOf("</div>"));
                     description = description.Replace("<br>", "");
                     description = description.Replace("<b>", "");
                     description = description.Replace("</b>", ""); 

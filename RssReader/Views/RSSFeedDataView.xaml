@@ -229,7 +229,7 @@
                                                ToolTip="reddit" />
                                     </Button>
 
-                                    <Button Cursor="Hand"
+                                    <!--<Button Cursor="Hand"
                                             Style="{StaticResource browser_btn}"
                                             Margin="3"
                                             Command="{Binding OnCommandFromView}"
@@ -239,7 +239,7 @@
                                                Width="18"
                                                Height="18"
                                                ToolTip="stumbleupon" />
-                                    </Button>
+                                    </Button>-->
 
                                     <Button Cursor="Hand"
                                             Style="{StaticResource browser_btn}"

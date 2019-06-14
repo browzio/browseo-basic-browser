@@ -1,5 +1,6 @@
 ﻿using BrowseoFX_WPF.Browseo.SocialBirdEye.Social_Networks;
 using BrowseoFX_WPF.Browseo.SocialBirdEye.Social_Networks_Controllers;
+using BrowseoFX_WPF.Browseo.SocialBirdEye.ViewModels;
 using BrowseoFX_WPF.Browseo.SocialBirdEye.Windows;
 using Organiser.Common.Classes;
 using System;
@@ -40,7 +41,9 @@ namespace Browseo.SocialBirdEye.ViewModels
         public GoogleEye Controller_Google { get; set; }
         public LinkedInEye Controller_LinkedIn { get; set; }
         public PinterestEye Controller_Pinterest { get; set; }
-        
+
+        public BirdsEyeStreamTabViewModel StreamTabVM { get; set; }
+
         public GoogleApisController GoogleApisController { get; set; }
         public PinterestApisController PinterestApisController { get; set; }
         public TwitterApisController TwitterApisController { get; set; }
@@ -54,6 +57,8 @@ namespace Browseo.SocialBirdEye.ViewModels
             PinterestApisController = new PinterestApisController();
             TwitterApisController = new TwitterApisController();
             FacebookApisController = new FacebookApisController();
+
+            StreamTabVM = new BirdsEyeStreamTabViewModel(FacebookApisController);
 
             OnCommandFromView = new RelayCommand(OnCommandFromView_Raised);
         }

@@ -1,0 +1,10 @@
+﻿BirdsEyeDashboardViewModel
+	-FacebookApisController
+	-BirdsEyeStreamTabViewModel
+		-FacebookApisController
+		-StreamTabViewModel
+			-FacebookApisController
+			-StreamTabStreamViewModel
+				-FacebookApisController
+	-BirdsEyeAnalyticsTabViewModel
+		-FacebookApisController

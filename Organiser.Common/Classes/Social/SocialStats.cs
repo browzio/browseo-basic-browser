@@ -16,13 +16,14 @@ namespace Organiser.Common.Classes.SocialHelpers
         //public const string FB_TOKEN = "EAAHJ7QkNbSEBABM2SOZBvYkYq4WjpZAjWtzlhncoOl0hZAJQFZA505CIZAoFDMpHJFZCqWrVZCBZCZAqmZCN6lNOx1Pqc86PQoSHqoNbxZC05tI3ECnCZB4uOWPifFwl6c21BsfbCHkWjUH1kM7qWulk20GpE23JebRj1hkZD";
 
         public const string FB_SHARES_URL = "https://graph.facebook.com/v2.8/";
-        public const string FB_QUERI = "?fields=share,og_object{likes.limit(0).summary(true)}&access_token=503494873017633|F7xbKhlQGZGhPc8ThMU6pDdyiro";
+        public const string FB_QUERI = "?fields=engagement&access_token=503494873017633|F7xbKhlQGZGhPc8ThMU6pDdyiro";
+        //public const string FB_QUERI = "?fields=share,og_object{likes.limit(0).summary(true)}&access_token=503494873017633|F7xbKhlQGZGhPc8ThMU6pDdyiro";
         //EAAHJ7QkNbSEBABM2SOZBvYkYq4WjpZAjWtzlhncoOl0hZAJQFZA505CIZAoFDMpHJFZCqWrVZCBZCZAqmZCN6lNOx1Pqc86PQoSHqoNbxZC05tI3ECnCZB4uOWPifFwl6c21BsfbCHkWjUH1kM7qWulk20GpE23JebRj1hkZD";
 
         //need to crawl in browser
         public const string GOOGLE_PLUSONE_URL = "https://plusone.google.com/_/+1/fastbutton?url=";
 
-        public const string PINTREST_PINS_URL = "http://api.pinterest.com/v1/urls/count.json?callback=receiveCount&url=";
+        public const string PINTREST_PINS_URL = "https://api.pinterest.com/v1/urls/count.json?callback=receiveCount&url=";
 
         public const string STUMBLE_VIEWS_URL = "http://www.stumbleupon.com/services/1.01/badge.getinfo?url=";
 
@@ -31,6 +32,8 @@ namespace Organiser.Common.Classes.SocialHelpers
         public const string BUFFER_URL = "https://api.bufferapp.com/1/links/shares.json?url=";
 
         public const string REDDIT_URL = "https://www.reddit.com/api/info.json?url=";
+
+        static object mPinterestHttpLoc = new object();
 
         public static T GetStatsReply<T>(string url)
         {
@@ -73,7 +76,17 @@ namespace Organiser.Common.Classes.SocialHelpers
 
                 try
                 {
-                    source = client.DownloadString(url);
+                    //if (typeof(T) == typeof(PinterestReply))
+                    //{
+                    //    lock(mPinterestHttpLoc)
+                    //    {
+                    //        source = client.DownloadString("https://api.pinterest.com/v1/urls/count.json?callback=receiveCount&url=https://gpluseurope.com/");
+                    //    }
+                    //}
+                    //else
+                    //{
+                        source = client.DownloadString(url);
+                    //}
                 }
                 catch
                 {
@@ -110,26 +123,37 @@ namespace Organiser.Common.Classes.SocialHelpers
 
     public class FacebookReply
     {
-        public Share share { get; set; }
-        public OG_Object og_object { get; set; }
+        //public Share share { get; set; }
+        //public OG_Object og_object { get; set; }
 
-        public class Share
+        //public class Share
+        //{
+        //    public string comment_count { get; set; }
+        //    public string share_count { get; set; }
+        //}
+
+        //public class OG_Object
+        //{
+        //    public Likes likes { get; set; }
+        //    public class Likes
+        //    {
+        //        public Summary summary { get; set; }
+        //        public class Summary
+        //        {
+        //            public string total_count { get; set; }
+        //        }
+        //    }
+        //}
+
+        public string id { get; set; }
+        public Engagement engagement { get; set; }
+
+        public class Engagement
         {
+            public string reaction_count { get; set; }
             public string comment_count { get; set; }
             public string share_count { get; set; }
-        }
-
-        public class OG_Object
-        {
-            public Likes likes { get; set; }
-            public class Likes
-            {
-                public Summary summary { get; set; }
-                public class Summary
-                {
-                    public string total_count { get; set; }
-                }
-            }
+            public string comment_plugin_count { get; set; }
         }
     }
 
@@ -217,15 +241,15 @@ namespace Organiser.Common.Classes.SocialHelpers
             IEnumerable<IHaveSocialStats> orderd = null;
 
             if (orderbyType == "ORDERBY_FBSHARES")
-                orderd = statsList.OrderByDescending(result => result.SocialStatsReplys == null ? 0 : result.SocialStatsReplys.FacebookReply == null ? 0 : result.SocialStatsReplys.FacebookReply.share == null ? 0 :
-                                                             result.SocialStatsReplys.FacebookReply.share.share_count.IsNullOrEmpty() ? 0 : Convert.ToInt32(result.SocialStatsReplys.FacebookReply.share.share_count));
+                orderd = statsList.OrderByDescending(result => result.SocialStatsReplys == null ? 0 : result.SocialStatsReplys.FacebookReply == null ? 0 : result.SocialStatsReplys.FacebookReply.engagement == null ? 0 :
+                                                             result.SocialStatsReplys.FacebookReply.engagement.share_count.IsNullOrEmpty() ? 0 : Convert.ToInt32(result.SocialStatsReplys.FacebookReply.engagement.share_count));
             else if (orderbyType == "ORDERBY_FBLIKES")
                 orderd = statsList.OrderByDescending(result => result.SocialStatsReplys == null ? 0 : result.SocialStatsReplys.FacebookReply == null ? 0 : 
-                                                             result.SocialStatsReplys.FacebookReply.og_object == null ? 0 : result.SocialStatsReplys.FacebookReply.og_object.likes == null ? 0 : result.SocialStatsReplys.FacebookReply.og_object.likes.summary == null ? 0 :
-                                                             result.SocialStatsReplys.FacebookReply.og_object.likes.summary.total_count.IsNullOrEmpty() ? 0 : Convert.ToInt32(result.SocialStatsReplys.FacebookReply.og_object.likes.summary.total_count));
+                                                             result.SocialStatsReplys.FacebookReply.engagement == null ? 0 : result.SocialStatsReplys.FacebookReply.engagement.reaction_count == null ? 0 : result.SocialStatsReplys.FacebookReply.engagement.reaction_count == null ? 0 :
+                                                             result.SocialStatsReplys.FacebookReply.engagement.reaction_count.IsNullOrEmpty() ? 0 : Convert.ToInt32(result.SocialStatsReplys.FacebookReply.engagement.reaction_count));
             else if (orderbyType == "ORDERBY_FBCOMMENTS")
-                orderd = statsList.OrderByDescending(result => result.SocialStatsReplys == null ? 0 : result.SocialStatsReplys.FacebookReply == null ? 0 : result.SocialStatsReplys.FacebookReply.share == null ? 0 :
-                                                             result.SocialStatsReplys.FacebookReply.share.comment_count.IsNullOrEmpty() ? 0 : Convert.ToInt32(result.SocialStatsReplys.FacebookReply.share.comment_count));
+                orderd = statsList.OrderByDescending(result => result.SocialStatsReplys == null ? 0 : result.SocialStatsReplys.FacebookReply == null ? 0 : result.SocialStatsReplys.FacebookReply.engagement == null ? 0 :
+                                                             result.SocialStatsReplys.FacebookReply.engagement.comment_count.IsNullOrEmpty() ? 0 : Convert.ToInt32(result.SocialStatsReplys.FacebookReply.engagement.comment_count));
 
             else if (orderbyType == "ORDERBY_GPLUSONES")
                  orderd = statsList.OrderByDescending(result => result.SocialStatsReplys == null ? 0 : result.SocialStatsReplys.GoogleReply == null ? 0 :

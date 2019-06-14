@@ -38,15 +38,15 @@
             <Image Source="pack://application:,,,/Organiser.Common;component/Image/facebook-icon.png" Width="24" Height="24" />
             <TextBlock Grid.Column="1" VerticalAlignment="Center" Margin="2,0,0,0">
                 <Run  Text="Shares: " />
-                <Run  Text="{Binding share.share_count}" />
+                <Run  Text="{Binding engagement.share_count}" />
                 <Run  Text=" Comments: " />
-                <Run  Text="{Binding share.comment_count}" />
-                <Run  Text=" Likes: " />
-                <Run  Text="{Binding og_object.likes.summary.total_count}" />
+                <Run  Text="{Binding engagement.comment_count}" />
+                <Run  Text=" Reactions: " />
+                <Run  Text="{Binding engagement.reaction_count}" />
             </TextBlock>
         </Grid>
 
-        <Grid Grid.Column="1" DataContext="{Binding GoogleReply}" Margin="3" HorizontalAlignment="Left">
+        <!--<Grid Grid.Column="1" DataContext="{Binding GoogleReply}" Margin="3" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
@@ -56,7 +56,7 @@
                 <Run  Text="Plus Ones: " />
                 <Run  Text="{Binding PlusOnes}" />
             </TextBlock>
-        </Grid>
+        </Grid>-->
 
         <Grid Grid.Row="1" DataContext="{Binding PinterestReply}" Margin="3" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
@@ -70,7 +70,7 @@
             </TextBlock>
         </Grid>
 
-        <Grid Grid.Row="1" Grid.Column="1" DataContext="{Binding StumbleReply}" Margin="3" HorizontalAlignment="Left">
+        <!--<Grid Grid.Row="1" Grid.Column="1" DataContext="{Binding StumbleReply}" Margin="3" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
@@ -80,9 +80,9 @@
                 <Run  Text="Views: " />
                 <Run  Text="{Binding result.views}" />
             </TextBlock>
-        </Grid>
+        </Grid>-->
 
-        <Grid Grid.Row="2" DataContext="{Binding LinkedInReply}" Margin="3" HorizontalAlignment="Left">
+        <!--<Grid Grid.Row="2" DataContext="{Binding LinkedInReply}" Margin="3" HorizontalAlignment="Left">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
@@ -92,7 +92,7 @@
                 <Run  Text="Count: " />
                 <Run  Text="{Binding count}" />
             </TextBlock>
-        </Grid>
+        </Grid>-->
 
             <Grid Grid.Row="2" Grid.Column="1" DataContext="{Binding BufferReply}" Margin="3" HorizontalAlignment="Left">
                 <Grid.ColumnDefinitions>

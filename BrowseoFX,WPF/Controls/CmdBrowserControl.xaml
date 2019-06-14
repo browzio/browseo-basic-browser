@@ -138,13 +138,13 @@
                                                   CommandParameter="ORDERBY_FBCOMMENTS" />
                                 </MenuItem.InputBindings>
                             </MenuItem>
-                            <MenuItem Header="Google+ Order By Plus Ones">
+                            <!--<MenuItem Header="Google+ Order By Plus Ones">
                                 <MenuItem.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
                                                   Command="{Binding OnCommandFromView}"
                                                   CommandParameter="ORDERBY_GPLUSONES" />
                                 </MenuItem.InputBindings>
-                            </MenuItem>
+                            </MenuItem>-->
                             <MenuItem Header="Pinterest Order By Pins">
                                 <MenuItem.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
@@ -152,20 +152,20 @@
                                                   CommandParameter="ORDERBY_PINTERESTPINS" />
                                 </MenuItem.InputBindings>
                             </MenuItem>
-                            <MenuItem Header="Stumble Order By Views">
+                            <!--<MenuItem Header="Stumble Order By Views">
                                 <MenuItem.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
                                                   Command="{Binding OnCommandFromView}"
                                                   CommandParameter="ORDERBY_STUMBLEVIEWS" />
                                 </MenuItem.InputBindings>
-                            </MenuItem>
-                            <MenuItem Header="LinkedIn Order By Count">
+                            </MenuItem>-->
+                            <!--<MenuItem Header="LinkedIn Order By Count">
                                 <MenuItem.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
                                                   Command="{Binding OnCommandFromView}"
                                                   CommandParameter="ORDERBY_LINKEDINCOUNT" />
                                 </MenuItem.InputBindings>
-                            </MenuItem>
+                            </MenuItem>-->
                             <MenuItem Header="Buffer Order By Shares">
                                 <MenuItem.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"

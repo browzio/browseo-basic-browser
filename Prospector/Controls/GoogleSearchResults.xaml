@@ -108,6 +108,7 @@
                                   IsExpanded="True"
                                   Header="Social Stats"
                                   Visibility="{Binding DwExtras}"
+                                  DataContext="{Binding SocialStatsReplys}"
                                   Grid.Row="7">
                             <commonControls:SocialStatsUserControl />
                         </Expander>
@@ -153,7 +154,7 @@
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBSHARES" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="Facebook Order By Likes"
+                    <MenuItem Header="Facebook Order By Reactions"
                               Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBLIKES" />
@@ -165,30 +166,30 @@
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_FBCOMMENTS" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="Google+ Order By Plus Ones"
+                    <!--<MenuItem Header="Google+ Order By Plus Ones"
                               Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_GPLUSONES" />
                         </MenuItem.InputBindings>
-                    </MenuItem>
+                    </MenuItem>-->
                     <MenuItem Header="Pinterest Order By Pins"
                               Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_PINTERESTPINS" />
                         </MenuItem.InputBindings>
                     </MenuItem>
-                    <MenuItem Header="Stumble Order By Views"
+                    <!--<MenuItem Header="Stumble Order By Views"
                               Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_STUMBLEVIEWS" />
                         </MenuItem.InputBindings>
-                    </MenuItem>
-                    <MenuItem Header="LinkedIn Order By Count"
+                    </MenuItem>-->
+                    <!--<MenuItem Header="LinkedIn Order By Count"
                               Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>
                             <MouseBinding MouseAction="LeftClick" Command="{Binding SendToBrowser}" CommandParameter="ORDERBY_LINKEDINCOUNT" />
                         </MenuItem.InputBindings>
-                    </MenuItem>
+                    </MenuItem>-->
                     <MenuItem Header="Buffer Order By Shares"
                               Visibility="{Binding DwExtras}">
                         <MenuItem.InputBindings>

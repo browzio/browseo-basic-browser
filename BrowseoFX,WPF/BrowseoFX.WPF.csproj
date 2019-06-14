@@ -160,8 +160,17 @@
     <Compile Include="Browseo.SocialBirdEye\Social Networks\TwitterEye.cs" />
     <Compile Include="Browseo.SocialBirdEye\Social Networks\GoogleEye.cs" />
     <Compile Include="Browseo.SocialBirdEye\ViewModels\BirdsEyeDashboardViewModel.cs" />
+    <Compile Include="Browseo.SocialBirdEye\ViewModels\BirdsEyeStreamTabViewModel.cs" />
+    <Compile Include="Browseo.SocialBirdEye\ViewModels\StreamTabStreamViewModel.cs" />
+    <Compile Include="Browseo.SocialBirdEye\ViewModels\StreamTabViewModel.cs" />
     <Compile Include="Browseo.SocialBirdEye\Views\BirdsEyeDashboardView.xaml.cs">
       <DependentUpon>BirdsEyeDashboardView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browseo.SocialBirdEye\Views\BirdsEyeStreamTab.xaml.cs">
+      <DependentUpon>BirdsEyeStreamTab.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Browseo.SocialBirdEye\Views\BirdsEyeTabbedDashView.xaml.cs">
+      <DependentUpon>BirdsEyeTabbedDashView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Browseo.SocialBirdEye\Views\FacebookAnalyticsView.xaml.cs">
       <DependentUpon>FacebookAnalyticsView.xaml</DependentUpon>
@@ -199,13 +208,20 @@
     <Compile Include="Browseo.SocialBirdEye\Windows\BirdsEyeDashboardWindow.xaml.cs">
       <DependentUpon>BirdsEyeDashboardWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\Addons\FBSearchControl.xaml.cs">
+      <DependentUpon>FBSearchControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\BaseBrowserControl.xaml.cs">
       <DependentUpon>BaseBrowserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\CmdBrowserControl.xaml.cs">
       <DependentUpon>CmdBrowserControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Core\Services\BFXpcom\nsObserverFingerPrint.cs" />
     <Compile Include="Crawlers\FBConverseoOGCrawler.cs" />
+    <Compile Include="Models\Addons\SavedProjectsFolder.cs" />
+    <Compile Include="Models\Addons\User.cs" />
+    <Compile Include="ViewModels\Addons\FBSearchViewModel.cs" />
     <Compile Include="ViewModels\BaseBrowserViewModel.cs" />
     <Compile Include="Windows\BrowserWindow.xaml.cs">
       <DependentUpon>BrowserWindow.xaml</DependentUpon>
@@ -216,6 +232,14 @@
     <Page Include="Browseo.SocialBirdEye\Views\BirdsEyeDashboardView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Browseo.SocialBirdEye\Views\BirdsEyeStreamTab.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Browseo.SocialBirdEye\Views\BirdsEyeTabbedDashView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Browseo.SocialBirdEye\Views\FacebookAnalyticsView.xaml">
       <SubType>Designer</SubType>
@@ -262,6 +286,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Browseo.SocialBirdEye\Windows\BirdsEyeDashboardWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Addons\FBSearchControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -404,6 +432,15 @@
       <Project>{1e10924d-bb32-451b-9444-ccddfb230f8a}</Project>
       <Name>Organiser.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Browseo.SocialBirdEye\Socialytics.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Browseo.SocialBirdEye\Socialytics Wireframe Textual.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Browseo.SocialBirdEye\Socialytics Doc.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

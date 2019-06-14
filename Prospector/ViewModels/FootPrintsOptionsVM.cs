@@ -1817,6 +1817,10 @@ namespace Prospector.ViewModels
 
                             result.SocialStatsReplys = new SocialStatsReplys();
                             result.SocialStatsReplys.GetAllStatsFor(result.Link);
+                            result.SocialStatsReplys.OnFinishedAll += () =>
+                            {
+                                result.RaisePropertyChanged("SocialStatsReplys");
+                            };
                             Task.Run(async()=> 
                             {
                                 string websitehtml = await WebRequests.AsyncDownloadStringWithProfileProxy(result.Link);

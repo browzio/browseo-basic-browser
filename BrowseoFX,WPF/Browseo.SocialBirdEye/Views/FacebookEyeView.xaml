@@ -15,6 +15,7 @@
 
             <converters:NullToVisibleConverter x:Key="nullToVis" />
             <converters:ElementSizeMathConverter x:Key="mathConv" />
+            <converters:NullImageConverter x:Key="NullImageConverter" />
 
             <DataTemplate x:Key="summaryTemplate">
                 <StackPanel Orientation="Horizontal" Grid.IsSharedSizeScope="True">
@@ -168,15 +169,15 @@
                                                            TextWrapping="Wrap" 
                                                            FontSize="14" />
 
-                                                <Image Source="{Binding full_picture}"
+                                                <Image Source="{Binding picture, Converter={StaticResource NullImageConverter}}"
                                                        
-                                                       Visibility="{Binding Path=full_picture, Converter={StaticResource nullToVis}, ConverterParameter=NOT}"
+                                                       Visibility="{Binding Path=picture, Converter={StaticResource nullToVis}, ConverterParameter=NOT}"
                                                        
-                                                       MaxWidth="360"
-                                                       MaxHeight="360"
+                                                       MaxWidth="275"
+                                                       MaxHeight="260"
                                                        
-                                                       MinWidth="360"
-                                                       MinHeight="360"
+                                                       MinWidth="275"
+                                                       MinHeight="260"
                                                        Stretch="Uniform"
                                                        
                                                        HorizontalAlignment="Left"

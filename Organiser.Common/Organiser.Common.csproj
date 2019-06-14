@@ -90,6 +90,8 @@
       <DependentUpon>SocialShareButtonsView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\DatetimeToStringConverter.cs" />
+    <Compile Include="Converters\NullImageConverter.cs" />
+    <Compile Include="Converters\PrpertyEqualsParameterConverter.cs" />
     <Compile Include="Extensions\Int32Extension.cs" />
     <Compile Include="Controlls\FlexibleMessageBox.cs" />
     <Compile Include="Classes\Helpers\GloableProfData.cs" />

@@ -50,7 +50,15 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Core
             {
                 var apisController = Controller as FacebookApisController;
 
-                authUrl = Social.FACEBOOK_GRAPH_LINK;
+
+                //authUrl = Social.FACEBOOK_GRAPH_LINK;
+                authUrl =
+                    FBRequests.DefaultAuthUrl +
+                    "?client_id=" + FBRequests.AppID +
+                    "&scope=" + FBRequests.Scopes +
+                    "&response_type=token" +
+                    "&redirect_uri=https://www.facebook.com/connect/login_success.html" +
+                    "&state=" + GenUniqueState();
             }
 
             BrowseoFXManager.Instance.GloableWebView.Navigated -= GloableWebView_Navigated;
@@ -102,19 +110,23 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Core
                 else if (Controller is FacebookApisController)
                 {
                     var apisController = Controller as FacebookApisController;
-                    if (BrowseoFXManager.Instance.TabbrowserHandler.SelectedContentDocument.ReadyState == "loading") return;
+                    if (e.Url == null || !e.Url.Fragment.Contains("&access_token=")) return;
                     BrowseoFXManager.Instance.GloableWebView.Navigated -= GloableWebView_Navigated;
-                    string source = (BrowseoFXManager.Instance.TabbrowserHandler.SelectedContentDocument.DocumentElement as Gecko.DOM.HTML.GeckoHTMLHtmlElement).OuterHtml;
 
-                    var AccessToken = source.Trim().Split(new string[] { "placeholder=\"Paste in an existing Access Token or click &quot;Get User Access Token" }, StringSplitOptions.None)[1];
-                    AccessToken = AccessToken.Split(new string[] { "value=" }, StringSplitOptions.None)[1];
-                    AccessToken = AccessToken.Remove(AccessToken.IndexOf(@">"));
-                    AccessToken = AccessToken.Replace("\"", "");
-                    AccessToken = AccessToken.Replace(" type=text", "");
+                    var at = e.Url.Fragment.Split(new string[] { "&access_token=" }, StringSplitOptions.RemoveEmptyEntries)[1];
+                    var AccessToken = at.Remove(at.IndexOf("&"));
 
-                    if (e.Url.OriginalString == Social.FACEBOOK_GRAPH_LINK)
+                    //string source = (BrowseoFXManager.Instance.TabbrowserHandler.SelectedContentDocument.DocumentElement as Gecko.DOM.HTML.GeckoHTMLHtmlElement).OuterHtml;
+
+                    //var AccessToken = source.Trim().Split(new string[] { "placeholder=\"Paste in an existing Access Token or click &quot;Get User Access Token" }, StringSplitOptions.None)[1];
+                    //AccessToken = AccessToken.Split(new string[] { "value=" }, StringSplitOptions.None)[1];
+                    //AccessToken = AccessToken.Remove(AccessToken.IndexOf(@">"));
+                    //AccessToken = AccessToken.Replace("\"", "");
+                    //AccessToken = AccessToken.Replace(" type=text", "");
+
+                  //  if (e.Url.OriginalString == Social.FACEBOOK_GRAPH_LINK)
                         apisController.AccessToken_FB = AccessToken;
-                    else
+                    //else
                         apisController.AccessToken_Insta = AccessToken;
                 }
             }

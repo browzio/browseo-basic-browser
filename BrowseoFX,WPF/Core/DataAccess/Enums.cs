@@ -66,6 +66,9 @@ namespace BrowseoFX_WPF.Core.DataAccess
         [Description("navbar_FbConverseo")]
         navbar_FbConverseo,
 
+        [Description("navbar_FbConverseo")]
+        navbar_FbSearch,
+
         [Description("navbar_LSB")]
         navbar_LSB,
 
@@ -92,6 +95,13 @@ namespace BrowseoFX_WPF.Core.DataAccess
 
         [Description("panelUi_ctlSK_LikePosts")]
         panelUi_ctlSK_LikePosts,
+
+        [Description("panelUi_ctlSK_mindsSubscribe")]
+        panelUi_ctlSK_mindsSubscribe,
+
+
+        [Description("PanelUISub_toolbarbutton_fingerprint")]
+        PanelUISub_toolbarbutton_fingerprint,
     }
 
 

@@ -34,7 +34,7 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
 
         public PanelUIHandler()
         {
-           // IsEnabledForKK = true;
+            IsEnabledForKK = true;
         }
         public void Init()
         {
@@ -66,6 +66,7 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
                 CreateLSBButton();
                 CreateSEOButton();
                 CreateFbConverseoButton();
+                CreateFBSearchButton();
             }
 
             //Social social-share-button
@@ -77,6 +78,9 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
             //Added Functionality to the popup ui\\
             //Anonymity panel
             CreateAnonymitySettingsPanelUI();
+
+            //Fingerprint panel
+            //CreateFingerprintSettingsPanelUI();
 
             //TimeSync panel
             CreateTimeSyncPanelUI();
@@ -357,6 +361,27 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
         }
 
         /// <summary>
+        /// FB Open Graph Search
+        /// </summary>
+        private void CreateFBSearchButton()
+        {
+            var navBar_toolbarlitem_FbOGSearch = CreateXULElement("toolbaritem",
+                "id", "navBar_toolbarlitem_FbOGSearch");
+            NaveBarContents.AppendChild(navBar_toolbarlitem_FbOGSearch);
+
+            var navBar_toolbarbutton_FbSearch = CreateXULElement("toolbarbutton",
+                "id", "navBar_toolbarbutton_FbSearch",
+                "consumeanchor", "navBar_toolbarlitem_FbOGSearch",
+                "tooltiptext", "FB Open Graph Search Generator",
+                "label", "FB Conver·SEO",
+                "class", "toolbarbutton-1 chromeclass-toolbar-additional",
+                "style", "list-style-image: url(\"chrome://xulfx/skin/baseline_search_black_18dp.png\"); -moz-image-region: auto;");
+            navBar_toolbarlitem_FbOGSearch.AppendChild(navBar_toolbarbutton_FbSearch);
+
+            new NavBarEventListener(NavBarListenerStates.navbar_FbSearch, navBar_toolbarbutton_FbSearch, "command");
+        }
+
+        /// <summary>
         /// Social Share
         /// </summary>
         private void CreateSocialButton()
@@ -491,6 +516,7 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
                 "style", "list-style-image: url(\"chrome://xulfx/skin/baseline_keyboard_black_18dp.png\"); -moz-image-region: auto;",
                 "closemenu", "none");
             panelUi_toolbarlitem_CP.AppendChild(panelUi_toolbarbutton_CP);
+            new NavBarEventListener(NavBarListenerStates.panelUi_ctlSK_CP, panelUi_toolbarbutton_CP, "command");
 
             //panel view for the settings options
             var panelUI_ctlsk = CreateXULElement("panelview",
@@ -521,6 +547,7 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
             "closemenu", "none",
             "class", "subviewbutton");
             PanelUISub_ctlsk_vbox.AppendChild(PanelUISubBtn_ctlsk);
+            new NavBarEventListener(NavBarListenerStates.panelUi_ctlSK_AcceptFriends, PanelUISubBtn_ctlsk, "command");
 
             var PanelUIfbLikePagesBtn_ctlsk = CreateXULElement("toolbarbutton",
            "id", "PanelUIfbLikePagesBtn_ctlsk",
@@ -529,6 +556,7 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
            "closemenu", "none",
            "class", "subviewbutton");
             PanelUISub_ctlsk_vbox.AppendChild(PanelUIfbLikePagesBtn_ctlsk);
+            new NavBarEventListener(NavBarListenerStates.panelUi_ctlSK_LikePages, PanelUIfbLikePagesBtn_ctlsk, "command");
 
             var PanelUIfbLikeGroupsBtn_ctlsk = CreateXULElement("toolbarbutton",
             "id", "PanelUIfbLikeGroupsBtn_ctlsk",
@@ -537,6 +565,7 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
             "closemenu", "none",
             "class", "subviewbutton");
             PanelUISub_ctlsk_vbox.AppendChild(PanelUIfbLikeGroupsBtn_ctlsk);
+            new NavBarEventListener(NavBarListenerStates.panelUi_ctlSK_LikeGroups, PanelUIfbLikeGroupsBtn_ctlsk, "command");
 
             var PanelUIfbLikePostsBtn_ctlsk = CreateXULElement("toolbarbutton",
             "id", "PanelUIfbLikePostsBtn_ctlsk",
@@ -545,12 +574,17 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
             "closemenu", "none",
             "class", "subviewbutton");
             PanelUISub_ctlsk_vbox.AppendChild(PanelUIfbLikePostsBtn_ctlsk);
-
-            new NavBarEventListener(NavBarListenerStates.panelUi_ctlSK_CP, panelUi_toolbarbutton_CP, "command");
-            new NavBarEventListener(NavBarListenerStates.panelUi_ctlSK_AcceptFriends, PanelUISubBtn_ctlsk, "command");
-            new NavBarEventListener(NavBarListenerStates.panelUi_ctlSK_LikePages, PanelUIfbLikePagesBtn_ctlsk, "command");
-            new NavBarEventListener(NavBarListenerStates.panelUi_ctlSK_LikeGroups, PanelUIfbLikeGroupsBtn_ctlsk, "command");
             new NavBarEventListener(NavBarListenerStates.panelUi_ctlSK_LikePosts, PanelUIfbLikePostsBtn_ctlsk, "command");
+
+            var PanelUIminds_ctlsk = CreateXULElement("toolbarbutton",
+            "id", "PanelUIminds_ctlsk",
+            "label", "Minds Subscribe Channels",
+            "tooltiptext", "Subscribe to visible channels on page",
+            "closemenu", "none",
+            "class", "subviewbutton");
+            PanelUISub_ctlsk_vbox.AppendChild(PanelUIminds_ctlsk);
+            new NavBarEventListener(NavBarListenerStates.panelUi_ctlSK_mindsSubscribe, PanelUIminds_ctlsk, "command");
+
         }
 
         /// <summary>
@@ -742,6 +776,64 @@ namespace BrowseoFX_WPF.Core.BrowserHandlers.GUI
                     (uaStringValue == BrowseoFXManager.Instance.SettingsHandler.UserAgent_Current).ToLowerString(),
                     PanelUIListenerState.PanelUImenuitem_Useragent, PanelUISub_vboxSecurity);
             }
+        }
+
+        private void CreateFingerprintSettingsPanelUI()
+        {
+            //placeholder in panelUi popup for the button
+            var panelUI_toolbaritemFingerprint = CreateXULElement("toolbaritem",
+                "id", "panelUI_toolbaritemFingerprint");
+            PanelUIcontents.AppendChild(panelUI_toolbaritemFingerprint);
+            
+            var panelUI_toolbarbuttonFingerprint = CreateXULElement("toolbarbutton",
+             "id", "panelUI_toolbarbuttonFingerprint",
+             "consumeanchor", "panelUI_toolbaritemFingerprint",
+             "tooltiptext", "Open Fingerprint Settings",
+             "label", "Canvas Fingerprint",
+             "class", "toolbarbutton-1 chromeclass-toolbar-additional",
+             "style", "list-style-image: url(\"chrome://xulfx/skin/ic_security_black_24dp_2x.png\"); -moz-image-region: auto;",
+             "closemenu", "none");
+            panelUI_toolbaritemFingerprint.AppendChild(panelUI_toolbarbuttonFingerprint);
+
+
+            new NavBarEventListener(NavBarListenerStates.PanelUISub_toolbarbutton_fingerprint, panelUI_toolbarbuttonFingerprint, "command");
+            //anonymity slideout\\
+
+            ////panel view for the settings options
+            //var panelUI_panelviewFingerprint = CreateXULElement("panelview",
+            //"id", "panelUI_panelviewFingerprint",
+            //"flex", "1",
+            //"class", "panel-subview-body",
+            //"flip", "slide",
+            //"animate", "true");
+            //PanelUImultiView.AppendChild(panelUI_panelviewFingerprint);
+
+            ////label for the panel slideout
+            //var PanelUI_labelSecurity = CreateXULElement("label",
+            //"id", "PanelUI_labelSecurity",
+            //"class", "panel-subview-header",
+            //"value", "Canvas Fingerprint Settings");
+            //panelUI_panelviewFingerprint.AppendChild(PanelUI_labelSecurity);
+
+            ////viewbox to hold the options
+            //var PanelUISub_vboxFingerprint = CreateXULElement("vbox",
+            //"id", "PanelUISub_vboxFingerprint",
+            //"class", "panel-subview-body");
+            //panelUI_panelviewFingerprint.AppendChild(PanelUISub_vboxFingerprint);
+
+            ////Fingerprint Options\\
+            ////PanelUISub_vboxFingerprint.AppendChild(
+            ////    CreateXULElement("label",
+            ////    "id", "useragentHeader",
+            ////    "class", "panel-subview-header",
+            ////    "value", ""));
+
+            ////flash
+            //AddCBOptionTo(
+            //    "Generate new fingerprint", 
+            //    PanelUIListenerState.PanelUISub_toolbarbutton_fingerprint.GetDescription(),
+            //    "true",
+            //    PanelUIListenerState.PanelUISub_toolbarbutton_fingerprint, PanelUISub_vboxFingerprint);
         }
 
         private void AddCBOptionTo(string label, string id,string isChecked, PanelUIListenerState paneluiListenerType, GeckoXULElement elementToAppend)

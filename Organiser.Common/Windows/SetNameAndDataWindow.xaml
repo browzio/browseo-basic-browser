@@ -6,7 +6,7 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         Icon="pack://application:,,,/Organiser.Common;component/Image/browseo (1).ico"
-        Title="" Topmost="True">
+        Title="" Topmost="True" Loaded="Window_Loaded">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -17,7 +17,7 @@
     
     <StackPanel>
         <TextBlock Name="tblockInfo" Text="" Margin="5" x:FieldModifier="public" />
-        <TextBox Name="tbInputText" Margin="5" x:FieldModifier="public" />
+        <TextBox Name="tbInputText" Margin="5" x:FieldModifier="public" PreviewKeyDown="tbInputText_PreviewKeyDown" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Ok" Margin="5" Click="Button_Click" Width="75" Style="{StaticResource FlatbtnStyle}" />
             <Button Content="Cancel" Margin="5" Click="Button_Click_1" Width="75" Style="{StaticResource FlatbtnStyle}" />

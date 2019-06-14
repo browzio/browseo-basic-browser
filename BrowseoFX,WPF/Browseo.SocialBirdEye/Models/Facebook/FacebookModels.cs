@@ -1570,15 +1570,25 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Models.Facebook
         //enum{link, status, photo, video, offer}
         public string type { get; set; }
 
-        public string[] with_tags { get; set; }
+        //TODO
+        public DefaultDataResponse<from> with_tags { get; set; }
+        //"with_tags": {
+        //    "data": [{
+        //        "name": "Lazer Brody",
+        //        "id": "15891965717"
+        //    }, {
+        //        "name": "Eli Dadia",
+        //        "id": "10156596030402246"
+        //    }]
+        //},
 
         public shares shares { get; set; }
         public from from { get; set; }
-
+        
         public properties[] properties { get; set; }
-
+        
         public DefaultDataResponse<sharedpostsData> sharedposts { get; set; }
-
+        
         public request_with_summary likes { get; set; }
         public request_with_summary comments { get; set; }
         public request_with_summary reactions { get; set; }
@@ -1630,6 +1640,7 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Models.Facebook
         //public paging paging { get; set; }
     }
 
+    //https://developers.facebook.com/docs/graph-api/reference/object/sharedposts/
     //sharedposts{id,link,story,permalink_url,shares}
     public class sharedpostsData
     {

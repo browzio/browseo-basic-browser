@@ -1,0 +1,659 @@
+﻿Main Objectives
+Main Objective 
+	-Utility & Productivity
+    1. To host the available social network acounts of each project combined and seprate in an easy to use dashboard.
+
+More Specifically
+    Phase
+    1. Data
+        -Visualization
+        -Analyzation
+        -Statistics
+        
+    Phase
+    2. Administration of accounts and there content
+    
+    Phase
+    3. Strategising and tasking on accounts/projects
+ 
+ Phase 1   
+    Data Visualization, Analyzation, Statistics (ex:Sorting of content)
+    1.Overview/Summary
+        -Project Name
+            -Facebook
+                1.User
+                    -https://developers.facebook.com/docs/graph-api/reference/user/
+                        -Logged in user data
+                            -username
+                            -friend total
+                            -timeline
+                            -albums
+                            -photos
+                            -videos
+                            -pages
+                            -liked pages
+                            -groups joined
+                            -groups owned
+                            -events
+                2.Page
+                    -https://developers.facebook.com/docs/graph-api/reference/page/
+                    -Page Public Content Access
+                          -Liked 
+                            -https://developers.facebook.com/docs/graph-api/reference/user/likes/
+                        -Public
+                        -Saved
+                        -Owned
+                    -Insights
+                        -https://developers.facebook.com/docs/platforminsights/page
+                        -Owned Only
+                        -InsightsResult
+                            LikeSource
+                            NegativeFeedback
+                            PositiveFeedback
+                            InsightsPageStory
+                                name
+                                period
+                                title
+                                description
+                                end_time
+                                values
+                                    Activity
+                                        page_content_activity
+                                        page_content_activity_by_action_type
+                                        page_content_activity_by_action_type_unique
+                                    Impressions
+										page_impressions
+										page_impressions_unique
+										page_impressions_paid
+										page_impressions_paid_unique
+										page_impressions_organic
+										page_impressions_organic_unique
+										page_impressions_viral
+										page_impressions_viral_unique
+										page_impressions_nonviral
+										page_impressions_nonviral_unique"
+										page_impressions_by_story_type
+                                    Engagement
+										page_engaged_users
+										page_post_engagements
+										page_consumptions
+										page_consumptions_unique
+										page_places_checkin_total
+										page_places_checkin_total_unique
+										page_negative_feedback
+										page_negative_feedback_unique
+										page_fans_online_per_day"
+										page_negative_feedback_by_type
+										page_negative_feedback_by_type_unique
+										page_positive_feedback_by_type
+										page_positive_feedback_by_type_unique
+                                    Reactions
+										page_actions_post_reactions_like_total
+										page_actions_post_reactions_love_total
+										page_actions_post_reactions_wow_total
+										page_actions_post_reactions_haha_total
+										page_actions_post_reactions_sorry_total
+										page_actions_post_reactions_anger_total"
+                                    CTA Clicks (Call To Action)
+										page_total_actions
+										page_website_clicks_logged_in_unique
+                                    Page User Demographics /Likes and unlikes
+										page_fans
+										page_fan_adds
+										page_fan_adds_unique
+										page_fan_removes
+										page_fan_removes_unique
+                                    Content
+										page_fans_by_like_source
+									    page_fans_by_like_source_unique
+                                    Page Views
+										page_views_total
+									    page_views_logout
+									    page_views_logged_in_total
+									    page_views_logged_in_unique
+                                    Video Views
+										page_video_views
+										page_video_views_paid
+										page_video_views_organic
+										page_video_views_autoplayed
+										page_video_views_click_to_play
+										page_video_views_unique
+										page_video_repeat_views
+										page_video_view_time"
+                                    Posts
+										page_posts_impressions
+										page_posts_impressions_unique
+										page_posts_impressions_paid
+										page_posts_impressions_paid_unique
+										page_posts_impressions_organic
+										page_posts_impressions_organic_unique
+										page_posts_served_impressions_organic_unique
+										page_posts_impressions_viral
+										page_posts_impressions_viral_unique
+										page_posts_impressions_nonviral
+										page_posts_impressions_nonviral_unique"
+                                    Post Impressions
+										post_impressions*
+										post_impressions_unique*
+										post_impressions_paid*
+										post_impressions_paid_unique*
+										post_impressions_fan*
+										post_impressions_fan_unique*
+										post_impressions_fan_paid*
+										post_impressions_fan_paid_unique*
+										post_impressions_organic*
+										post_impressions_organic_unique*
+										post_impressions_viral*
+										post_impressions_viral_unique*
+										post_impressions_nonviral*
+										post_impressions_nonviral_unique*
+                                    Post Engagement
+										post_engaged_users*
+										post_negative_feedback*
+										post_negative_feedback_unique*
+										post_engaged_fan
+										post_clicks*
+										post_clicks_unique*
+                                    Post Reactions
+										post_reactions_like_total
+										post_reactions_love_total
+										post_reactions_wow_total
+										post_reactions_haha_total
+										post_reactions_sorry_total
+										post_reactions_anger_total
+										post_reactions_by_type_total
+                                    Video Posts
+										post_video_avg_time_watched
+
+										post_video_complete_views_organic	
+										post_video_complete_views_organic_unique	
+										post_video_complete_views_paid	
+										post_video_complete_views_paid_unique
+										
+										post_video_retention_graph*	
+										post_video_retention_graph_clicked_to_play	
+										post_video_retention_graph_autoplayed
+										
+										post_video_views_organic	
+										post_video_views_organic_unique	
+										post_video_views_paid	
+										post_video_views_paid_unique
+										
+										post_video_length
+										
+										post_video_views	
+										post_video_views_unique	
+										post_video_views_autoplayed	
+										post_video_views_clicked_to_play
+										
+										post_video_views_10s	
+										post_video_views_10s_unique	
+										post_video_views_10s_autoplayed	
+										post_video_views_10s_clicked_to_play	
+										post_video_views_10s_organic	
+										post_video_views_10s_paid	
+										post_video_views_10s_sound_on
+										
+										post_video_views_sound_on
+										
+										post_video_view_time	
+										post_video_view_time_organic	
+										post_video_view_time_by_age_bucket_and_gender	
+										post_video_view_time_by_region_id
+										
+										post_video_views_by_distribution_type
+										
+										post_video_view_time_by_distribution_type	
+										post_video_view_time_by_country_id
+										
+									Video Ad Breaks
+								Data is available for dates after October 15, 2017.
+										page_daily_video_ad_break_ad_impressions_by_crosspost_status
+										page_daily_video_ad_break_cpm_by_crosspost_status
+										page_daily_video_ad_break_earnings_by_crosspost_status
+										
+										post_video_ad_break_ad_impressions
+										post_video_ad_break_earnings
+										post_video_ad_break_ad_cpm
+                    -General Overview
+                        page name
+                        description
+                        creation
+                    -General Stats
+                        checkins
+                        country_page_likes
+                        fan_count
+                        new_like_count
+                        talking_about_count
+                        were_here_count
+                3.Group
+                    -https://developers.facebook.com/docs/graph-api/reference/group/
+                    -Overview
+                        description
+                        email
+                        icon
+                        name
+                        privacy
+                        administrator
+                        bookmark_order
+                        created_time
+                        unread
+                    -Owned Overview
+                        member_count
+                        member_request_count
+                        updated_time
+                4.Event
+                    -https://developers.facebook.com/docs/graph-api/reference/event/
+                    id
+                    description
+                    end_time
+                    name
+                    start_time
+                    ticket_uri
+                    ticket_uri_start_sales_time
+                    ticketing_terms_uri
+                    timezone
+                    type
+                    discount_code_enabled
+                    attending_count
+                    declined_count
+                    erested_count
+                    maybe_count
+                    noreply_count
+                    updated_time
+                5.Album
+                    -https://developers.facebook.com/docs/graph-api/reference/album
+					id
+					can_upload
+					count 
+					cover_photo 
+					created_time
+					description
+					event 
+					from 
+					link 
+					location
+					name
+					place 
+					privacy
+					type
+					updated_time
+					likes, comments, reactions, sharedposts{id,link,created_time,updated_time,story,permalink_url,shares}
+                6.Photo
+                    -https://developers.facebook.com/docs/graph-api/reference/photo
+					id
+					can_upload
+					count
+					cover_photo
+					created_time
+					description
+					event
+					from
+					link
+					location
+					name
+					place
+					privacy
+					type
+					updated_time
+					likes, comments, reactions, sharedposts{id,link,created_time,updated_time,story,permalink_url,shares}
+                7.Video
+                    -https://developers.facebook.com/docs/graph-api/reference/video/
+					backdated_time
+					created_time
+					scheduled_publish_time
+					updated_time
+					content_category
+					description
+					id
+					embed_html
+					icon
+					permalink_url
+					picture
+					source
+					title
+					universal_video_id
+					length
+					is_crosspost_video
+					is_crossposting_eligible
+					is_episode
+					is_instagram_eligible
+					published
+					embeddable
+					likes, comments, reactions, sharedposts{id,link,created_time,updated_time,story,permalink_url,shares}
+                8.Post
+                    -https://developers.facebook.com/docs/graph-api/reference/v3.0/post
+                9.Live Video
+                    -https://developers.facebook.com/docs/graph-api/reference/live-video/
+					-id,status,title,permalink_url,live_views
+				10.TimeLine
+					caption
+					description
+					message
+					name
+					id
+					object_id
+					parent_id
+					is_instagram_eligible
+					is_published
+					permalink_url
+					link
+					source
+					full_picture
+					icon
+					picture
+					created_time
+					updated_time
+					status_type
+					type
+					with_tags
+					shares
+					from
+					properties
+					likes, comments, reactions, sharedposts{id,link,created_time,updated_time,story,permalink_url,shares}					
+            -Instagram and Instagram Buisness
+                username
+                followers_count
+                media_count
+                posts
+                liked
+                scheduled
+            -Twitter
+				https://developer.twitter.com/en/docs.html
+                User Info
+					https://developer.twitter.com/en/docs/accounts-and-users/manage-account-settings/overview
+                    id_str 
+                    name 
+                    screen_name 
+                    location 
+                    profile_location 
+                    description 
+                    url 
+                    followers_count 
+                    friends_count 
+                    listed_count 
+                    favourites_count 
+                    statuses_count 
+                    created_at 
+                    lang 
+                Timelines
+					https://developer.twitter.com/en/docs/tweets/timelines/overview
+                    coordinates 
+                    truncated 
+                    created_at 
+                    favorited 
+                    id_str 
+                    in_reply_to_user_id_str 
+                    text 
+                    contributors 
+                    in_reply_to_status_id_str 
+                    geo 
+                    retweeted 
+                    in_reply_to_user_id 
+                    place 
+                    source 
+                    in_reply_to_screen_name 
+                    in_reply_to_status_id 
+                    retweet_count 
+                    favorite_count 
+                    hashtags
+                    user_mentions
+                    urls
+                Trends
+					https://developer.twitter.com/en/docs/trends/trends-for-location/overview
+					https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/overview
+                    as_of
+                    created_at
+                    locations
+                    trends
+                        name 
+                        url 
+                        promoted_content 
+                        query 
+                        tweet_volume
+				Engagement API
+					https://developer.twitter.com/en/docs/metrics/get-tweet-engagement/overview
+					Enterprise account
+            -Pinterest
+			https://business.pinterest.com/en/insights
+			https://business.pinterest.com/en/pinterest-analytics
+			https://developers.pinterest.com/docs/getting-started/introduction/?
+                PerestInfoDataImage
+                    sixtyBysixty
+                    original
+                PeresInfoDataCounts
+                    pins 
+                    following 
+                    followers 
+                    boards 
+                    saves 
+                    comments 
+                    collaborators 
+                PeresInfoDataCreator
+                    url 
+                    first_name 
+                    last_name 
+                    id 
+                PeresInfoDataMedia
+                    type
+                PeresInfoDataAttribution
+                    title 
+                    url 
+                    provider_icon_url 
+                    author_name 
+                    provider_favicon_url 
+                    author_url 
+                    provider_name 
+                PeresInfoDataBoard
+                    url 
+                    id 
+                    name 
+                PeresInfoDataPage
+                    cursor 
+                    next 
+                -UserInfo
+                    id 
+                    username 
+                    bio 
+                    first_name 
+                    last_name 
+                    created_at 
+                    PerestInfoDataImage
+                    PeresInfoDataCounts
+                -Board Info
+                    id 
+                    name 
+                    description 
+                    url 
+                    created_at 
+                    PerestInfoDataImage
+                    PeresInfoDataCounts
+                    PeresInfoDataCreator
+                    <PerestPinsDataInfoData>Pins
+                -Pins
+                    id 
+                    url 
+                    created_at 
+                    note 
+                    color 
+                    link 
+                    original_link 
+                    PeresInfoDataAttribution
+                    PeresInfoDataCreator
+                    PeresInfoDataMedia
+                    PeresInfoDataBoard
+                    PerestInfoDataImage
+                    PeresInfoDataCounts
+                -Followers
+                    id 
+                    bio 
+                    first_name 
+                    last_name 
+                    account_type 
+                    url 
+                    created_at 
+                    username 
+                    PerestInfoDataImage
+                    PeresInfoDataCounts
+                -Boards Following
+                    name 
+                    url 
+                    created_at 
+                    privacy 
+                    reason 
+                    id 
+                    PerestInfoDataImage
+                    PeresInfoDataCreator
+                    PeresInfoDataCounts
+                    <PerestPinsDataInfoData> Pins
+			-Google Apis
+			https://developers.google.com/products/
+			https://developers.google.com/youtube/v3/
+			https://developers.google.com/youtube/reporting/
+					-Audiences*
+					-Comments*
+					-Circles*
+					-People*
+					-Media*
+				GoogleApisResponse
+					kind 
+				    etag 
+				    nextPageToken 
+					PageInfo
+					<GoogleApisResponseItemsData> Items
+				PageInfo
+					totalResults 
+					resultsPerPage 
+				GoogleApisResponseItemsData
+					kind 
+					etag 
+					id 
+					Snippet
+					ContentDetails
+					Statistics
+					<GoogleApisResponseItemsData> Comment
+				Snippet
+					 title 
+					 description 
+					 publishedAt 
+					elSections.list
+					 type 
+					 style 
+					 channelId 
+					 position 
+					ntThreads.list
+					 videoId 
+					 canReply 
+					 totalReplyCount 
+					 isPublic 
+					 authorDisplayName 
+					 authorProfileImageUrl 
+					 authorChannelUrl 
+					 textDisplay 
+					 textOriginal 
+					 canRate 
+					 viewerRating 
+					 likeCount 
+					 updatedAt 
+					istItems.list
+					 channelTitle 
+					 playlistId 
+					s.list
+					 categoryId 
+					 liveBroadcastContent 
+					 defaultLanguage 
+					 defaultAudioLanguage 
+					[] tags 
+					thumbnails
+					localized
+					topLevelComment
+					authorChannelId
+					resourceId
+				ContentDetails
+					 videoId 
+					 videoPublishedAt 
+					 itemCount 
+					 totalItemCount 
+					 newItemCount 
+					 activityType 
+					s.list
+					 duration 
+					 dimension 
+					 definition 
+					 caption 
+					 licensedContent 
+					 projection 
+					relatedPlaylists
+				Statistics
+					viewCount 
+					commentCount 
+					subscriberCount 
+					hiddenSubscriberCount 
+					videoCount 
+					likeCount 
+					dislikeCount 
+					favoriteCount 
+					
+				thumbnails
+					Default 
+					medium 
+					high 
+				localized
+					title 
+					description 
+				topLevelComment
+					kind 
+					etag 
+					id 
+					snippet
+				authorChannelId
+					value
+				resourceId
+					kind 
+					videoId 
+					channelId 
+				relatedPlaylists
+					likes 
+					favorites 
+					uploads 
+					watchHistory 
+					watchLater 
+				-Youtube
+					Channels
+					Videos
+					LikedVideos
+					MostPopularVideos
+					Video reports
+					Playlist reports
+					Ad performance reports
+					Estimated revenue reports
+					Asset reports
+					System-managed reports
+    
+				-Google+
+			*(for more functionality registering for domains api)https://developers.google.com/+/domains/api/
+					PlusActivities
+					Audiences*
+					Comments*
+					Circles*
+					People*
+					Media*
+					Pages*
+                    
+Phase 2
+    Administration of accounts and there content
+        -Facebook
+        -Instagram
+        -Twitter
+        -Youtube
+        -Google+
+        -Perest
+        
+Phase 3
+    Strategising and tasking on accounts/projects
+        -Facebook
+        -Instagram
+        -Twitter
+        -Youtube
+        -Google+
+        -Perest

@@ -242,5 +242,10 @@ namespace BrowseoFX_WPF.Controls
         {
            // throw new NotImplementedException();
         }
+
+        public void OnOpenFbSearch()
+        {
+          //  throw new NotImplementedException();
+        }
     }
 }

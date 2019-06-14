@@ -1,0 +1,444 @@
+﻿<UserControl x:Class="BrowseoFX_WPF.Browseo.SocialBirdEye.Views.BirdsEyeStreamTab"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BrowseoFX_WPF.Browseo.SocialBirdEye.Views"
+             xmlns:commonControlls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
+             xmlns:converters="clr-namespace:Organiser.Common.Converters;assembly=Organiser.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Organiser.Common;component/GloableStyleDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:EmptyListToVisibleConverter x:Key="EmptyListToVisibleConverter" />
+            <converters:BooleanToVisible x:Key="BooleanToVisible" />
+            <converters:PrpertyEqualsParameterConverter x:Key="PrpertyEqualsParameterConverter" />
+
+            <converters:NullToVisibleConverter x:Key="nullToVis" />
+            <converters:ElementSizeMathConverter x:Key="mathConv" />
+            <converters:NullImageConverter x:Key="NullImageConverter" />
+
+            <DataTemplate x:Key="summaryTemplate">
+                <StackPanel Orientation="Horizontal" Grid.IsSharedSizeScope="True">
+                    <local:StatsBarView Margin="3"
+                                        StatImageUrl="pack://application:,,,/Organiser.Common;component/Image/social/baseline_thumb_up_alt_black_18dp.png"
+                                        StatValue="{Binding likes.summary.total_count}" />
+
+                    <local:StatsBarView Margin="3"
+                                        StatImageUrl="pack://application:,,,/Organiser.Common;component/Image/social/baseline_comment_black_18dp.png"
+                                        StatValue="{Binding comments.summary.total_count}" />
+
+                    <local:StatsBarView Margin="3"
+                                        StatImageUrl="pack://application:,,,/Organiser.Common;component/Image/Content/baseline_redo_black_18dp.png"
+                                        StatValue="{Binding shares.count}" />
+
+                    <!--<local:KeyValDisplayControl ParamTitle="likes:"
+                                                ParamValue="{Binding likes.summary.total_count}"/>
+
+                    <local:KeyValDisplayControl ParamTitle="comments:" 
+                                                ParamValue="{Binding comments.summary.total_count}" />
+
+                    <local:KeyValDisplayControl ParamTitle="reactions:" 
+                                                ParamValue="{Binding reactions.summary.total_count}" />
+                    
+                                                                    <local:KeyValDisplayControl ParamTitle="Shares:" 
+                                                                        ParamValue="{Binding shares.count}" />-->
+                </StackPanel>
+            </DataTemplate>
+
+
+
+            <Style x:Key="CloseButtonStyle" TargetType="{x:Type Button}" >
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Grid Width="12" Height="12">
+                                <Rectangle x:Name="rec" Fill="Transparent"/>
+                                <ContentPresenter/>
+                                <Image Source="pack://application:,,,/Organiser.Common;component/Image/close.png" Stretch="None" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver"  Value="True">
+                                    <Setter TargetName="rec" Property="Fill" Value="#e0e0e0" />
+                                </Trigger>
+                                <Trigger Property="IsPressed"  Value="True">
+                                    <Setter TargetName="rec" Property="Fill" Value="#d5d5d5" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+                <!--<Style.Resources>
+                    <Style TargetType="{x:Type Path}">
+                        <Setter Property="Fill" Value="#FF969696" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                                <Setter Property="Fill" Value="Black" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Style.Resources>-->
+
+            </Style>
+
+            <Style TargetType="Button" x:Key="ButtonStyle">
+                <Setter Property="Height" Value="23" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border 
+                                Background="#a1a5ad" Cursor="Hand"
+                                Padding="{TemplateBinding Padding}" MinWidth="95"
+                                CornerRadius="0" x:Name="Border">
+                                <ContentControl Content="{TemplateBinding Content}"
+                                                HorizontalAlignment="Center" Margin="7,0"
+                                                VerticalAlignment="Center" TextElement.Foreground="White"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Border" Property="Background">
+                                        <Setter.Value>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#FF376ED4" Offset="0"/>
+                                                <GradientStop Color="#FF588DF0" Offset="0.332"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="Button" x:Key="NarrowButtonStyle">
+                <Setter Property="Height" Value="23" />
+                <Setter Property="Margin" Value="0" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border 
+                                Background="#5ea9f5" Cursor="Hand"
+                                Padding="{TemplateBinding Padding}" MinWidth="25"
+                                CornerRadius="0" x:Name="Border">
+                                <ContentControl Content="{TemplateBinding Content}"
+                                                HorizontalAlignment="Center" Margin="7,0"
+                                                VerticalAlignment="Center" TextElement.Foreground="White"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Border" Property="Background">
+                                        <Setter.Value>
+                                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                                <GradientStop Color="#5ea9f5" Offset="0.6"/>
+                                                <GradientStop Color="#4b87c4" Offset="0.5"/>
+                                            </LinearGradientBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style TargetType="{x:Type commonControlls:NonReloadingTabControl}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type commonControlls:NonReloadingTabControl}">
+                            <Grid ClipToBounds="True"
+                                  KeyboardNavigation.TabNavigation="Local"
+                                  SnapsToDevicePixels="True">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition x:Name="RowDefinition0" Height="50" />
+                                    <RowDefinition x:Name="RowDefinition1" Height="*" />
+                                </Grid.RowDefinitions>
+                                <ScrollViewer HorizontalScrollBarVisibility="Auto" CanContentScroll="True" VerticalScrollBarVisibility="Disabled">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border BorderThickness="0,0,0,0" BorderBrush="#d0d0d0">
+                                            <Grid Margin="1,8,0,0" VerticalAlignment="Top">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <TabPanel x:Name="HeaderPanel"
+                                                      SnapsToDevicePixels="True"
+                                                      Margin="3,0,0,0"
+                                                      VerticalAlignment="Center"
+                                                      Panel.ZIndex="1"
+                                                      IsItemsHost="True"
+                                                      KeyboardNavigation.TabIndex="1" />
+                                                <!--<Button Width="20" Height="20" Name="btnAddTab" 
+                                                Command="ApplicationCommands.New"
+                                                Grid.Column="1" Margin="3" ToolTip="New Tab" >
+                                                    <TextBlock Text="+" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-5,0,0" />
+                                                </Button>-->
+
+                                                <Button Width="25" Name="btnAddTab" 
+                                                        Command="{Binding OnCommandFromView}" 
+                                                        CommandParameter="CreateNewTab"
+                                                        Focusable="False"
+                                                        Style="{StaticResource NarrowButtonStyle}"
+                                                    Grid.Column="1" Margin="5,0,0,0" VerticalAlignment="Center" >
+                                                    <TextBlock Text="+" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,-3,0,0" Foreground="White" FontWeight="Bold" FontSize="16"/>
+                                                </Button>
+
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </ScrollViewer>
+
+                                <Border x:Name="ContentPanel"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    KeyboardNavigation.DirectionalNavigation="Contained"
+                                    KeyboardNavigation.TabIndex="2"
+                                    KeyboardNavigation.TabNavigation="Local">
+                                    <Grid x:Name="PART_ItemsHolder"
+                                      Margin="{TemplateBinding Padding}"
+                                      SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                </Border>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+
+            <Style TargetType="TabItem">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TabItem">
+                            <Grid Cursor="Hand">
+                                <!--<Button Name="btnFirstTab"
+                                    Content="{Binding TabTitle}" 
+                                    VerticalAlignment="Top"
+                                    Width="100" 
+                                    Height="25" 
+                                    Style="{StaticResource tabButtonStyle}" />-->
+                                <Border Name="contentRect"
+                                        Height="23"
+                                        Background="#f5f5f5" BorderBrush="LightGray" BorderThickness="1" Margin="5,0">
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Name="TitleContent" Text="{Binding TabTitle}" ClipToBounds="True" Margin="10,0" Foreground="Black" VerticalAlignment="Center"  />
+                                        <Button  Command="{Binding OnCommandFromView}" 
+                                                 CommandParameter="CloseTab"
+                                                 Width="25"
+                                                Style="{StaticResource CloseButtonStyle}">
+                                            <Image Source="pack://application:,,,/Organiser.Common;component/Image/close.png" Stretch="None" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Button>
+                                    </StackPanel>
+
+                                    <!--<Border.ContextMenu>
+                                        <ContextMenu Opened="ContextMenu_Opened">
+                                            <MenuItem Header="Remove" Command="ApplicationCommands.Close" />
+                                        </ContextMenu>
+                                    </Border.ContextMenu>-->
+                                </Border>
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter TargetName="contentRect" Property="Background" Value="#1E8EFF" />
+                                    <Setter TargetName="contentRect" Property="BorderThickness" Value="1" />
+                                    <Setter TargetName="contentRect" Property="BorderBrush" Value="White" />
+                                    <Setter TargetName="TitleContent" Property="TextElement.Foreground" Value="White" />
+                                </Trigger>
+
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="contentRect" Property="BorderBrush" Value="White" />
+                                </Trigger>
+
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!--<DataTemplate DataType="{x:Type controls:MainViewModel}">
+                <controls:RssControl />
+            </DataTemplate>-->
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+
+    <Grid DataContext="{Binding StreamTabVM}">
+        <commonControlls:NonReloadingTabControl x:Name="tbContrl"  
+                                                Grid.Row="1"
+                                                BorderThickness="0"
+                                                ItemsSource="{Binding StreamTabs}">
+            <TabControl.ContentTemplate>
+                <DataTemplate>
+                    <ScrollViewer Grid.Row="1"
+                                  HorizontalAlignment="Left"
+                                  Name="svContent"
+                                  Margin="3"
+                                  HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Disabled">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <ItemsControl  Background="White"
+                                           ItemsSource="{Binding StreamTabsStreams}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                        <ScrollViewer Grid.Row="1"
+                                                      Width="500"
+                                                  HorizontalAlignment="Left"
+                                                  Name="svContent"
+                                                  Margin="3"
+                                                  HorizontalScrollBarVisibility="Disabled"
+                                                  VerticalScrollBarVisibility="Auto">
+
+                                            <Grid Grid.IsSharedSizeScope="True"
+                                              HorizontalAlignment="Left"
+                                              Visibility="{Binding Path=Type, Converter={StaticResource PrpertyEqualsParameterConverter}, ConverterParameter=TimeLine}">
+                                                <ItemsControl DataContext="{Binding FacebookApisController}" 
+                                                          ItemsSource="{Binding UserSummary.feedResponse.data}"
+                                                          HorizontalAlignment="Left"
+                                                          Margin="10"
+                                                          Background="WhiteSmoke">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Vertical"
+                                                                    Grid.IsSharedSizeScope="True"
+                                                                    Background="White"
+                                                                    Margin="5">
+
+                                                                <local:SocialHeaderView ImageUrl="{Binding from.profile_pic}"
+                                                                                        FromName="{Binding from.name}" 
+                                                                                        ProfileUrl="{Binding from.profile_url}"
+                                                                                        CreatedAtFull="{Binding created_time}"/>
+
+                                                                <TextBox Text="{Binding message}"
+                                                                         
+                                                                         Style="{StaticResource SelectableTextBlock}"
+                                                                         
+                                                                         Margin="5"
+                                                                         TextWrapping="Wrap" 
+                                                                         FontSize="14" />
+
+                                                                <Image Source="{Binding picture, Converter={StaticResource NullImageConverter}}"
+                                                                       Visibility="{Binding Path=picture, Converter={StaticResource nullToVis}, ConverterParameter=NOT}"
+                                                                       
+                                                                       MaxWidth="275"
+                                                                       MaxHeight="260"
+                                                                       MinWidth="275"
+                                                                       MinHeight="260"
+                                                                       
+                                                                       Stretch="Uniform"
+                                                                       HorizontalAlignment="Left"
+                                                                       Margin="5" />
+                                                                <ContentPresenter ContentTemplate="{StaticResource summaryTemplate}"/>
+
+                                                                <local:KeyValDisplayControl ParamTitle="Type:" 
+                                                                            ParamValue="{Binding type}" />
+
+                                                                <local:KeyValDisplayControl ParamTitle="Status Type:" 
+                                                                            ParamValue="{Binding status_type}" />
+
+                                                                <local:KeyValDisplayControl ParamTitle="Permalink Url:" 
+                                                                            ParamValue="{Binding permalink_url}" />
+
+                                                                <local:KeyValDisplayControl ParamTitle="Link:" 
+                                                                            ParamValue="{Binding link}" />
+
+                                                                <local:KeyValDisplayControl ParamTitle="Source:" 
+                                                                            ParamValue="{Binding source}" />
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </Grid>
+                                        </ScrollViewer>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!--<GridSplitter ResizeDirection="Columns"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
+                      Grid.Column="1"
+                      Grid.Row="0"
+                      Grid.RowSpan="3"
+                      Width="5" 
+                      Background="Black" />-->
+                            
+                            <Border Grid.Column="1"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                BorderBrush="Black"
+                                BorderThickness="1">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition />
+                                    </Grid.RowDefinitions>
+                                    <Border BorderBrush="Black"
+                                        BorderThickness="0,0,0,1">
+                                        <TextBlock Text="Facebook" 
+                                               FontSize="20"
+                                                Margin="6"
+                                                FontWeight="Medium" />
+                                    </Border>
+                                    <StackPanel Grid.Row="1">
+                                        <Button Content="Connect"
+                                            Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisible}, ConverterParameter=NOT}"
+                                           
+                                            Command="{Binding OnCommandFromView}" 
+                                            CommandParameter="Connect"
+                                            
+                                            Margin="3" />
+
+                                        <Button Content="TimeLine"
+                                            Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisible}}"
+                                           
+                                            Command="{Binding OnCommandFromView}" 
+                                            CommandParameter="TimeLine"
+                                            
+                                            Margin="3"/>
+
+                                        <Button Content="Page"
+                                            Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisible}}"
+                                           
+                                            Command="{Binding OnCommandFromView}" 
+                                            CommandParameter="Page"
+                                            
+                                            Margin="3"/>
+
+                                        <Button Content="Group"
+                                            Visibility="{Binding IsLoggedIn, Converter={StaticResource BooleanToVisible}}"
+                                           
+                                            Command="{Binding OnCommandFromView}" 
+                                            CommandParameter="Group"
+                                            
+                                            Margin="3" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Grid>
+                    </ScrollViewer>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </commonControlls:NonReloadingTabControl>
+    </Grid>
+</UserControl>

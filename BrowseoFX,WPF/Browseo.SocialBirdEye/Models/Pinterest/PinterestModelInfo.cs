@@ -20,15 +20,15 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Models.Pinterest
     public class PinterestBoardsFollowingDataInfoData
     {
         public string name { get; set; }
-        public PinteresInfoDataCreator creator { get; set; }
         public string url { get; set; }
         public string created_at { get; set; }
         public string privacy { get; set; }
         public string reason { get; set; }
-        public PinteresInfoDataCounts counts { get; set; }
         public string id { get; set; }
 
         public PinterestInfoDataImage image { get; set; }
+        public PinteresInfoDataCreator creator { get; set; }
+        public PinteresInfoDataCounts counts { get; set; }
 
         public ObservableCollection<PinterestPinsDataInfoData> Pins { get; set; }
         public PinterestBoardsFollowingDataInfoData()

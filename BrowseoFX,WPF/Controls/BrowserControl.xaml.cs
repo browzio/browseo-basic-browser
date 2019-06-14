@@ -1,5 +1,6 @@
 ﻿using BrowseoFX_WPF.Core;
 using BrowseoFX_WPF.Core.Services.Browser.Crawlers;
+using BrowseoFX_WPF.ViewModels.Addons;
 using GoViral.ViewModels;
 using Organiser.Common.Classes;
 using System;
@@ -31,56 +32,20 @@ namespace BrowseoFX_WPF.Controls
         public Action<string, string, List<string>> OnAddedToGoViral;
         public Action OnSpinClicked;
         public Action OnGloableWebView_Loaded;
+        
+        bool fbconverseoExpanded = false;
+        bool lsbExpanded = false;
+        bool seoExpanded = false;
+        bool SocialStatsExpanderIsExpanded;
+        bool fbSearchExpanded { get { return expFBSearch.Visibility == Visibility.Visible; } }
 
-        bool resizeBigger = false;
-
+        #region init
         public BrowserControl()
         {
             InitializeComponent();
 
             this.Loaded += BrowserControl_Loaded;
             this.SizeChanged += BrowserControl_SizeChanged;
-        }
-
-        private void BrowserControl_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            //if (host.HorizontalAlignment == HorizontalAlignment.Left)
-            //{
-            host.Width = this.ActualWidth + 15;
-            host.HorizontalAlignment = HorizontalAlignment.Stretch;
-            //    if (resizeBigger) host.Width -= 400;
-            host.HorizontalAlignment = HorizontalAlignment.Left;
-            //}
-
-            if (SocialStatsExpander.IsExpanded && host.ActualHeight > 350)
-            {
-                host.Height = host.ActualHeight - 300;
-            }
-
-            if (fbconverseoExpanded && !seoExpanded && !lsbExpanded)
-            {
-                fbConverseoExpand();
-            }
-            else if (!fbconverseoExpanded && !seoExpanded && lsbExpanded)
-            {
-                lsbExpand();
-            }
-            else if (!fbconverseoExpanded && seoExpanded && !lsbExpanded)
-            {
-                seoExpand();
-            }
-            else
-            {
-                AirspaceHost.Width = this.ActualWidth;
-            }
-        }
-
-        private void SetExpandSize()
-        {
-            AirspaceHost.Width = this.ActualWidth - 505;
-            AirspaceHost.HorizontalAlignment = HorizontalAlignment.Left;
-            host.Width = this.ActualWidth - 485;
-            host.HorizontalAlignment = HorizontalAlignment.Left;
         }
 
         private async void BrowserControl_Loaded(object sender, RoutedEventArgs e)
@@ -93,8 +58,6 @@ namespace BrowseoFX_WPF.Controls
             host.Children.Add(BrowseoFXManager.Instance.GloableWebView);
             BrowseoFXManager.Instance.GloableWebView.Loaded += GloableWebView_Loaded;
         }
-
-
 
         private Action EmptyDelegate = delegate () { };
         private void GloableWebView_Loaded(object sender, RoutedEventArgs e)
@@ -113,10 +76,93 @@ namespace BrowseoFX_WPF.Controls
             OnGloableWebView_Loaded?.Invoke();
             BrowseoFXManager.Instance.TabbrowserHandler.OnAddedToGoViral += TabbrowserHandler_OnAddedToGoViral;
         }
+        #endregion
 
-        private void TabbrowserHandler_OnAddedToGoViral(string arg1, string arg2, List<string> linksToReturn)
+        #region util
+        
+        private void CollapseExpanderBase()
         {
-            OnAddedToGoViral?.Invoke(arg1, arg2, linksToReturn);
+            AirspaceHost.Width = this.ActualWidth;
+            AirspaceHost.HorizontalAlignment = HorizontalAlignment.Stretch;
+            host.Width = this.ActualWidth + 15;
+            host.HorizontalAlignment = HorizontalAlignment.Stretch;
+        }
+
+        private void SetExpandSize()
+        {
+            AirspaceHost.Width = this.ActualWidth - 505;
+            AirspaceHost.HorizontalAlignment = HorizontalAlignment.Left;
+            host.Width = this.ActualWidth - 485;
+            host.HorizontalAlignment = HorizontalAlignment.Left;
+        }
+
+        private void SetExpanderStatesAll(bool fbConverse, bool fbSearch, bool lsb, bool seo)
+        {
+            if (!fbConverse)
+            {
+                fbConverseoCollapse();
+            }
+            if (!fbSearch)
+            {
+                fbSreachCollapse();
+            }
+            if (!lsb)
+            {
+                lsbCollapse();
+            }
+            if (!seo)
+            {
+                seoCollapse();
+            }
+
+
+            if (fbConverse)
+            {
+                if (fbconverseoExpanded)
+                {
+                    fbConverseoCollapse();
+                }
+                else
+                {
+                    fbConverseoExpand();
+                }
+            }
+
+            if(fbSearch)
+            {
+                if(fbSearchExpanded)
+                {
+                    fbSreachCollapse();
+                }
+                else
+                {
+                    fbSreachExpand();
+                }
+            }
+
+            if(lsb)
+            {
+                if (lsbExpanded)
+                {
+                    lsbCollapse();
+                }
+                else
+                {
+                    lsbExpand();
+                }
+            }
+
+            if(seo)
+            {
+                if (seoExpanded)
+                {
+                    seoCollapse();
+                }
+                else
+                {
+                    seoExpand();
+                }
+            }
         }
 
         private void UpdateLayouts()
@@ -127,20 +173,10 @@ namespace BrowseoFX_WPF.Controls
             BrowseoFXManager.Instance.GloableWebView.Widget.BaseWindow.Instance.Repaint(true);
         }
 
-        //public void GotScreenCords(string message)
-        //{
-        //  //TODO:  throw new NotImplementedException();
-        //}
-
         public void CloseAllTabs()
         {
             BrowseoFXManager.Instance.Shutdown();
         }
-
-        //public void SetBookmarksEvents(bool v)
-        //{
-        //    //TODO throw new NotImplementedException();
-        //}
 
         public void SearchFor(string query)
         {
@@ -150,61 +186,50 @@ namespace BrowseoFX_WPF.Controls
 
         public void LaunchNewWindow(string link, string rssLink)
         {
-
             BrowseoFXManager.Instance.TabbrowserHandler.SelectedContentDocument.DefaultView.Open(link, rssLink, "resizable,scrollbars,status");
         }
 
-        //
-        //MacroManger managerForTab;
-        //public event Action OnInitializedMacros = delegate { };
-        //public async void OnOpenIAMacros()
-        //{
-        //    if (BrowseoFXManager.Instance.GloableWebView == null ||
-        //        BrowseoFXManager.Instance.GloableWebView.Widget == null ||
-        //        BrowseoFXManager.Instance.GloableWebView.Widget.BaseWindow == null) return;
-
-        //    host.Width = resizeBigger ? host.ActualWidth + 400 : host.ActualWidth - 400;
-        //    host.HorizontalAlignment = resizeBigger ? HorizontalAlignment.Stretch : HorizontalAlignment.Left;
-        //    resizeBigger = !resizeBigger;
-
-
-
-
-        //    MacroflyOut.Cursor = Cursors.Wait;
-        //    await MacroSettings.InitMacrosSettings();
-        //    if (MacroflyOut.DataContext == null || MacroflyOut.DataContext.GetType() != typeof(MacroManger))
-        //    {
-        //        if (managerForTab == null)
-        //        {
-        //            managerForTab = new MacroManger();
-        //            managerForTab.OnPlayMacro += ManagerForTab_OnPlayMacro;
-        //        }
-        //        MacroflyOut.DataContext = managerForTab;
-        //        try
-        //        {
-        //            await managerForTab.LoadIMacros(false);
-        //        }
-        //        catch { "Failed To Load Macro List".Show(); }
-
-        //        OnInitializedMacros();
-
-        //    }
-        //    MacroflyOut.Cursor = this.Cursor;
-
-
-        //    UpdateLayouts();
-        //}
-
-        private async void ManagerForTab_OnPlayMacro(MacroManger manger, IIMPlayType type, int loop)
+        public void AsyncAddLinkToList(string link, string type, List<string> multiLinks, bool showLinksWindow)
         {
-            //if (DataContext is BrowserTabViewModel)
-            //{
-            //    await (DataContext as BrowserTabViewModel).OnPlayMacro(manger, type, loop);
-            //}
+            //GoViralVM goViralVM; AsyncAddLinkToList
+            (ucGoViral.DataContext as GoViralVM).AsyncAddLinkToList(link, type, multiLinks, showLinksWindow);
         }
 
+        #endregion
 
-        bool SocialStatsExpanderIsExpanded;
+        #region IListenToFXManager
+
+        public void OnOpenIAMacros()
+        {
+            // throw new NotImplementedException();
+        }
+
+        public void OnOpenFBConverseo()
+        {
+            (ucGoViral.DataContext as GoViralVM).OnSelectedTabNavigate -= BrowserControl_OnSelectedTabNavigate;
+            (ucGoViral.DataContext as GoViralVM).OnSelectedTabNavigate += BrowserControl_OnSelectedTabNavigate;
+
+            (ucGoViral.DataContext as GoViralVM).OnDominateAll -= GoViralVM_OnDominateAll;
+            (ucGoViral.DataContext as GoViralVM).OnDominateAll += GoViralVM_OnDominateAll;
+
+            SetExpanderStatesAll(true, false, false, false);
+        }
+
+        public void OnOpenFbSearch()
+        {
+            SetExpanderStatesAll(false, true, false, false);
+        }
+
+        public void OnOpenLSB()
+        {
+            SetExpanderStatesAll(false, false, true, false);
+        }
+
+        public void OnOpenSEO()
+        {
+            SetExpanderStatesAll(false, false, false, true);
+        }
+
         public void OnOpenSocialStats(SocialStatsCrawlerService sscs)
         {
             if (SocialStatsExpanderIsExpanded)
@@ -218,16 +243,75 @@ namespace BrowseoFX_WPF.Controls
             }
         }
 
+        #endregion
+
+        #region events
+
+        private void BrowserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            //if (host.HorizontalAlignment == HorizontalAlignment.Left)
+            //{
+            host.Width = this.ActualWidth + 15;
+            host.HorizontalAlignment = HorizontalAlignment.Stretch;
+            //    if (resizeBigger) host.Width -= 400;
+            host.HorizontalAlignment = HorizontalAlignment.Left;
+            //}
+
+            if (SocialStatsExpander.IsExpanded && host.ActualHeight > 350)
+            {
+                host.Height = host.ActualHeight - 300;
+            }
+
+            if (fbconverseoExpanded && !seoExpanded && !lsbExpanded && !fbSearchExpanded)
+            {
+                fbConverseoExpand();
+            }
+            else if (!fbconverseoExpanded && !seoExpanded && lsbExpanded && !fbSearchExpanded)
+            {
+                lsbExpand();
+            }
+            else if (!fbconverseoExpanded && seoExpanded && !lsbExpanded && !fbSearchExpanded)
+            {
+                seoExpand();
+            }
+            else if (!fbconverseoExpanded && !seoExpanded && !lsbExpanded && fbSearchExpanded)
+            {
+                fbSreachExpand();
+            }
+            else
+            {
+                AirspaceHost.Width = this.ActualWidth;
+            }
+        }
+
+        private void TabbrowserHandler_OnAddedToGoViral(string arg1, string arg2, List<string> linksToReturn)
+        {
+            OnAddedToGoViral?.Invoke(arg1, arg2, linksToReturn);
+        }
+
+        private void ManagerForTab_OnPlayMacro(MacroManger manger, IIMPlayType type, int loop)
+        {
+            //if (DataContext is BrowserTabViewModel)
+            //{
+            //    await (DataContext as BrowserTabViewModel).OnPlayMacro(manger, type, loop);
+            //}
+        }
+
+        private void GoViralVM_OnDominateAll()
+        {
+            BrowseoFXManager.Instance.TabbrowserHandler.DominateAll();
+        }
+
         private void SocialCrawl_Click(object sender, RoutedEventArgs e)
         {
             SocialStatsExpander.Expanded -= SocialCrawl_Click;
 
             //if (!SocialStatsExpanderIsExpanded)
             //{
-                SocialStatsExpander.Visibility = Visibility.Visible;
-                SocialStatsExpander.IsExpanded = SocialStatsExpanderIsExpanded = true;
-                host.Height = host.ActualHeight - 300;
-                host.VerticalAlignment = VerticalAlignment.Bottom;
+            SocialStatsExpander.Visibility = Visibility.Visible;
+            SocialStatsExpander.IsExpanded = SocialStatsExpanderIsExpanded = true;
+            host.Height = host.ActualHeight - 300;
+            host.VerticalAlignment = VerticalAlignment.Bottom;
             //}
             //else
             //{
@@ -236,78 +320,18 @@ namespace BrowseoFX_WPF.Controls
 
             SocialStatsExpander.Expanded += SocialCrawl_Click;
         }
+
         private void SocialStatsExpander_Collapsed(object sender, RoutedEventArgs e)
         {
             SocialStatsExpander.Collapsed -= SocialStatsExpander_Collapsed;
-            collapseExpander();
-            SocialStatsExpander.Collapsed += SocialStatsExpander_Collapsed;
-        }
 
-        void collapseExpander()
-        {
             SocialStatsExpander.Visibility = Visibility.Collapsed;
             SocialStatsExpander.IsExpanded = SocialStatsExpanderIsExpanded = false;
             host.Height = host.ActualHeight + 300;
             host.VerticalAlignment = VerticalAlignment.Stretch;
+
+            SocialStatsExpander.Collapsed += SocialStatsExpander_Collapsed;
         }
-
-        public void OnOpenIAMacros()
-        {
-           // throw new NotImplementedException();
-        }
-
-        bool fbconverseoExpanded = false;
-        public void OnOpenFBConverseo()
-        {
-            (ucGoViral.DataContext as GoViralVM).OnSelectedTabNavigate -= BrowserControl_OnSelectedTabNavigate;
-            (ucGoViral.DataContext as GoViralVM).OnSelectedTabNavigate += BrowserControl_OnSelectedTabNavigate;
-            
-            (ucGoViral.DataContext as GoViralVM).OnDominateAll -= GoViralVM_OnDominateAll; 
-            (ucGoViral.DataContext as GoViralVM).OnDominateAll += GoViralVM_OnDominateAll;
-
-            if (lsbExpanded)
-            {
-                lsbCollapse();
-            }
-            if (seoExpanded)
-            {
-                seoCollapse();
-            }
-
-            if (fbconverseoExpanded)
-            {
-                fbConverseoCollapse();
-            }
-            else
-            {
-                fbConverseoExpand();
-            }
-        }
-
-        private void GoViralVM_OnDominateAll()
-        {
-            BrowseoFXManager.Instance.TabbrowserHandler.DominateAll();
-        }
-
-        private void fbConverseoExpand()
-        {
-            SetExpandSize();
-            expFBConverSEO.Visibility = Visibility.Visible;
-            fbconverseoExpanded = true;
-        }
-
-        private void fbConverseoCollapse()
-        {
-            //todo BrowseoFXManager.Instance.GloableWebView.Navigated -= GloableWebView_Navigated;
-            AirspaceHost.Width = this.ActualWidth;
-            AirspaceHost.HorizontalAlignment = HorizontalAlignment.Stretch;
-            host.Width = this.ActualWidth + 15;
-            host.HorizontalAlignment = HorizontalAlignment.Stretch;
-            expFBConverSEO.Visibility = Visibility.Collapsed;
-            fbconverseoExpanded = false;
-            
-        }
-
 
         private void BrowserControl_OnSelectedTabNavigate(string url)
         {
@@ -327,68 +351,27 @@ namespace BrowseoFX_WPF.Controls
             (ucGoViral.DataContext as GoViralVM).AccessToken = (ucGoViral.DataContext as GoViralVM).AccessToken.Replace(" type=text", "");
         }
 
-        public void AsyncAddLinkToList(string link, string type, List<string> multiLinks, bool showLinksWindow)
-        {
-            //GoViralVM goViralVM; AsyncAddLinkToList
-            (ucGoViral.DataContext as GoViralVM).AsyncAddLinkToList(link, type, multiLinks, showLinksWindow);
-        }
-        
         private void REFRESHTOKEN_Button_Click(object sender, RoutedEventArgs e)
         {
             BrowseoFXManager.Instance.GloableWebView.Navigated += GloableWebView_Navigated;
             BrowserControl_OnSelectedTabNavigate(Social.FACEBOOK_GRAPH_LINK);
         }
 
-        private void btnCloseFBConverseo_Click(object sender, RoutedEventArgs e)
-        {
-            fbConverseoCollapse();
-        }
-
         private void ucGoViral_OnClickedSendSocialLink(string command, string link, string imgLink)
         {
-            BrowseoFXManager.Instance.TabbrowserHandler.OpenWindow(Social.GetShareUrl(command,link,imgLink));
+            BrowseoFXManager.Instance.TabbrowserHandler.OpenWindow(Social.GetShareUrl(command, link, imgLink));
         }
 
-
-        bool lsbExpanded = false;
-        public void OnOpenLSB()
+        private void btnCloseFBConverseo_Click(object sender, RoutedEventArgs e)
         {
             if (fbconverseoExpanded)
-            {
                 fbConverseoCollapse();
-            }
-            if (seoExpanded)
-            {
-                seoCollapse();
-            }
-
-            if (lsbExpanded)
-            {
-                lsbCollapse();
-            }
-            else
-            {
-               lsbExpand();
-            }
         }
 
-        private void lsbExpand()
+        private void btnCloseexpFBSearch_Click(object sender, RoutedEventArgs e)
         {
-            SetExpandSize();
-            expLSB.Visibility = Visibility.Visible;
-            lsbExpanded = true;
-        }
-
-
-        private void lsbCollapse()
-        {
-            //todo BrowseoFXManager.Instance.GloableWebView.Navigated -= GloableWebView_Navigated;
-            AirspaceHost.Width = this.ActualWidth;
-            AirspaceHost.HorizontalAlignment = HorizontalAlignment.Stretch;
-            host.Width = this.ActualWidth + 15;
-            host.HorizontalAlignment = HorizontalAlignment.Stretch;
-            expLSB.Visibility = Visibility.Collapsed;
-            lsbExpanded = false;
+            if(fbSearchExpanded)
+                fbSreachCollapse();
         }
 
         private void btnCloseLSB_Click(object sender, RoutedEventArgs e)
@@ -399,63 +382,20 @@ namespace BrowseoFX_WPF.Controls
             }
         }
 
+        private void btnCloseSEO_Click(object sender, RoutedEventArgs e)
+        {
+            if (seoExpanded)
+            {
+                seoCollapse();
+            }
+        }
+
         private void ucSystemBrowSERLauncher_Loaded(object sender, RoutedEventArgs e)
         {
             if (ucSystemBrowSERLauncher.ViewModel == null)
             {
                 ucSystemBrowSERLauncher.ViewModel = new SyncedProjectsVM(SyncedProjectsVM.TypeOfSystemBrowSERLauncher);
                 ucSystemBrowSERLauncher.DataContext = ucSystemBrowSERLauncher.ViewModel;
-            }
-        }
-
-
-        bool seoExpanded = false;
-        public void OnOpenSEO()
-        {
-            if (fbconverseoExpanded)
-            {
-                fbConverseoCollapse();
-            }
-            if (lsbExpanded)
-            {
-                lsbCollapse();
-            }
-
-            if (seoExpanded)
-            {
-                seoCollapse();
-            }
-            else
-            {
-                seoExpand();
-            }
-        }
-
-
-        private void seoExpand()
-        {
-            SetExpandSize();
-            expSEO.Visibility = Visibility.Visible;
-            seoExpanded = true;
-        }
-
-
-        private void seoCollapse()
-        {
-            //todo BrowseoFXManager.Instance.GloableWebView.Navigated -= GloableWebView_Navigated;
-            AirspaceHost.Width = this.ActualWidth;
-            AirspaceHost.HorizontalAlignment = HorizontalAlignment.Stretch;
-            host.Width = this.ActualWidth + 15;
-            host.HorizontalAlignment = HorizontalAlignment.Stretch;
-            expSEO.Visibility = Visibility.Collapsed;
-            seoExpanded = false;
-        }
-
-        private void btnCloseSEO_Click(object sender, RoutedEventArgs e)
-        {
-            if (seoExpanded)
-            {
-                seoCollapse();
             }
         }
 
@@ -472,5 +412,145 @@ namespace BrowseoFX_WPF.Controls
         {
             OnSpinClicked?.Invoke();
         }
+
+        private void ucFBSearch_Loaded(object sender, RoutedEventArgs e)
+        {
+            ucFBSearch.DataContext = new FBSearchViewModel();
+        }
+        #endregion
+
+        #region expanders
+
+        #region fb search
+
+        private void fbSreachExpand()
+        {
+            SetExpandSize();
+            expFBSearch.Visibility = Visibility.Visible;
+        }
+
+        private void fbSreachCollapse()
+        {
+            CollapseExpanderBase();
+            expFBSearch.Visibility = Visibility.Collapsed;
+        }
+
+        #endregion;
+
+        #region fbConverseo
+
+        private void fbConverseoExpand()
+        {
+            SetExpandSize();
+            expFBConverSEO.Visibility = Visibility.Visible;
+            fbconverseoExpanded = true;
+        }
+
+        private void fbConverseoCollapse()
+        {
+            //todo BrowseoFXManager.Instance.GloableWebView.Navigated -= GloableWebView_Navigated;
+            CollapseExpanderBase();
+            expFBConverSEO.Visibility = Visibility.Collapsed;
+            fbconverseoExpanded = false;
+        }
+
+        #endregion
+
+        #region lsb
+
+        private void lsbExpand()
+        {
+            SetExpandSize();
+            expLSB.Visibility = Visibility.Visible;
+            lsbExpanded = true;
+        }
+
+
+        private void lsbCollapse()
+        {
+            //todo BrowseoFXManager.Instance.GloableWebView.Navigated -= GloableWebView_Navigated;
+            CollapseExpanderBase();
+            expLSB.Visibility = Visibility.Collapsed;
+            lsbExpanded = false;
+        }
+
+        #endregion
+
+        #region seo
+
+        private void seoExpand()
+        {
+            SetExpandSize();
+            expSEO.Visibility = Visibility.Visible;
+            seoExpanded = true;
+        }
+
+
+        private void seoCollapse()
+        {
+            //todo BrowseoFXManager.Instance.GloableWebView.Navigated -= GloableWebView_Navigated;
+            CollapseExpanderBase();
+            expSEO.Visibility = Visibility.Collapsed;
+            seoExpanded = false;
+        }
+
+        #endregion
+
+        #endregion
     }
 }
+
+
+
+//public void GotScreenCords(string message)
+//{
+//  //TODO:  throw new NotImplementedException();
+//}
+
+//public void SetBookmarksEvents(bool v)
+//{
+//    //TODO throw new NotImplementedException();
+//}
+
+
+
+//
+//MacroManger managerForTab;
+//public event Action OnInitializedMacros = delegate { };
+//public async void OnOpenIAMacros()
+//{
+//    if (BrowseoFXManager.Instance.GloableWebView == null ||
+//        BrowseoFXManager.Instance.GloableWebView.Widget == null ||
+//        BrowseoFXManager.Instance.GloableWebView.Widget.BaseWindow == null) return;
+
+//    host.Width = resizeBigger ? host.ActualWidth + 400 : host.ActualWidth - 400;
+//    host.HorizontalAlignment = resizeBigger ? HorizontalAlignment.Stretch : HorizontalAlignment.Left;
+//    resizeBigger = !resizeBigger;
+
+
+
+
+//    MacroflyOut.Cursor = Cursors.Wait;
+//    await MacroSettings.InitMacrosSettings();
+//    if (MacroflyOut.DataContext == null || MacroflyOut.DataContext.GetType() != typeof(MacroManger))
+//    {
+//        if (managerForTab == null)
+//        {
+//            managerForTab = new MacroManger();
+//            managerForTab.OnPlayMacro += ManagerForTab_OnPlayMacro;
+//        }
+//        MacroflyOut.DataContext = managerForTab;
+//        try
+//        {
+//            await managerForTab.LoadIMacros(false);
+//        }
+//        catch { "Failed To Load Macro List".Show(); }
+
+//        OnInitializedMacros();
+
+//    }
+//    MacroflyOut.Cursor = this.Cursor;
+
+
+//    UpdateLayouts();
+//}

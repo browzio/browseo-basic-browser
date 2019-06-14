@@ -6,6 +6,7 @@
              xmlns:interop="clr-namespace:Microsoft.DwayneNeed.Interop;assembly=Microsoft.DwayneNeed"
              xmlns:mdi="clr-namespace:Microsoft.DwayneNeed.MDI;assembly=Microsoft.DwayneNeed"
              xmlns:local="clr-namespace:BrowseoFX_WPF.Controls"
+             xmlns:addons="clr-namespace:BrowseoFX_WPF.Controls.Addons"
              xmlns:commonControls="clr-namespace:Organiser.Common.Controlls;assembly=Organiser.Common"
              xmlns:goVival="clr-namespace:GoViral.Controls;assembly=GoViral"
              SnapsToDevicePixels="True"
@@ -140,13 +141,13 @@
                                                   CommandParameter="ORDERBY_FBCOMMENTS" />
                                 </MenuItem.InputBindings>
                             </MenuItem>
-                            <MenuItem Header="Google+ Order By Plus Ones">
+                            <!--<MenuItem Header="Google+ Order By Plus Ones">
                                 <MenuItem.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
                                                   Command="{Binding OnCommandFromView}"
                                                   CommandParameter="ORDERBY_GPLUSONES" />
                                 </MenuItem.InputBindings>
-                            </MenuItem>
+                            </MenuItem>-->
                             <MenuItem Header="Pinterest Order By Pins">
                                 <MenuItem.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
@@ -154,20 +155,20 @@
                                                   CommandParameter="ORDERBY_PINTERESTPINS" />
                                 </MenuItem.InputBindings>
                             </MenuItem>
-                            <MenuItem Header="Stumble Order By Views">
+                            <!--<MenuItem Header="Stumble Order By Views">
                                 <MenuItem.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
                                                   Command="{Binding OnCommandFromView}"
                                                   CommandParameter="ORDERBY_STUMBLEVIEWS" />
                                 </MenuItem.InputBindings>
-                            </MenuItem>
-                            <MenuItem Header="LinkedIn Order By Count">
+                            </MenuItem>-->
+                            <!--<MenuItem Header="LinkedIn Order By Count">
                                 <MenuItem.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
                                                   Command="{Binding OnCommandFromView}"
                                                   CommandParameter="ORDERBY_LINKEDINCOUNT" />
                                 </MenuItem.InputBindings>
-                            </MenuItem>
+                            </MenuItem>-->
                             <MenuItem Header="Buffer Order By Shares">
                                 <MenuItem.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
@@ -260,18 +261,53 @@
                            Stretch="None"
                            Source="pack://application:,,,/Organiser.Common;component/Image/close.png" />
                 </Button>
-                <Button Content="Refresh User Token"
+                <!--<Button Content="Refresh User Token"
                         Grid.Column="1"
                         Width="150"
                         Click="REFRESHTOKEN_Button_Click"
                         HorizontalAlignment="Right"
-                        CommandParameter="REFRESHTOKEN" />
+                        CommandParameter="REFRESHTOKEN" />-->
                 <goVival:ProjectsWithBrowser Name="ucGoViral"
                                              OnClickedSendSocialLink="ucGoViral_OnClickedSendSocialLink"
                                              Grid.ColumnSpan="2"
                                              Grid.Row="1" />
             </Grid>
         </Grid>
+
+        <Grid Name="expFBSearch"
+              Grid.Row="1"
+              Grid.Column="1"
+              Visibility="Collapsed"
+              Background="WhiteSmoke"
+              Width="505">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Button Name="btnCloseFBexpFBSearch"
+                        Click="btnCloseexpFBSearch_Click"
+                        HorizontalAlignment="Left"
+                        Width="20"
+                        Height="20"
+                        Style="{DynamicResource FlatbtnStyle}">
+                    <Image HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Stretch="None"
+                           Source="pack://application:,,,/Organiser.Common;component/Image/close.png" />
+                </Button>
+
+                <addons:FBSearchControl x:Name="ucFBSearch"
+                                        Loaded="ucFBSearch_Loaded"
+                                        Grid.ColumnSpan="2"
+                                        Grid.Row="1" />
+            </Grid>
+        </Grid>
+
 
         <Grid Name="expLSB"
               Grid.Row="1"

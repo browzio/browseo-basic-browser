@@ -17,6 +17,9 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
+        <views:BirdsEyeTabbedDashView />
+    </Grid>
+    <!--<Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="5" />
@@ -53,5 +56,5 @@
 
         <views:FacebookEyeView Grid.Row="3"
                                Grid.Column="2"/>
-    </Grid>
+    </Grid>-->
 </Window>

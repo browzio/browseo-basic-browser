@@ -14,6 +14,10 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Social_Networks_Controllers
     public static class FBRequests
     {
         public const string DefaultOgRequestUrl = "https://graph.facebook.com/v3.0/";
+        public const string DefaultAuthUrl = "https://www.facebook.com/v3.1/dialog/oauth";
+
+        public const string AppID = "1790605374388289";
+        public const string Scopes = "user_likes,user_events,user_photos,user_posts,pages_show_list";
 
         public const string Endpoint_feed = "feed";
         public const string Endpoint_accounts = "accounts";
@@ -53,9 +57,23 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Social_Networks_Controllers
 
     public class FacebookApisController : ViewModelBase
     {
+        public event Action OnAccessTokenSet;
+         
         public ICommand OnCommandFromView { get; set; }
 
-        public string AccessToken_FB { get; set; }
+        private string accessToken = "";
+        public string AccessToken_FB
+        {
+            get
+            {
+                return accessToken;
+            }
+            set
+            {
+                accessToken = value;
+                if (accessToken != "") OnAccessTokenSet?.Invoke();
+            }
+        }
         public string AccessToken_Insta { get; set; }
 
 
@@ -85,7 +103,7 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Social_Networks_Controllers
                         break;
 
                     case "OauthApi":
-                        new AuthTokenActivator(this).SetOauthCode();
+                        OauthApi();
                         break;
 
                     case "AnalyzeAllData":
@@ -105,6 +123,47 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Social_Networks_Controllers
                 var message = "Facebook Apis Error " + param + " threw an Exception: " + ex.Message;
 
             }
+        }
+
+        public void OauthApi()
+        {
+            new AuthTokenActivator(this).SetOauthCode();
+        }
+
+        public async Task RequestTimeline()
+        {
+            string id = "me";
+
+            //feedResponse
+            string url = buildRequestUrl(id + "/" + FBRequests.Endpoint_feed,
+                "caption",
+                "description",
+                "message",
+                "name",
+                "id",
+                "object_id",
+                "parent_id",
+                "is_instagram_eligible",
+                "is_published",
+                "permalink_url",
+                "link",
+                "source",
+                "full_picture",
+                "icon",
+                "picture",
+                "created_time",
+                "updated_time",
+                "status_type",
+                "type",
+                "with_tags",
+                "shares",
+                "from",
+                "properties" +
+                FBRequests.SummaryFields);
+            var feedResponse = await HttpRequestsBase.GetUrlRequest<DefaultDataResponse<Models.Facebook.Post>>(url);
+            UserSummary.feedResponse = feedResponse;
+
+            NotifyOfPropertyChange("UserSummary");
         }
 
         private async Task AnalyzeAllInsitesData()
@@ -383,36 +442,7 @@ namespace BrowseoFX_WPF.Browseo.SocialBirdEye.Social_Networks_Controllers
 
             NotifyOfPropertyChange("UserSummary");
 
-            //feedResponse
-            url = buildRequestUrl(id + "/" + FBRequests.Endpoint_feed,
-                "caption",
-                "description",
-                "message",
-                "name",
-                "id",
-                "object_id",
-                "parent_id",
-                "is_instagram_eligible",
-                "is_published",
-                "permalink_url",
-                "link",
-                "source",
-                "full_picture",
-                "icon",
-                "picture",
-                "created_time",
-                "updated_time",
-                "status_type",
-                "type",
-                "with_tags",
-                "shares",
-                "from",
-                "properties" + 
-                FBRequests.SummaryFields);
-            var feedResponse = await HttpRequestsBase.GetUrlRequest<DefaultDataResponse<Post>>(url);
-            UserSummary.feedResponse = feedResponse;
-
-            NotifyOfPropertyChange("UserSummary");
+            await RequestTimeline();
 
             //albumsResponse
             url = buildRequestUrl(id + "/" + FBRequests.Endpoint_albums,

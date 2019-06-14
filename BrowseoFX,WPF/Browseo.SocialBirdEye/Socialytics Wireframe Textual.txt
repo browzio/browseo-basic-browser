@@ -1,0 +1,77 @@
+﻿Pages For Phase 1
+    1.Main Dashboard
+        1.1 Content Stream Setup
+		
+    2.Content Streams
+	    2.1 Facebook
+			-User Info
+            -Timeline
+            -Pages
+                -admin posts
+                -mentions
+                -activity
+                -messages
+            -Groups
+        2.2 Instagram
+			-User Info
+            -Posts
+            -Hashtag Search/Follow
+            -Location Search/Follow
+        2.3 Pinterest
+			-User Info
+			-Boards
+            -Boards Following
+			-Followers
+			-Pins
+		2.4 Google+
+			-User Info
+			-Plus Activities
+			-Audiences*
+			-Comments*
+			-Circles*
+			-People*
+			-Media*
+			-Pages*
+		2.5 Youtube
+			-User Info
+			-User Channels
+			-User Videos
+			-User Liked Videos
+			-Most Popular Videos Globle
+			-Most Popular Videos By Location
+
+    3.Analytics Dashboard
+	    3.1 Facebook
+			-Pages Insights*
+				-Activity
+				-Impressions
+				-Engagement
+				-Reactions
+				-CTA Clicks (Call To Action)
+				-Page User Demographics /Likes and unlikes
+				-Content
+				-Page Views
+				-Video Views
+				-Video Posts
+				-Posts
+				-Post Impressions
+				-Post Engagement
+				-Post Reactions
+				-Video Ad Breaks
+		3.2 Instagram
+			-User Insights
+			-Media Insights
+		3.2 Pinterest
+		3.3 Google+
+			-Pages Api*
+		3.4 Youtube
+			-YouTube Analytics API
+			-YouTube Reporting API
+			-Video reports
+			-Playlist reports
+			-Ad performance reports
+			-Estimated revenue reports
+			-Asset reports
+			-System-managed reports
+    
+    

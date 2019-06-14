@@ -5,6 +5,7 @@ using GoViral.Instagram.InstViewModels;
 using GoViral.ViewModels;
 using IMacroMultyLayout.ViewModels;
 using Organiser.Common.Classes;
+using Organiser.Common.ViewModels;
 using PData.FilesReader;
 using Prospector.ViewModels;
 using RssReader.Mvvm;
@@ -405,7 +406,7 @@ namespace BrowserAndFeatures
             }
         }
 
-        private void OnRSSMainWorkspaceViewModelMessage(RSSMainWorkspaceViewModelMessage message)
+        private async void OnRSSMainWorkspaceViewModelMessage(RSSMainWorkspaceViewModelMessage message)
         {
             //rssControl.OnLaunchToBrowser += RssControl_OnLaunchToBrowser; ;
             //rssControl.OnLaunchToTabBrowser += FeatureCallage_OnClickedSearch;

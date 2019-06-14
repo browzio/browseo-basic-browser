@@ -169,7 +169,19 @@ namespace GoViral.Models
                     case "View":
                         if (SISavedLinks != -1 && SavedLinksList.Count > 0)
                         {
-                            OnLoadInBrowser(SavedLinksList[SISavedLinks].Url);
+                            var url = SavedLinksList[SISavedLinks].Url;
+                            if (url.Contains("facebook.com") && url.Contains("-"))
+                            {
+                                string urltillId = url.Remove(url.LastIndexOf("/"));
+                                string name = url.Substring(url.LastIndexOf("/") + 1);
+                                if (name.Contains("-"))
+                                {
+                                    string id = name.Substring(name.LastIndexOf("-") + 1);
+                                    url = "https://www.facebook.com/" + id;
+                                }
+                            }
+
+                            OnLoadInBrowser(url);
                         }
                         break;
 

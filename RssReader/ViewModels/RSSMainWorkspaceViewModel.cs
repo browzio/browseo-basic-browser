@@ -5,9 +5,11 @@ using RssReader.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace RssReader.ViewModels
 {
@@ -228,19 +230,60 @@ namespace RssReader.ViewModels
             OnRSSMainWorkspaceViewModelMessage?.Invoke(message);
         }
 
-        internal void OnClickedOpenSocialShareLink(string type, string link, string imageLink)
+        internal async void OnClickedOpenSocialShareLink(string type, string link, string imageLink)
         {
             string fullUrl = Social.GetShareUrl(type, link, imageLink);
-            
 
-            UsageTracker.AddTraceCookie(type + " " + UsageTracker.Usage_Type_ShareFromRss);
+            if (MessageBox.Show("Would you like to share this from an external project?",
+                "External Project?", 
+                MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+            {
+                ChooseProjectsVM cpvm = new ChooseProjectsVM();
+                await cpvm.InitProjectsWindowList();
+                if (cpvm.ShowListWindowDialog())
+                {
+                    int windowsLaunched = 0;
+                    foreach (var sp in cpvm.SavedProjectsListAdded)
+                    {
+                        if (!sp.IsChecked || sp.IsFolder) continue;
 
-            var message = new RSSMainWorkspaceViewModelMessage() { MessageType = "OnClickedOpenSocialShareLink" };
-            message.Parameters.Add(fullUrl);
-            message.Parameters.Add(link);
-            message.Parameters.Add(type.StartsWith("ff_"));
+                        var info = new ProcessStartInfo
+                        {
+                            CreateNoWindow = true,
+                            UseShellExecute = false
+                        };
+                        if (type.StartsWith("ff_"))
+                        {
+                            info.Arguments = "\"" + sp.FilePath + "\"" + " " + "\"" + fullUrl + "\" " + windowsLaunched;
+                            info.FileName = "BrowseoFX.CMD.exe";
+                        }
+                        else
+                        {
+                            info.Arguments = sp.FilePath.Replace(" ", MyFilesDatabase.SPLITTER) + " " + fullUrl.Replace(" ", MyFilesDatabase.SPLITTER) + " " + "SocialEngagerOptimizer";
+                            info.FileName = "AnyProjectBrowserProcess.exe";//Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AnyProjectBrowserProcess.exe"),
+                        }
 
-            OnRSSMainWorkspaceViewModelMessage?.Invoke(message);
+                        Process p = Process.Start(info);
+                        ProcessManager.Instance.AddProcess(p);
+
+                        int randLaunchWait = new Random().Next(1, 3) * 1000;
+                        await Task.Delay(randLaunchWait < 5000 ? randLaunchWait + 5000 : randLaunchWait);
+                        windowsLaunched++;
+                    }
+                }
+            }
+            else
+            {
+
+                UsageTracker.AddTraceCookie(type + " " + UsageTracker.Usage_Type_ShareFromRss);
+
+                var message = new RSSMainWorkspaceViewModelMessage() { MessageType = "OnClickedOpenSocialShareLink" };
+                message.Parameters.Add(fullUrl);
+                message.Parameters.Add(link);
+                message.Parameters.Add(type.StartsWith("ff_"));
+
+                OnRSSMainWorkspaceViewModelMessage?.Invoke(message);
+            }
         }
     }
 }
