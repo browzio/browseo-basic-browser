@@ -16,16 +16,43 @@ using System.Windows.Input;
 namespace BrowseoFX_WPF.ViewModels.Addons
 {
 
-    public class UIDReaponse
+//https://graph.facebook.com/v3.1/techinsider?fields=id&access_token=503494873017633|F7xbKhlQGZGhPc8ThMU6pDdyiro
+//https://graph.facebook.com/v3.1/https://www.facebook.com/groups/Techbuds/?fields=og_object&access_token=503494873017633|F7xbKhlQGZGhPc8ThMU6pDdyiro
+//https://graph.facebook.com/v3.1/https://www.facebook.com/groups/Techbuds/?fields=id,app_links&access_token=503494873017633|F7xbKhlQGZGhPc8ThMU6pDdyiro
+
+//https://graph.facebook.com/v3.1/https://www.facebook.com/edadia/?fields=id,app_links&access_token=503494873017633|F7xbKhlQGZGhPc8ThMU6pDdyiro
+
+//https://www.facebook.com/search/posts/?q=best%20buy&epa=FILTERS&filters=eyJycF9hdXRob3IiOiJ7XCJuYW1lXCI6XCJhdXRob3JcIixcImFyZ3NcIjpcIjM1Mjc1MTI2ODI1NjU2OVwifSJ9
+//https://www.facebook.com/search/posts/?q=best%20buy&epa=FILTERS&filters=eyJycF9hdXRob3IiOiJ7Im5hbWUiOiJhdXRob3IiLCJhcmdzIjoiMzUyNzUxMjY4MjU2NTY5In0ifQ
+//https://www.facebook.com/search/posts/?q=best%20buy&epa=FILTERS&filters=eyJycF9hdXRob3IiOiJ7Im5hbWUiOiJhdXRob3IiLCJhcmdzIjoiMzUyNzUxMjY4MjU2NTY5In0ifQ
+//https://www.facebook.com/search/posts/?q=best%20buy&epa=FILTERS&filters=eyJycF9hdXRob3IiOiJ7Im5hbWUiOiJhdXRob3IiLCJhcmdzIjoiMzUyNzUxMjY4MjU2NTY5In0ifQ
+
+//https://www.facebook.com/search/posts/?q=best%20buy&epa=FILTERS&filters=e30
+//https://www.facebook.com/search/posts/?q=best%20buy&epa=FILTERS&filters=e30
+    public class FBOGIDResponse
     {
-        public string friendlyname { get; set; }
-        public string fb_uid { get; set; }
+        public string id { get; set; }
+        public App_links app_links { get; set; }
+
+        public class App_links
+        {
+            public List<Dictionary<string, string>> android { get; set; }
+            public List<Dictionary<string, string>> ios { get; set; }
+
+            public class fields
+            {
+                public string app_name { get; set; }
+                public string package { get; set; }
+                public string url { get; set; }
+            }
+        }
     }
     public class FBSearchViewModel : ViewModelBase
     {
         string ModuleName = "FBSearch";
         string FBSearchUrl = "https://www.facebook.com/search/";
-        string UsernameToUidRequestUrl = "http://graph.tips/beta/controller.php?request=add-fb-item&var1=&var2=";
+        string UsernameToUidRequestUrl = "https://graph.facebook.com/v3.1/https://www.facebook.com/";
+        string UsernameToUidRequestUrlFields = "/?fields=id,app_links&access_token=503494873017633|F7xbKhlQGZGhPc8ThMU6pDdyiro";
 
         string SavedFolderName = "FBOGSavedUsernames";
         string SavedFolderPath { get { return Path.Combine(MyFilesDatabase.GetBaseDir(), SavedFolderName); } }
@@ -140,6 +167,23 @@ namespace BrowseoFX_WPF.ViewModels.Addons
 
         #endregion
 
+        #region Keyword Search properties
+
+        private string keywordSearchText;
+        public string KeywordSearchText
+        {
+            get { return keywordSearchText; }
+            set { keywordSearchText = value; NotifyOfPropertyChange(); }
+        }
+
+        private User selectedSavedUsernameSearch;
+        public User SelectedSavedUsernameSearch
+        {
+            get { return selectedSavedUsernameSearch; }
+            set { selectedSavedUsernameSearch = value; NotifyOfPropertyChange(); }
+        }
+        #endregion
+
         public FBSearchViewModel()
         {
             OnCommandFromView = new RelayCommand(OnCommandFromView_Raised);
@@ -219,6 +263,7 @@ namespace BrowseoFX_WPF.ViewModels.Addons
                 {
                     case "Refresh":
                         LoadSavedUsernames();
+                        SelectedSavedUsernameSearch = null;
                         break;
 
                     case "DeleteProjectFolder":
@@ -288,6 +333,27 @@ namespace BrowseoFX_WPF.ViewModels.Addons
                         );
                         break;
 
+                    case "SearchPosts":
+                        BrowseoFXManager.Instance.TabbrowserHandler.SelectedTabNavigate
+                       (
+                           "https://www.facebook.com/search/posts/?q=" + KeywordSearchText + GetFilters()
+                       );
+                        break;
+
+                    case "SearchPhotos":
+                        BrowseoFXManager.Instance.TabbrowserHandler.SelectedTabNavigate
+                       (
+                           "https://www.facebook.com/search/photos/?q=" + KeywordSearchText + GetFilters()
+                       );
+                        break;
+
+                    case "SearchTop":
+                        BrowseoFXManager.Instance.TabbrowserHandler.SelectedTabNavigate
+                       (
+                           "https://www.facebook.com/search/top/?q=" + KeywordSearchText + GetFilters()
+                       );
+                        break;
+
                     default:
                         break;
                 }
@@ -298,6 +364,23 @@ namespace BrowseoFX_WPF.ViewModels.Addons
             }
         }
 
+        private string GetFilters()
+        {
+            var filters = "e30";
+
+            if (SelectedSavedUsernameSearch != null)
+            {
+                //"{"rp_author":"{\"name\":\"author\",\"args\":\"352751268256569\"}"}"
+                
+                var base64 = MyFilesDatabase.EncodeTo64("{ \"rp_author\":\"{\\\"name\\\":\\\"author\\\",\\\"args\\\":\\\""+ SelectedSavedUsernameSearch.ID + "\\\"}\"}");
+
+                filters = base64.Replace("==", "");
+            }
+            var searchFilters = "&epa=FILTERS&filters=" + filters;
+
+            return searchFilters;
+        }
+
         private async void SaveUsernames(bool request)
         {
             if (request)
@@ -306,7 +389,7 @@ namespace BrowseoFX_WPF.ViewModels.Addons
                     ProjectsSavedUsernamesList.Any(u => u.ProjectName == GloableProfData.PData.ProjectName && u.SavedData.Any(t => t.Username == UsernameInput)))
                     return;
 
-                UIDReaponse uidResponse = null;
+                FBOGIDResponse uidResponse = null;
 
                 Mouse.OverrideCursor = Cursors.Wait;
 
@@ -318,8 +401,8 @@ namespace BrowseoFX_WPF.ViewModels.Addons
                         {
                             client.Proxy = MyFilesDatabase.GetRequestsProxy();
 
-                            string uidJson = client.DownloadString(UsernameToUidRequestUrl + UsernameInput);
-                            uidResponse = JsonConvert.DeserializeObject<UIDReaponse>(uidJson.ToLower());
+                            string uidJson = client.DownloadString(UsernameToUidRequestUrl + UsernameInput + UsernameToUidRequestUrlFields);
+                            uidResponse = JsonConvert.DeserializeObject<FBOGIDResponse>(uidJson.ToLower());
                         }
                     });
                 }
@@ -330,8 +413,12 @@ namespace BrowseoFX_WPF.ViewModels.Addons
                 Mouse.OverrideCursor = null;
 
                 if (uidResponse == null) return;
-
-                AddUserToList(new User() { ID = uidResponse.fb_uid, Username = uidResponse.friendlyname });
+                
+                AddUserToList(new User()
+                {
+                    ID = uidResponse.app_links.ios.ElementAt(0).Values.ElementAt(2).Substring(uidResponse.app_links.ios.ElementAt(0).Values.ElementAt(2).LastIndexOf("/") + 1),
+                    Username = UsernameInput
+                });
             }
 
             if (!Directory.Exists(SavedFolderPath))
